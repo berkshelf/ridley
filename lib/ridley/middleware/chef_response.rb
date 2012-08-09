@@ -2,7 +2,6 @@ module Ridley
   module Middleware
     class ChefResponse < Faraday::Response::Middleware
       def on_complete(env)
-        # puts env
         env[:body] = parse(env[:body])
 
         unless [200, 201].index(env[:status].to_i)
