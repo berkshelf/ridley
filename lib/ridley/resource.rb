@@ -19,7 +19,7 @@ module Ridley
       #
       # @return [String]
       def set_chef_id(identifier)
-        @chef_id = identifier
+        @chef_id = identifier.to_sym
       end
 
       # @return [String]
@@ -107,7 +107,7 @@ module Ridley
 
       # @return [Object]
       def update(attributes)
-        new(Connection.active.put("#{self.resource_path}/#{self.chef_id}", attributes.to_json).body)
+        new(Connection.active.put("#{self.resource_path}/#{attribute[self.chef_id]}", attributes.to_json).body)
       end
 
       private
