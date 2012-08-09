@@ -247,6 +247,12 @@ describe Ridley::Environment do
         result.should have(2).items
         result.each { |x| x.should be_a(Ridley::Environment) }
       end
+
+      it "sets a value for the chef_id attribute for each record found" do
+        result = subject.all
+
+        result.each { |x| x.name.should_not be_nil }
+      end
     end
   end
 end

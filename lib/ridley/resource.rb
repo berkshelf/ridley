@@ -85,8 +85,8 @@ module Ridley
 
       # @return [Array<Object>]
       def all
-        Connection.active.get(self.resource_path).body.collect do |attributes|
-          new(attributes)
+        Connection.active.get(self.resource_path).body.collect do |identity, location|
+          new(self.chef_id => identity)
         end
       end
       
@@ -106,8 +106,8 @@ module Ridley
       end
 
       # @return [Object]
-      def update(attributes)
-        new(Connection.active.put("#{self.resource_path}/#{attribute[self.chef_id]}", attributes.to_json).body)
+      def update(object)
+        new(Connection.active.put("#{self.resource_path}/#{object[self.chef_id]}", object.to_json).body)
       end
 
       private
