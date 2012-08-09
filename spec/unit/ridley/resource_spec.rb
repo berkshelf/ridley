@@ -30,11 +30,20 @@ describe Ridley::Resource do
       end
 
       it "merges the default values for attributes into the attributes hash" do
+        subject.stub(:attributes).and_return(Set.new([:name]))
         subject.should_receive(:attribute_defaults).and_return(name: "whatever")
-        subject.attribute(:name, deafult: "whatever")
         klass = subject.new
 
         klass.attributes[:name].should eql("whatever")
+      end
+
+      it "explicit attributes take precedence over defaults" do
+        subject.stub(:attributes).and_return(Set.new([:name]))
+        subject.stub(:attribute_defaults).and_return(name: "default")
+
+        klass = subject.new(name: "explicit_name")
+
+        klass.attributes[:name].should eql("explicit_name")
       end
     end
 

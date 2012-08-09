@@ -92,22 +92,26 @@ module Ridley
       
       # @return [Object]
       def find(oid)
-        new(Connection.active.get("#{self.resource_path}/#{oid}").body)
+        attrs = Connection.active.get("#{self.resource_path}/#{oid}").body
+        new(attrs)
       end
 
       # @return [Object]
       def create(attributes)
-        new(Connection.active.post(self.resource_path, attributes.to_json).body)
+        attrs = Connection.active.post(self.resource_path, attributes.to_json).body
+        new(attrs)
       end
 
       # @return [Object]
       def delete(oid)
-        new(Connection.active.delete("#{self.resource_path}/#{oid}").body)
+        attrs = Connection.active.delete("#{self.resource_path}/#{oid}").body
+        new(attrs)
       end
 
       # @return [Object]
       def update(object)
-        new(Connection.active.put("#{self.resource_path}/#{object[self.chef_id]}", object.to_json).body)
+        attrs = Connection.active.put("#{self.resource_path}/#{object[self.chef_id]}", object.to_json).body
+        new(attrs)
       end
 
       private
@@ -119,7 +123,7 @@ module Ridley
 
     # @param [Hash] attributes
     def initialize(attributes = {})
-      self.attributes = attributes.merge(self.class.attribute_defaults)
+      self.attributes = self.class.attribute_defaults.merge(attributes)
     end
 
     # @param [String, Symbol] key
