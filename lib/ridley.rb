@@ -20,6 +20,7 @@ module Ridley
   autoload :Node, 'ridley/resources/node'
   autoload :DataBag, 'ridley/resources/data_bag'
   autoload :Cookbook, 'ridley/resources/cookbook'
+  autoload :DSL, 'ridley/dsl'
 
   class << self
     def connection(*args)

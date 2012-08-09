@@ -8,7 +8,7 @@ module Ridley
     end
 
     extend Forwardable
-    include Environment::DSL
+    include Ridley::DSL
 
     cattr_accessor :active
 
