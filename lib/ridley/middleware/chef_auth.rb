@@ -25,8 +25,6 @@ module Ridley
         env[:request_headers] = env[:request_headers].merge(authentication_headers).merge(default_headers)
         env[:request_headers] = env[:request_headers].merge('Content-Length' => env[:body].bytesize.to_s) if env[:body]
 
-        # puts env
-
         @app.call(env)
       end
 

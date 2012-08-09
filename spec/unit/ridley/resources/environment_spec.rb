@@ -91,16 +91,15 @@ describe Ridley::Environment do
             to_return(body: %({"uri":"https://api.opscode.com/organizations/vialstudios/environments/ridley-devtest"}))
         end
 
-        it "returns a hash containing the URI of the created environment" do
-          env = Ridley::Environment.new(
+        it "returns an instance of the created Environment" do
+          obj = subject.create(
             name: "ridley-devtest",
             description: "Ridley development test environment"
           )
 
-          result = subject.create(env)
-          result.should be_a(Hash)
-          result.should have_key(:uri)
-          result[:uri].should_not be_nil
+          obj.should be_a(Ridley::Environment)
+          obj.name.should eql("ridley-devtest")
+          obj.description.should eql("Ridley development test environment")
         end
       end
 
@@ -110,26 +109,16 @@ describe Ridley::Environment do
             to_return(status: 409, body: %({"error":["Environment already exists"]}))
         end
 
-        it "raises SHIT" do
-          env = Ridley::Environment.new(
-            name: "ridley-devtest",
-            description: "Ridley development test environment"
-          )
-
+        it "raises a Ridley::Errors::HTTPConflict error" do
           lambda {
-            subject.create(env)
+            subject.create(
+              name: "ridley-devtest",
+              description: "Ridley development test environment"
+            )
           }.should raise_error(Ridley::Errors::HTTPConflict, "Environment already exists")
         end
       end
     end
-
-    # before(:each) do
-    #   WebMock.allow_net_connect!
-    # end
-
-    # after(:each) do
-    #   WebMock.disable_net_connect!
-    # end
 
     describe "::find" do
       before(:each) do

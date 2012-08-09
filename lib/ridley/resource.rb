@@ -39,7 +39,7 @@ module Ridley
         @chef_type ||= self.class.name.underscore
       end
 
-      # @param [String, Symbol]
+      # @param [String, Symbol] type
       #
       # @return [String]
       def set_chef_type(type)
@@ -92,26 +92,29 @@ module Ridley
       
       # @return [Object]
       def find(oid)
-        attrs = Connection.active.get("#{self.resource_path}/#{oid}").body
-        new(attrs)
+        obj_attrs = Connection.active.get("#{self.resource_path}/#{oid}").body
+        new(obj_attrs)
       end
 
+      # @param [Hash] attributes
+      #
       # @return [Object]
       def create(attributes)
-        attrs = Connection.active.post(self.resource_path, attributes.to_json).body
-        new(attrs)
+        obj = new(attributes)
+        Connection.active.post(self.resource_path, obj.to_json)
+        obj
       end
 
       # @return [Object]
       def delete(oid)
-        attrs = Connection.active.delete("#{self.resource_path}/#{oid}").body
-        new(attrs)
+        obj_attrs = Connection.active.delete("#{self.resource_path}/#{oid}").body
+        new(obj_attrs)
       end
 
       # @return [Object]
       def update(object)
-        attrs = Connection.active.put("#{self.resource_path}/#{object[self.chef_id]}", object.to_json).body
-        new(attrs)
+        obj_attrs = Connection.active.put("#{self.resource_path}/#{object[self.chef_id]}", object.to_json).body
+        new(obj_attrs)
       end
 
       private
