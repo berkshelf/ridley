@@ -167,11 +167,11 @@ module Ridley
       end
     end
 
-    # @param [Hash] new_attributes
+    # @param [#to_hash] new_attributes
     #
     # @return [Hash]
     def attributes=(new_attributes)
-      new_attributes.symbolize_keys!
+      new_attributes.to_hash.symbolize_keys!
 
       self.class.attributes.each do |attr_name|
         send(:attribute=, attr_name, new_attributes[attr_name.to_sym])
