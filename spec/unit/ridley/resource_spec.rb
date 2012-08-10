@@ -241,6 +241,21 @@ describe Ridley::Resource do
     end
   end
 
+  describe "#from_hash" do
+    before(:each) do
+      subject.class.attribute(:name)
+      @object = subject.from_hash(name: "reset")
+    end
+
+    it "returns an instance of the implementing class" do
+      @object.should be_a(subject.class)
+    end
+
+    it "assigns the attributes to the values of the corresponding keys in the given Hash" do
+      @object.name.should eql("reset")
+    end
+  end
+
   describe "#to_hash" do
     it "returns a hash" do
       subject.to_hash.should be_a(Hash)
@@ -269,7 +284,7 @@ describe Ridley::Resource do
       @object.should be_a(subject.class)
     end
 
-    it "assigns the attributes to the values of the given JSON" do
+    it "assigns the attributes to the values of the corresponding keys in the given JSON" do
       @object.name.should eql("reset")
     end
   end

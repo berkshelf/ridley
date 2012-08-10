@@ -190,7 +190,7 @@ module Ridley
 
     # @param [String] json
     # @option options [Boolean] :symbolize_keys
-    # @option options [Class] :adapter
+    # @option options [Class, Symbol, String] :adapter
     #
     # @return [Object]
     def from_json(json, options = {})
@@ -198,8 +198,16 @@ module Ridley
       self
     end
 
+    # @param [#to_hash] hash
+    #
+    # @return [Object]
+    def from_hash(hash)
+      self.attributes = hash.to_hash
+      self
+    end
+
     # @option options [Boolean] :symbolize_keys
-    # @option options [Class] :adapter
+    # @option options [Class, Symbol, String] :adapter
     #
     # @return [String]
     def to_json(options = {})
