@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe Ridley::Environment do
+  it_behaves_like "a Ridley Resource", Ridley::Environment
+
   let(:server_url) { "https://api.opscode.com/organizations/vialstudios/" }
   let(:client_name) { "reset" }
   let(:client_key) { "/Users/reset/.chef/reset.pem" }

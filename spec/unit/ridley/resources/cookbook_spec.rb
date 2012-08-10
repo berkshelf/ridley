@@ -1,5 +1,5 @@
 require 'spec_helper'
 
 describe Ridley::Cookbook do
-  pending
+  it_behaves_like "a Ridley Resource", Ridley::Cookbook
 end

@@ -1,7 +1,7 @@
 guard 'spork' do
   watch('Gemfile')
-  watch('spec/spec_helper.rb')  { :rspec }
-  watch(%r{^features/support/}) { :cucumber }
+  watch('spec/spec_helper.rb')     { :rspec }
+  watch(%r{^spec/support/.+\.rb$}) { :rspec }
 end
 
 guard 'yard', stdout: '/dev/null', stderr: '/dev/null' do
@@ -14,4 +14,5 @@ guard 'rspec', version: 2, cli: "--color --drb --format Fuubar", all_on_start: f
   watch(%r{^spec/unit/.+_spec\.rb$})
   watch(%r{^lib/(.+)\.rb$})          { |m| "spec/unit/#{m[1]}_spec.rb" }
   watch('spec/spec_helper.rb')       { "spec" }
+  watch(%r{^spec/support/.+\.rb$})   { "spec" }
 end

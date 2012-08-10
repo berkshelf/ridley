@@ -8,12 +8,7 @@ describe Ridley::Resource do
       end
     end
 
-    let(:active_connection) { double('active-connection') }
-    let(:response) { double('response') }
-
-    before(:each) do
-      Ridley::Connection.stub(:active).and_return(active_connection)
-    end
+    it_behaves_like "a Ridley Resource", subject.call
 
     describe "::initialize" do
       it "has an empty Hash for attributes if no attributes have been defined" do
@@ -54,23 +49,23 @@ describe Ridley::Resource do
       end
     end
 
-    describe "::chef_id" do
-      it "returns nil if nothing is set" do
-        subject.chef_id.should be_nil
+    describe "::attributes" do
+      it "returns a Set" do
+        subject.attributes.should be_a(Set)
       end
     end
 
-    describe "::set_chef_id" do
-      it "sets the chef_id attribute on the class" do
-        subject.set_chef_id(:environment)
+    describe "::attribute" do
+      it "adds the given symbol to the attributes Set" do
+        subject.attribute(:name)
 
-        subject.chef_id.should eql(:environment)
+        subject.attributes.should include(:name)
       end
-    end
 
-    describe "::chef_type" do
-      it "returns the underscored name of the including class if nothing is set" do
-        subject.chef_type.should eql("class")
+      it "convers the given string into a symbol and adds it to the attributes Set" do
+        subject.attribute('last_name')
+
+        subject.attributes.should include(:last_name)
       end
     end
 
@@ -82,23 +77,11 @@ describe Ridley::Resource do
       end
     end
 
-    describe "::resource_path" do
-      it "returns the underscored and plural name of the including class if nothing is set" do
-        subject.resource_path.should eql("classes")
-      end
-    end
-
     describe "::set_resource_path" do
       it "sets the resource_path attr on the class" do
         subject.set_resource_path("environments")
 
         subject.resource_path.should eql("environments")
-      end
-    end
-
-    describe "::chef_json_class" do
-      it "returns nil if nothing has been set" do
-        subject.chef_json_class.should be_nil
       end
     end
 
@@ -117,76 +100,35 @@ describe Ridley::Resource do
       end
     end
 
-    describe "::attributes" do
-      it "returns a Set" do
-        subject.attributes.should be_a(Set)
+    describe "::set_chef_id" do
+      it "sets the chef_id attribute on the class" do
+        subject.set_chef_id(:environment)
+
+        subject.chef_id.should eql(:environment)
       end
     end
 
-    describe "::attribute" do
-      pending
-    end
-
-    describe "::all" do
-      it "sends a get request for the class' resource_path using the active connection" do
-        response.stub(:body) { Hash.new }
-        active_connection.should_receive(:get).with(subject.resource_path).and_return(response)
-        
-        subject.all
+    describe "::resource_path" do
+      it "returns the underscored and plural name of the including class if nothing is set" do
+        subject.resource_path.should eql(subject.class.name.underscore.pluralize)
       end
     end
 
-    describe "::find" do
-      it "sends a get request to the active connection to the resource_path of the class for the given chef_id" do
-        chef_id = "ridley_test"
-        response.stub(:body) { Hash.new }
-        active_connection.should_receive(:get).with("#{subject.resource_path}/#{chef_id}").and_return(response)
-
-        subject.find(chef_id)
+    describe "::chef_type" do
+      it "returns the underscored name of the including class if nothing is set" do
+        subject.chef_type.should eql(subject.class.name.underscore)
       end
     end
 
-    describe "::create" do
-      it "sends a post request to the active connection using the includer's resource_path" do
-        attrs = {
-          first_name: "jamie",
-          last_name: "winsor"
-        }
-
-        response.stub(:body) { attrs }
-        active_connection.should_receive(:post).with(subject.resource_path, duck_type(:to_json)).and_return(response)
-
-        subject.create(attrs)
+    describe "::chef_json_class" do
+      it "returns the chef_json if nothing has been set" do
+        subject.chef_json_class.should be_nil
       end
     end
 
-    describe "::delete" do
-      it "sends a delete request to the active connection using the includer's resource_path for the given string" do
-        response.stub(:body) { Hash.new }
-        active_connection.should_receive(:delete).with("#{subject.resource_path}/ridley-test").and_return(response)
-
-        subject.delete("ridley-test")
-      end
-
-      it "accepts an object that responds to 'chef_id'" do
-        object = double("obj")
-        object.stub(:chef_id) { "hello" }
-        response.stub(:body) { Hash.new }
-        active_connection.should_receive(:delete).with("#{subject.resource_path}/#{object.chef_id}").and_return(response)
-
-        subject.delete(object)
-      end
-    end
-
-    describe "::update" do
-      it "sends a put request to the active connection using the includer's resource_path with the given object" do
-        subject.stub(:chef_id) { :name }
-        subject.attribute(:name)
-        object = subject.new(name: "hello")
-        response.stub(:body) { Hash.new }
-        active_connection.should_receive(:put).with("#{subject.resource_path}/#{object.chef_id}", duck_type(:to_json)).and_return(response)
-
-        subject.update(object)
+    describe "::chef_id" do
+      it "returns nil if nothing is set" do
+        subject.chef_id.should be_nil
       end
     end
   end
@@ -195,14 +137,6 @@ describe Ridley::Resource do
     Class.new do
       include Ridley::Resource
     end.new
-  end
-
-  describe "#attribute" do
-    pending
-  end
-
-  describe "#attribute=" do
-    pending
   end
 
   describe "#attribute?" do
@@ -241,83 +175,12 @@ describe Ridley::Resource do
     end
   end
 
-  describe "#attributes" do
-    it "returns a hash of attributes" do
-      subject.attributes.should be_a(Hash)
-    end
-
-    it "includes attribute_defaults in the attributes" do
-      subject.class.stub(:attributes).and_return(Set.new([:val_one]))
-      subject.class.stub(:attribute_defaults).and_return(val_one: "value")
-
-      subject.attributes.should have_key(:val_one)
-      subject.attributes[:val_one].should eql("value")
-    end
-  end
-
   describe "#attributes=" do
-    pending
-  end
-
-  describe "#save" do
-    pending
-  end
-
-  describe "#chef_id" do
-    it "returns the value of the chef_id attribute" do
+    it "assigns the hash of attributes to the objects attributes" do
       subject.class.attribute(:name)
-      subject.class.stub(:chef_id) { :name }
       subject.attributes = { name: "reset" }
 
-      subject.chef_id.should eql("reset")
-    end
-  end
-
-  describe "#from_hash" do
-    before(:each) do
-      subject.class.attribute(:name)
-      @object = subject.from_hash(name: "reset")
-    end
-
-    it "returns an instance of the implementing class" do
-      @object.should be_a(subject.class)
-    end
-
-    it "assigns the attributes to the values of the corresponding keys in the given Hash" do
-      @object.name.should eql("reset")
-    end
-  end
-
-  describe "#to_hash" do
-    it "returns a hash" do
-      subject.to_hash.should be_a(Hash)
-    end
-
-    it "delegates to .attributes" do
-      subject.should_receive(:attributes)
-
-      subject.to_hash
-    end
-  end
-
-  describe "#to_json" do
-    it "returns valid JSON" do
-      subject.to_json.should be_json_eql("{}")
-    end
-  end
-
-  describe "#from_json" do
-    before(:each) do
-      subject.class.attribute(:name)
-      @object = subject.from_json(%({"name": "reset"}))
-    end
-
-    it "returns an instance of the implementing class" do
-      @object.should be_a(subject.class)
-    end
-
-    it "assigns the attributes to the values of the corresponding keys in the given JSON" do
-      @object.name.should eql("reset")
+      subject.attributes[:name].should eql("reset")
     end
   end
 end
