@@ -106,7 +106,7 @@ module Ridley
         resource
       end
 
-      # @param [String, #chef_id] chef_id
+      # @param [String, #chef_id] object
       #
       # @return [Object]
       def delete(object)
@@ -188,21 +188,27 @@ module Ridley
       attribute(self.class.chef_id)
     end
 
+    # @param [String] json
+    # @option options [Boolean] :symbolize_keys
+    # @option options [Class] :adapter
+    #
+    # @return [Object]
+    def from_json(json, options = {})
+      self.attributes = MultiJson.load(json, options)
+      self
+    end
+
+    # @option options [Boolean] :symbolize_keys
+    # @option options [Class] :adapter
+    #
+    # @return [String]
+    def to_json(options = {})
+      MultiJson.dump(self.attributes, options)
+    end
+    alias_method :as_json, :to_json
+
     def to_hash
       self.attributes
-    end
-
-    def to_json
-      MultiJson.dump(self.attributes)
-    end
-
-    def as_json(options = {})
-      options.merge!(root: false)
-      super(options)
-    end
-
-    def from_json(json, include_root = false)
-      super(json, include_root)
     end
 
     def to_s
