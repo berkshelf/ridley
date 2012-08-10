@@ -155,7 +155,7 @@ module Ridley
     #
     # @return [Boolean]
     def attribute?(key)
-      instance_variable_get("@#{key}").present?
+      attribute(key).present?
     end
 
     # @return [Hash]

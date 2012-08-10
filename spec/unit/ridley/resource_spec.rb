@@ -206,7 +206,39 @@ describe Ridley::Resource do
   end
 
   describe "#attribute?" do
-    pending
+    context "if the class has the attribute defined" do
+      before(:each) do
+        subject.class.attribute(:name)
+      end
+
+      it "returns false if the attribute has no value" do
+        subject.name = nil
+
+        subject.attribute?(:name).should be_false
+      end
+
+      it "returns true if the attribute has a value" do
+        subject.name = "reset"
+
+        subject.attribute?(:name).should be_true
+      end
+    end
+
+    context "if the class has the attribute defined with a default value" do
+      before(:each) do
+        subject.class.attribute(:name, default: "exception")
+      end
+
+      it "returns true if the attribute has not been explicitly set" do
+        subject.attribute?(:name).should be_true
+      end
+    end
+
+    context "if the class does not have the attribute defined" do
+      it "returns false" do
+        subject.attribute?(:name).should be_false
+      end
+    end
   end
 
   describe "#attributes" do
