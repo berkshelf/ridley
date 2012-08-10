@@ -90,31 +90,36 @@ module Ridley
         end
       end
       
-      # @return [Object]
-      def find(oid)
-        obj_attrs = Connection.active.get("#{self.resource_path}/#{oid}").body
-        new(obj_attrs)
-      end
-
-      # @param [Hash] attributes
+      # @param [String] chef_id
       #
       # @return [Object]
-      def create(attributes)
-        obj = new(attributes)
-        Connection.active.post(self.resource_path, obj.to_json)
-        obj
+      def find(chef_id)
+        new(Connection.active.get("#{self.resource_path}/#{chef_id}").body)
       end
 
+      # @param [#to_hash] object
+      #
       # @return [Object]
-      def delete(oid)
-        obj_attrs = Connection.active.delete("#{self.resource_path}/#{oid}").body
-        new(obj_attrs)
+      def create(object)
+        resource = new(object.to_hash)
+        Connection.active.post(self.resource_path, resource.to_json)
+        resource
       end
 
+      # @param [String, #chef_id] chef_id
+      #
+      # @return [Object]
+      def delete(object)
+        chef_id = object.respond_to?(:chef_id) ? object.chef_id : object
+        new(Connection.active.delete("#{self.resource_path}/#{chef_id}").body)
+      end
+
+      # @param [#to_hash] object
+      #
       # @return [Object]
       def update(object)
-        obj_attrs = Connection.active.put("#{self.resource_path}/#{object[self.chef_id]}", object.to_json).body
-        new(obj_attrs)
+        resource = new(object.to_hash)
+        new(Connection.active.put("#{self.resource_path}/#{resource.chef_id}", resource.to_json).body)
       end
 
       private
@@ -176,6 +181,15 @@ module Ridley
     # @return [Object]
     def save
       raise "implement me, Jamie"
+    end
+
+    # @return [String]
+    def chef_id
+      attribute(self.class.chef_id)
+    end
+
+    def to_hash
+      self.attributes
     end
 
     def to_json
