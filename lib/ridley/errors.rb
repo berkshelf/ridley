@@ -1,13 +1,20 @@
 module Ridley
   module Errors
-    class << self
-      def error_for(symbol)
-        const_get()
-      end
-    end
-
     class RidleyError < StandardError; end
     class InternalError < RidleyError; end
+
+    class InvalidResource < RidleyError
+      attr_reader :errors
+
+      def initialize(errors)
+        @errors = errors
+      end
+
+      def message
+        errors.full_messages.join(', ')
+      end
+      alias_method :to_s, :message
+    end
 
     class HTTPError < RidleyError
       class << self

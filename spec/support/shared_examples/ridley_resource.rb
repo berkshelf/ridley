@@ -110,7 +110,36 @@ shared_examples_for "a Ridley Resource" do |resource_klass|
   end
 
   describe "#save" do
-    pending
+    context "when the object is valid" do
+      before(:each) { subject.stub(:valid?).and_return(true) }
+
+      it "sends a create message to the implementing class" do
+        subject.class.should_receive(:create).with(subject)
+
+        subject.save
+      end
+
+      context "when there is an HTTPConflict" do
+        it "sends an update message to the implemeneting class" do
+          env = double('env')
+          env.stub(:[]).and_return(Hash.new)
+          subject.class.should_receive(:create).and_raise(Ridley::Errors::HTTPConflict.new(env))
+          subject.class.should_receive(:update).with(subject)
+
+          subject.save
+        end
+      end
+    end
+
+    context "when the object is invalid" do
+      before(:each) { subject.stub(:valid?).and_return(false) }
+
+      it "raises an InvalidObject error" do
+        lambda {
+          subject.save
+        }.should raise_error(Ridley::Errors::InvalidResource)
+      end
+    end
   end
 
   describe "#chef_id" do

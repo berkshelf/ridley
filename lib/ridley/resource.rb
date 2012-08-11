@@ -178,9 +178,20 @@ module Ridley
       end
     end
 
+    # Creates a resource on the target remote or updates one if the resource
+    # already exists.
+    #
+    # @raise [Errors::InvalidResource]
+    #   if the resource does not pass validations
+    #
     # @return [Object]
+    #   the created or updated object
     def save
-      raise "implement me, Jamie"
+      raise Errors::InvalidResource.new(self.errors) unless valid?
+
+      self.class.create(self)
+    rescue Errors::HTTPConflict
+      self.class.update(self)
     end
 
     # @return [String]
