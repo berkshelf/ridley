@@ -51,7 +51,8 @@ module Ridley
         if errors.empty?
           @message = env[:body] || "no content body"
         else
-          @message = errors.join(', ')
+          @message = "errors: "
+          @message << errors.collect { |e| "'#{e}'" }.join(', ')
         end
       end
     end
