@@ -59,7 +59,7 @@ describe Ridley::Middleware::ChefResponse do
     it "should have the body of the response as the error's message" do
       lambda {
         subject.get('cookbooks')
-      }.should raise_error("400 - Bad Request: Valid X-CHEF-VERSION header is required.")
+      }.should raise_error("errors: '400 - Bad Request: Valid X-CHEF-VERSION header is required.'")
     end
   end
 
@@ -77,7 +77,7 @@ describe Ridley::Middleware::ChefResponse do
     it "should have the body of the response as the error's message" do
       lambda {
         subject.get('cookbooks')
-      }.should raise_error("401 - Unauthorized.  You must properly authenticate your API requests!")
+      }.should raise_error("errors: '401 - Unauthorized.  You must properly authenticate your API requests!'")
     end
   end
 
@@ -95,7 +95,7 @@ describe Ridley::Middleware::ChefResponse do
     it "should have the body of the response as the error's message" do
       lambda {
         subject.get('cookbooks')
-      }.should raise_error("403 - Forbidden.")
+      }.should raise_error("errors: '403 - Forbidden.'")
     end
   end
 
@@ -113,7 +113,7 @@ describe Ridley::Middleware::ChefResponse do
     it "should have the body of the response as the error's message" do
       lambda {
         subject.get('not_existant_route')
-      }.should raise_error(Ridley::Errors::HTTPNotFound, "No routes match the request: /organizations/vialstudios/cookbookss/not_existant")
+      }.should raise_error(Ridley::Errors::HTTPNotFound, "errors: 'No routes match the request: /organizations/vialstudios/cookbookss/not_existant'")
     end
   end
 
@@ -131,7 +131,7 @@ describe Ridley::Middleware::ChefResponse do
     it "should have the body of the response as the error's message" do
       lambda {
         subject.get('cookbooks')
-      }.should raise_error("409 - Conflict.")
+      }.should raise_error("errors: '409 - Conflict.'")
     end
   end
 

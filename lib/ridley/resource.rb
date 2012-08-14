@@ -90,10 +90,23 @@ module Ridley
         end
       end
       
-      # @param [String] chef_id
+      # @param [String, #chef_id] object
+      #
+      # @return [nil, Object]
+      def find(object)
+        find!(object)
+      rescue Errors::HTTPNotFound
+        nil
+      end
+
+      # @param [String, #chef_id] object
+      #
+      # @raise [Errors::HTTPNotFound]
+      #   if a resource with the given chef_id is not found
       #
       # @return [Object]
-      def find(chef_id)
+      def find!(object)
+        chef_id = object.respond_to?(:chef_id) ? object.chef_id : object
         new(Connection.active.get("#{self.resource_path}/#{chef_id}").body)
       end
 
@@ -102,7 +115,8 @@ module Ridley
       # @return [Object]
       def create(object)
         resource = new(object.to_hash)
-        Connection.active.post(self.resource_path, resource.to_json)
+        new_attributes = Connection.active.post(self.resource_path, resource.to_json).body
+        resource.attributes = resource.attributes.merge(new_attributes)
         resource
       end
 
@@ -112,6 +126,11 @@ module Ridley
       def delete(object)
         chef_id = object.respond_to?(:chef_id) ? object.chef_id : object
         new(Connection.active.delete("#{self.resource_path}/#{chef_id}").body)
+      end
+
+      # @return [Array<Object>]
+      def delete_all
+        all.collect { |obj| delete(obj) }
       end
 
       # @param [#to_hash] object
@@ -232,6 +251,20 @@ module Ridley
 
     def to_s
       self.attributes
+    end
+
+    # @param [Object] other
+    #
+    # @return [Boolean]
+    def ==(other)
+      self.attributes == other.attributes
+    end
+
+    # @param [Object] other
+    #
+    # @return [Boolean]
+    def eql?(other)
+      other.is_a?(self.class) && send(:==, other)
     end
   end
 end

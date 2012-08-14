@@ -19,12 +19,33 @@ shared_examples_for "a Ridley Resource" do |resource_klass|
     end
 
     describe "::find" do
+      it "delegates to find!" do
+        id = double('id')
+        subject.should_receive(:find!).with(id)
+
+        subject.find(id)
+      end
+
+      context "when the resource is not found" do
+        it "returns nil" do
+          pending
+        end
+      end
+    end
+
+    describe "::find!" do
       it "sends a get request to the active connection to the resource_path of the class for the given chef_id" do
         chef_id = "ridley_test"
         response.stub(:body) { Hash.new }
         active_connection.should_receive(:get).with("#{subject.resource_path}/#{chef_id}").and_return(response)
 
         subject.find(chef_id)
+      end
+
+      context "when the resource is not found" do
+        it "raises a Ridley::Errors::HTTPNotFound error" do
+          pending
+        end
       end
     end
 
@@ -57,6 +78,12 @@ shared_examples_for "a Ridley Resource" do |resource_klass|
         active_connection.should_receive(:delete).with("#{subject.resource_path}/#{object.chef_id}").and_return(response)
 
         subject.delete(object)
+      end
+    end
+
+    describe "::delete_all" do
+      it "sends a delete request for every object in the collection" do
+        pending
       end
     end
 

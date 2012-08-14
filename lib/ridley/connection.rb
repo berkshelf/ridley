@@ -1,8 +1,8 @@
 module Ridley
   class Connection
     class << self
-      def start(server_url, client_name, client_key, &block)
-        new(server_url, client_name, client_key).start(&block)
+      def start(options, &block)
+        new(options).start(&block)
       end
       alias_method :open, :start
     end
@@ -14,19 +14,23 @@ module Ridley
 
     attr_reader :client_name
     attr_reader :client_key
+    attr_reader :organization
 
     def_delegator :server_uri, :scheme
     def_delegator :server_uri, :host
     def_delegator :server_uri, :port
     def_delegator :server_uri, :path
-    def_delegator :server_uri, :query
 
-    def initialize(server_url, client_name, client_key)
-      @server_uri = Addressable::URI.parse(server_url)
-      @client_name = client_name
-      @client_key = client_key
+    REQUIRED_OPTIONS = [
+      :server_url,
+      :client_name,
+      :client_key
+    ]
 
-      @conn = Faraday.new(server_url) do |c|
+    def initialize(options)
+      parse_options(options)
+
+      @conn = Faraday.new(server_uri) do |c|
         c.request :chef_auth, client_name, client_key
         c.response :chef_response
 
@@ -47,19 +51,19 @@ module Ridley
     alias_method :open, :start
 
     def get(path)
-      conn.run_request(:get, server_uri.join(path), nil, Hash.new)
+      conn.run_request(:get, path, nil, Hash.new)
     end
 
     def put(path, body)
-      conn.run_request(:put, server_uri.join(path), body, Hash.new)
+      conn.run_request(:put, path, body, Hash.new)
     end
 
     def post(path, body)
-      conn.run_request(:post, server_uri.join(path), body, Hash.new)
+      conn.run_request(:post, path, body, Hash.new)
     end
 
     def delete(path)
-      conn.run_request(:delete, server_uri.join(path), nil, Hash.new)
+      conn.run_request(:delete, path, nil, Hash.new)
     end
 
     private
@@ -74,6 +78,30 @@ module Ridley
 
       def method_missing(method, *args, &block)
         @self_before_instance_eval.send(method, *args, &block)
+      end
+
+      def parse_options(options)
+        missing = REQUIRED_OPTIONS - options.keys
+        unless missing.empty?
+          missing.collect! { |opt| "'#{opt}'" }
+          raise ArgumentError, "missing required option(s): #{missing.join(', ')}"
+        end
+
+        @client_name = options[:client_name]
+        @client_key = options[:client_key]
+        @organization = options[:organization]
+
+        uri_hash = Addressable::URI.parse(options[:server_url]).to_hash.slice(:scheme, :host, :port)
+
+        unless uri_hash[:port]
+          uri_hash[:port] = (uri_hash[:scheme] == "https" ? 443 : 80)
+        end
+
+        if organization
+          uri_hash[:path] = "/organizations/#{organization}"
+        end
+
+        @server_uri = Addressable::URI.new(uri_hash)
       end
   end
 end

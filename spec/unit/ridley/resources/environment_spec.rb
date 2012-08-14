@@ -3,10 +3,20 @@ require 'spec_helper'
 describe Ridley::Environment do
   it_behaves_like "a Ridley Resource", Ridley::Environment
 
-  let(:server_url) { "https://api.opscode.com/organizations/vialstudios/" }
+  let(:server_url) { "https://api.opscode.com" }
   let(:client_name) { "reset" }
   let(:client_key) { "/Users/reset/.chef/reset.pem" }
-  let(:connection) { Ridley.connection(server_url, client_name, client_key) }
+  let(:organization) { "vialstudios" }
+  let(:config) do
+    {
+      server_url: server_url,
+      client_name: client_name,
+      client_key: client_key,
+      organization: organization
+    }
+  end
+
+  let(:connection) { Ridley.connection(config) }
 
   let(:environment_json) do
     %(
