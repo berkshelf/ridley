@@ -68,6 +68,7 @@ module Ridley
     class HTTPUnauthorized < HTTPError; register_error(401); end
     class HTTPForbidden < HTTPError; register_error(403); end
     class HTTPNotFound < HTTPError; register_error(404); end
+    class HTTPMethodNotAllowed < HTTPError; register_error(405); end
     class HTTPRequestTimeout < HTTPError; register_error(408); end
     class HTTPConflict < HTTPError; register_error(409); end
     class HTTPInternalServerError < HTTPError; register_error(500); end

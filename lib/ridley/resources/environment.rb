@@ -6,6 +6,13 @@ module Ridley
       end
     end
 
+    class << self
+      def delete_all
+        envs = all.reject { |env| env.name.to_s == '_default' }
+        envs.collect { |obj| delete(obj) }
+      end
+    end
+
     include Ridley::Resource
 
     set_chef_id "name"
