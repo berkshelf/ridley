@@ -76,7 +76,7 @@ module Ridley
       #
       # @return [Set]
       def attribute(name, options = {})
-        if options[:default]
+        if options.has_key?(:default)
           default_for_attribute(name, options[:default])
         end
         define_attribute_method(name)
@@ -170,7 +170,11 @@ module Ridley
     #
     # @return [Object]
     def attribute(key)
-      instance_variable_get("@#{key}") || self.class.attribute_defaults[key]
+      if instance_variable_defined?("@#{key}")
+        instance_variable_get("@#{key}")
+      else
+        self.class.attribute_defaults[key]
+      end
     end
     alias_method :[], :attribute
 

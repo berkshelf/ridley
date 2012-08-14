@@ -67,6 +67,32 @@ describe Ridley::Resource do
 
         subject.attributes.should include(:last_name)
       end
+
+      describe "setting a default value for the attribute" do
+        it "allows a string as the default value for the attribute" do
+          subject.attribute(:name, default: "jamie")
+
+          subject.attribute_defaults[:name].should eql("jamie")
+        end
+
+        it "allows a false boolean as the default value for the attribute" do
+          subject.attribute(:admin, default: false)
+
+          subject.attribute_defaults[:admin].should eql(false)
+        end
+
+        it "allows a true boolean as the default value for the attribute" do
+          subject.attribute(:admin, default: true)
+
+          subject.attribute_defaults[:admin].should eql(true)
+        end
+
+        it "allows nil as the default value for the attribute" do
+          subject.attribute(:certificate, default: nil)
+
+          subject.attribute_defaults[:certificate].should be_nil
+        end
+      end
     end
 
     describe "::set_chef_type" do
