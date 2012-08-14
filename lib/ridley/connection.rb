@@ -45,8 +45,10 @@ module Ridley
 
       original_conn = self.class.active
       self.class.active = self
-      evaluate(&block)
+      result = evaluate(&block)
       self.class.active = original_conn
+
+      result
     end
     alias_method :open, :start
 
