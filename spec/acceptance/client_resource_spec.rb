@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "Environment API operations" do
+describe "Client API operations" do
   let(:server_url) { "https://api.opscode.com" }
   let(:client_name) { "reset" }
   let(:client_key) { "/Users/reset/.chef/reset.pem" }
@@ -106,8 +106,8 @@ describe "Environment API operations" do
   describe "deleting all clients" do
     before(:each) do
       connection.start do
-        client.create("ridley-one")
-        client.create("ridley-two")
+        client.create(name: "ridley-one")
+        client.create(name: "ridley-two")
       end
     end
 
