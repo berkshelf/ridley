@@ -11,7 +11,8 @@ require 'ridley/errors'
 
 module Ridley
   CHEF_VERSION = '10.12.0'.freeze
-  
+
+  autoload :Log, 'ridley/log'  
   autoload :Connection, 'ridley/connection'
   autoload :Resource, 'ridley/resource'
   autoload :Environment, 'ridley/resources/environment'
@@ -30,6 +31,11 @@ module Ridley
     def start(*args, &block)
       connection(*args).start(&block)
     end
+
+    def log
+      Ridley::Log
+    end
+    alias_method :logger, :log
   end
 end
 
