@@ -85,6 +85,21 @@ module Ridley
       conn.run_request(:delete, path, nil, Hash.new)
     end
 
+    # @return [Symbol]
+    def api_type
+      organization.nil? ? :foss : :hosted
+    end
+
+    # @return [Boolean]
+    def hosted?
+      api_type == :hosted
+    end
+
+    # @return [Boolean]
+    def foss?
+      api_type == :foss
+    end
+
     private
 
       attr_reader :server_uri

@@ -195,5 +195,19 @@ describe Ridley::Connection do
         end
       end
     end
+
+    describe "api_type" do
+      it "returns :foss if the organization is not set" do
+        subject.stub(:organization).and_return(nil)
+
+        subject.api_type.should eql(:foss)
+      end
+
+      it "returns :hosted if the organization is set" do
+        subject.stub(:organization).and_return("vialstudios")
+
+        subject.api_type.should eql(:hosted)
+      end
+    end
   end
 end
