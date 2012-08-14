@@ -27,10 +27,24 @@ module Ridley
       :client_key
     ]
 
-    def initialize(options)
+    # @option options [String] :server_url
+    # @option options [String] :client_name
+    # @option options [String] :client_key
+    # @option options [Hash] :params
+    #   URI query unencoded key/value pairs
+    # @option options [Hash] :headers
+    #   unencoded HTTP header key/value pairs
+    # @option options [Hash] :request
+    #   request options
+    # @option options [Hash] :ssl
+    #   SSL options
+    # @option options [URI, String, Hash] :proxy
+    #   URI, String, or Hash of HTTP proxy options
+    def initialize(options = {})
       parse_options(options)
+      faraday_options = options.slice(:params, :headers, :request, :ssl, :proxy)
 
-      @conn = Faraday.new(server_uri) do |c|
+      @conn = Faraday.new(server_uri, faraday_options) do |c|
         c.request :chef_auth, client_name, client_key
         c.response :chef_response
 
