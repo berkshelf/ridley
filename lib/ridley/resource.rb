@@ -130,7 +130,20 @@ module Ridley
 
       # @return [Array<Object>]
       def delete_all
-        all.collect { |obj| delete(obj) }
+        mutex = Mutex.new
+        deleted = []
+        resources = self.all
+
+        Connection.thread_count.times.collect do
+          Thread.new(resources, deleted) do |resources, deleted|
+            while resource = mutex.synchronize { resources.pop }
+              result = delete(resource)
+              mutex.synchronize { deleted << result }
+            end
+          end
+        end.each(&:join)
+
+        deleted
       end
 
       # @param [#to_hash] object

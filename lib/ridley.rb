@@ -6,6 +6,7 @@ require 'active_support/inflector'
 require 'active_support/core_ext'
 require 'forwardable'
 require 'set'
+require 'thread'
 
 require 'ridley/errors'
 

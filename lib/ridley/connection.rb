@@ -10,7 +10,10 @@ module Ridley
     extend Forwardable
     include Ridley::DSL
 
+    @@thread_count = 8
+
     cattr_accessor :active
+    cattr_accessor :thread_count
 
     attr_reader :client_name
     attr_reader :client_key
