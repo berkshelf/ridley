@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "Client API operations" do
+describe "Client API operations", type: "acceptance" do
   let(:server_url) { "https://api.opscode.com" }
   let(:client_name) { "reset" }
   let(:client_key) { "/Users/reset/.chef/reset.pem" }
@@ -56,8 +56,7 @@ describe "Client API operations" do
   describe "creating a client" do
     let(:target) do
       Ridley::Client.new(
-        name: "motherbrain-test",
-        admin: false
+        clientname: "motherbrain_test"
       )
     end
 

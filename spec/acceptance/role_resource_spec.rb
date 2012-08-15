@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "Role API operations" do
+describe "Role API operations", type: "acceptance" do
   let(:server_url) { "https://api.opscode.com" }
   let(:client_name) { "reset" }
   let(:client_key) { "/Users/reset/.chef/reset.pem" }
