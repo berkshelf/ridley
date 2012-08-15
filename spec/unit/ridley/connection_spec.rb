@@ -31,7 +31,11 @@ describe Ridley::Connection do
 
       describe "parsing the 'server_url' option" do
         before(:each) do
-          @conn = subject.new(server_url: server_url, client_name: client_name, client_key: client_key)
+          @conn = subject.new(
+            server_url: server_url,
+            client_name: client_name,
+            client_key: client_key
+          )
         end
 
         it "assigns a 'host' attribute from the given 'server_url' option" do
@@ -42,8 +46,8 @@ describe Ridley::Connection do
           @conn.scheme.should eql("https")
         end
 
-        it "throws away the 'path' from the given 'server_url' option" do
-          @conn.path.should eql("/")
+        it "sets a 'path_prefix' to the root of the given 'server_url' option" do
+          @conn.path_prefix.should eql("/")
         end
       end
 
@@ -61,8 +65,8 @@ describe Ridley::Connection do
           @conn.organization.should eql(organization)
         end
 
-        it "sets the path of the connection to '/organizations/{org_name}'" do
-          @conn.path.should eql("/organizations/#{organization}")
+        it "sets the 'path_prefix' of the connection the organization sub URI" do
+          @conn.path_prefix.should eql("/organizations/#{organization}")
         end
       end
 
@@ -159,7 +163,7 @@ describe Ridley::Connection do
     describe "HTTP Request" do
       describe "#get" do
         it "appends the given path to the connection's server_uri path and sends a get request to it" do
-          stub_request(:get, "https://api.opscode.com:80/organizations/vialstudios/cookbooks").
+          stub_request(:get, subject.build_url("cookbooks")).
             to_return(status: 200, body: "{}")
 
           subject.get("cookbooks")
@@ -168,7 +172,7 @@ describe Ridley::Connection do
 
       describe "#put" do
         it "appends the given path to the connection's server_uri path and sends a put request to it" do
-          stub_request(:put, "https://api.opscode.com:80/organizations/vialstudios/cookbooks").
+          stub_request(:put, subject.build_url("cookbooks")).
             with(body: "content").
             to_return(status: 200, body: "{}")
 
@@ -178,7 +182,7 @@ describe Ridley::Connection do
 
       describe "#post" do
         it "appends the given path to the connection's server_uri path and sends a post request to it" do
-          stub_request(:post, "https://api.opscode.com:80/organizations/vialstudios/cookbooks").
+          stub_request(:post, subject.build_url("cookbooks")).
             with(body: "content").
             to_return(status: 200, body: "{}")
 
@@ -188,7 +192,7 @@ describe Ridley::Connection do
 
       describe "#delete" do
         it "appends the given path to the connection's server_uri path and sends a delete request to it" do
-          stub_request(:delete, "https://api.opscode.com:80/organizations/vialstudios/cookbooks/nginx").
+          stub_request(:delete, subject.build_url("cookbooks/nginx")).
             to_return(status: 200, body: "{}")
 
           subject.delete("cookbooks/nginx")

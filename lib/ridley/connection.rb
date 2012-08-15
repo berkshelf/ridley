@@ -19,10 +19,11 @@ module Ridley
     attr_reader :client_key
     attr_reader :organization
 
-    def_delegator :server_uri, :scheme
-    def_delegator :server_uri, :host
-    def_delegator :server_uri, :port
-    def_delegator :server_uri, :path
+    def_delegator :conn, :build_url
+    def_delegator :conn, :scheme
+    def_delegator :conn, :host
+    def_delegator :conn, :port
+    def_delegator :conn, :path_prefix
 
     REQUIRED_OPTIONS = [
       :server_url,
@@ -44,8 +45,24 @@ module Ridley
     # @option options [URI, String, Hash] :proxy
     #   URI, String, or Hash of HTTP proxy options
     def initialize(options = {})
-      parse_options(options)
+      validate_options(options)
+
+      @client_name  = options[:client_name]
+      @client_key   = options[:client_key]
+      @organization = options[:organization]
+
       faraday_options = options.slice(:params, :headers, :request, :ssl, :proxy)
+      uri_hash = Addressable::URI.parse(options[:server_url]).to_hash.slice(:scheme, :host, :port)
+
+      unless uri_hash[:port]
+        uri_hash[:port] = (uri_hash[:scheme] == "https" ? 443 : 80)
+      end
+
+      if organization
+        uri_hash[:path] = "/organizations/#{organization}"
+      end
+
+      server_uri = Addressable::URI.new(uri_hash)
 
       @conn = Faraday.new(server_uri, faraday_options) do |c|
         c.request :chef_auth, client_name, client_key
@@ -102,7 +119,6 @@ module Ridley
 
     private
 
-      attr_reader :server_uri
       attr_reader :conn
 
       def evaluate(&block)
@@ -114,28 +130,12 @@ module Ridley
         @self_before_instance_eval.send(method, *args, &block)
       end
 
-      def parse_options(options)
+      def validate_options(options)
         missing = REQUIRED_OPTIONS - options.keys
         unless missing.empty?
           missing.collect! { |opt| "'#{opt}'" }
           raise ArgumentError, "missing required option(s): #{missing.join(', ')}"
         end
-
-        @client_name = options[:client_name]
-        @client_key = options[:client_key]
-        @organization = options[:organization]
-
-        uri_hash = Addressable::URI.parse(options[:server_url]).to_hash.slice(:scheme, :host, :port)
-
-        unless uri_hash[:port]
-          uri_hash[:port] = (uri_hash[:scheme] == "https" ? 443 : 80)
-        end
-
-        if organization
-          uri_hash[:path] = "/organizations/#{organization}"
-        end
-
-        @server_uri = Addressable::URI.new(uri_hash)
       end
   end
 end
