@@ -15,20 +15,54 @@ describe "Environment API operations", type: "acceptance" do
     )
   end
 
-  before(:all) do
-    WebMock.allow_net_connect!
-  end
+  before(:all) { WebMock.allow_net_connect! }
 
   after(:all) do
+    connection.start { environment.delete_all }
     WebMock.disable_net_connect!
   end
 
+  before(:each) do
+    connection.start { environment.delete_all }
+  end
+
   describe "finding an environment" do
-    pending
+    let(:target) do
+      Ridley::Environment.new(
+        name: "ridley-test-env"
+      )
+    end
+
+    before(:each) do
+      connection.start { environment.create(target) }
+    end
+
+    it "returns a valid Ridley::Environment object" do
+      connection.start do
+        obj = environment.find(target)
+
+        obj.should be_a(Ridley::Environment)
+        obj.should be_valid
+      end
+    end
   end
 
   describe "creating an environment" do
-    pending
+    let(:target) do
+      Ridley::Environment.new(
+        name: "ridley-test-env",
+        description: "a testing environment for ridley"
+      )
+    end
+
+    it "returns a valid Ridley::Environment object" do
+      connection.start do
+        obj = environment.create(target)
+
+        obj.should be_a(Ridley::Environment)
+        obj.should be_valid
+      end
+    end
   end
 
   describe "deleting an environment" do
@@ -72,6 +106,71 @@ describe "Environment API operations", type: "acceptance" do
   end
 
   describe "updating an environment" do
-    pending
+    let(:target) do
+      Ridley::Environment.new(
+        name: "ridley-env-test"
+      )
+    end
+
+    before(:each) do
+      connection.start { environment.create(target) }
+    end
+
+    it "saves a new 'description'" do
+      target.description = description = "ridley testing environment"
+
+      connection.start do
+        environment.update(target)
+        obj = environment.find(target)
+
+        obj.description.should eql(description)
+      end
+    end
+
+    it "saves a new set of 'default_attributes'" do
+      target.default_attributes = default_attributes = {
+        attribute_one: "val_one",
+        nested: {
+          other: "val"
+        }
+      }
+
+      connection.start do
+        environment.update(target)
+        obj = environment.find(target)
+
+        obj.default_attributes.should eql(default_attributes)
+      end
+    end
+
+    it "saves a new set of 'override_attributes'" do
+      target.override_attributes = override_attributes = {
+        attribute_one: "val",
+        nested: {
+          other: "val"
+        }
+      }
+
+      connection.start do
+        environment.update(target)
+        obj = environment.find(target)
+
+        obj.override_attributes.should eql(override_attributes)
+      end
+    end
+
+    it "saves a new set of 'cookbook_versions'" do
+      target.cookbook_versions = cookbook_versions = {
+        nginx: "1.2.0",
+        tomcat: "1.3.0"
+      }
+
+      connection.start do
+        environment.update(target)
+        obj = environment.find(target)
+
+        obj.cookbook_versions.should eql(cookbook_versions)
+      end
+    end
   end
 end
