@@ -71,11 +71,37 @@ describe "Role API operations", type: "acceptance" do
   end
 
   describe "deleting a role" do
-    pending
+    let(:target) do
+      Ridley::Role.new(
+        name: "ridley-role-one"
+      )
+    end
+
+    before(:each) do
+      connection.start { role.create(target) }
+    end
+
+    it "returns the deleted Ridley::Role resource" do
+      connection.start do
+        role.delete(target).should eql(target)
+      end
+    end
+
+    it "removes the role from the server" do
+      connection.start do
+        role.delete(target)
+
+        role.find(target).should be_nil
+      end
+    end
   end
 
   describe "deleting all roles" do
-    pending
+    it "deletes all nodes from the remote server" do
+      connection.start { role.delete_all }
+
+      connection.start { role.all.should have(0).roles }
+    end
   end
 
   describe "listing all roles" do
@@ -97,6 +123,88 @@ describe "Role API operations", type: "acceptance" do
   end
 
   describe "updating a role" do
-    pending
+    let(:target) do
+      Ridley::Role.new(
+        name: "ridley-role-one"
+      )
+    end
+
+    before(:each) do
+      connection.start { role.create(target) }
+    end
+
+    it "returns an updated Ridley::Role object" do
+      connection.start do
+        role.update(target).should eql(target)
+      end
+    end
+
+    it "saves a new run_list" do
+      target.run_list = run_list = ["recipe[one]", "recipe[two]"]
+
+      connection.start do
+        role.update(target)
+        obj = role.find(target)
+
+        obj.run_list.should eql(run_list)
+      end
+    end
+
+    it "saves a new env_run_lists" do
+      target.env_run_lists = env_run_lists = {
+        production: ["recipe[one]"],
+        development: ["recipe[two]"]
+      }
+
+      connection.start do
+        role.update(target)
+        obj = role.find(target)
+
+        obj.env_run_lists.should eql(env_run_lists)
+      end
+    end
+
+    it "saves a new description" do
+      target.description = description = "a new description!"
+
+      connection.start do
+        role.update(target)
+        obj = role.find(target)
+
+        obj.description.should eql(description)
+      end
+    end
+
+    it "saves a new default_attributes" do
+      target.default_attributes = defaults = {
+        attribute_one: "value_one",
+        nested: {
+          other: false
+        }
+      }
+
+      connection.start do
+        role.update(target)
+        obj = role.find(target)
+
+        obj.default_attributes.should eql(defaults)
+      end
+    end
+
+    it "saves a new override_attributes" do
+      target.override_attributes = overrides = {
+        attribute_two: "value_two",
+        nested: {
+          other: false
+        }
+      }
+
+      connection.start do
+        role.update(target)
+        obj = role.find(target)
+
+        obj.override_attributes.should eql(overrides)
+      end
+    end
   end
 end

@@ -26,6 +26,8 @@ module Ridley
     validates_presence_of :override_attributes
 
     attribute :run_list, default: Array.new
-    validates_presence_of :run_list    
+    validates_presence_of :run_list
+
+    attribute :env_run_lists, default: Hash.new
   end
 end
