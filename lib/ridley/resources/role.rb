@@ -17,17 +17,9 @@ module Ridley
     validates_presence_of :name
 
     attribute :description, default: String.new
-    validates_presence_of :description
-
     attribute :default_attributes, default: Hash.new
-    validates_presence_of :default_attributes
-
     attribute :override_attributes, default: Hash.new
-    validates_presence_of :override_attributes
-
     attribute :run_list, default: Array.new
-    validates_presence_of :run_list
-
     attribute :env_run_lists, default: Hash.new
   end
 end
