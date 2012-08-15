@@ -132,23 +132,94 @@ describe "Node API operations", type: "acceptance" do
     end
 
     it "returns the updated node" do
-      target.description = "a description!"
-
       connection.start do
-        obj = node.update(target)
-
-        obj.should eql(target)
+        node.update(target).should eql(target)
       end
     end
 
-    it "updates the node on the remote server" do
-      target.description = "wow, another description"
+    it "saves a new set of 'normal' attributes" do
+      target.normal = normal = {
+        attribute_one: "value_one",
+        nested: {
+          other: "val"
+        }
+      }
 
       connection.start do
         node.update(target)
         obj = node.find(target)
 
-        obj.description.should eql("wow, another description")
+        obj.normal.should eql(normal)
+      end
+    end
+
+    it "saves a new set of 'default' attributes" do
+      target.default = defaults = {
+        attribute_one: "val_one",
+        nested: {
+          other: "val"
+        }
+      }
+
+      connection.start do
+        node.update(target)
+        obj = node.find(target)
+
+        obj.default.should eql(defaults)
+      end
+    end
+
+    it "saves a new set of 'automatic' attributes" do
+      target.automatic = automatics = {
+        attribute_one: "val_one",
+        nested: {
+          other: "val"
+        }
+      }
+
+      connection.start do
+        node.update(target)
+        obj = node.find(target)
+
+        obj.automatic.should eql(automatics)
+      end
+    end
+
+    it "saves a new set of 'override' attributes" do
+      target.override = overrides = {
+        attribute_one: "val_one",
+        nested: {
+          other: "val"
+        }
+      }
+
+      connection.start do
+        node.update(target)
+        obj = node.find(target)
+
+        obj.override.should eql(overrides)
+      end
+    end
+
+    it "places a node in a new 'chef_environment'" do
+      target.chef_environment = environment = "ridley"
+
+      connection.start do
+        node.update(target)
+        obj = node.find(target)
+
+        obj.chef_environment.should eql(environment)
+      end
+    end
+
+    it "saves a new 'run_list' for the node" do
+      target.run_list = run_list = ["recipe[one]", "recipe[two]"]
+
+      connection.start do
+        node.update(target)
+        obj = node.find(target)
+
+        obj.run_list.should eql(run_list)
       end
     end
   end

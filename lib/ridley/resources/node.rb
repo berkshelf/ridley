@@ -16,22 +16,11 @@ module Ridley
     attribute :name
     validates_presence_of :name
 
-    attribute :description, default: String.new
-    validates_presence_of :description
-
-    # JW TODO: oh man. An attribute called attributes. Need to figure out how to
-    # deal with this best.
-    #
-    # attribute :attributes, default: Hash.new
-    # validates_presence_of :attributes
-
-    attribute :overrides, default: Hash.new
-    validates_presence_of :overrides
-
-    attribute :defaults, default: Hash.new
-    validates_presence_of :defaults
-
+    attribute :chef_environment, default: "_default"
+    attribute :automatic, default: Hash.new
+    attribute :normal, default: Hash.new
+    attribute :default, default: Hash.new
+    attribute :override, default: Hash.new
     attribute :run_list, default: Array.new
-    validates_presence_of :run_list
   end
 end
