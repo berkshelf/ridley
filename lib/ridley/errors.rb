@@ -73,5 +73,6 @@ module Ridley
     class HTTPConflict < HTTPError; register_error(409); end
     class HTTPInternalServerError < HTTPError; register_error(500); end
     class HTTPBadGateway < HTTPError; register_error(502); end
+    class HTTPGatewayTimeout < HTTPError; register_error(504); end
   end
 end
