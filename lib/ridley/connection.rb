@@ -25,6 +25,14 @@ module Ridley
     def_delegator :conn, :port
     def_delegator :conn, :path_prefix
 
+    def_delegator :conn, :get
+    def_delegator :conn, :put
+    def_delegator :conn, :post
+    def_delegator :conn, :delete
+    def_delegator :conn, :head
+
+    def_delegator :conn, :in_parallel
+
     REQUIRED_OPTIONS = [
       :server_url,
       :client_name,
@@ -85,22 +93,6 @@ module Ridley
       result
     end
     alias_method :open, :start
-
-    def get(path)
-      conn.run_request(:get, path, nil, Hash.new)
-    end
-
-    def put(path, body)
-      conn.run_request(:put, path, body, Hash.new)
-    end
-
-    def post(path, body)
-      conn.run_request(:post, path, body, Hash.new)
-    end
-
-    def delete(path)
-      conn.run_request(:delete, path, nil, Hash.new)
-    end
 
     # @return [Symbol]
     def api_type
