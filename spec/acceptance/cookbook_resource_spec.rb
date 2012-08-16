@@ -15,13 +15,8 @@ describe "Cookbook API operations", type: "acceptance" do
     )
   end
 
-  before(:all) do
-    WebMock.allow_net_connect!
-  end
-
-  after(:all) do
-    WebMock.disable_net_connect!
-  end
+  before(:all) { WebMock.allow_net_connect! }
+  after(:all) { WebMock.disable_net_connect! }
 
   describe "finding a cookbook" do
     pending

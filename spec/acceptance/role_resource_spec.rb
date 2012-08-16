@@ -16,11 +16,7 @@ describe "Role API operations", type: "acceptance" do
   end
 
   before(:all) { WebMock.allow_net_connect! }
-
-  after(:all) do
-    connection.start { role.delete_all }
-    WebMock.disable_net_connect!
-  end
+  after(:all) { WebMock.disable_net_connect! }
 
   before(:each) do
     connection.start { role.delete_all }

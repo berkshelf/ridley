@@ -15,14 +15,8 @@ describe "Client API operations", type: "acceptance" do
     )
   end
 
-  before(:all) do
-    WebMock.allow_net_connect!
-  end
-
-  after(:all) do
-    connection.start { client.delete_all }
-    WebMock.disable_net_connect!
-  end
+  before(:all) { WebMock.allow_net_connect! }
+  after(:all) { WebMock.disable_net_connect! }
 
   before(:each) do
     connection.start { client.delete_all }
@@ -40,15 +34,12 @@ describe "Client API operations", type: "acceptance" do
       connection.start { client.create(target) }
     end
 
-    it "returns a Ridley::Environment" do
+    it "returns a valid Ridley::Client" do
       connection.start do
-        client.find(target).should be_a(Ridley::Client)
-      end
-    end
+        obj = client.find(target)
 
-    it "returns the target Ridley::Client from the server" do
-      connection.start do
-        client.find(target).should eql(target)
+        obj.should be_a(Ridley::Client)
+        obj.should be_valid
       end
     end
   end
@@ -56,7 +47,7 @@ describe "Client API operations", type: "acceptance" do
   describe "creating a client" do
     let(:target) do
       Ridley::Client.new(
-        clientname: "motherbrain_test"
+        name: "motherbrain_test"
       )
     end
 
@@ -88,16 +79,6 @@ describe "Client API operations", type: "acceptance" do
     it "returns a Ridley::Client object" do
       connection.start do
         client.delete(target).should be_a(Ridley::Client)
-      end
-    end
-
-    context "when the client does not exist" do
-      it "raises a Ridley::Errors::HTTPNotFound error" do
-        lambda {
-          connection.start do
-            client.delete("motherbrain-test")
-          end
-        }.should raise_error(Ridley::Errors::HTTPNotFound)
       end
     end
   end
@@ -133,7 +114,7 @@ describe "Client API operations", type: "acceptance" do
     end
   end
 
-  describe "updating a client" do
+  describe "regenerating a client's private key" do
     let(:target) do
       Ridley::Client.new(
         name: "motherbrain-test",
@@ -145,21 +126,11 @@ describe "Client API operations", type: "acceptance" do
       connection.start { client.create(target) }
     end
 
-    it "returns a Ridley::Client object" do
-      target.admin = true
-
+    it "returns a Ridley::Client object with a value for 'private_key'" do
       connection.start do
-        client.update(target).should be_a(Ridley::Client)
-      end
-    end
+        obj = client.regenerate_key(target)
 
-    it "updates the resources attributes" do
-      target.admin = true
-
-      connection.start do
-        client.update(target)
-
-        client.find(target).admin.should be_true
+        obj.private_key.should match(/^-----BEGIN RSA PRIVATE KEY-----/)
       end
     end
   end
