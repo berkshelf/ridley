@@ -141,17 +141,20 @@ shared_examples_for "a Ridley Resource" do |resource_klass|
       before(:each) { subject.stub(:valid?).and_return(true) }
 
       it "sends a create message to the implementing class" do
-        subject.class.should_receive(:create).with(subject)
+        updated = double('updated')
+        updated.stub(:attributes).and_return(Hash.new)
+        subject.class.should_receive(:create).with(subject).and_return(updated)
 
         subject.save
       end
 
       context "when there is an HTTPConflict" do
         it "sends an update message to the implemeneting class" do
-          env = double('env')
-          env.stub(:[]).and_return(Hash.new)
-          subject.class.should_receive(:create).and_raise(Ridley::Errors::HTTPConflict.new(env))
-          subject.class.should_receive(:update).with(subject)
+          updated = double('updated')
+          updated.stub(:[]).and_return(Hash.new)
+          updated.stub(:attributes).and_return(Hash.new)
+          subject.class.should_receive(:create).and_raise(Ridley::Errors::HTTPConflict.new(updated))
+          subject.class.should_receive(:update).with(subject).and_return(updated)
 
           subject.save
         end

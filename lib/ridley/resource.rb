@@ -220,14 +220,16 @@ module Ridley
     # @raise [Errors::InvalidResource]
     #   if the resource does not pass validations
     #
-    # @return [Object]
-    #   the created or updated object
+    # @return [Boolean]
+    #   true if successful and false for failure
     def save
       raise Errors::InvalidResource.new(self.errors) unless valid?
 
-      self.class.create(self)
+      self.attributes = self.class.create(self).attributes
+      true
     rescue Errors::HTTPConflict
-      self.class.update(self)
+      self.attributes = self.class.update(self).attributes
+      true
     end
 
     # @return [String]
