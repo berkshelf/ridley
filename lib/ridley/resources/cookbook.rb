@@ -10,4 +10,10 @@ module Ridley
     attribute :name
     validates_presence_of :name
   end
+
+  module DSL
+    def cookbook
+      Context.new(Ridley::Cookbook, self)
+    end
+  end
 end

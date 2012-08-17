@@ -16,4 +16,10 @@ module Ridley
     attribute :run_list, default: Array.new
     attribute :env_run_lists, default: Hash.new
   end
+
+  module DSL
+    def role
+      Context.new(Ridley::Role, self)
+    end
+  end
 end

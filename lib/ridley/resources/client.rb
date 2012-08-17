@@ -42,6 +42,8 @@ module Ridley
     attribute :orgname
 
     def attributes
+      # @todo JW: reflect on the connection type to determine if we need to strip the
+      # json_class attribute. Only OHC/OPC needs this stripped.
       super.except(:json_class)
     end
 
@@ -54,6 +56,12 @@ module Ridley
     def regenerate_key
       self.private_key = true
       self.save
+    end
+  end
+
+  module DSL
+    def client
+      Context.new(Ridley::Client, self)
     end
   end
 end

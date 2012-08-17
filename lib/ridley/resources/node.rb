@@ -1,4 +1,4 @@
-module Ridley
+module Ridley 
   class Node
     include Ridley::Resource
 
@@ -16,5 +16,11 @@ module Ridley
     attribute :default, default: Hash.new
     attribute :override, default: Hash.new
     attribute :run_list, default: Array.new
+  end
+
+  module DSL
+    def node
+      Context.new(Ridley::Node, self)
+    end
   end
 end

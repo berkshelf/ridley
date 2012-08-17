@@ -15,6 +15,7 @@ module Ridley
 
   autoload :Log, 'ridley/log'  
   autoload :Connection, 'ridley/connection'
+  autoload :DSL, 'ridley/dsl'
   autoload :Context, 'ridley/context'
   autoload :Resource, 'ridley/resource'
   autoload :Environment, 'ridley/resources/environment'
@@ -23,7 +24,6 @@ module Ridley
   autoload :Node, 'ridley/resources/node'
   autoload :DataBag, 'ridley/resources/data_bag'
   autoload :Cookbook, 'ridley/resources/cookbook'
-  autoload :DSL, 'ridley/dsl'
 
   class << self
     def connection(*args)
