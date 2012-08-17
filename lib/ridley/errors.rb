@@ -71,8 +71,11 @@ module Ridley
     class HTTPMethodNotAllowed < HTTPError; register_error(405); end
     class HTTPRequestTimeout < HTTPError; register_error(408); end
     class HTTPConflict < HTTPError; register_error(409); end
+    
     class HTTPInternalServerError < HTTPError; register_error(500); end
+    class HTTPNotImplemented < HTTPError; register_error(501); end
     class HTTPBadGateway < HTTPError; register_error(502); end
+    class HTTPServiceUnavailable < HTTPError; register_error(503); end
     class HTTPGatewayTimeout < HTTPError; register_error(504); end
   end
 end
