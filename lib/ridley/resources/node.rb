@@ -1,4 +1,5 @@
 module Ridley 
+  # @author Jamie Winsor <jamie@vialstudios.com>
   class Node
     include Ridley::Resource
 
@@ -17,8 +18,15 @@ module Ridley
     attribute :override, default: Hash.new
     attribute :run_list, default: Array.new
   end
-
+  
   module DSL
+    # Coerces instance functions into class functions on Ridley::Node. This coercion
+    # sends an instance of the including class along to the class function.
+    #
+    # @see Ridley::Context
+    #
+    # @return [Ridley::Context]
+    #   a context object to delegate instance functions to class functions on Ridley::Node
     def node
       Context.new(Ridley::Node, self)
     end

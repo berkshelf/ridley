@@ -1,4 +1,5 @@
 module Ridley
+  # @author Jamie Winsor <jamie@vialstudios.com>
   module Middleware
     require 'ridley/middleware/chef_response'
     require 'ridley/middleware/chef_auth'

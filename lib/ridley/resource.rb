@@ -1,4 +1,5 @@
 module Ridley
+  # @author Jamie Winsor <jamie@vialstudios.com>
   module Resource
     extend ActiveSupport::Concern
     include ActiveModel::AttributeMethods

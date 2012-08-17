@@ -1,4 +1,5 @@
 module Ridley
+  # @author Jamie Winsor <jamie@vialstudios.com>
   module Errors
     class RidleyError < StandardError; end
     class InternalError < RidleyError; end

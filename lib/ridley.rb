@@ -10,6 +10,7 @@ require 'thread'
 
 require 'ridley/errors'
 
+# @author Jamie Winsor <jamie@vialstudios.com>
 module Ridley
   CHEF_VERSION = '10.12.0'.freeze
 

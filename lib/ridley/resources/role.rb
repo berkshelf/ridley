@@ -1,4 +1,5 @@
 module Ridley
+  # @author Jamie Winsor <jamie@vialstudios.com>
   class Role
     include Ridley::Resource
 
@@ -18,6 +19,13 @@ module Ridley
   end
 
   module DSL
+    # Coerces instance functions into class functions on Ridley::Role. This coercion
+    # sends an instance of the including class along to the class function.
+    #
+    # @see Ridley::Context
+    #
+    # @return [Ridley::Context]
+    #   a context object to delegate instance functions to class functions on Ridley::Role
     def role
       Context.new(Ridley::Role, self)
     end

@@ -1,4 +1,5 @@
 module Ridley
+  # @author Jamie Winsor <jamie@vialstudios.com>
   class Environment
     class << self
       # Delete all of the environments on the remote connection. The
@@ -30,6 +31,13 @@ module Ridley
   end
 
   module DSL
+    # Coerces instance functions into class functions on Ridley::Environment. This coercion
+    # sends an instance of the including class along to the class function.
+    #
+    # @see Ridley::Context
+    #
+    # @return [Ridley::Context]
+    #   a context object to delegate instance functions to class functions on Ridley::Environment
     def environment
       Context.new(Ridley::Environment, self)
     end

@@ -1,5 +1,6 @@
 module Ridley
   module Middleware
+    # @author Jamie Winsor <jamie@vialstudios.com>
     class ChefResponse < Faraday::Response::Middleware
       def on_complete(env)
         Ridley.log.debug(env)
