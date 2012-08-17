@@ -5,10 +5,6 @@ describe Ridley::Client do
 
   let(:connection) { double('connection') }
 
-  before(:each) do
-    Ridley::Connection.active = connection
-  end
-
   describe "ClassMethods" do
     subject { Ridley::Client }
 
@@ -17,22 +13,22 @@ describe Ridley::Client do
 
       it "finds the given client and regenerates it's key" do
         client.should_receive(:regenerate_key)
-        subject.should_receive(:find!).with("ridley-test").and_return(client)
+        subject.should_receive(:find!).with(connection, "ridley-test").and_return(client)
         
-        subject.regenerate_key("ridley-test")
+        subject.regenerate_key(connection, "ridley-test")
       end
 
       it "returns the updated client" do
         client.should_receive(:regenerate_key)
-        subject.should_receive(:find!).with("ridley-test").and_return(client)
+        subject.should_receive(:find!).with(connection, "ridley-test").and_return(client)
 
-        subject.regenerate_key("ridley-test").should eql(client)
+        subject.regenerate_key(connection, "ridley-test").should eql(client)
       end
     end
   end
 
   subject do
-    Ridley::Client.new(name: "ridley-test", admin: false)
+    Ridley::Client.new(connection, name: "ridley-test", admin: false)
   end
 
   describe "#regenerate_key" do

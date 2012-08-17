@@ -1,29 +1,26 @@
 shared_examples_for "a Ridley Resource" do |resource_klass|
+  let(:connection) { double('connection') }
   let(:active_connection) { double('active-connection') }
   let(:response) { double('response') }
-
-  before(:each) do
-    Ridley::Connection.stub(:active).and_return(active_connection)
-  end
 
   describe "ClassMethods" do
     subject { resource_klass }
 
     describe "::all" do
-      it "sends a get request for the class' resource_path using the active connection" do
+      it "sends a get request for the class' resource_path using the given connection" do
         response.stub(:body) { Hash.new }
-        active_connection.should_receive(:get).with(subject.resource_path).and_return(response)
+        connection.should_receive(:get).with(subject.resource_path).and_return(response)
         
-        subject.all
+        subject.all(connection)
       end
     end
 
     describe "::find" do
       it "delegates to find!" do
         id = double('id')
-        subject.should_receive(:find!).with(id)
+        subject.should_receive(:find!).with(connection, id)
 
-        subject.find(id)
+        subject.find(connection, id)
       end
 
       context "when the resource is not found" do
@@ -34,12 +31,12 @@ shared_examples_for "a Ridley Resource" do |resource_klass|
     end
 
     describe "::find!" do
-      it "sends a get request to the active connection to the resource_path of the class for the given chef_id" do
+      it "sends a get request to the given connection to the resource_path of the class for the given chef_id" do
         chef_id = "ridley_test"
         response.stub(:body) { Hash.new }
-        active_connection.should_receive(:get).with("#{subject.resource_path}/#{chef_id}").and_return(response)
+        connection.should_receive(:get).with("#{subject.resource_path}/#{chef_id}").and_return(response)
 
-        subject.find(chef_id)
+        subject.find(connection, chef_id)
       end
 
       context "when the resource is not found" do
@@ -50,34 +47,34 @@ shared_examples_for "a Ridley Resource" do |resource_klass|
     end
 
     describe "::create" do
-      it "sends a post request to the active connection using the includer's resource_path" do
+      it "sends a post request to the given connection using the includer's resource_path" do
         attrs = {
           first_name: "jamie",
           last_name: "winsor"
         }
 
         response.stub(:body) { attrs }
-        active_connection.should_receive(:post).with(subject.resource_path, duck_type(:to_json)).and_return(response)
+        connection.should_receive(:post).with(subject.resource_path, duck_type(:to_json)).and_return(response)
 
-        subject.create(attrs)
+        subject.create(connection, attrs)
       end
     end
 
     describe "::delete" do
-      it "sends a delete request to the active connection using the includer's resource_path for the given string" do
+      it "sends a delete request to the given connection using the includer's resource_path for the given string" do
         response.stub(:body) { Hash.new }
-        active_connection.should_receive(:delete).with("#{subject.resource_path}/ridley-test").and_return(response)
+        connection.should_receive(:delete).with("#{subject.resource_path}/ridley-test").and_return(response)
 
-        subject.delete("ridley-test")
+        subject.delete(connection, "ridley-test")
       end
 
       it "accepts an object that responds to 'chef_id'" do
         object = double("obj")
         object.stub(:chef_id) { "hello" }
         response.stub(:body) { Hash.new }
-        active_connection.should_receive(:delete).with("#{subject.resource_path}/#{object.chef_id}").and_return(response)
+        connection.should_receive(:delete).with("#{subject.resource_path}/#{object.chef_id}").and_return(response)
 
-        subject.delete(object)
+        subject.delete(connection, object)
       end
     end
 
@@ -88,19 +85,19 @@ shared_examples_for "a Ridley Resource" do |resource_klass|
     end
 
     describe "::update" do
-      it "sends a put request to the active connection using the includer's resource_path with the given object" do
+      it "sends a put request to the given connection using the includer's resource_path with the given object" do
         subject.stub(:chef_id) { :name }
         subject.attribute(:name)
         object = subject.new(name: "hello")
         response.stub(:body) { Hash.new }
-        active_connection.should_receive(:put).with("#{subject.resource_path}/#{object.chef_id}", duck_type(:to_json)).and_return(response)
+        connection.should_receive(:put).with("#{subject.resource_path}/#{object.chef_id}", duck_type(:to_json)).and_return(response)
 
-        subject.update(object)
+        subject.update(connection, object)
       end
     end
   end
 
-  subject { resource_klass.new }
+  subject { resource_klass.new(connection) }
 
   describe "#attribute" do
     it "returns the value of the attribute of the corresponding identifier" do
@@ -143,7 +140,7 @@ shared_examples_for "a Ridley Resource" do |resource_klass|
       it "sends a create message to the implementing class" do
         updated = double('updated')
         updated.stub(:attributes).and_return(Hash.new)
-        subject.class.should_receive(:create).with(subject).and_return(updated)
+        subject.class.should_receive(:create).with(connection, subject).and_return(updated)
 
         subject.save
       end
@@ -154,7 +151,7 @@ shared_examples_for "a Ridley Resource" do |resource_klass|
           updated.stub(:[]).and_return(Hash.new)
           updated.stub(:attributes).and_return(Hash.new)
           subject.class.should_receive(:create).and_raise(Ridley::Errors::HTTPConflict.new(updated))
-          subject.class.should_receive(:update).with(subject).and_return(updated)
+          subject.class.should_receive(:update).with(connection, subject).and_return(updated)
 
           subject.save
         end

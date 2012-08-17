@@ -1,11 +1,5 @@
 module Ridley
   class Role
-    module DSL
-      def role
-        Ridley::Role
-      end
-    end
-
     include Ridley::Resource
 
     set_chef_id "name"

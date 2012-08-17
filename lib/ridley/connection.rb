@@ -10,14 +10,11 @@ module Ridley
     extend Forwardable
     include Ridley::DSL
 
-    @@thread_count = 8
-
-    cattr_accessor :active
-    cattr_accessor :thread_count
-
     attr_reader :client_name
     attr_reader :client_key
     attr_reader :organization
+
+    attr_accessor :thread_count
 
     def_delegator :conn, :build_url
     def_delegator :conn, :scheme
@@ -39,9 +36,12 @@ module Ridley
       :client_key
     ]
 
+    DEFAULT_THREAD_COUNT = 8
+
     # @option options [String] :server_url
     # @option options [String] :client_name
     # @option options [String] :client_key
+    # @option options [Integer] :thread_count
     # @option options [Hash] :params
     #   URI query unencoded key/value pairs
     # @option options [Hash] :headers
@@ -53,11 +53,14 @@ module Ridley
     # @option options [URI, String, Hash] :proxy
     #   URI, String, or Hash of HTTP proxy options
     def initialize(options = {})
+      options[:thread_count] ||= DEFAULT_THREAD_COUNT
+
       validate_options(options)
 
       @client_name  = options[:client_name]
       @client_key   = options[:client_key]
       @organization = options[:organization]
+      @thread_count = options[:thread_count]
 
       faraday_options = options.slice(:params, :headers, :request, :ssl, :proxy)
       uri_hash = Addressable::URI.parse(options[:server_url]).to_hash.slice(:scheme, :host, :port)
@@ -85,12 +88,7 @@ module Ridley
         raise Errors::InternalError, "A block must be given to start a connection."
       end
 
-      original_conn = self.class.active
-      self.class.active = self
-      result = evaluate(&block)
-      self.class.active = original_conn
-
-      result
+      evaluate(&block)
     end
     alias_method :open, :start
 

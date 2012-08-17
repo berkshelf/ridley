@@ -18,49 +18,43 @@ describe "Role API operations", type: "acceptance" do
   before(:all) { WebMock.allow_net_connect! }
   after(:all) { WebMock.disable_net_connect! }
 
-  before(:each) do
-    connection.start { role.delete_all }
-  end
+  before(:each) { connection.role.delete_all }
 
   describe "finding a role" do
     let(:target) do
       Ridley::Role.new(
+        connection,
         name: "ridley-test",
         description: "a testing role for ridley" 
       )
     end
 
     before(:each) do
-      connection.start { role.create(target) }
+      connection.role.create(target)
     end
 
     it "returns the target Ridley::Role from the server" do
-      connection.start do
-        role.find(target.name).should eql(target)
-      end
+      connection.role.find(target.name).should eql(target)
     end
   end
 
   describe "creating a role" do
     let(:target) do
       Ridley::Role.new(
+        connection,
         name: "ridley-test",
         description: "a testing role for ridley" 
       )
     end
 
     it "returns a new Ridley::Role" do
-      connection.start do
-        role.create(target).should eql(target)
-      end
+      connection.role.create(target).should eql(target)
     end
 
     it "adds a new role to the server" do
       connection.start do
         role.create(target)
-      end
 
-      connection.start do
         role.all.should have(1).role
       end
     end
@@ -69,18 +63,17 @@ describe "Role API operations", type: "acceptance" do
   describe "deleting a role" do
     let(:target) do
       Ridley::Role.new(
+        connection,
         name: "ridley-role-one"
       )
     end
 
     before(:each) do
-      connection.start { role.create(target) }
+      connection.role.create(target)
     end
 
     it "returns the deleted Ridley::Role resource" do
-      connection.start do
-        role.delete(target).should eql(target)
-      end
+      connection.role.delete(target).should eql(target)
     end
 
     it "removes the role from the server" do
@@ -94,9 +87,11 @@ describe "Role API operations", type: "acceptance" do
 
   describe "deleting all roles" do
     it "deletes all nodes from the remote server" do
-      connection.start { role.delete_all }
+      connection.start do
+        role.delete_all
 
-      connection.start { role.all.should have(0).roles }
+        role.all.should have(0).roles
+      end
     end
   end
 
@@ -121,18 +116,17 @@ describe "Role API operations", type: "acceptance" do
   describe "updating a role" do
     let(:target) do
       Ridley::Role.new(
+        connection,
         name: "ridley-role-one"
       )
     end
 
     before(:each) do
-      connection.start { role.create(target) }
+      connection.role.create(target)
     end
 
     it "returns an updated Ridley::Role object" do
-      connection.start do
-        role.update(target).should eql(target)
-      end
+      connection.role.update(target).should eql(target)
     end
 
     it "saves a new run_list" do

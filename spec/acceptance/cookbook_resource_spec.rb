@@ -36,9 +36,7 @@ describe "Cookbook API operations", type: "acceptance" do
 
   describe "listing all cookbooks" do
     it "should return an array of environment objects" do
-      connection.start do
-        cookbook.all.should each be_a(Ridley::Cookbook)
-      end
+      connection.cookbook.all.should each be_a(Ridley::Cookbook)
     end
   end
 

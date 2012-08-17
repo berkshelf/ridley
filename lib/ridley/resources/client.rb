@@ -1,11 +1,5 @@
 module Ridley
   class Client
-    module DSL
-      def client
-        Ridley::Client
-      end
-    end
-
     include Ridley::Resource
 
     class << self
@@ -13,6 +7,7 @@ module Ridley
       # and regenerates it's private key. An instance of the updated object will
       # be returned and have a value set for the 'private_key' accessor.
       #
+      # @param [Ridley::Connection] connection
       # @param [String, #chef_id] client
       #
       # @raise [Errors::HTTPNotFound]
@@ -20,8 +15,8 @@ module Ridley
       # @raise [Errors::HTTPError]
       #
       # @return [Ridley::Client]
-      def regenerate_key(client)
-        obj = find!(client)
+      def regenerate_key(connection, client)
+        obj = find!(connection, client)
         obj.regenerate_key
         obj
       end

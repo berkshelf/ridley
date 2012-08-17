@@ -25,12 +25,13 @@ describe "Environment API operations", type: "acceptance" do
   describe "finding an environment" do
     let(:target) do
       Ridley::Environment.new(
+        connection,
         name: "ridley-test-env"
       )
     end
 
     before(:each) do
-      connection.start { environment.create(target) }
+      connection.environment.create(target)
     end
 
     it "returns a valid Ridley::Environment object" do
@@ -46,6 +47,7 @@ describe "Environment API operations", type: "acceptance" do
   describe "creating an environment" do
     let(:target) do
       Ridley::Environment.new(
+        connection,
         name: "ridley-test-env",
         description: "a testing environment for ridley"
       )
@@ -64,7 +66,7 @@ describe "Environment API operations", type: "acceptance" do
   describe "deleting an environment" do
     it "raises Ridley::Errors::HTTPMethodNotAllowed when attempting to delete the '_default' environment" do
       lambda {
-        connection.start { environment.delete("_default") }
+        connection.environment.delete("_default")
       }.should raise_error(Ridley::Errors::HTTPMethodNotAllowed)
     end
   end
@@ -78,9 +80,7 @@ describe "Environment API operations", type: "acceptance" do
     end
 
     it "returns an array of Ridley::Environment objects" do
-      connection.start do
-        environment.delete_all.should each be_a(Ridley::Environment)
-      end
+      connection.environment.delete_all.should each be_a(Ridley::Environment)
     end
 
     it "deletes all environments but '_default' from the remote" do
@@ -95,21 +95,20 @@ describe "Environment API operations", type: "acceptance" do
 
   describe "listing all environments" do
     it "should return an array of Ridley::Environment objects" do
-      connection.start do
-        environment.all.should each be_a(Ridley::Environment)
-      end
+      connection.environment.all.should each be_a(Ridley::Environment)
     end
   end
 
   describe "updating an environment" do
     let(:target) do
       Ridley::Environment.new(
+        connection,
         name: "ridley-env-test"
       )
     end
 
     before(:each) do
-      connection.start { environment.create(target) }
+      connection.environment.create(target)
     end
 
     it "saves a new 'description'" do

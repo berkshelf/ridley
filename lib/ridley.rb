@@ -15,6 +15,7 @@ module Ridley
 
   autoload :Log, 'ridley/log'  
   autoload :Connection, 'ridley/connection'
+  autoload :Context, 'ridley/context'
   autoload :Resource, 'ridley/resource'
   autoload :Environment, 'ridley/resources/environment'
   autoload :Role, 'ridley/resources/role'
@@ -30,9 +31,10 @@ module Ridley
     end
 
     def start(*args, &block)
-      connection(*args).start(&block)
+      Connection.start(*args, &block)
     end
 
+    # @return [Ridley::Log]
     def log
       Ridley::Log
     end

@@ -1,15 +1,10 @@
 module Ridley
   class Environment
-    module DSL
-      def environment
-        Ridley::Environment
-      end
-    end
-
     class << self
-      def delete_all
-        envs = all.reject { |env| env.name.to_s == '_default' }
-        envs.collect { |obj| delete(obj) }
+      # @param [Ridley::Connection] connection
+      def delete_all(connection)
+        envs = all(connection).reject { |env| env.name.to_s == '_default' }
+        envs.collect { |obj| delete(connection, obj) }
       end
     end
 

@@ -25,13 +25,14 @@ describe "Client API operations", type: "acceptance" do
   describe "finding a client" do
     let(:target) do
       Ridley::Client.new(
+        connection,
         name: "motherbrain-test",
         admin: false
       )
     end
 
     before(:each) do
-      connection.start { client.create(target) }
+      connection.client.create(target)
     end
 
     it "returns a valid Ridley::Client" do
@@ -47,6 +48,7 @@ describe "Client API operations", type: "acceptance" do
   describe "creating a client" do
     let(:target) do
       Ridley::Client.new(
+        connection,
         name: "motherbrain_test"
       )
     end
@@ -67,6 +69,7 @@ describe "Client API operations", type: "acceptance" do
   describe "deleting a client" do
     let(:target) do
       Ridley::Client.new(
+        connection,
         name: "motherbrain-test",
         admin: false
       )
@@ -117,6 +120,7 @@ describe "Client API operations", type: "acceptance" do
   describe "regenerating a client's private key" do
     let(:target) do
       Ridley::Client.new(
+        connection,
         name: "motherbrain-test",
         admin: false
       )

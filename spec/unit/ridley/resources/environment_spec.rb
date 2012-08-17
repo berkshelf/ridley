@@ -3,6 +3,8 @@ require 'spec_helper'
 describe Ridley::Environment do
   it_behaves_like "a Ridley Resource", Ridley::Environment
 
+  let(:connection) { double("connection") }
+
   let(:environment_json) do
     %(
       {
@@ -36,7 +38,7 @@ describe Ridley::Environment do
 
     describe "::initialize" do
       before(:each) do
-        @env = subject.new(parse_json(environment_json))
+        @env = subject.new(connection, parse_json(environment_json))
       end
 
       it "has a value for 'name'" do

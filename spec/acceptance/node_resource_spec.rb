@@ -19,38 +19,36 @@ describe "Node API operations", type: "acceptance" do
   after(:all) { WebMock.disable_net_connect! }
 
   before(:each) do
-    connection.start { node.delete_all }
+    connection.node.delete_all
   end
 
   describe "finding a node" do
     let(:target) do
       Ridley::Node.new(
+        connection,
         name: "ridley-one"
       )
     end
 
     before(:each) do
-      connection.start { node.create(target) }
+      connection.node.create(target)
     end
 
     it "returns a Ridley::Node object" do
-      connection.start do
-        node.find(target.name).should eql(target)
-      end
+      connection.node.find(target.name).should eql(target)
     end
   end
 
   describe "creating a node" do
     let(:target) do
       Ridley::Node.new(
+        connection,
         name: "ridley-one"
       )
     end
     
     it "returns a new Ridley::Node object" do
-      connection.start do
-        node.create(target).should eql(target)
-      end
+      connection.node.create(target).should eql(target)
     end
 
     it "adds a new node to the server" do
@@ -65,12 +63,13 @@ describe "Node API operations", type: "acceptance" do
   describe "deleting a node" do
     let(:target) do
       Ridley::Node.new(
+        connection,
         name: "ridley-one"
       )
     end
 
     before(:each) do
-      connection.start { node.create(target) }
+      connection.node.create(target)
     end
 
     it "returns the deleted object" do
@@ -90,9 +89,11 @@ describe "Node API operations", type: "acceptance" do
 
   describe "deleting all nodes" do
     it "deletes all nodes from the remote server" do
-      connection.start { node.delete_all }
+      connection.start do
+        node.delete_all
 
-      connection.start { node.all.should have(0).nodes }
+        connection.node.all.should have(0).nodes
+      end
     end
   end
 
@@ -117,18 +118,17 @@ describe "Node API operations", type: "acceptance" do
   describe "updating a node" do
     let(:target) do
       Ridley::Node.new(
+        connection,
         name: "ridley-one"
       )
     end
 
     before(:each) do
-      connection.start { node.create(target) }
+      connection.node.create(target)
     end
 
     it "returns the updated node" do
-      connection.start do
-        node.update(target).should eql(target)
-      end
+      connection.node.update(target).should eql(target)
     end
 
     it "saves a new set of 'normal' attributes" do

@@ -1,11 +1,5 @@
 module Ridley
-  class Cookbook
-    module DSL
-      def cookbook
-        Ridley::Cookbook
-      end
-    end
-    
+  class Cookbook    
     include Ridley::Resource
 
     set_chef_id "name"

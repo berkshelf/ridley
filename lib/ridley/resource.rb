@@ -83,61 +83,69 @@ module Ridley
         attributes << name.to_sym
       end
 
+      # @param [Ridley::Connection] connection
+      #
       # @return [Array<Object>]
-      def all
-        Connection.active.get(self.resource_path).body.collect do |identity, location|
-          new(self.chef_id => identity)
+      def all(connection)
+        connection.get(self.resource_path).body.collect do |identity, location|
+          new(connection, self.chef_id => identity)
         end
       end
       
+      # @param [Ridley::Connection] connection
       # @param [String, #chef_id] object
       #
       # @return [nil, Object]
-      def find(object)
-        find!(object)
+      def find(connection, object)
+        find!(connection, object)
       rescue Errors::HTTPNotFound
         nil
       end
 
+      # @param [Ridley::Connection] connection
       # @param [String, #chef_id] object
       #
       # @raise [Errors::HTTPNotFound]
       #   if a resource with the given chef_id is not found
       #
       # @return [Object]
-      def find!(object)
+      def find!(connection, object)
         chef_id = object.respond_to?(:chef_id) ? object.chef_id : object
-        new(Connection.active.get("#{self.resource_path}/#{chef_id}").body)
+        new(connection, connection.get("#{self.resource_path}/#{chef_id}").body)
       end
 
+      # @param [Ridley::Connection] connection
       # @param [#to_hash] object
       #
       # @return [Object]
-      def create(object)
-        resource = new(object.to_hash)
-        new_attributes = Connection.active.post(self.resource_path, resource.to_json).body
+      def create(connection, object)
+        resource = new(connection, object.to_hash)
+        new_attributes = connection.post(self.resource_path, resource.to_json).body
         resource.attributes = resource.attributes.merge(new_attributes)
         resource
       end
 
+      # @param [Ridley::Connection] connection
       # @param [String, #chef_id] object
       #
       # @return [Object]
-      def delete(object)
+      def delete(connection, object)
         chef_id = object.respond_to?(:chef_id) ? object.chef_id : object
-        new(Connection.active.delete("#{self.resource_path}/#{chef_id}").body)
+        new(connection, connection.delete("#{self.resource_path}/#{chef_id}").body)
       end
 
+      # @param [Ridley::Connection] connection
+      #
       # @return [Array<Object>]
-      def delete_all
+      def delete_all(connection)
         mutex = Mutex.new
         deleted = []
-        resources = self.all
+        resources = all(connection)
 
-        Connection.thread_count.times.collect do
-          Thread.new(resources, deleted) do |resources, deleted|
+        connection.thread_count.times.collect do
+          Thread.new(connection, resources, deleted) do |connection, resources, deleted|
             while resource = mutex.synchronize { resources.pop }
-              result = delete(resource)
+              result = delete(connection, resource)
               mutex.synchronize { deleted << result }
             end
           end
@@ -146,12 +154,13 @@ module Ridley
         deleted
       end
 
+      # @param [Ridley::Connection] connection
       # @param [#to_hash] object
       #
       # @return [Object]
-      def update(object)
-        resource = new(object.to_hash)
-        new(Connection.active.put("#{self.resource_path}/#{resource.chef_id}", resource.to_json).body)
+      def update(connection, object)
+        resource = new(connection, object.to_hash)
+        new(connection, connection.put("#{self.resource_path}/#{resource.chef_id}", resource.to_json).body)
       end
 
       private
@@ -161,8 +170,10 @@ module Ridley
         end
     end
 
+    # @param [Ridley::Connection] connection
     # @param [Hash] attributes
-    def initialize(attributes = {})
+    def initialize(connection, attributes = {})
+      @connection = connection
       self.attributes = self.class.attribute_defaults.merge(attributes)
     end
 
@@ -225,10 +236,10 @@ module Ridley
     def save
       raise Errors::InvalidResource.new(self.errors) unless valid?
 
-      self.attributes = self.class.create(self).attributes
+      self.attributes = self.class.create(connection, self).attributes
       true
     rescue Errors::HTTPConflict
-      self.attributes = self.class.update(self).attributes
+      self.attributes = self.class.update(connection, self).attributes
       true
     end
 
@@ -285,5 +296,9 @@ module Ridley
     def eql?(other)
       other.is_a?(self.class) && send(:==, other)
     end
+
+    private
+
+      attr_reader :connection
   end
 end

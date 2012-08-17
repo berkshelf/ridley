@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe Ridley::Resource do
+  let(:connection) { double('connection') }
+  
   describe "ClassMethods" do
     subject do
       Class.new do
@@ -12,21 +14,21 @@ describe Ridley::Resource do
 
     describe "::initialize" do
       it "has an empty Hash for attributes if no attributes have been defined" do
-        klass = subject.new
+        klass = subject.new(connection)
 
         klass.attributes.should be_empty
       end
 
       it "assigns the given attributes to the attribute hash if the attribute is defined on the class" do
         subject.attribute(:name)
-        klass = subject.new(name: "a name")
+        klass = subject.new(connection, name: "a name")
 
         klass.name.should eql("a name")
         klass.attributes.should have_key(:name)
       end
 
       it "skips attributes which are not defined on the class when assigning attributes" do
-        klass = subject.new(fake: "not here")
+        klass = subject.new(connection, fake: "not here")
 
         klass.attributes.should_not have_key(:fake)
       end
@@ -34,7 +36,7 @@ describe Ridley::Resource do
       it "merges the default values for attributes into the attributes hash" do
         subject.stub(:attributes).and_return(Set.new([:name]))
         subject.should_receive(:attribute_defaults).and_return(name: "whatever")
-        klass = subject.new
+        klass = subject.new(connection)
 
         klass.attributes[:name].should eql("whatever")
       end
@@ -43,7 +45,7 @@ describe Ridley::Resource do
         subject.stub(:attributes).and_return(Set.new([:name]))
         subject.stub(:attribute_defaults).and_return(name: "default")
 
-        klass = subject.new(name: "explicit_name")
+        klass = subject.new(connection, name: "explicit_name")
 
         klass.attributes[:name].should eql("explicit_name")
       end
@@ -162,7 +164,7 @@ describe Ridley::Resource do
   subject do
     Class.new do
       include Ridley::Resource
-    end.new
+    end.new(connection)
   end
 
   describe "#attribute?" do
