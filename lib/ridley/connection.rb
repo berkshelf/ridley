@@ -5,10 +5,6 @@ module Ridley
       def sync(options, &block)
         new(options).sync(&block)
       end
-
-      def async(options, &block)
-        new(options).async(&block)
-      end
     end
 
     extend Forwardable
@@ -90,14 +86,6 @@ module Ridley
     def sync(&block)
       unless block
         raise Errors::InternalError, "A block must be given to synchronously process requests."
-      end
-
-      evaluate(&block)
-    end
-
-    def async(&block)
-      unless block
-        raise Errors::InternalError, "A block must be given to asynchronously process requests."
       end
 
       evaluate(&block)

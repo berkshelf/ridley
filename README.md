@@ -85,23 +85,7 @@ A helper function exists to allow you to express yourself in a one-liner: `Ridle
 
 ### Asynchronous execution
 
-To perform requests in paralell you can use the connection's `async` function.
-
-    conn = Ridley.connection(...)
-
-    conn.async do
-      role.delete("ridley-test-one")
-      role.delete("ridley-test-two")
-    end
-
-This will destroy both roles at the same time instead of in sequence. Using `async` allows you to speed up your operations quite a bit if you are performing a lot of requests on a Chef server at once.
-
-Just like `sync`, a helper function exists for `async`: `Ridley.async`
-
-    Ridley.async(server_url: "https://api.opscode.com", ...) do
-      role.delete("ridley-test-one")
-      role.delete("ridley-test-two")
-    end
+__COMING SOON__
 
 ## Manipulating Chef Resources
 

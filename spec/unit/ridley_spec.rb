@@ -14,14 +14,6 @@ describe Ridley do
       end
     end
 
-    describe "::async" do
-      it "delegates to Ridley::Connection.async" do
-        Ridley::Connection.should_receive(:async).with(config)
-
-        subject.async(config) do; end
-      end
-    end
-
     describe "::connection" do
       it "creates a new Ridley::Connection" do
         conn = double('conn')

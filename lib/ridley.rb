@@ -35,10 +35,6 @@ module Ridley
       Connection.sync(*args, &block)
     end
 
-    def async(*args, &block)
-      Connection.async(*args, &block)
-    end
-
     # @return [Ridley::Log]
     def log
       Ridley::Log
