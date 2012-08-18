@@ -52,7 +52,7 @@ describe "Role API operations", type: "acceptance" do
     end
 
     it "adds a new role to the server" do
-      connection.start do
+      connection.sync do
         role.create(target)
 
         role.all.should have(1).role
@@ -77,7 +77,7 @@ describe "Role API operations", type: "acceptance" do
     end
 
     it "removes the role from the server" do
-      connection.start do
+      connection.sync do
         role.delete(target)
 
         role.find(target).should be_nil
@@ -87,7 +87,7 @@ describe "Role API operations", type: "acceptance" do
 
   describe "deleting all roles" do
     it "deletes all nodes from the remote server" do
-      connection.start do
+      connection.sync do
         role.delete_all
 
         role.all.should have(0).roles
@@ -97,14 +97,14 @@ describe "Role API operations", type: "acceptance" do
 
   describe "listing all roles" do
     before(:each) do
-      connection.start do
+      connection.sync do
         role.create(name: "jamie")
         role.create(name: "winsor")
       end
     end
 
     it "should return an array of Ridley::Role objects" do
-      connection.start do
+      connection.sync do
         obj = role.all
 
         obj.should have(2).roles
@@ -132,7 +132,7 @@ describe "Role API operations", type: "acceptance" do
     it "saves a new run_list" do
       target.run_list = run_list = ["recipe[one]", "recipe[two]"]
 
-      connection.start do
+      connection.sync do
         role.update(target)
         obj = role.find(target)
 
@@ -146,7 +146,7 @@ describe "Role API operations", type: "acceptance" do
         development: ["recipe[two]"]
       }
 
-      connection.start do
+      connection.sync do
         role.update(target)
         obj = role.find(target)
 
@@ -157,7 +157,7 @@ describe "Role API operations", type: "acceptance" do
     it "saves a new description" do
       target.description = description = "a new description!"
 
-      connection.start do
+      connection.sync do
         role.update(target)
         obj = role.find(target)
 
@@ -173,7 +173,7 @@ describe "Role API operations", type: "acceptance" do
         }
       }
 
-      connection.start do
+      connection.sync do
         role.update(target)
         obj = role.find(target)
 
@@ -189,7 +189,7 @@ describe "Role API operations", type: "acceptance" do
         }
       }
 
-      connection.start do
+      connection.sync do
         role.update(target)
         obj = role.find(target)
 

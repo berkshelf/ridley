@@ -6,11 +6,19 @@ describe Ridley do
   describe "ClassMethods" do
     subject { Ridley }
 
-    describe "::start" do
-      it "delegates to Ridley::Connection.start" do
-        Ridley::Connection.should_receive(:start).with(config)
+    describe "::sync" do
+      it "delegates to Ridley::Connection.sync" do
+        Ridley::Connection.should_receive(:sync).with(config)
 
-        subject.start(config) do; end
+        subject.sync(config) do; end
+      end
+    end
+
+    describe "::async" do
+      it "delegates to Ridley::Connection.async" do
+        Ridley::Connection.should_receive(:async).with(config)
+
+        subject.async(config) do; end
       end
     end
 

@@ -2,10 +2,13 @@ module Ridley
   # @author Jamie Winsor <jamie@vialstudios.com>
   class Connection
     class << self
-      def start(options, &block)
-        new(options).start(&block)
+      def sync(options, &block)
+        new(options).sync(&block)
       end
-      alias_method :open, :start
+
+      def async(options, &block)
+        new(options).async(&block)
+      end
     end
 
     extend Forwardable
@@ -84,14 +87,21 @@ module Ridley
       end
     end
 
-    def start(&block)
+    def sync(&block)
       unless block
-        raise Errors::InternalError, "A block must be given to start a connection."
+        raise Errors::InternalError, "A block must be given to synchronously process requests."
       end
 
       evaluate(&block)
     end
-    alias_method :open, :start
+
+    def async(&block)
+      unless block
+        raise Errors::InternalError, "A block must be given to asynchronously process requests."
+      end
+
+      evaluate(&block)
+    end
 
     # @return [Symbol]
     def api_type

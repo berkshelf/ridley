@@ -90,10 +90,10 @@ describe Ridley::Connection do
       end
     end
 
-    describe "::start" do
+    describe "::sync" do
       it "raises a Ridley::Errors::InternalError if no block is given" do
         lambda {
-          subject.start(config)
+          subject.sync(config)
         }.should raise_error(Ridley::Errors::InternalError)
       end
     end
@@ -103,10 +103,10 @@ describe Ridley::Connection do
     Ridley::Connection.new(config)
   end
 
-  describe "#start" do
+  describe "#sync" do
     it "raises a Ridley::Errors::InternalError if no block is given" do
       lambda {
-        subject.start
+        subject.sync
       }.should raise_error(Ridley::Errors::InternalError)
     end
 

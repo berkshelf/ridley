@@ -52,7 +52,7 @@ describe "Node API operations", type: "acceptance" do
     end
 
     it "adds a new node to the server" do
-      connection.start do
+      connection.sync do
         node.create(target)
 
         node.all.should have(1).node
@@ -73,13 +73,11 @@ describe "Node API operations", type: "acceptance" do
     end
 
     it "returns the deleted object" do
-      connection.start do
-        node.delete(target).should eql(target)
-      end
+      connection.node.delete(target).should eql(target)
     end
 
     it "removes the node from the server" do
-      connection.start do
+      connection.sync do
         node.delete(target)
 
         node.find(target).should be_nil
@@ -89,7 +87,7 @@ describe "Node API operations", type: "acceptance" do
 
   describe "deleting all nodes" do
     it "deletes all nodes from the remote server" do
-      connection.start do
+      connection.sync do
         node.delete_all
 
         connection.node.all.should have(0).nodes
@@ -99,14 +97,14 @@ describe "Node API operations", type: "acceptance" do
 
   describe "listing all nodes" do
     before(:each) do
-      connection.start do
+      connection.sync do
         node.create(name: "ridley-one")
         node.create(name: "ridley-two")
       end
     end
 
     it "returns an array of Ridley::Node objects" do
-      connection.start do
+      connection.sync do
         obj = node.all
         
         obj.should each be_a(Ridley::Node)
@@ -139,7 +137,7 @@ describe "Node API operations", type: "acceptance" do
         }
       }
 
-      connection.start do
+      connection.sync do
         node.update(target)
         obj = node.find(target)
 
@@ -155,7 +153,7 @@ describe "Node API operations", type: "acceptance" do
         }
       }
 
-      connection.start do
+      connection.sync do
         node.update(target)
         obj = node.find(target)
 
@@ -171,7 +169,7 @@ describe "Node API operations", type: "acceptance" do
         }
       }
 
-      connection.start do
+      connection.sync do
         node.update(target)
         obj = node.find(target)
 
@@ -187,7 +185,7 @@ describe "Node API operations", type: "acceptance" do
         }
       }
 
-      connection.start do
+      connection.sync do
         node.update(target)
         obj = node.find(target)
 
@@ -198,7 +196,7 @@ describe "Node API operations", type: "acceptance" do
     it "places a node in a new 'chef_environment'" do
       target.chef_environment = environment = "ridley"
 
-      connection.start do
+      connection.sync do
         node.update(target)
         obj = node.find(target)
 
@@ -209,7 +207,7 @@ describe "Node API operations", type: "acceptance" do
     it "saves a new 'run_list' for the node" do
       target.run_list = run_list = ["recipe[one]", "recipe[two]"]
 
-      connection.start do
+      connection.sync do
         node.update(target)
         obj = node.find(target)
 

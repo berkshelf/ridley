@@ -19,7 +19,7 @@ describe "Environment API operations", type: "acceptance" do
   after(:all) { WebMock.disable_net_connect! }
 
   before(:each) do
-    connection.start { environment.delete_all }
+    connection.environment.delete_all
   end
 
   describe "finding an environment" do
@@ -35,7 +35,7 @@ describe "Environment API operations", type: "acceptance" do
     end
 
     it "returns a valid Ridley::Environment object" do
-      connection.start do
+      connection.sync do
         obj = environment.find(target)
 
         obj.should be_a(Ridley::Environment)
@@ -54,7 +54,7 @@ describe "Environment API operations", type: "acceptance" do
     end
 
     it "returns a valid Ridley::Environment object" do
-      connection.start do
+      connection.sync do
         obj = environment.create(target)
 
         obj.should be_a(Ridley::Environment)
@@ -73,7 +73,7 @@ describe "Environment API operations", type: "acceptance" do
 
   describe "deleting all environments" do
     before(:each) do
-      connection.start do
+      connection.sync do
         environment.create(name: "ridley-one")
         environment.create(name: "ridley-two")
       end
@@ -84,7 +84,7 @@ describe "Environment API operations", type: "acceptance" do
     end
 
     it "deletes all environments but '_default' from the remote" do
-      connection.start do
+      connection.sync do
         environment.delete_all
 
         environment.all.should have(1).clients
@@ -114,7 +114,7 @@ describe "Environment API operations", type: "acceptance" do
     it "saves a new 'description'" do
       target.description = description = "ridley testing environment"
 
-      connection.start do
+      connection.sync do
         environment.update(target)
         obj = environment.find(target)
 
@@ -130,7 +130,7 @@ describe "Environment API operations", type: "acceptance" do
         }
       }
 
-      connection.start do
+      connection.sync do
         environment.update(target)
         obj = environment.find(target)
 
@@ -146,7 +146,7 @@ describe "Environment API operations", type: "acceptance" do
         }
       }
 
-      connection.start do
+      connection.sync do
         environment.update(target)
         obj = environment.find(target)
 
@@ -160,7 +160,7 @@ describe "Environment API operations", type: "acceptance" do
         tomcat: "1.3.0"
       }
 
-      connection.start do
+      connection.sync do
         environment.update(target)
         obj = environment.find(target)
 

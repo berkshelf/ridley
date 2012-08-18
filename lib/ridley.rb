@@ -31,8 +31,12 @@ module Ridley
       Connection.new(*args)
     end
 
-    def start(*args, &block)
-      Connection.start(*args, &block)
+    def sync(*args, &block)
+      Connection.sync(*args, &block)
+    end
+
+    def async(*args, &block)
+      Connection.async(*args, &block)
     end
 
     # @return [Ridley::Log]
