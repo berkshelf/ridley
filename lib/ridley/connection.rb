@@ -78,6 +78,7 @@ module Ridley
       @conn = Faraday.new(server_uri, faraday_options) do |c|
         c.request :chef_auth, client_name, client_key
         c.response :chef_response
+        c.response :json
 
         c.adapter Faraday.default_adapter
       end

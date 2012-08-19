@@ -3,45 +3,111 @@ require 'spec_helper'
 describe Ridley::Middleware::ChefResponse do
   let(:server_url) { "https://api.opscode.com/organizations/vialstudios/" }
 
+  describe "ClassMethods" do
+    subject { Ridley::Middleware::ChefResponse }
+
+    describe "::success?" do
+      let(:env) { double('env') }
+
+      it "returns true if response status between 200 and 210" do
+        (200..210).each do |code|
+          env.should_receive(:[]).with(:status).and_return(code)
+
+          subject.success?(env).should be_true
+        end
+      end
+
+      it "returns false if response status is in the 300 range" do
+        (300..399).each do |code|
+          env.should_receive(:[]).with(:status).and_return(code)
+
+          subject.success?(env).should be_false
+        end
+      end
+
+      it "returns false if response status is in the 400 range" do        
+        (400..499).each do |code|
+          env.should_receive(:[]).with(:status).and_return(code)
+
+          subject.success?(env).should be_false
+        end
+      end
+
+      it "returns false if response status is in the 500 range" do
+        (500..599).each do |code|
+          env.should_receive(:[]).with(:status).and_return(code)
+
+          subject.success?(env).should be_false
+        end
+      end
+    end
+  end
+
   subject do
     Faraday.new(server_url) do |conn|
       conn.response :chef_response
+      conn.response :json
       conn.adapter Faraday.default_adapter
     end
+  end
+
+  let(:chef_ok) do
+    {
+      status: 200,
+      body: generate_normalized_json(name: "reset-role", description: "a new role"),
+      headers: {
+        content_type: "application/json; charset=utf8"
+      }
+    }
   end
 
   let(:chef_bad_request) do
     {
       status: 400,
-      body: generate_normalized_json(error: "400 - Bad Request: Valid X-CHEF-VERSION header is required.")
+      body: generate_normalized_json(error: "400 - Bad Request: Valid X-CHEF-VERSION header is required."),
+      headers: {
+        content_type: "application/json; charset=utf8"
+      }
     }
   end
 
   let(:chef_unauthorized) do
     {
       status: 401, 
-      body: generate_normalized_json(error: "401 - Unauthorized.  You must properly authenticate your API requests!")
+      body: generate_normalized_json(error: "401 - Unauthorized.  You must properly authenticate your API requests!"),
+      headers: {
+        content_type: "application/json; charset=utf8"
+      }
     }
   end
 
   let(:chef_forbidden) do
     {
       status: 403, 
-      body: generate_normalized_json(error: "403 - Forbidden.")
+      body: generate_normalized_json(error: "403 - Forbidden."),
+      headers: {
+        content_type: "application/json; charset=utf8"
+      }
     }
   end
 
   let(:chef_not_found) do
     {
       status: 404,
-      body: generate_normalized_json(error: [ "No routes match the request: /organizations/vialstudios/cookbookss/not_existant" ])
+      body: generate_normalized_json(error: [ "No routes match the request: /organizations/vialstudios/cookbookss/not_existant" ]),
+      headers: {
+        content_type: "application/json; charset=utf8"
+      }
     }
   end
 
   let(:chef_conflict) do
     {
       status: 409,
-      body: generate_normalized_json(error: "409 - Conflict.")
+      body: generate_normalized_json(error: "409 - Conflict."),
+      headers: {
+        content_type: "application/json; charset=utf8"
+      }
     }
   end
 
@@ -136,6 +202,12 @@ describe Ridley::Middleware::ChefResponse do
   end
 
   describe "200 OK" do
-    pending
+    before(:each) do
+      stub_request(:get, File.join(server_url, 'roles/reset')).to_return(chef_ok)
+    end
+
+    it "returns a body containing a hash" do
+      subject.get('roles/reset').env[:body].should be_a(Hash)
+    end
   end
 end
