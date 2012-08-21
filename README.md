@@ -6,6 +6,13 @@ A reliable Chef API client with a clean syntax
 
     $ gem install ridley
 
+## Known Issues
+
+* Search has not been implemented
+* Sandboxes has not been implemented
+* Full support for Cookbooks is not included
+* Acceptance test suite needs to be refactored
+
 ## Usage
 
 Require Ridley into your application
