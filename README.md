@@ -1,4 +1,5 @@
 # Ridley
+[![Build Status](https://secure.travis-ci.org/reset/ridley.png?branch=master)](http://travis-ci.org/reset/ridley)
 [![Code Climate](https://codeclimate.com/badge.png)](https://codeclimate.com/github/reset/ridley)
 
 A reliable Chef API client with a clean syntax
