@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Ridley::Connection do
   let(:server_url) { "https://api.opscode.com" }
   let(:client_name) { "reset" }
-  let(:client_key) { "/Users/reset/.chef/reset.pem" }
+  let(:client_key) { fixtures_path.join("reset.pem").to_s }
   let(:organization) { "vialstudios" }
 
   let(:config) do

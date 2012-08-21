@@ -10,6 +10,7 @@ Spork.prefork do
   Dir[File.join(File.expand_path("../../spec/support/**/*.rb", __FILE__))].each { |f| require f }
 
   RSpec.configure do |config|
+    config.include Ridley::SpecHelpers
     config.include JsonSpec::Helpers
 
     config.mock_with :rspec
