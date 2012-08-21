@@ -1,6 +1,8 @@
 module Ridley
   # @author Jamie Winsor <jamie@vialstudios.com>
   class Environment
+    include Ridley::Resource
+    
     class << self
       # Delete all of the environments on the remote connection. The
       # '_default' environment will never be deleted.
@@ -13,8 +15,6 @@ module Ridley
         envs.collect { |obj| delete(connection, obj) }
       end
     end
-
-    include Ridley::Resource
 
     set_chef_id "name"
     set_chef_type "environment"

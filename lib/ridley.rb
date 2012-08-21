@@ -1,5 +1,6 @@
 require 'faraday'
 require 'addressable/uri'
+require 'yajl'
 require 'multi_json'
 require 'active_model'
 require 'active_support/inflector'
@@ -24,6 +25,7 @@ module Ridley
   autoload :Client, 'ridley/resources/client'
   autoload :Node, 'ridley/resources/node'
   autoload :DataBag, 'ridley/resources/data_bag'
+  autoload :DataBagItem, 'ridley/resources/data_bag_item'
   autoload :Cookbook, 'ridley/resources/cookbook'
 
   class << self

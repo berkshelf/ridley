@@ -15,6 +15,7 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
   s.version       = Ridley::VERSION
 
+  s.add_runtime_dependency 'yajl-ruby'
   s.add_runtime_dependency 'mixlib-log'
   s.add_runtime_dependency 'mixlib-authentication'
   s.add_runtime_dependency 'addressable'

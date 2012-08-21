@@ -229,6 +229,36 @@ _Regenerate function on an instantiated resource object_
 
     obj.regenerate_key => <#Ridley::Client: @name="jwinsor", @private_key="HIDDEN">
 
+## Manipulating Data Bags and Data Bag Items
+
+A data bag is managed exactly the same as any other Chef resource
+
+    conn = Ridley.connection(...)
+    conn.data_bag.create("ridley-test")
+
+You can create, delete, update, or retrieve a data bag exactly how you would expect if you read through the
+Manipulating Chef Resources portion of this document.
+
+Unlike a role, node, client, or environment, a data bag is a container for other resources. These other resources are Data Bag Items. Data Bag Items behave slightly different than other resources. Data Bag Items can have an abritrary attribute hash filled with any key values that you would like. The one exception is that every Data Bag Item __requires__ an 'id' key and value. This identifier is the name of the Data Bag Item.
+
+### Creating a Data Bag Item
+
+    conn = Ridley.connection(...)
+    data_bag = conn.data_bag.create("ridley-test")
+
+    data_bag.item.create(id: "appconfig", host: "reset.local", user: "jwinsor") => 
+      <#Ridley::DataBagItem: @id="appconfig", @host="reset.local", @user="jwinsor">
+
+### Saving a Data Bag Item
+
+    conn = Ridley.connection(...)
+    data_bag = conn.data_bag.create("ridley-test")
+
+    dbi = data_bag.item.new
+    dbi[:id] = "appconfig"
+    dbi[:host] = "reset.local"
+    dbi.save => true
+
 # Authors and Contributors
 
 * Jamie Winsor (<jamie@vialstudios.com>)
