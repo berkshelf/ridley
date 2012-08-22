@@ -208,13 +208,13 @@ shared_examples_for "a Ridley Resource" do |resource_klass|
 
   describe "#to_json" do
     it "serializes the objects attributes using MultiJson" do
-      MultiJson.should_receive(:dump).with(subject.attributes, kind_of(Hash))
+      MultiJson.should_receive(:encode).with(subject.attributes, kind_of(Hash))
 
       subject.to_json
     end
 
     it "returns the seralized value" do
-      MultiJson.stub(:dump).and_return("{}")
+      MultiJson.stub(:encode).and_return("{}")
 
       subject.to_json.should eql("{}")
     end
