@@ -27,6 +27,7 @@ module Ridley
   autoload :DataBag, 'ridley/resources/data_bag'
   autoload :DataBagItem, 'ridley/resources/data_bag_item'
   autoload :Cookbook, 'ridley/resources/cookbook'
+  autoload :Search, 'ridley/resources/search'
 
   class << self
     def connection(*args)
