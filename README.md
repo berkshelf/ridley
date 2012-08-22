@@ -10,7 +10,6 @@ A reliable Chef API client with a clean syntax
 
 ## Known Issues
 
-* Search has not been implemented
 * Sandboxes has not been implemented
 * Full support for Cookbooks is not included
 * Acceptance test suite needs to be refactored
