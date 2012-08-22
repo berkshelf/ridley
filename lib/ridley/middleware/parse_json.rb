@@ -24,7 +24,7 @@ module Ridley
         #
         # @return [Hash]
         def parse(body)
-          MultiJson.load(body, symbolize_keys: true)
+          MultiJson.decode(body, symbolize_keys: true)
         end
 
         # Extracts the type of the response from the response headers
