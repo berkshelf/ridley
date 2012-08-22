@@ -268,6 +268,12 @@ Unlike a role, node, client, or environment, a data bag is a container for other
     dbi[:host] = "reset.local"
     dbi.save => true
 
+## Searching
+
+    conn = Ridley.connection(...)
+    conn.search(:node)
+    conn.search(:node, "name:ridley-test.local")
+
 # Authors and Contributors
 
 * Jamie Winsor (<jamie@vialstudios.com>)
