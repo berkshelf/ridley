@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'mixlib-authentication'
   s.add_runtime_dependency 'addressable'
   s.add_runtime_dependency 'faraday'
-  s.add_runtime_dependency 'multi_json'
+  s.add_runtime_dependency 'multi_json', '~> 1.3.0'
   s.add_runtime_dependency 'activemodel'
 
   s.add_development_dependency 'rake'

@@ -167,7 +167,7 @@ module Ridley
     #
     # @return [String]
     def to_json(options = {})
-      MultiJson.dump(self.attributes, options)
+      MultiJson.encode(self.attributes, options)
     end
     alias_method :as_json, :to_json
 
