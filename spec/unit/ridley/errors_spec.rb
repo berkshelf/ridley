@@ -30,5 +30,13 @@ describe Ridley::Errors do
         end
       end
     end
+
+    context "with an HTML error payload" do
+      subject { Ridley::Errors::HTTPError.new(:body => "<html><body><h1>Redirected</h1></body></html>") }
+
+      it "has an HTML body" do
+        subject.message.should eq("<html><body><h1>Redirected</h1></body></html>")
+      end
+    end
   end
 end
