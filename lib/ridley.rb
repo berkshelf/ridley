@@ -9,6 +9,7 @@ require 'forwardable'
 require 'set'
 require 'thread'
 
+require 'ridley/version'
 require 'ridley/errors'
 
 # @author Jamie Winsor <jamie@vialstudios.com>

@@ -68,7 +68,7 @@ describe Ridley::Connection do
             client_name: client_name,
             client_key: client_key
           )
-        }.should raise_error(ArgumentError, "missing required option(s): 'server_url'")
+        }.should raise_error(ArgumentError, "Missing required option(s): 'server_url'")
       end
 
       it "raises if a value for client_name is not given" do
@@ -77,7 +77,7 @@ describe Ridley::Connection do
             server_url: server_url,
             client_key: client_key
           )
-        }.should raise_error(ArgumentError, "missing required option(s): 'client_name'")
+        }.should raise_error(ArgumentError, "Missing required option(s): 'client_name'")
       end
 
       it "raises if a value for client_key is not given" do
@@ -86,7 +86,7 @@ describe Ridley::Connection do
             server_url: server_url,
             client_name: client_name
           )
-        }.should raise_error(ArgumentError, "missing required option(s): 'client_key'")
+        }.should raise_error(ArgumentError, "Missing required option(s): 'client_key'")
       end
     end
 
