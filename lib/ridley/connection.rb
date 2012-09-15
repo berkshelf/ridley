@@ -5,6 +5,18 @@ module Ridley
       def sync(options, &block)
         new(options).sync(&block)
       end
+      
+      # @raise [ArgumentError]
+      #
+      # @return [Boolean]
+      def validate_options(options)
+        missing = (REQUIRED_OPTIONS - options.keys)
+
+        unless missing.empty?
+          missing.collect! { |opt| "'#{opt}'" }
+          raise ArgumentError, "Missing required option(s): #{missing.join(', ')}"
+        end
+      end
     end
 
     extend Forwardable
@@ -55,7 +67,7 @@ module Ridley
     def initialize(options = {})
       options[:thread_count] ||= DEFAULT_THREAD_COUNT
 
-      validate_options(options)
+      self.class.validate_options(options)
 
       @client_name  = options[:client_name]
       @client_key   = options[:client_key]
@@ -118,14 +130,6 @@ module Ridley
 
       def method_missing(method, *args, &block)
         @self_before_instance_eval.send(method, *args, &block)
-      end
-
-      def validate_options(options)
-        missing = REQUIRED_OPTIONS - options.keys
-        unless missing.empty?
-          missing.collect! { |opt| "'#{opt}'" }
-          raise ArgumentError, "missing required option(s): #{missing.join(', ')}"
-        end
       end
   end
 end
