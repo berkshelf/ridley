@@ -11,17 +11,17 @@ class Default < Thor
   include Thor::RakeCompat
   Bundler::GemHelper.install_tasks
 
-  desc "build", "Build berkshelf-#{Ridley::VERSION}.gem into the pkg directory"
+  desc "build", "Build ridley-#{Ridley::VERSION}.gem into the pkg directory"
   def build
     Rake::Task["build"].execute
   end
 
-  desc "install", "Build and install berkshelf-#{Ridley::VERSION}.gem into system gems"
+  desc "install", "Build and install ridley-#{Ridley::VERSION}.gem into system gems"
   def install
     Rake::Task["install"].execute
   end
 
-  desc "release", "Create tag v#{Ridley::VERSION} and build and push berkshelf-#{Ridley::VERSION}.gem to Rubygems"
+  desc "release", "Create tag v#{Ridley::VERSION} and build and push ridley-#{Ridley::VERSION}.gem to Rubygems"
   def release
     Rake::Task["release"].execute
   end
