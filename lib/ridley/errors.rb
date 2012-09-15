@@ -47,7 +47,7 @@ module Ridley
 
       def initialize(env)
         @env = env
-        @errors = Array(env[:body][:error]) || []
+        @errors = env[:body].is_a?(Hash) ? Array(env[:body][:error]) : []
 
         if errors.empty?
           @message = env[:body] || "no content body"
