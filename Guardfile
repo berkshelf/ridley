@@ -1,3 +1,6 @@
+notification :off
+interactor :coolline
+
 guard 'spork' do
   watch('Gemfile')
   watch('spec/spec_helper.rb')     { :rspec }
@@ -10,7 +13,7 @@ guard 'yard', stdout: '/dev/null', stderr: '/dev/null' do
   watch(%r{ext/.+\.c})
 end
 
-guard 'rspec', version: 2, cli: "--color --drb --format Fuubar", all_on_start: false, all_after_pass: false, notification: false do
+guard 'rspec', version: 2, cli: "--color --drb --format Fuubar", all_on_start: false, all_after_pass: false do
   watch(%r{^spec/unit/.+_spec\.rb$})
   watch(%r{^spec/acceptance/.+_spec\.rb$})
   
