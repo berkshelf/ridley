@@ -23,7 +23,7 @@ module Ridley
           user_id: client_name
         )
         authentication_headers = sign_obj.sign(client_key)
-        env[:request_headers] = env[:request_headers].merge(authentication_headers).merge(default_headers)
+        env[:request_headers] = default_headers.merge(env[:request_headers]).merge(authentication_headers)
         env[:request_headers] = env[:request_headers].merge('Content-Length' => env[:body].bytesize.to_s) if env[:body]
 
         Ridley.log.debug(env)
