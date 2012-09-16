@@ -51,8 +51,15 @@ module Ridley
     DEFAULT_THREAD_COUNT = 8
 
     # @option options [String] :server_url
+    #   URL to the Chef API
     # @option options [String] :client_name
+    #   name of the client used to authenticate with the Chef API
     # @option options [String] :client_key
+    #   filepath to the client's private key used to authenticate with
+    #   the Chef API
+    # @option options [String] :organization
+    #   the Organization to connect to. This is only used if you are connecting to
+    #   private Chef or hosted Chef
     # @option options [Integer] :thread_count
     # @option options [Hash] :params
     #   URI query unencoded key/value pairs
@@ -65,14 +72,12 @@ module Ridley
     # @option options [URI, String, Hash] :proxy
     #   URI, String, or Hash of HTTP proxy options
     def initialize(options = {})
-      options[:thread_count] ||= DEFAULT_THREAD_COUNT
-
       self.class.validate_options(options)
 
-      @client_name  = options[:client_name]
-      @client_key   = options[:client_key]
-      @organization = options[:organization]
-      @thread_count = options[:thread_count]
+      @client_name  = options.fetch(:client_name)
+      @client_key   = options.fetch(:client_key)
+      @organization = options.fetch(:organization, nil)
+      @thread_count = options.fetch(:thread_count, DEFAULT_THREAD_COUNT)
 
       faraday_options = options.slice(:params, :headers, :request, :ssl, :proxy)
       uri_hash = Addressable::URI.parse(options[:server_url]).to_hash.slice(:scheme, :host, :port)
@@ -81,7 +86,7 @@ module Ridley
         uri_hash[:port] = (uri_hash[:scheme] == "https" ? 443 : 80)
       end
 
-      if organization
+      unless organization.nil?
         uri_hash[:path] = "/organizations/#{organization}"
       end
 
