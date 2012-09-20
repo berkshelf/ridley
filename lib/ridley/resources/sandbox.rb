@@ -75,7 +75,11 @@ module Ridley
       }
       contents = File.open(path, 'rb') { |f| f.read }
 
-      Faraday.put(checksum[:url], contents, headers)
+      if connection.hosted?
+        Faraday.put(checksum[:url], contents, headers)
+      else
+        connection.put(URI(checksum[:url]).path, contents, headers)
+      end
     end
 
     def commit
