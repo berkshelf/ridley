@@ -88,6 +88,14 @@ describe Ridley::Connection do
           )
         }.should raise_error(ArgumentError, "Missing required option(s): 'client_key'")
       end
+
+      it "raises a ClientKeyFileNotFound if the filepath for client_key is not found" do
+        config[:client_key] = "/tmp/nofile.xxsa"
+
+        lambda {
+          subject.new(config)
+        }.should raise_error(Ridley::Errors::ClientKeyFileNotFound)
+      end
     end
 
     describe "::sync" do

@@ -17,6 +17,8 @@ module Ridley
       alias_method :to_s, :message
     end
 
+    class ClientKeyFileNotFound < RidleyError; end
+
     class HTTPError < RidleyError
       class << self
         def fabricate(env)

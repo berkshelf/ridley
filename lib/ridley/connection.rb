@@ -79,6 +79,10 @@ module Ridley
       @organization = options.fetch(:organization, nil)
       @thread_count = options.fetch(:thread_count, DEFAULT_THREAD_COUNT)
 
+      unless @client_key.present? && File.exist?(@client_key)
+        raise Errors::ClientKeyFileNotFound, "client key not found at: '#{@client_key}'"
+      end
+
       faraday_options = options.slice(:params, :headers, :request, :ssl, :proxy)
       uri_hash = Addressable::URI.parse(options[:server_url]).to_hash.slice(:scheme, :host, :port)
 
