@@ -34,6 +34,8 @@ module Ridley
     def_delegator :conn, :port
     def_delegator :conn, :path_prefix
 
+    def_delegator :conn, :url_prefix=
+
     def_delegator :conn, :get
     def_delegator :conn, :put
     def_delegator :conn, :post

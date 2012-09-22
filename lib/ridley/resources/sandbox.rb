@@ -75,11 +75,23 @@ module Ridley
       }
       contents = File.open(path, 'rb') { |f| f.read }
 
-      if connection.hosted?
-        Faraday.put(checksum[:url], contents, headers)
-      else
-        connection.put(URI(checksum[:url]).path, contents, headers)
-      end
+      # Hosted Chef returns Amazon S3 URLs for where to upload
+      # checksums to. OSS Chef Server and Hosted Chef return URLs
+      # to the same Chef API that the Sandbox creation request was
+      # sent to.
+      #
+      # The connection object is duplicated to ensure all of our connection
+      # settings persist, but the scheme, host, and port are set to the
+      # value of the given checksum.
+      conn = connection.send(:conn).dup
+
+      url = URI(checksum[:url])
+      upload_path = url.path
+      url.path = ""
+
+      conn.url_prefix = url.to_s
+
+      conn.put(upload_path, contents, headers)
     end
 
     def commit
