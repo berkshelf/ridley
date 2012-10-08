@@ -8,6 +8,7 @@ require 'active_support/core_ext'
 require 'forwardable'
 require 'set'
 require 'thread'
+require 'chozo/core_ext'
 
 require 'ridley/version'
 require 'ridley/errors'

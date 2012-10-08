@@ -12,11 +12,42 @@ module Ridley
     validates_presence_of :name
 
     attribute :chef_environment, default: "_default"
-    attribute :automatic, default: Hash.new
-    attribute :normal, default: Hash.new
-    attribute :default, default: Hash.new
-    attribute :override, default: Hash.new
-    attribute :run_list, default: Array.new
+    attribute :automatic, default: HashWithIndifferentAccess.new
+    attribute :normal, default: HashWithIndifferentAccess.new
+    attribute :default, default: HashWithIndifferentAccess.new
+    attribute :override, default: HashWithIndifferentAccess.new
+    attribute :run_list, default: HashWithIndifferentAccess.new
+
+    def automatic=(hash)
+      super(HashWithIndifferentAccess.new(hash))
+    end
+
+    def normal=(hash)
+      super(HashWithIndifferentAccess.new(hash))
+    end
+
+    def default=(hash)
+      super(HashWithIndifferentAccess.new(hash))
+    end
+
+    def override=(hash)
+      super(HashWithIndifferentAccess.new(hash))
+    end
+
+    def set_override_attribute(key, value)
+      attr_hash = HashWithIndifferentAccess.from_dotted_path(key, value)
+      self.override = self.override.merge(attr_hash)
+    end
+
+    def set_default_attribute(key, value)
+      attr_hash = HashWithIndifferentAccess.from_dotted_path(key, value)
+      self.default = self.default.merge(attr_hash)
+    end
+
+    def set_normal_attribute(key, value)
+      attr_hash = HashWithIndifferentAccess.from_dotted_path(key, value)
+      self.normal = self.normal.merge(attr_hash)
+    end
   end
   
   module DSL
