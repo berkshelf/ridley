@@ -15,7 +15,7 @@ require 'ridley/errors'
 
 # @author Jamie Winsor <jamie@vialstudios.com>
 module Ridley
-  CHEF_VERSION = '10.12.0'.freeze
+  CHEF_VERSION = '10.14.4'.freeze
 
   autoload :Log, 'ridley/log'  
   autoload :Connection, 'ridley/connection'
