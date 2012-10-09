@@ -330,6 +330,21 @@ And the same goes for setting an environment level override attribute
       obj.save
     end
 
+### Role Attributes
+
+    conn = Ridley.connection
+    conn.sync do
+      obj = role.find("why_god_why")
+      obj.set_default_attribute("my_app.proxy.enabled", false)
+      obj.save
+    end
+
+    conn.sync do
+      obj = role.find("why_god_why")
+      obj.set_override_attribute("my_app.webapp.enabled", false)
+      obj.save
+    end
+
 # Authors and Contributors
 
 * Jamie Winsor (<jamie@vialstudios.com>)
