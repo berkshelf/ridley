@@ -274,6 +274,13 @@ Unlike a role, node, client, or environment, a data bag is a container for other
     conn.search(:node)
     conn.search(:node, "name:ridley-test.local")
 
+Search will return an array of Ridley resource objects if one of the default indices is specified. Chef's default indices are
+
+* node
+* role
+* client
+* environment
+
 ## Manipulating Attributes
 
 Using Ridley you can quickly manipulate node or environment attributes. Attributes are identified by a dotted path notation.

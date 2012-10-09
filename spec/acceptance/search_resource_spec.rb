@@ -28,24 +28,6 @@ describe "Search API operations", type: "acceptance" do
     end
   end
 
-  describe "showing an index" do
-    before(:each) do
-      @result = connection.search(:node)
-    end
-
-    it "returns a hash with a total key" do
-      @result.should have_key(:total)
-    end
-
-    it "returns a hash with a start key" do
-      @result.should have_key(:start)
-    end
-
-    it "returns a hash with a rows key" do
-      @result.should have_key(:rows)
-    end
-  end
-
   describe "searching an index that doesn't exist" do
     it "it raises a Ridley::Errors::HTTPNotFound error" do
       lambda {

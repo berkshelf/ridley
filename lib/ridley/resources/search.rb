@@ -3,14 +3,19 @@ module Ridley
     class << self
       # Returns an array of possible search indexes to be search on
       #
-      # @param [Ridley::Connection]
+      # @param [Ridley::Connection] connection
       #
-      # @return [Array<String, Symbol]
+      # @example
+      #
+      #   Search.indexes(connection) => [ :client, :environment, :node, :role ]
+      #
+      # @return [Array<String, Symbol>]
       def indexes(connection)
         connection.get("search").body.collect { |name, _| name }
       end
     end
 
+    # @return [Ridley::Connection]
     attr_reader :connection
     attr_reader :index
     attr_reader :query
@@ -19,9 +24,19 @@ module Ridley
     attr_accessor :rows
     attr_accessor :start
 
+    # @param [Ridley::Connection] connection
+    # @param [#to_sym] index
+    # @param [#to_s] query
+    #
+    # @option options [String] :sort
+    #   a sort string such as 'name DESC'
+    # @option options [Integer] :rows
+    #   how many rows to return
+    # @option options [Integer] :start
+    #   the result number to start from
     def initialize(connection, index, query, options = {})
       @connection = connection
-      @index      = index
+      @index      = index.to_sym
       @query      = query
 
       @sort       = options[:sort]
@@ -53,7 +68,20 @@ module Ridley
     #
     # @return [Hash]
     def run
-      connection.get(query_uri, query_options).body
+      response = connection.get(query_uri, query_options).body
+
+      case index
+      when :node
+        response[:rows].collect { |row| Node.new(connection, row) }
+      when :role
+        response[:rows].collect { |row| Role.new(connection, row) }
+      when :client
+        response[:rows].collect { |row| Client.new(connection, row) }
+      when :environment
+        response[:rows].collect { |row| Environment.new(connection, row) }
+      else
+        response[:rows]
+      end
     end
 
     private
