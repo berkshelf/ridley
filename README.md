@@ -274,6 +274,54 @@ Unlike a role, node, client, or environment, a data bag is a container for other
     conn.search(:node)
     conn.search(:node, "name:ridley-test.local")
 
+## Manipulating Attributes
+
+Using Ridley you can quickly manipulate node or environment attributes. Attributes are identified by a dotted path notation.
+
+    default[:my_app][:billing][:enabled] => "my_app.billing.enabled"
+
+Given the previous example you could set the default node attribute with the `set_default_attribute` function on a Node object
+
+### Node Attributes
+
+Setting the `default[:my_app][:billing][:enabled]` node level default attribute on the node "jwinsor-1"
+
+    conn = Ridley.connection
+    conn.sync do
+      obj = node.find("jwinsor-1")
+      obj.set_default_attribute("my_app.billing.enabled", false)
+      obj.save
+    end
+
+Other attribute precedence levels can be set with their own respective set attribute functions
+
+    conn = Ridley.connection
+    conn.sync do
+      obj = node.find("jwinsor-1")
+      obj.set_override_attribute("my_app.proxy.enabled", false)
+      obj.set_normal_attribute("my_app.webapp.enabled", false)
+    end
+
+### Environment Attributes
+
+Setting a default environment attribute is just like setting a node level default attribute
+
+    conn = Ridley.connection
+    conn.sync do
+      obj = environment.find("production")
+      obj.set_default_attribute("my_app.proxy.enabled", false)
+      obj.save
+    end
+
+And the same goes for setting an environment level override attribute
+
+    conn = Ridley.connection
+    conn.sync do
+      obj = environment.find("production")
+      obj.set_override_attribute("my_app.webapp.enabled", false)
+      obj.save
+    end
+
 # Authors and Contributors
 
 * Jamie Winsor (<jamie@vialstudios.com>)
