@@ -16,7 +16,7 @@ module Ridley
     attribute :normal, default: HashWithIndifferentAccess.new
     attribute :default, default: HashWithIndifferentAccess.new
     attribute :override, default: HashWithIndifferentAccess.new
-    attribute :run_list, default: HashWithIndifferentAccess.new
+    attribute :run_list, default: Array.new
 
     # @param [Hash] hash
     def automatic=(hash)
