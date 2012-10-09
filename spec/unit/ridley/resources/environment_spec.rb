@@ -75,6 +75,30 @@ describe Ridley::Environment do
 
   subject { Ridley::Environment.new(connection) }
 
+  describe "#default_attributes=" do
+    context "given a Hash" do
+      it "returns a HashWithIndifferentAccess" do
+        subject.default_attributes = {
+          "key" => "value"
+        }
+
+        subject.default_attributes.should be_a(HashWithIndifferentAccess)
+      end
+    end
+  end
+
+  describe "#override_attributes=" do
+    context "given a Hash" do
+      it "returns a HashWithIndifferentAccess" do
+        subject.override_attributes = {
+          "key" => "value"
+        }
+
+        subject.override_attributes.should be_a(HashWithIndifferentAccess)
+      end
+    end
+  end
+
   describe "#set_override_attribute" do
     it "returns a HashWithIndifferentAccess" do
       subject.set_override_attribute('deep.nested.item', true).should be_a(HashWithIndifferentAccess)

@@ -7,6 +7,54 @@ describe Ridley::Node do
 
   subject { Ridley::Node.new(connection) }
 
+  describe "#override=" do
+    context "given a Hash" do
+      it "returns a HashWithIndifferentAccess" do
+        subject.override = {
+          "key" => "value"
+        }
+
+        subject.override.should be_a(HashWithIndifferentAccess)
+      end
+    end
+  end
+
+  describe "#automatic=" do
+    context "given a Hash" do
+      it "returns a HashWithIndifferentAccess" do
+        subject.automatic = {
+          "key" => "value"
+        }
+
+        subject.automatic.should be_a(HashWithIndifferentAccess)
+      end
+    end
+  end
+
+  describe "#normal=" do
+    context "given a Hash" do
+      it "returns a HashWithIndifferentAccess" do
+        subject.normal = {
+          "key" => "value"
+        }
+
+        subject.normal.should be_a(HashWithIndifferentAccess)
+      end
+    end
+  end
+
+  describe "#default=" do
+    context "given a Hash" do
+      it "returns a HashWithIndifferentAccess" do
+        subject.default = {
+          "key" => "value"
+        }
+
+        subject.default.should be_a(HashWithIndifferentAccess)
+      end
+    end
+  end
+
   describe "#set_override_attribute" do
     it "returns a HashWithIndifferentAccess" do
       subject.set_override_attribute('deep.nested.item', true).should be_a(HashWithIndifferentAccess)
