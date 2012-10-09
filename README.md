@@ -300,6 +300,7 @@ Other attribute precedence levels can be set with their own respective set attri
       obj = node.find("jwinsor-1")
       obj.set_override_attribute("my_app.proxy.enabled", false)
       obj.set_normal_attribute("my_app.webapp.enabled", false)
+      obj.save
     end
 
 ### Environment Attributes
