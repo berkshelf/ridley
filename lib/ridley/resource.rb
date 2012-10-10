@@ -68,7 +68,7 @@ module Ridley
 
       # @return [Hash]
       def attribute_defaults
-        @attribute_defaults ||= Hash.new
+        @attribute_defaults ||= HashWithIndifferentAccess.new
       end
 
       # @param [String, Symbol] name

@@ -24,7 +24,7 @@ module Ridley
         #
         # @return [Hash]
         def parse(body)
-          MultiJson.decode(body, symbolize_keys: true)
+          HashWithIndifferentAccess.new MultiJson.decode(body)
         end
 
         # Extracts the type of the response from the response headers
@@ -62,8 +62,7 @@ module Ridley
         #
         # @return [Boolean]
         def json_response?(env)
-          response_type(env) == JSON_TYPE ||
-            looks_like_json?(env)
+          response_type(env) == JSON_TYPE || looks_like_json?(env)
         end
 
         # Examines the body of a request env and returns true if it appears
