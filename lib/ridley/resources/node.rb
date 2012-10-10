@@ -91,6 +91,14 @@ module Ridley
       attr_hash = HashWithIndifferentAccess.from_dotted_path(key, value)
       self.normal = self.normal.merge(attr_hash)
     end
+
+    def eucalyptus?
+      self.automatic.has_key?(:eucalyptus)
+    end
+
+    def ec2?
+      self.automatic.has_key?(:ec2)
+    end
   end
   
   module DSL

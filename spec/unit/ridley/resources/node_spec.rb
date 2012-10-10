@@ -144,4 +144,36 @@ describe Ridley::Node do
       end
     end
   end
+
+  describe "#eucalyptus?" do
+    it "returns true if the eucalyptus automatic attribute is set" do
+      subject.automatic = {
+        "eucalyptus" => Hash.new
+      }
+
+      subject.eucalyptus?.should be_true
+    end
+
+    it "returns false if the eucalyptus automatic attribute is not set" do
+      subject.automatic.delete(:eucalyptus)
+
+      subject.eucalyptus?.should be_false
+    end
+  end
+
+  describe "#ec2?" do
+    it "returns true if the ec2 automatic attribute is set" do
+      subject.automatic = {
+        "ec2" => Hash.new
+      }
+
+      subject.ec2?.should be_true
+    end
+
+    it "returns false if the ec2 automatic attribute is not set" do
+      subject.automatic.delete(:ec2)
+
+      subject.ec2?.should be_false
+    end
+  end
 end
