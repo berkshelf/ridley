@@ -98,15 +98,20 @@ module Ridley
       end
     end
 
+    # @return [Ridley::DataBag]
     attr_reader :data_bag
+    # @return [HashWithIndifferentAccess]
+    attr_reader :attributes
 
-    attr_accessor :attributes    
     validates_presence_of :id
 
+    # @param [Ridley::Connection] connection
+    # @param [Ridley::DataBag] data_bag
+    # @param [#to_hash] attributes
     def initialize(connection, data_bag, attributes = {})
       @connection = connection
       @data_bag = data_bag
-      @attributes = attributes
+      self.attributes = attributes
     end
 
     # Alias for accessing the value of the 'id' attribute
@@ -134,6 +139,13 @@ module Ridley
     end
     alias_method :[]=, :attribute=
 
+    # @param [#to_hash] new_attributes
+    #
+    # @return [HashWithIndifferentAccess]
+    def attributes=(new_attributes)
+      @attributes = HashWithIndifferentAccess.new(new_attributes.to_hash)
+    end
+
     # Creates a resource on the target remote or updates one if the resource
     # already exists.
     #
@@ -156,7 +168,7 @@ module Ridley
     #
     # @return [Object]
     def from_hash(hash)
-      hash = hash.to_hash
+      hash = HashWithIndifferentAccess.new(hash.to_hash)
 
       self.attributes = hash.has_key?(:raw_data) ? hash[:raw_data] : hash
       self
@@ -181,6 +193,7 @@ module Ridley
 
     private
 
+      # @return [Ridley::Connection]
       attr_reader :connection
   end
 end

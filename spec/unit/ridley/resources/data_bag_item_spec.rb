@@ -10,27 +10,27 @@ describe Ridley::DataBagItem do
     context "when JSON has a 'raw_data' field" do
       let(:response) do
         {
-          name: "data_bag_item_ridley-test_appconfig",
-          raw_data: {
-            id: "appconfig",
-            host: "host.local"
+          "name" => "data_bag_item_ridley-test_appconfig",
+          "raw_data" => {
+            "id" => "appconfig",
+            "host" => "host.local"
           },
-          json_class: "Chef::DataBagItem",
-          data_bag: "ridley-test",
-          chef_type: "data_bag_item"
+          "json_class" => "Chef::DataBagItem",
+          "data_bag" => "ridley-test",
+          "chef_type" => "data_bag_item"
         }
       end
 
       it "returns a new object from attributes in the 'raw_data' field" do
-        subject.from_hash(response).attributes.should eql(response[:raw_data])
+        subject.from_hash(response).attributes.should eql(response["raw_data"])
       end
     end
 
     context "when JSON does not contain a 'raw_data' field" do
       let(:response) do
         {
-          id: "appconfig",
-          host: "host.local"
+          "id" => "appconfig",
+          "host" => "host.local"
         }
       end
 

@@ -124,9 +124,9 @@ describe "Environment API operations", type: "acceptance" do
 
     it "saves a new set of 'default_attributes'" do
       target.default_attributes = default_attributes = {
-        attribute_one: "val_one",
-        nested: {
-          other: "val"
+        "attribute_one" => "val_one",
+        "nested" => {
+          "other" => "val"
         }
       }
 
@@ -140,9 +140,9 @@ describe "Environment API operations", type: "acceptance" do
 
     it "saves a new set of 'override_attributes'" do
       target.override_attributes = override_attributes = {
-        attribute_one: "val",
-        nested: {
-          other: "val"
+        "attribute_one" => "val_one",
+        "nested" => {
+          "other" => "val"
         }
       }
 
@@ -156,8 +156,8 @@ describe "Environment API operations", type: "acceptance" do
 
     it "saves a new set of 'cookbook_versions'" do
       target.cookbook_versions = cookbook_versions = {
-        nginx: "1.2.0",
-        tomcat: "1.3.0"
+        "nginx" => "1.2.0",
+        "tomcat" => "1.3.0"
       }
 
       connection.sync do

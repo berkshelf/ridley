@@ -142,8 +142,8 @@ describe "Role API operations", type: "acceptance" do
 
     it "saves a new env_run_lists" do
       target.env_run_lists = env_run_lists = {
-        production: ["recipe[one]"],
-        development: ["recipe[two]"]
+        "production" => ["recipe[one]"],
+        "development" => ["recipe[two]"]
       }
 
       connection.sync do
@@ -167,9 +167,9 @@ describe "Role API operations", type: "acceptance" do
 
     it "saves a new default_attributes" do
       target.default_attributes = defaults = {
-        attribute_one: "value_one",
-        nested: {
-          other: false
+        "attribute_one" => "value_one",
+        "nested" => {
+          "other" => false
         }
       }
 
@@ -183,9 +183,9 @@ describe "Role API operations", type: "acceptance" do
 
     it "saves a new override_attributes" do
       target.override_attributes = overrides = {
-        attribute_two: "value_two",
-        nested: {
-          other: false
+        "attribute_two" => "value_two",
+        "nested" => {
+          "other" => false
         }
       }
 

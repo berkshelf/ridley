@@ -69,7 +69,13 @@ describe "DataBag API operations", type: "acceptance" do
   describe "retrieving a data bag item" do
     it "returns the desired item in the data bag" do
       attributes = {
-        id: "appconfig", host: "host.local", port: 80, admin: false, servers: ["one"]
+        "id" => "appconfig",
+        "host" => "host.local",
+        "port" => 80,
+        "admin" => false,
+        "servers" => [
+          "one"
+        ]
       }
       @databag.item.create(attributes)
 
@@ -80,8 +86,8 @@ describe "DataBag API operations", type: "acceptance" do
   describe "deleting a data bag item" do
     let(:attributes) do
       {
-        id: "appconfig",
-        host: "host.local"
+        "id" => "appconfig",
+        "host" => "host.local"
       }
     end
 
@@ -90,16 +96,16 @@ describe "DataBag API operations", type: "acceptance" do
     end
 
     it "returns the deleted data bag item" do
-      dbi = @databag.item.delete(attributes[:id])
+      dbi = @databag.item.delete(attributes["id"])
 
       dbi.should be_a(Ridley::DataBagItem)
       dbi.attributes.should eql(attributes)
     end
 
     it "deletes the data bag item from the server" do
-      @databag.item.delete(attributes[:id])
+      @databag.item.delete(attributes["id"])
 
-      @databag.item.find(attributes[:id]).should be_nil
+      @databag.item.find(attributes["id"]).should be_nil
     end
   end
 

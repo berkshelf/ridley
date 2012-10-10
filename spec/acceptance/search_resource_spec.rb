@@ -22,9 +22,10 @@ describe "Search API operations", type: "acceptance" do
     it "returns an array of indexes" do
       indexes = connection.search_indexes
 
-      indexes.should include(:role)
-      indexes.should include(:node)
-      indexes.should include(:client)
+      indexes.should include("role")
+      indexes.should include("node")
+      indexes.should include("client")
+      indexes.should include("environment")
     end
   end
 

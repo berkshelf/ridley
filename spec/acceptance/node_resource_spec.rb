@@ -131,9 +131,9 @@ describe "Node API operations", type: "acceptance" do
 
     it "saves a new set of 'normal' attributes" do
       target.normal = normal = {
-        attribute_one: "value_one",
-        nested: {
-          other: "val"
+        "attribute_one" => "value_one",
+        "nested" => {
+          "other" => "val"
         }
       }
 
@@ -147,9 +147,9 @@ describe "Node API operations", type: "acceptance" do
 
     it "saves a new set of 'default' attributes" do
       target.default = defaults = {
-        attribute_one: "val_one",
-        nested: {
-          other: "val"
+        "attribute_one" => "val_one",
+        "nested" => {
+          "other" => "val"
         }
       }
 
@@ -163,9 +163,9 @@ describe "Node API operations", type: "acceptance" do
 
     it "saves a new set of 'automatic' attributes" do
       target.automatic = automatics = {
-        attribute_one: "val_one",
-        nested: {
-          other: "val"
+        "attribute_one" => "val_one",
+        "nested" => {
+          "other" => "val"
         }
       }
 
@@ -179,9 +179,9 @@ describe "Node API operations", type: "acceptance" do
 
     it "saves a new set of 'override' attributes" do
       target.override = overrides = {
-        attribute_one: "val_one",
-        nested: {
-          other: "val"
+        "attribute_one" => "val_one",
+        "nested" => {
+          "other" => "val"
         }
       }
 

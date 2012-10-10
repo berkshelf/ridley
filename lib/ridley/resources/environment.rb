@@ -27,7 +27,7 @@ module Ridley
     attribute :description, default: String.new
     attribute :default_attributes, default: HashWithIndifferentAccess.new
     attribute :override_attributes, default: HashWithIndifferentAccess.new
-    attribute :cookbook_versions, default: Hash.new
+    attribute :cookbook_versions, default: HashWithIndifferentAccess.new
 
     # @param [Hash] hash
     def default_attributes=(hash)
@@ -36,6 +36,10 @@ module Ridley
 
     # @param [Hash] hash
     def override_attributes=(hash)
+      super(HashWithIndifferentAccess.new(hash))
+    end
+
+    def cookbook_versions=(hash)
       super(HashWithIndifferentAccess.new(hash))
     end
 
