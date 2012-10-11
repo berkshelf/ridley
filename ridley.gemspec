@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.version       = Ridley::VERSION
   s.required_ruby_version = ">= 1.9.1"
 
-  s.add_runtime_dependency 'chozo', '>= 0.0.2'
+  s.add_runtime_dependency 'chozo', '>= 0.0.3'
   s.add_runtime_dependency 'yajl-ruby'
   s.add_runtime_dependency 'mixlib-log'
   s.add_runtime_dependency 'mixlib-authentication'
