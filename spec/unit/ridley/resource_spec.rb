@@ -211,4 +211,86 @@ describe Ridley::Resource do
       subject.attributes[:name].should eql("reset")
     end
   end
+
+  describe "comparable" do
+    subject do
+      Class.new do
+        include Ridley::Resource
+
+        set_chef_id "name"
+
+        attribute "name"
+        attribute "other_extra"
+        attribute "extra"
+      end
+    end
+
+    let(:one) { subject.new(connection) }
+    let(:two) { subject.new(connection) }
+
+    context "given two objects with the same value for their 'chef_id'" do
+      before(:each) do
+        one.attributes = { name: "reset", other_extra: "stuff" }
+        two.attributes = { name: "reset", extra: "stuff" }
+      end
+
+      it "is equal" do
+        one.should be_eql(two)
+      end
+    end
+
+    context "given two objects with different values for their 'chef_id'" do
+      before(:each) do
+        one.attributes = { name: "jamie", other_extra: "stuff" }
+        two.attributes = { name: "winsor", extra: "stuff" }
+      end
+
+      it "is not equal" do
+        one.should_not be_eql(two)
+      end
+    end
+  end
+
+  describe "uniqueness" do
+    subject do
+      Class.new do
+        include Ridley::Resource
+
+        set_chef_id "name"
+
+        attribute "name"
+        attribute "other_extra"
+        attribute "extra"
+      end
+    end
+
+    let(:one) { subject.new(connection) }
+    let(:two) { subject.new(connection) }
+
+    context "given an array of objects with the same value for their 'chef_id'" do
+      let(:nodes) do
+        one.attributes = { name: "reset", other_extra: "stuff" }
+        two.attributes = { name: "reset", extra: "stuff" }
+
+        [ one, two ]
+      end
+
+      it "returns only one unique element" do
+        nodes.uniq.should have(1).item
+      end
+    end
+
+    context "given an array of objects with different values for their 'chef_id'" do
+      let(:nodes) do
+        one.attributes = { name: "jamie", other_extra: "stuff" }
+        two.attributes = { name: "winsor", extra: "stuff" }
+
+        [ one, two ]
+      end
+
+      it "returns all of the elements" do
+        nodes.uniq.should have(2).item
+      end
+    end
+  end
 end

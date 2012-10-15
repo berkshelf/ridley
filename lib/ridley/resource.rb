@@ -5,6 +5,7 @@ module Ridley
     include ActiveModel::AttributeMethods
     include ActiveModel::Validations
     include ActiveModel::Serializers::JSON
+    include Comparable
 
     included do
       attribute_method_suffix('=')
@@ -287,15 +288,23 @@ module Ridley
     # @param [Object] other
     #
     # @return [Boolean]
+    def <=>(other)
+      self.chef_id <=> other.chef_id
+    end
+
     def ==(other)
-      self.attributes == other.attributes
+      self.chef_id == other.chef_id
     end
 
     # @param [Object] other
     #
     # @return [Boolean]
     def eql?(other)
-      other.is_a?(self.class) && send(:==, other)
+      self.class == other.class && self == other
+    end
+
+    def hash
+      self.chef_id.hash
     end
 
     private
