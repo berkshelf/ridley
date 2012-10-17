@@ -62,6 +62,29 @@ describe Ridley::Connection do
         end
       end
 
+      describe "with a server_url containing an organization" do
+        before(:each) do
+          @conn = subject.new(
+            server_url: "#{server_url}/organizations/#{organization}",
+            client_name: client_name,
+            client_key: client_key
+          )
+        end
+
+        it "gets the host data from the server_url" do
+          @conn.host.should eql("api.opscode.com")
+          @conn.scheme.should eql("https")
+        end
+
+        it "assigns the value of the 'organization' option to an 'organization' attribute" do
+          @conn.organization.should eql(organization)
+        end
+
+        it "sets the 'path_prefix' of the connection the organization sub URI" do
+          @conn.path_prefix.should eql("/organizations/#{organization}")
+        end
+      end
+
       it "raises 'ArgumentError' if a value for server_url is not given" do
         lambda {
           subject.new(
