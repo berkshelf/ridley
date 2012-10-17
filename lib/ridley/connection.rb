@@ -92,6 +92,10 @@ module Ridley
         uri_hash[:port] = (uri_hash[:scheme] == "https" ? 443 : 80)
       end
 
+      if org_match = options[:server_url].match(/.*\/organizations\/(.*)/)
+        @organization ||= org_match[1]
+      end
+
       unless organization.nil?
         uri_hash[:path] = "/organizations/#{organization}"
       end
