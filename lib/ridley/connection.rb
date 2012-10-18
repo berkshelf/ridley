@@ -144,7 +144,11 @@ module Ridley
       end
 
       def method_missing(method, *args, &block)
-        @self_before_instance_eval.send(method, *args, &block)
+        unless @self_before_instance_eval.nil?
+          @self_before_instance_eval.send(method, *args, &block)
+        end
+
+        super
       end
   end
 end
