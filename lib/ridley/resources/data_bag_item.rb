@@ -50,7 +50,7 @@ module Ridley
         end
 
         new_attributes = connection.post("#{data_bag.class.resource_path}/#{data_bag.name}", resource.to_json).body
-        resource.from_hash(resource.attributes.merge(new_attributes))
+        resource.from_hash(resource.attributes.deep_merge(new_attributes))
         resource
       end
 

@@ -42,7 +42,7 @@ module Ridley
     # @return [HashWithIndifferentAccess]
     def set_override_attribute(key, value)
       attr_hash = HashWithIndifferentAccess.from_dotted_path(key, value)
-      self.override_attributes = self.override_attributes.merge(attr_hash)
+      self.override_attributes = self.override_attributes.deep_merge(attr_hash)
     end
 
     # Set a role level default attribute given the dotted path representation of the Chef
@@ -60,7 +60,7 @@ module Ridley
     # @return [HashWithIndifferentAccess]
     def set_default_attribute(key, value)
       attr_hash = HashWithIndifferentAccess.from_dotted_path(key, value)
-      self.default_attributes = self.default_attributes.merge(attr_hash)
+      self.default_attributes = self.default_attributes.deep_merge(attr_hash)
     end
   end
 

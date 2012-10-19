@@ -123,7 +123,7 @@ module Ridley
       def create(connection, object)
         resource = new(connection, object.to_hash)
         new_attributes = connection.post(self.resource_path, resource.to_json).body
-        resource.attributes = resource.attributes.merge(new_attributes)
+        resource.attributes = resource.attributes.deep_merge(new_attributes)
         resource
       end
 
@@ -176,7 +176,7 @@ module Ridley
     # @param [Hash] attributes
     def initialize(connection, attributes = {})
       @connection = connection
-      self.attributes = self.class.attribute_defaults.merge(attributes)
+      self.attributes = self.class.attribute_defaults.deep_merge(attributes)
     end
 
     # @param [String, Symbol] key
