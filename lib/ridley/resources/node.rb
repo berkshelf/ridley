@@ -61,7 +61,7 @@ module Ridley
     # @return [HashWithIndifferentAccess]
     def set_attribute(key, value)
       attr_hash = HashWithIndifferentAccess.from_dotted_path(key, value)
-      self.normal = self.normal.merge(attr_hash)
+      self.normal = self.normal.deep_merge(attr_hash)
     end
 
     def eucalyptus?
