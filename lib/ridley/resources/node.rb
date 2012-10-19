@@ -38,44 +38,16 @@ module Ridley
       super(HashWithIndifferentAccess.new(hash))
     end
 
-    # Set a node level override attribute given the dotted path representation of the Chef
-    # attribute and value
-    # 
-    # @example setting and saving a node level override attribute
-    #
-    #   obj = node.find("jwinsor-1")
-    #   obj.set_override_attribute("my_app.billing.enabled", false)
-    #   obj.save
-    #
-    # @param [String] key
-    # @param [Object] value
-    #
-    # @return [HashWithIndifferentAccess]
-    def set_override_attribute(key, value)
-      attr_hash = HashWithIndifferentAccess.from_dotted_path(key, value)
-      self.override = self.override.merge(attr_hash)
-    end
-
-    # Set a node level default attribute given the dotted path representation of the Chef
-    # attribute and value
-    # 
-    # @example setting and saving a node level default attribute
-    #
-    #   obj = node.find("jwinsor-1")
-    #   obj.set_default_attribute("my_app.billing.enabled", false)
-    #   obj.save
-    #
-    # @param [String] key
-    # @param [Object] value
-    #
-    # @return [HashWithIndifferentAccess]
-    def set_default_attribute(key, value)
-      attr_hash = HashWithIndifferentAccess.from_dotted_path(key, value)
-      self.default = self.default.merge(attr_hash)
+    # @param [Hash] hash
+    def normal=(hash)
+      super(HashWithIndifferentAccess.new(hash))
     end
 
     # Set a node level normal attribute given the dotted path representation of the Chef
-    # attribute and value
+    # attribute and value.
+    #
+    # @note It is not possible to set any other attribute level on a node and have it persist after
+    #   a Chef Run. This is because all other attribute levels are truncated at the start of a Chef Run. 
     # 
     # @example setting and saving a node level normal attribute
     #
@@ -87,7 +59,7 @@ module Ridley
     # @param [Object] value
     #
     # @return [HashWithIndifferentAccess]
-    def set_normal_attribute(key, value)
+    def set_attribute(key, value)
       attr_hash = HashWithIndifferentAccess.from_dotted_path(key, value)
       self.normal = self.normal.merge(attr_hash)
     end
