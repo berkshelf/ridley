@@ -23,7 +23,8 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'addressable'
   s.add_runtime_dependency 'faraday'
   s.add_runtime_dependency 'multi_json', '>= 1.0.4'
-  s.add_runtime_dependency 'activemodel'
+  s.add_runtime_dependency 'activemodel', '>= 3.2.0'
+  s.add_runtime_dependency 'activesupport', '>= 3.2.0'
 
   s.add_development_dependency 'rake'
   s.add_development_dependency 'rspec'
