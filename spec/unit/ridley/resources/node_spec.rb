@@ -55,43 +55,13 @@ describe Ridley::Node do
     end
   end
 
-  describe "#set_override_attribute" do
+  describe "#set_attribute" do
     it "returns a HashWithIndifferentAccess" do
-      subject.set_override_attribute('deep.nested.item', true).should be_a(HashWithIndifferentAccess)
-    end
-
-    it "sets an override node attribute at the nested path" do
-       subject.set_override_attribute('deep.nested.item', true)
-
-       subject.override.should have_key("deep")
-       subject.override["deep"].should have_key("nested")
-       subject.override["deep"]["nested"].should have_key("item")
-       subject.override["deep"]["nested"]["item"].should be_true
-    end
-
-    context "when the override attribute is already set" do
-      it "test" do
-        subject.override = {
-          deep: {
-            nested: {
-              item: false
-            }
-          }
-        }
-        subject.set_override_attribute('deep.nested.item', true)
-        
-        subject.override["deep"]["nested"]["item"].should be_true
-      end
-    end
-  end
-
-  describe "#set_normal_attribute" do
-    it "returns a HashWithIndifferentAccess" do
-      subject.set_normal_attribute('deep.nested.item', true).should be_a(HashWithIndifferentAccess)
+      subject.set_attribute('deep.nested.item', true).should be_a(HashWithIndifferentAccess)
     end
 
     it "sets an normal node attribute at the nested path" do
-       subject.set_normal_attribute('deep.nested.item', true)
+       subject.set_attribute('deep.nested.item', true)
 
        subject.normal.should have_key("deep")
        subject.normal["deep"].should have_key("nested")
@@ -108,39 +78,9 @@ describe Ridley::Node do
             }
           }
         }
-        subject.set_normal_attribute('deep.nested.item', true)
+        subject.set_attribute('deep.nested.item', true)
         
         subject.normal["deep"]["nested"]["item"].should be_true
-      end
-    end
-  end
-
-  describe "#set_default_attribute" do
-    it "returns a HashWithIndifferentAccess" do
-      subject.set_default_attribute('deep.nested.item', true).should be_a(HashWithIndifferentAccess)
-    end
-
-    it "sets an default node attribute at the nested path" do
-       subject.set_default_attribute('deep.nested.item', true)
-
-       subject.default.should have_key("deep")
-       subject.default["deep"].should have_key("nested")
-       subject.default["deep"]["nested"].should have_key("item")
-       subject.default["deep"]["nested"]["item"].should be_true
-    end
-
-    context "when the default attribute is already set" do
-      it "test" do
-        subject.default = {
-          deep: {
-            nested: {
-              item: false
-            }
-          }
-        }
-        subject.set_default_attribute('deep.nested.item', true)
-        
-        subject.default["deep"]["nested"]["item"].should be_true
       end
     end
   end
