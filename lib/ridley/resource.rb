@@ -245,6 +245,14 @@ module Ridley
       true
     end
 
+    # Reload the attributes of the instantiated resource
+    #
+    # @return [Object]
+    def reload
+      self.attributes = self.class.find(connection, self).attributes
+      self
+    end
+
     # @return [String]
     def chef_id
       attribute(self.class.chef_id)

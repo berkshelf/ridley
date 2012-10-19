@@ -234,4 +234,24 @@ shared_examples_for "a Ridley Resource" do |resource_klass|
       @object.name.should eql("reset")
     end
   end
+
+  describe "#reload" do
+    let(:updated_subject) { double('updated_subject', attributes: { fake_attribute: "some_value" }) }
+
+    before(:each) do
+      subject.class.attribute(:fake_attribute)
+      subject.class.stub(:find).with(connection, subject).and_return(updated_subject)
+    end
+
+    it "returns itself" do
+      subject.reload.should eql(subject)
+    end
+
+    it "sets the attributes of self to include those of the reloaded object" do
+      subject.reload
+
+      subject.attributes.should have_key(:fake_attribute)
+      subject.attributes[:fake_attribute].should eql("some_value")
+    end
+  end
 end
