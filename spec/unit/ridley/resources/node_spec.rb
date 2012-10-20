@@ -85,35 +85,164 @@ describe Ridley::Node do
     end
   end
 
-  describe "#eucalyptus?" do
-    it "returns true if the eucalyptus automatic attribute is set" do
+  describe "#cloud?" do
+    it "returns true if the cloud automatic attribute is set" do
       subject.automatic = {
-        "eucalyptus" => Hash.new
+        "cloud" => Hash.new
+      }
+
+      subject.cloud?.should be_true
+    end
+
+    it "returns false if the cloud automatic attribute is not set" do
+      subject.automatic.delete(:cloud)
+
+      subject.cloud?.should be_false
+    end
+  end
+
+  describe "#eucalyptus?" do
+    it "returns true if the node is a cloud node using the eucalyptus provider" do
+      subject.automatic = {
+        "cloud" => {
+          "provider" => "eucalyptus"
+        }
       }
 
       subject.eucalyptus?.should be_true
     end
 
-    it "returns false if the eucalyptus automatic attribute is not set" do
-      subject.automatic.delete(:eucalyptus)
+    it "returns false if the node is not a cloud node" do
+      subject.automatic.delete(:cloud)
+
+      subject.eucalyptus?.should be_false
+    end
+
+    it "returns false if the node is a cloud node but not using the eucalyptus provider" do
+      subject.automatic = {
+        "cloud" => {
+          "provider" => "ec2"
+        }
+      }
 
       subject.eucalyptus?.should be_false
     end
   end
 
   describe "#ec2?" do
-    it "returns true if the ec2 automatic attribute is set" do
+    it "returns true if the node is a cloud node using the ec2 provider" do
       subject.automatic = {
-        "ec2" => Hash.new
+        "cloud" => {
+          "provider" => "ec2"
+        }
       }
 
       subject.ec2?.should be_true
     end
 
-    it "returns false if the ec2 automatic attribute is not set" do
-      subject.automatic.delete(:ec2)
+    it "returns false if the node is not a cloud node" do
+      subject.automatic.delete(:cloud)
 
       subject.ec2?.should be_false
+    end
+
+    it "returns false if the node is a cloud node but not using the ec2 provider" do
+      subject.automatic = {
+        "cloud" => {
+          "provider" => "rackspace"
+        }
+      }
+
+      subject.ec2?.should be_false
+    end
+  end
+
+  describe "#rackspace?" do
+    it "returns true if the node is a cloud node using the rackspace provider" do
+      subject.automatic = {
+        "cloud" => {
+          "provider" => "rackspace"
+        }
+      }
+
+      subject.rackspace?.should be_true
+    end
+
+    it "returns false if the node is not a cloud node" do
+      subject.automatic.delete(:cloud)
+
+      subject.rackspace?.should be_false
+    end
+
+    it "returns false if the node is a cloud node but not using the rackspace provider" do
+      subject.automatic = {
+        "cloud" => {
+          "provider" => "ec2"
+        }
+      }
+
+      subject.rackspace?.should be_false
+    end
+  end
+
+  describe "#cloud_provider" do
+    it "returns the cloud provider if the node is a cloud node" do
+      subject.automatic = {
+        "cloud" => {
+          "provider" => "ec2"
+        }
+      }
+
+      subject.cloud_provider.should eql("ec2")
+    end
+
+    it "returns nil if the node is not a cloud node" do
+      subject.automatic.delete(:cloud)
+
+      subject.cloud_provider.should be_nil
+    end
+  end
+
+  describe "#public_ipv4" do
+    it "returns the public ipv4 address if the node is a cloud node" do
+      subject.automatic = {
+        "cloud" => {
+          "provider" => "ec2",
+          "public_ipv4" => "10.0.0.1"
+        }
+      }
+
+      subject.public_ipv4.should eql("10.0.0.1")
+    end
+
+    it "returns the ipaddress if the node is not a cloud node" do
+      subject.automatic = {
+        "ipaddress" => "192.168.1.1"
+      }
+      subject.automatic.delete(:cloud)
+
+      subject.public_ipv4.should eql("192.168.1.1")
+    end
+  end
+
+  describe "#public_hostname" do
+    it "returns the public hostname if the node is a cloud node" do
+      subject.automatic = {
+        "cloud" => {
+          "public_hostname" => "reset.cloud.riotgames.com"
+        }
+      }
+
+      subject.public_hostname.should eql("reset.cloud.riotgames.com")
+    end
+
+    it "returns the FQDN if the node is not a cloud node" do
+      subject.automatic = {
+        "fqdn" => "reset.internal.riotgames.com"
+      }
+      subject.automatic.delete(:cloud)
+
+      subject.public_hostname.should eql("reset.internal.riotgames.com")
     end
   end
 end
