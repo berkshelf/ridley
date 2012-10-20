@@ -102,7 +102,7 @@ describe Ridley::Node do
   end
 
   describe "#eucalyptus?" do
-    it "returns true if the node is a cloud ndoe using the eucalyptus provider" do
+    it "returns true if the node is a cloud node using the eucalyptus provider" do
       subject.automatic = {
         "cloud" => {
           "provider" => "eucalyptus"

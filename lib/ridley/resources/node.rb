@@ -18,30 +18,34 @@ module Ridley
     attribute :override, default: HashWithIndifferentAccess.new
     attribute :run_list, default: Array.new
 
-    # @param [Hash] hash
-    def automatic=(hash)
-      super(HashWithIndifferentAccess.new(hash))
-    end
+    alias_method :normal_attributes, :normal
+    alias_method :automatic_attributes, :automatic
+    alias_method :default_attributes, :default
+    alias_method :override_attributes, :override
 
     # @param [Hash] hash
     def normal=(hash)
       super(HashWithIndifferentAccess.new(hash))
     end
+    alias_method :normal_attributes=, :normal=
+
+    # @param [Hash] hash
+    def automatic=(hash)
+      super(HashWithIndifferentAccess.new(hash))
+    end
+    alias_method :automatic_attributes=, :automatic=
 
     # @param [Hash] hash
     def default=(hash)
       super(HashWithIndifferentAccess.new(hash))
     end
+    alias_method :default_attributes=, :default=
 
     # @param [Hash] hash
     def override=(hash)
       super(HashWithIndifferentAccess.new(hash))
     end
-
-    # @param [Hash] hash
-    def normal=(hash)
-      super(HashWithIndifferentAccess.new(hash))
-    end
+    alias_method :override_attributes=, :override=
 
     # Set a node level normal attribute given the dotted path representation of the Chef
     # attribute and value.
@@ -52,7 +56,7 @@ module Ridley
     # @example setting and saving a node level normal attribute
     #
     #   obj = node.find("jwinsor-1")
-    #   obj.set_normal_attribute("my_app.billing.enabled", false)
+    #   obj.set_attribute("my_app.billing.enabled", false)
     #   obj.save
     #
     # @param [String] key
