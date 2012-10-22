@@ -6,6 +6,19 @@ module Ridley
     autoload :Response, 'ridley/ssh/response'
     autoload :Worker, 'ridley/ssh/worker'
 
+    class << self
+      # @param [Ridley::Node, Array<Ridley::Node>] nodes
+      # @param [String] user
+      # @param [Hash] options
+      def start(nodes, user, options = {}, &block)
+        runner = new(nodes, user, options)
+        result = yield runner
+        runner.terminate
+
+        result
+      end
+    end
+
     include Celluloid
     include Celluloid::Logger
 

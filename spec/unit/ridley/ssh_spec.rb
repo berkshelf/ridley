@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Ridley::SSH, focus: true do
+describe Ridley::SSH do
   let(:connection) { double('conn', ssh: { user: "vagrant", password: "vagrant" }) }
 
   let(:node_one) do
@@ -9,6 +9,14 @@ describe Ridley::SSH, focus: true do
 
   let(:node_two) do
     Ridley::Node.new(connection, automatic: { cloud: { public_hostname: "33.33.33.11" } })
+  end
+
+  describe "ClassMethods" do
+    subject { Ridley::SSH }
+    
+    describe "::start" do
+      pending
+    end
   end
 
   subject { Ridley::SSH.new([node_one, node_two], "vagrant", password: "vagrant") }
