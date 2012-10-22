@@ -132,6 +132,30 @@ module Ridley
     def rackspace?
       self.cloud_provider == "rackspace"
     end
+
+    # Run Chef-Client on the instantiated node
+    #
+    # @return [Array]
+    #   an array containing a result symbol and an {SSH::Result}
+    def chef_client(options = {})
+      runner = Ridley::SSH.new(self, nil, connection.ssh)
+      result = runner.run("sudo chef-client").first
+      runner.terminate
+
+      result
+    end
+
+    # Run Chef-Solo on the instantiated node
+    #
+    # @return [Array]
+    #   an array containing a result symbol and an {SSH::Result}
+    def chef_solo(options = {})
+      runner = Ridley::SSH.new(self, nil, connection.ssh)
+      result = runner.run("sudo chef-solo").first
+      runner.terminate
+
+      result
+    end
   end
   
   module DSL

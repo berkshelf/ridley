@@ -1,3 +1,4 @@
+require 'celluloid'
 require 'faraday'
 require 'addressable/uri'
 require 'yajl'
@@ -17,21 +18,24 @@ require 'ridley/errors'
 module Ridley
   CHEF_VERSION = '10.14.4'.freeze
 
-  autoload :Log, 'ridley/log'  
-  autoload :Connection, 'ridley/connection'
-  autoload :DSL, 'ridley/dsl'
-  autoload :Context, 'ridley/context'
-  autoload :Resource, 'ridley/resource'
-  autoload :Environment, 'ridley/resources/environment'
-  autoload :Role, 'ridley/resources/role'
   autoload :Client, 'ridley/resources/client'
-  autoload :Node, 'ridley/resources/node'
+  autoload :Connection, 'ridley/connection'
+  autoload :Context, 'ridley/context'
+  autoload :Cookbook, 'ridley/resources/cookbook'
   autoload :DataBag, 'ridley/resources/data_bag'
   autoload :DataBagItem, 'ridley/resources/data_bag_item'
-  autoload :Cookbook, 'ridley/resources/cookbook'
+  autoload :DSL, 'ridley/dsl'
+  autoload :Environment, 'ridley/resources/environment'
+  autoload :Logging, 'ridley/logging'
+  autoload :Node, 'ridley/resources/node'
+  autoload :Resource, 'ridley/resource'
+  autoload :Role, 'ridley/resources/role'
   autoload :Search, 'ridley/resources/search'
+  autoload :SSH, 'ridley/ssh'
 
   class << self
+    attr_accessor :logger
+
     def connection(*args)
       Connection.new(*args)
     end
@@ -40,12 +44,21 @@ module Ridley
       Connection.sync(*args, &block)
     end
 
-    # @return [Ridley::Log]
-    def log
-      Ridley::Log
+    # @return [Logger]
+    def logger
+      Ridley::Logging.logger
     end
-    alias_method :logger, :log
+    alias_method :log, :logger
+
+    # @param [Logger, nil] obj
+    #
+    # @return [Logger]
+    def set_logger(obj)
+      Ridley::Logging.set_logger(obj)
+    end
   end
 end
+
+Celluloid.logger = Ridley.logger
 
 require 'ridley/middleware'

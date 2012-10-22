@@ -25,6 +25,7 @@ module Ridley
     attr_reader :client_name
     attr_reader :client_key
     attr_reader :organization
+    attr_reader :ssh
 
     attr_accessor :thread_count
 
@@ -48,9 +49,15 @@ module Ridley
       :server_url,
       :client_name,
       :client_key
-    ]
+    ].freeze
 
     DEFAULT_THREAD_COUNT = 8
+
+    DEFAULT_SSH_CONFIG = {
+      user: nil,
+      password: nil,
+      keys: nil
+    }.freeze
 
     # @option options [String] :server_url
     #   URL to the Chef API
@@ -80,6 +87,7 @@ module Ridley
       @client_key   = options.fetch(:client_key)
       @organization = options.fetch(:organization, nil)
       @thread_count = options.fetch(:thread_count, DEFAULT_THREAD_COUNT)
+      @ssh          = options.fetch(:ssh, DEFAULT_SSH_CONFIG)
 
       unless @client_key.present? && File.exist?(@client_key)
         raise Errors::ClientKeyFileNotFound, "client key not found at: '#{@client_key}'"

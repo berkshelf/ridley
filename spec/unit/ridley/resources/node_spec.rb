@@ -245,4 +245,12 @@ describe Ridley::Node do
       subject.public_hostname.should eql("reset.internal.riotgames.com")
     end
   end
+
+  describe "#chef_solo" do
+    pending
+  end
+
+  describe "#chef_client" do
+    pending
+  end
 end
