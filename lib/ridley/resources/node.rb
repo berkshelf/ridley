@@ -1,6 +1,15 @@
 module Ridley 
   # @author Jamie Winsor <jamie@vialstudios.com>
   class Node
+    class << self
+      # @param [Ridley::Connection] connection
+      def bootstrap(connection, *args)
+        options = args.last.is_a?(Hash) ? args.pop : Hash.new
+
+        Bootstrapper.new(connection, args, options).run
+      end
+    end
+
     include Ridley::Resource
 
     set_chef_id "name"
@@ -138,7 +147,7 @@ module Ridley
     # @return [Array]
     #   an array containing a result symbol and an {SSH::Result}
     def chef_client(options = {})
-      Ridley::SSH.start(self, nil, connection.ssh) do |ssh|
+      Ridley::SSH.start(self, connection.ssh) do |ssh|
         ssh.run("sudo chef-client").first
       end
     end
@@ -148,7 +157,7 @@ module Ridley
     # @return [Array]
     #   an array containing a result symbol and an {SSH::Result}
     def chef_solo(options = {})
-      Ridley::SSH.start(self, nil, connection.ssh) do |ssh|
+      Ridley::SSH.start(self, connection.ssh) do |ssh|
         ssh.run("sudo chef-client").first
       end
     end

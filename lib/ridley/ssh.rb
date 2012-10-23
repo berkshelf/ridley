@@ -8,10 +8,9 @@ module Ridley
 
     class << self
       # @param [Ridley::Node, Array<Ridley::Node>] nodes
-      # @param [String] user
       # @param [Hash] options
-      def start(nodes, user, options = {}, &block)
-        runner = new(nodes, user, options)
+      def start(nodes, options = {}, &block)
+        runner = new(nodes, options)
         result = yield runner
         runner.terminate
 
@@ -23,16 +22,13 @@ module Ridley
     include Celluloid::Logger
 
     attr_reader :nodes
-    attr_reader :user
     attr_reader :options
 
     # @param [Ridley::Node, Array<Ridley::Node>] nodes
-    # @param [String] user
     # @param [Hash] options
     #   @see Net::SSH
-    def initialize(nodes, user, options = {})
+    def initialize(nodes, options = {})
       @nodes   = nodes
-      @user    = user
       @options = options
 
       self.options[:timeout] ||= 1.5
@@ -41,7 +37,7 @@ module Ridley
     # @return [Array<SSH::Worker>]
     def workers
       @workers ||= Array(nodes).collect do |node|
-        Worker.new_link(current_actor, node.public_hostname, user, options)
+        Worker.new_link(current_actor, node.public_hostname, options)
       end
     end
 

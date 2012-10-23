@@ -27,6 +27,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'activesupport', '>= 3.2.0'
   s.add_runtime_dependency 'celluloid'
   s.add_runtime_dependency 'net-ssh'
+  s.add_runtime_dependency 'erubis'
 
   s.add_development_dependency 'rake'
   s.add_development_dependency 'rspec'

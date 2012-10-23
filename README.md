@@ -345,6 +345,13 @@ And the same goes for setting an environment level override attribute
       obj.save
     end
 
+## Bootstrapping nodes
+
+    conn = Ridley.connection
+    conn.sync do
+      node.bootstrap("33.33.33.10", "33.33.33.11", options)
+    end
+
 # Authors and Contributors
 
 * Jamie Winsor (<jamie@vialstudios.com>)

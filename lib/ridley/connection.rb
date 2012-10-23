@@ -83,11 +83,12 @@ module Ridley
     def initialize(options = {})
       self.class.validate_options(options)
 
-      @client_name  = options.fetch(:client_name)
-      @client_key   = options.fetch(:client_key)
-      @organization = options.fetch(:organization, nil)
-      @thread_count = options.fetch(:thread_count, DEFAULT_THREAD_COUNT)
-      @ssh          = options.fetch(:ssh, DEFAULT_SSH_CONFIG)
+      @client_name      = options.fetch(:client_name)
+      @client_key       = options.fetch(:client_key)
+      @organization     = options.fetch(:organization, nil)
+      @thread_count     = options.fetch(:thread_count, DEFAULT_THREAD_COUNT)
+      @ssh              = options.fetch(:ssh, DEFAULT_SSH_CONFIG)
+      @validator_client = options.fetch(:validator_client, "chef-validator")
 
       unless @client_key.present? && File.exist?(@client_key)
         raise Errors::ClientKeyFileNotFound, "client key not found at: '#{@client_key}'"

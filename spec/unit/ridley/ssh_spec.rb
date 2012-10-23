@@ -19,29 +19,13 @@ describe Ridley::SSH do
     end
   end
 
-  subject { Ridley::SSH.new([node_one, node_two], "vagrant", password: "vagrant") }
+  subject { Ridley::SSH.new([node_one, node_two], user: "vagrant", password: "vagrant") }
 
   describe "#workers" do
     pending
   end
 
   describe "#run" do
-    it "test" do
-      result = node_one.chef_solo
-
-      result.should be_a(Array)
-      result.should have(2).items
-      result[0].should eql(:error)
-      result[1].should be_a(Ridley::SSH::Response)
-    end
-
-    it "other_test" do
-      result = node_two.chef_solo
-
-      result.should be_a(Array)
-      result.should have(2).items
-      result[0].should eql(:error)
-      result[1].should be_a(Timeout::Error)
-    end
+    pending
   end
 end

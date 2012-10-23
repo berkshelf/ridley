@@ -18,6 +18,7 @@ require 'ridley/errors'
 module Ridley
   CHEF_VERSION = '10.14.4'.freeze
 
+  autoload :Bootstrapper, 'ridley/bootstrapper'
   autoload :Client, 'ridley/resources/client'
   autoload :Connection, 'ridley/connection'
   autoload :Context, 'ridley/context'
@@ -55,6 +56,11 @@ module Ridley
     # @return [Logger]
     def set_logger(obj)
       Ridley::Logging.set_logger(obj)
+    end
+
+    # @return [Pathname]
+    def root
+      @root ||= Pathname.new(File.expand_path('../', File.dirname(__FILE__)))
     end
   end
 end

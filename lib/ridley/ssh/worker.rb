@@ -8,13 +8,12 @@ module Ridley
 
       # @param [Ridley::SSH] runner
       # @param [String] host
-      # @param [String] user
       # @param [Hash] options
-      def initialize(runner, host, user, options = {})
+      def initialize(runner, host, options = {})
         @runner  = runner
         @options = options
         @host    = host
-        @user    = options.fetch(:user, user)
+        @user    = options.fetch(:user)
       end
 
       # @param [String] command
