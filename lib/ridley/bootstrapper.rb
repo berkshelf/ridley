@@ -4,6 +4,7 @@ module Ridley
     autoload :Context, 'ridley/bootstrapper/context'
 
     class << self
+      # @return [Pathname]
       def templates_path
         Ridley.root.join('bootstrappers')
       end
@@ -17,17 +18,20 @@ module Ridley
     include Celluloid
     include Celluloid::Logger
 
+    # @return [Array<String>]
     attr_reader :hosts
+
+    # @return [Array<Bootstrapper::Context>]
     attr_reader :contexts
 
     # @param [Ridley::Connection] connection
-    # @param [Array<String>, Array<Ridley::Node>] nodes
+    # @param [Array<#to_s>] nodes
     # @param [Hash] options
     def initialize(connection, hosts, options = {})
       @connection = connection
-      @hosts      = hosts
+      @hosts      = Array(hosts).collect(&:to_s)
 
-      @contexts = hosts.collect do |host|
+      @contexts = @hosts.collect do |host|
         Context.new(host, connection, options)
       end
     end
