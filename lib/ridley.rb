@@ -21,7 +21,7 @@ module Ridley
   autoload :Bootstrapper, 'ridley/bootstrapper'
   autoload :Client, 'ridley/resources/client'
   autoload :Connection, 'ridley/connection'
-  autoload :Context, 'ridley/context'
+  autoload :ChainLink, 'ridley/chain_link'
   autoload :Cookbook, 'ridley/resources/cookbook'
   autoload :DataBag, 'ridley/resources/data_bag'
   autoload :DataBagItem, 'ridley/resources/data_bag_item'

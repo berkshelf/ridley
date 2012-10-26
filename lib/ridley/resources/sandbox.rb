@@ -111,12 +111,12 @@ module Ridley
     # Coerces instance functions into class functions on Ridley::Sandbox. This coercion
     # sends an instance of the including class along to the class function.
     #
-    # @see Ridley::Context
+    # @see Ridley::ChainLink
     #
-    # @return [Ridley::Context]
+    # @return [Ridley::ChainLink]
     #   a context object to delegate instance functions to class functions on Ridley::Sandbox
     def sandbox
-      Context.new(Ridley::Sandbox, self)
+      ChainLink.new(self, Ridley::Sandbox)
     end
   end
 end
