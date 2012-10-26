@@ -84,12 +84,12 @@ module Ridley
     # Coerces instance functions into class functions on Ridley::Environment. This coercion
     # sends an instance of the including class along to the class function.
     #
-    # @see Ridley::Context
+    # @see Ridley::ChainLink
     #
-    # @return [Ridley::Context]
+    # @return [Ridley::ChainLink]
     #   a context object to delegate instance functions to class functions on Ridley::Environment
     def environment
-      Context.new(Ridley::Environment, self)
+      ChainLink.new(self, Ridley::Environment)
     end
   end
 end

@@ -1,7 +1,7 @@
 module Ridley
-  # @api private
   # @author Jamie Winsor <jamie@vialstudios.com>
-  class DBIContext
+  # @api private
+  class DBIChainLink
     attr_reader :data_bag
     attr_reader :connection
 
@@ -56,7 +56,7 @@ module Ridley
     validates_presence_of :name
 
     def item
-      @dbi_context ||= DBIContext.new(self, connection)
+      @dbi_link ||= DBIChainLink.new(self, connection)
     end
   end
 
@@ -64,12 +64,12 @@ module Ridley
     # Coerces instance functions into class functions on Ridley::DataBag. This coercion
     # sends an instance of the including class along to the class function.
     #
-    # @see Ridley::Context
+    # @see Ridley::ChainLink
     #
-    # @return [Ridley::Context]
+    # @return [Ridley::ChainLink]
     #   a context object to delegate instance functions to class functions on Ridley::DataBag
     def data_bag
-      Context.new(Ridley::DataBag, self)
+      ChainLink.new(self, Ridley::DataBag)
     end
   end
 end

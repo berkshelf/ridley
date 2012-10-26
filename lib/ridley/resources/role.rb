@@ -68,12 +68,12 @@ module Ridley
     # Coerces instance functions into class functions on Ridley::Role. This coercion
     # sends an instance of the including class along to the class function.
     #
-    # @see Ridley::Context
+    # @see Ridley::ChainLink
     #
-    # @return [Ridley::Context]
+    # @return [Ridley::ChainLink]
     #   a context object to delegate instance functions to class functions on Ridley::Role
     def role
-      Context.new(Ridley::Role, self)
+      ChainLink.new(self, Ridley::Role)
     end
   end
 end
