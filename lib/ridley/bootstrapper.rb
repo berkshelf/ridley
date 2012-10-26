@@ -59,8 +59,8 @@ module Ridley
       @ssh_config = {
         user: options.fetch(:ssh_user),
         password: options.fetch(:ssh_password),
-        keys: options.fetch(:ssh_keys, nil),
-        timeout: options.fetch(:ssh_timeout, 1.5)
+        keys: options[:ssh_keys],
+        timeout: (options[:ssh_timeout] || 1.5)
       }
 
       @contexts = @hosts.collect do |host|
