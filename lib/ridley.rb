@@ -16,7 +16,7 @@ require 'ridley/errors'
 
 # @author Jamie Winsor <jamie@vialstudios.com>
 module Ridley
-  CHEF_VERSION = '10.14.4'.freeze
+  CHEF_VERSION = '10.16.2'.freeze
 
   autoload :Bootstrapper, 'ridley/bootstrapper'
   autoload :Client, 'ridley/resources/client'
