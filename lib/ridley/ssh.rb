@@ -4,6 +4,7 @@ module Ridley
   # @author Jamie Winsor <jamie@vialstudios.com>
   class SSH
     autoload :Response, 'ridley/ssh/response'
+    autoload :ResponseSet, 'ridley/ssh/response_set'
     autoload :Worker, 'ridley/ssh/worker'
 
     class << self
@@ -47,14 +48,16 @@ module Ridley
     def run(command)
       workers.collect { |worker| worker.async.run(command) }
 
-      [].tap do |responses|
+      ResponseSet.new.tap do |responses|
         until responses.length == workers.length
           receive { |msg|
             status, response = msg
             
             case status
-            when :ok, :error
-              responses << msg
+            when :ok
+              responses.add_ok(response)
+            when :error
+              responses.add_error(response)
             else
               error "SSH Failure: #{command}. terminating..."
               terminate

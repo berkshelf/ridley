@@ -347,10 +347,18 @@ And the same goes for setting an environment level override attribute
 
 ## Bootstrapping nodes
 
-    conn = Ridley.connection
-    conn.sync do
-      node.bootstrap("33.33.33.10", "33.33.33.11", options)
-    end
+    conn = Ridley.connection(
+      server_url: "https://api.opscode.com",
+      organization: "vialstudios",
+      validator_client: "vialstudios-validator",
+      validator_path: "/Users/reset/.chef/vialstudios-validator.pem",
+      ssh: {
+        user: "vagrant",
+        password: "vagrant"
+      }
+    )
+
+    conn.node.bootstrap("33.33.33.10", "33.33.33.11")
 
 # Authors and Contributors
 

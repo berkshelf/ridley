@@ -2,11 +2,47 @@ module Ridley
   # @author Jamie Winsor <jamie@vialstudios.com>
   class Node
     class << self
-      # @param [Ridley::Connection] connection
+      # @overload bootstrap(connection, nodes, options = {})
+      #   @param [Ridley::Connection] connection
+      #   @param [Array<String>, String] nodes
+      #   @option options [String] :ssh_user
+      #   @option options [String] :ssh_password
+      #   @option options [Array<String>, String] :ssh_keys
+      #   @option options [Float] :ssh_timeout
+      #     timeout value for SSH bootstrap (default: 1.5)
+      #   @option options [String] :validator_client
+      #   @option options [String] :validator_path
+      #     filepath to the validator used to bootstrap the node (required)
+      #   @option options [String] :bootstrap_proxy
+      #     URL to a proxy server to bootstrap through (default: nil)
+      #   @option options [String] :encrypted_data_bag_secret_path
+      #     filepath on your host machine to your organizations encrypted data bag secret (default: nil)
+      #   @option options [Hash] :hints
+      #     a hash of Ohai hints to place on the bootstrapped node (default: Hash.new)
+      #   @option options [Hash] :attributes
+      #     a hash of attributes to use in the first Chef run (default: Hash.new)
+      #   @option options [Array] :run_list
+      #     an initial run list to bootstrap with (default: Array.new)
+      #   @option options [String] :chef_version
+      #     version of Chef to install on the node (default: {Ridley::CHEF_VERSION})
+      #   @option options [String] :environment
+      #     environment to join the node to (default: '_default')
+      #   @option options [Boolean] :sudo
+      #     bootstrap with sudo (default: true)
+      #   @option options [String] :template
+      #     bootstrap template to use (default: omnibus)
       def bootstrap(connection, *args)
         options = args.last.is_a?(Hash) ? args.pop : Hash.new
 
-        Bootstrapper.new(connection, args, options).run
+        options[:server_url] ||= connection.server_url
+        options[:ssh_user] ||= connection.ssh[:user]
+        options[:ssh_password] ||= connection.ssh[:password]
+        options[:ssh_timeout] ||= connection.ssh[:timeout]
+        options[:validator_path] ||= connection.validator_path
+        options[:validator_client] ||= connection.validator_client
+        options[:encrypted_data_bag_secret_path] ||= connection.encrypted_data_bag_secret_path
+
+        Bootstrapper.new(args, options).run
       end
     end
 
@@ -144,19 +180,8 @@ module Ridley
 
     # Run Chef-Client on the instantiated node
     #
-    # @return [Array]
-    #   an array containing a result symbol and an {SSH::Result}
-    def chef_client(options = {})
-      Ridley::SSH.start(self, connection.ssh) do |ssh|
-        ssh.run("sudo chef-client").first
-      end
-    end
-
-    # Run Chef-Solo on the instantiated node
-    #
-    # @return [Array]
-    #   an array containing a result symbol and an {SSH::Result}
-    def chef_solo(options = {})
+    # @return [SSH::Response]
+    def chef_client
       Ridley::SSH.start(self, connection.ssh) do |ssh|
         ssh.run("sudo chef-client").first
       end

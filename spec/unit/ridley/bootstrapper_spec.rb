@@ -1,17 +1,6 @@
 require 'spec_helper'
 
 describe Ridley::Bootstrapper do
-  let(:connection) do
-    double('conn',
-      server_url: "https://api.opscode.com/organizations/vialstudios",
-      validator_client: "vialstudios-validator",
-      ssh: {
-        user: "reset",
-        password: "lol"
-      }
-    )
-  end
-
   let(:nodes) do
     [
       "33.33.33.10"
@@ -20,6 +9,10 @@ describe Ridley::Bootstrapper do
 
   let(:options) do
     {
+      ssh_user: "vagrant",
+      ssh_password: "vagrant",
+      server_url: "https://api.opscode.com/organizations/vialstudios",
+      validator_client: "vialstudios-validator",
       validator_path: fixtures_path.join("reset.pem").to_s,
       encrypted_data_bag_secret_path: fixtures_path.join("reset.pem").to_s
     }
@@ -31,7 +24,7 @@ describe Ridley::Bootstrapper do
     describe "::new" do
       context "given a single string for nodes" do
         before(:each) do
-          @obj = subject.new(connection, "33.33.33.10", options)
+          @obj = subject.new("33.33.33.10", options)
         end
 
         it "has one node" do
@@ -45,7 +38,7 @@ describe Ridley::Bootstrapper do
 
       context "given an an array of strings nodes" do
         before(:each) do
-          @obj = subject.new(connection, ["33.33.33.10", "33.33.33.11"], options)
+          @obj = subject.new(["33.33.33.10", "33.33.33.11"], options)
         end
 
         it "has a host for each item given" do
@@ -71,7 +64,7 @@ describe Ridley::Bootstrapper do
     end
   end
 
-  subject { Ridley::Bootstrapper.new(connection, nodes, options) }
+  subject { Ridley::Bootstrapper.new(nodes, options) }
 
   describe "#hosts" do
     it "returns an array of strings" do
@@ -88,27 +81,6 @@ describe Ridley::Bootstrapper do
   end
 
   describe "#run" do
-    let(:options) do
-      {
-        validator_path: "/Users/reset/.chef/vialstudios-validator.pem"
-      }
-    end
-
-    subject { Ridley::Bootstrapper.new(connection, nodes, options) }
-
-    before(:each) do
-      subject.ssh_config[:timeout] = 0.5
-      subject.ssh_config[:user] = "vagrant"
-      subject.ssh_config[:password] = "vagrant"
-    end
-
-    it "returns an array of response objects", focus: true do
-      p subject.contexts
-      result = subject.run
-
-      puts result.first[1].stdout
-
-      result.should be_a(Array)
-    end
+    pending
   end
 end

@@ -27,10 +27,13 @@ module Ridley
     # @return [Hash]
     attr_reader :ssh_config
 
-    # @param [Ridley::Connection] connection
     # @param [Array<#to_s>] hosts
-    # @option options [Hash] :timeout
+    # @option options [String] :ssh_user
+    # @option options [String] :ssh_password
+    # @option options [Array<String>, String] :ssh_keys
+    # @option options [Float] :ssh_timeout
     #   timeout value for SSH bootstrap (default: 1.5)
+    # @option options [String] :validator_client
     # @option options [String] :validator_path
     #   filepath to the validator used to bootstrap the node (required)
     # @option options [String] :bootstrap_proxy
@@ -51,16 +54,18 @@ module Ridley
     #   bootstrap with sudo (default: true)
     # @option options [String] :template
     #   bootstrap template to use (default: omnibus)
-    def initialize(connection, hosts, options = {})
-      @connection = connection
-      @hosts      = Array(hosts).collect(&:to_s)
-      @ssh_config = connection.ssh
+    def initialize(hosts, options = {})
+      @hosts      = Array(hosts).collect(&:to_s).uniq
+      @ssh_config = {
+        user: options.fetch(:ssh_user),
+        password: options.fetch(:ssh_password),
+        keys: options.fetch(:ssh_keys, nil),
+        timeout: options.fetch(:ssh_timeout, 1.5)
+      }
 
       @contexts = @hosts.collect do |host|
-        Context.new(connection, host, options)
+        Context.new(host, options)
       end
-
-      self.ssh_config[:timeout] = options.fetch(:timeout, 1.5)
     end
 
     # @param [String] command
@@ -74,16 +79,18 @@ module Ridley
         worker
       end
 
-      [].tap do |responses|
+      SSH::ResponseSet.new.tap do |responses|
         until responses.length == workers.length
           receive { |msg|
             status, response = msg
             
             case status
-            when :ok, :error
-              responses << msg
+            when :ok
+              responses.add_ok(response)
+            when :error
+              responses.add_error(response)
             else
-              error "No match for status: '#{status}'. terminating..."
+              error "SSH Failure: #{command}. terminating..."
               terminate
             end
           }
@@ -92,9 +99,5 @@ module Ridley
     ensure
       workers.collect(&:terminate)
     end
-
-    private
-
-      attr_reader :connection
   end
 end

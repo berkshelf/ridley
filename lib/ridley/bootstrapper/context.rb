@@ -8,10 +8,12 @@ module Ridley
       attr_reader :host
       # @return [String]
       attr_reader :node_name
-      # @return [Ridley::Connection]
-      attr_reader :connection
       # @return [String]
-      attr_reader :validation_client_name
+      attr_reader :server_url
+      # @return [String]
+      attr_reader :validator_client
+      # @return [String]
+      attr_reader :validator_path
       # @return [String]
       attr_reader :bootstrap_proxy
       # @return [Hash]
@@ -21,13 +23,13 @@ module Ridley
       # @return [String]
       attr_reader :environment
 
-      # @param [Ridley::Connection] connection
       # @param [String] host
       #   name of the node as identified in Chef
       # @option options [String] :validator_path
       #   filepath to the validator used to bootstrap the node (required)
       # @option options [String] :node_name
-      #   
+      # @option options [String] :server_url
+      # @option options [String] :validator_client
       # @option options [String] :bootstrap_proxy
       #   URL to a proxy server to bootstrap through (default: nil)
       # @option options [String] :encrypted_data_bag_secret_path
@@ -46,13 +48,16 @@ module Ridley
       #   bootstrap with sudo (default: true)
       # @option options [String] :template
       #   bootstrap template to use (default: omnibus)
-      def initialize(connection, host, options = {})
-        @connection                     = connection
+      def initialize(host, options = {})
         @host                           = host
+        @server_url                     = options.fetch(:server_url) {
+          raise Errors::ArgumentError, "A server_url is required for bootstrapping"
+        }
         @validator_path                 = options.fetch(:validator_path) {
           raise Errors::ArgumentError, "A path to a validator is required for bootstrapping"
         }
         @node_name                      = options.fetch(:node_name, nil)
+        @validator_client               = options.fetch(:validator_client, "chef-validator")
         @bootstrap_proxy                = options.fetch(:bootstrap_proxy, nil)
         @encrypted_data_bag_secret_path = options.fetch(:encrypted_data_bag_secret_path, nil)
         @hints                          = options.fetch(:hints, Hash.new)
@@ -90,8 +95,8 @@ module Ridley
         body = <<-CONFIG
 log_level        :info
 log_location     STDOUT
-chef_server_url  "#{connection.server_url}"
-validation_client_name "#{connection.validator_client}"
+chef_server_url  "#{server_url}"
+validation_client_name "#{validator_client}"
 CONFIG
 
         if node_name.present?
