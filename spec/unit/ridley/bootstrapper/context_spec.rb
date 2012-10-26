@@ -1,21 +1,12 @@
 require 'spec_helper'
 
 describe Ridley::Bootstrapper::Context do
-  let(:connection) do
-    double('conn',
-      server_url: "https://api.opscode.com/organizations/vialstudios",
-      validator_client: "chef-validator",
-      ssh: {
-        user: "reset",
-        password: "lol"
-      }
-    )
-  end
-
-  let(:node_name) { "reset.riotgames.com" }
+  let(:host) { "reset.riotgames.com" }
 
   let(:options) do
     {
+      server_url: "https://api.opscode.com/organizations/vialstudios",
+      validator_client: "chef-validator",
       validator_path: fixtures_path.join("reset.pem").to_s,
       encrypted_data_bag_secret_path: fixtures_path.join("reset.pem").to_s
     }
@@ -30,7 +21,7 @@ describe Ridley::Bootstrapper::Context do
 
         it "raises an ArgumentError" do
           lambda {
-            subject.new(connection, node_name, options)
+            subject.new(host, options)
           }.should raise_error(Ridley::Errors::ArgumentError)
         end
       end
@@ -38,18 +29,19 @@ describe Ridley::Bootstrapper::Context do
       context "when a validator_path is specified" do
         let(:options) do
           {
+            server_url: "https://api.opscode.com/organizations/vialstudios",
             validator_path: fixtures_path.join("reset.pem").to_s
           }
         end
 
         it "sets a value for validation_key" do
-          subject.new(connection, node_name, options).validation_key.should_not be_nil
+          subject.new(host, options).validation_key.should_not be_nil
         end
       end
     end
   end
 
-  subject { Ridley::Bootstrapper::Context.new(connection, node_name, options) }
+  subject { Ridley::Bootstrapper::Context.new(host, options) }
 
   describe "#boot_command" do
     it "returns a string" do
