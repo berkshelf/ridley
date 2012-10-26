@@ -56,7 +56,8 @@ module Ridley
     DEFAULT_SSH_CONFIG = {
       user: nil,
       password: nil,
-      keys: nil
+      keys: nil,
+      timeout: 1.5
     }.freeze
 
     # @option options [String] :server_url

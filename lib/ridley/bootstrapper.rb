@@ -24,16 +24,23 @@ module Ridley
     # @return [Array<Bootstrapper::Context>]
     attr_reader :contexts
 
+    # @return [Hash]
+    attr_reader :ssh_config
+
     # @param [Ridley::Connection] connection
-    # @param [Array<#to_s>] nodes
-    # @param [Hash] options
+    # @param [Array<#to_s>] hosts
+    # @option options [Hash] :timeout
+    #   timeout value for SSH bootstrap
     def initialize(connection, hosts, options = {})
       @connection = connection
       @hosts      = Array(hosts).collect(&:to_s)
+      @ssh_config = connection.ssh
 
       @contexts = @hosts.collect do |host|
         Context.new(host, connection, options)
       end
+
+      self.ssh_config[:timeout] = options.fetch(:timeout, 1.5)
     end
 
     # @param [String] command
@@ -42,7 +49,7 @@ module Ridley
     def run
       workers = Array.new
       workers = contexts.collect do |context|
-        worker = SSH::Worker.new_link(current_actor, context.node_name, connection.ssh)
+        worker = SSH::Worker.new_link(current_actor, context.node_name, self.ssh_config)
         worker.async.run(context.boot_command)
         worker
       end

@@ -88,6 +88,14 @@ describe Ridley::Bootstrapper do
   end
 
   describe "#run" do
-    pending
+    before(:each) do
+      subject.ssh_config[:timeout] = 0.5
+    end
+
+    it "returns an array of response objects" do
+      result = subject.run
+
+      result.should be_a(Array)
+    end
   end
 end
