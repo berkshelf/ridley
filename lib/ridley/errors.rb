@@ -3,6 +3,7 @@ module Ridley
   module Errors
     class RidleyError < StandardError; end
     class InternalError < RidleyError; end
+    class ArgumentError < InternalError; end
 
     class ValidatorNotFound < RidleyError; end
 

@@ -12,6 +12,8 @@ describe Ridley::Bootstrapper::Context do
     )
   end
 
+  let(:node_name) { "reset.riotgames.com" }
+
   let(:options) do
     {
       validator_path: fixtures_path.join("reset.pem").to_s,
@@ -23,11 +25,31 @@ describe Ridley::Bootstrapper::Context do
     subject { Ridley::Bootstrapper::Context }
 
     describe "::new" do
-      pending
+      context "when validator_path is not specified" do
+        let(:options) { Hash.new }
+
+        it "raises an ArgumentError" do
+          lambda {
+            subject.new(connection, node_name, options)
+          }.should raise_error(Ridley::Errors::ArgumentError)
+        end
+      end
+
+      context "when a validator_path is specified" do
+        let(:options) do
+          {
+            validator_path: fixtures_path.join("reset.pem").to_s
+          }
+        end
+
+        it "sets a value for validation_key" do
+          subject.new(connection, node_name, options).validation_key.should_not be_nil
+        end
+      end
     end
   end
 
-  subject { Ridley::Bootstrapper::Context.new("reset.riotgames.com", connection, options) }
+  subject { Ridley::Bootstrapper::Context.new(connection, node_name, options) }
 
   describe "#boot_command" do
     it "returns a string" do

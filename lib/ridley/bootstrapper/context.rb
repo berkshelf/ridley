@@ -8,28 +8,53 @@ module Ridley
       attr_reader :node_name
       # @return [Ridley::Connection]
       attr_reader :connection
-
+      # @return [String]
       attr_reader :validation_client_name
+      # @return [String]
       attr_reader :bootstrap_proxy
+      # @return [Hash]
       attr_reader :hints
+      # @return [String]
       attr_reader :chef_version
+      # @return [String]
       attr_reader :environment
-      attr_reader :client_path
 
-      def initialize(node_name, connection, options = {})
+      # @param [Ridley::Connection] connection
+      # @param [String] node_name
+      #   name of the node as identified in Chef
+      # @option options [String] :validator_path
+      #   filepath to the validator used to bootstrap the node (required)
+      # @option options [String] :bootstrap_proxy
+      #   URL to a proxy server to bootstrap through (default: nil)
+      # @option options [String] :encrypted_data_bag_secret_path
+      #   filepath on your host machine to your organizations encrypted data bag secret (default: nil)
+      # @option options [Hash] :hints
+      #   a hash of Ohai hints to place on the bootstrapped node (default: Hash.new)
+      # @option options [Hash] :attributes
+      #   a hash of attributes to use in the first Chef run (default: Hash.new)
+      # @option options [Array] :run_list
+      #   an initial run list to bootstrap with (default: Array.new)
+      # @option options [String] :chef_version
+      #   version of Chef to install on the node (default: {Ridley::CHEF_VERSION})
+      # @option options [String] :environment
+      #   environment to join the node to (default: '_default')
+      # @option options [Boolean] :sudo
+      #   bootstrap with sudo (default: true)
+      # @option options [String] :template
+      #   bootstrap template to use (default: omnibus)
+      def initialize(connection, node_name, options = {})
         @node_name                      = node_name
         @connection                     = connection
         @validator_path                 = options.fetch(:validator_path) {
-          raise ArgumentError, "A path to a validator is required for bootstrapping"
+          raise Errors::ArgumentError, "A path to a validator is required for bootstrapping"
         }
         @bootstrap_proxy                = options.fetch(:bootstrap_proxy, nil)
         @encrypted_data_bag_secret_path = options.fetch(:encrypted_data_bag_secret_path, nil)
-        @hints                          = options.fetch(:hints, Array.new)
+        @hints                          = options.fetch(:hints, Hash.new)
         @attributes                     = options.fetch(:attributes, Hash.new)
         @run_list                       = options.fetch(:run_list, Array.new)
         @chef_version                   = options.fetch(:chef_version, Ridley::CHEF_VERSION)
         @environment                    = options.fetch(:environment, "_default")
-        @client_path                    = options.fetch(:client_path, "chef-client")
         @sudo                           = options.fetch(:sudo, true)
         @template_file                  = options.fetch(:template, Bootstrapper.default_template)
       end
@@ -47,7 +72,7 @@ module Ridley
 
       # @return [String]
       def chef_run
-        "#{client_path} -j /etc/chef/first-boot.json -E #{environment}"
+        "chef-client -j /etc/chef/first-boot.json -E #{environment}"
       end
 
       # @return [String]
@@ -82,6 +107,8 @@ CONFIG
         attributes.merge(run_list: run_list).to_json
       end
 
+      # The validation key to create a new client for the node
+      #
       # @raise [Ridley::Errors::ValidatorNotFound]
       #
       # @return [String]

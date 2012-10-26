@@ -30,14 +30,34 @@ module Ridley
     # @param [Ridley::Connection] connection
     # @param [Array<#to_s>] hosts
     # @option options [Hash] :timeout
-    #   timeout value for SSH bootstrap
+    #   timeout value for SSH bootstrap (default: 1.5)
+    # @option options [String] :validator_path
+    #   filepath to the validator used to bootstrap the node (required)
+    # @option options [String] :bootstrap_proxy
+    #   URL to a proxy server to bootstrap through (default: nil)
+    # @option options [String] :encrypted_data_bag_secret_path
+    #   filepath on your host machine to your organizations encrypted data bag secret (default: nil)
+    # @option options [Hash] :hints
+    #   a hash of Ohai hints to place on the bootstrapped node (default: Hash.new)
+    # @option options [Hash] :attributes
+    #   a hash of attributes to use in the first Chef run (default: Hash.new)
+    # @option options [Array] :run_list
+    #   an initial run list to bootstrap with (default: Array.new)
+    # @option options [String] :chef_version
+    #   version of Chef to install on the node (default: {Ridley::CHEF_VERSION})
+    # @option options [String] :environment
+    #   environment to join the node to (default: '_default')
+    # @option options [Boolean] :sudo
+    #   bootstrap with sudo (default: true)
+    # @option options [String] :template
+    #   bootstrap template to use (default: omnibus)
     def initialize(connection, hosts, options = {})
       @connection = connection
       @hosts      = Array(hosts).collect(&:to_s)
       @ssh_config = connection.ssh
 
       @contexts = @hosts.collect do |host|
-        Context.new(host, connection, options)
+        Context.new(connection, host, options)
       end
 
       self.ssh_config[:timeout] = options.fetch(:timeout, 1.5)
