@@ -192,12 +192,12 @@ module Ridley
     # Coerces instance functions into class functions on Ridley::Node. This coercion
     # sends an instance of the including class along to the class function.
     #
-    # @see Ridley::Context
+    # @see Ridley::ChainLink
     #
-    # @return [Ridley::Context]
+    # @return [Ridley::ChainLink]
     #   a context object to delegate instance functions to class functions on Ridley::Node
     def node
-      Context.new(Ridley::Node, self)
+      ChainLink.new(self, Ridley::Node)
     end
   end
 end

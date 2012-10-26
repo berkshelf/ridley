@@ -22,6 +22,8 @@ describe "Bootstrapping a node", type: "acceptance" do
   end
 
   it "returns an array of response objects" do
+    pending
+    
     connection.node.bootstrap("33.33.33.10").should_not have_errors
   end
 end
