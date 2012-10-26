@@ -92,12 +92,12 @@ module Ridley
 
       @client_name      = options.fetch(:client_name)
       @client_key       = options.fetch(:client_key)
-      @organization     = options.fetch(:organization, nil)
-      @thread_count     = options.fetch(:thread_count, DEFAULT_THREAD_COUNT)
-      @ssh              = options.fetch(:ssh, Hash.new)
-      @validator_client = options.fetch(:validator_client, nil)
-      @validator_path   = options.fetch(:validator_path, nil)
-      @encrypted_data_bag_secret_path = options.fetch(:encrypted_data_bag_secret_path, nil)
+      @organization     = options[:organization]
+      @thread_count     = (options[:thread_count] || DEFAULT_THREAD_COUNT)
+      @ssh              = (options[:ssh] || Hash.new)
+      @validator_client = options[:validator_client]
+      @validator_path   = options[:validator_path]
+      @encrypted_data_bag_secret_path = options[:encrypted_data_bag_secret_path]
 
       unless @client_key.present? && File.exist?(@client_key)
         raise Errors::ClientKeyFileNotFound, "client key not found at: '#{@client_key}'"

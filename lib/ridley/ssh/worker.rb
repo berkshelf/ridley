@@ -60,7 +60,7 @@ module Ridley
           [ :error, response ]
         end
       rescue => e
-        runner.mailbox << [ :error, e ]
+        runner.mailbox << [ :error, e.message ]
       end
 
       private
