@@ -25,6 +25,11 @@ module Ridley
     attr_reader :client_name
     attr_reader :client_key
     attr_reader :organization
+    attr_reader :ssh
+
+    attr_reader :validator_client
+    attr_reader :validator_path
+    attr_reader :encrypted_data_bag_secret_path
 
     attr_accessor :thread_count
 
@@ -35,6 +40,7 @@ module Ridley
     def_delegator :conn, :path_prefix
 
     def_delegator :conn, :url_prefix=
+    def_delegator :conn, :url_prefix
 
     def_delegator :conn, :get
     def_delegator :conn, :put
@@ -48,7 +54,7 @@ module Ridley
       :server_url,
       :client_name,
       :client_key
-    ]
+    ].freeze
 
     DEFAULT_THREAD_COUNT = 8
 
@@ -62,7 +68,15 @@ module Ridley
     # @option options [String] :organization
     #   the Organization to connect to. This is only used if you are connecting to
     #   private Chef or hosted Chef
+    # @option options [String] :validator_client
+    #   (default: nil)
+    # @option options [String] :validator_path
+    #   (default: nil)
+    # @option options [String] :encrypted_data_bag_secret_path
+    #   (default: nil)
     # @option options [Integer] :thread_count
+    # @option options [Hash] :ssh
+    #   authentication credentials for bootstrapping or connecting to nodes (default: Hash.new)
     # @option options [Hash] :params
     #   URI query unencoded key/value pairs
     # @option options [Hash] :headers
@@ -76,10 +90,14 @@ module Ridley
     def initialize(options = {})
       self.class.validate_options(options)
 
-      @client_name  = options.fetch(:client_name)
-      @client_key   = options.fetch(:client_key)
-      @organization = options.fetch(:organization, nil)
-      @thread_count = options.fetch(:thread_count, DEFAULT_THREAD_COUNT)
+      @client_name      = options.fetch(:client_name)
+      @client_key       = options.fetch(:client_key)
+      @organization     = options.fetch(:organization, nil)
+      @thread_count     = options.fetch(:thread_count, DEFAULT_THREAD_COUNT)
+      @ssh              = options.fetch(:ssh, Hash.new)
+      @validator_client = options.fetch(:validator_client, nil)
+      @validator_path   = options.fetch(:validator_path, nil)
+      @encrypted_data_bag_secret_path = options.fetch(:encrypted_data_bag_secret_path, nil)
 
       unless @client_key.present? && File.exist?(@client_key)
         raise Errors::ClientKeyFileNotFound, "client key not found at: '#{@client_key}'"
@@ -132,6 +150,10 @@ module Ridley
     # @return [Boolean]
     def foss?
       api_type == :foss
+    end
+
+    def server_url
+      self.url_prefix.to_s
     end
 
     private

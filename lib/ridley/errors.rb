@@ -3,6 +3,9 @@ module Ridley
   module Errors
     class RidleyError < StandardError; end
     class InternalError < RidleyError; end
+    class ArgumentError < InternalError; end
+
+    class ValidatorNotFound < RidleyError; end
 
     class InvalidResource < RidleyError
       attr_reader :errors
@@ -17,7 +20,9 @@ module Ridley
       alias_method :to_s, :message
     end
 
-    class ClientKeyFileNotFound < RidleyError; end
+    class BootstrapError < RidleyError; end
+    class ClientKeyFileNotFound < BootstrapError; end
+    class EncryptedDataBagSecretNotFound < BootstrapError; end
 
     class HTTPError < RidleyError
       class << self

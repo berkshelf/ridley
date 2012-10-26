@@ -3,7 +3,39 @@ require 'spec_helper'
 describe Ridley::Node do
   it_behaves_like "a Ridley Resource", Ridley::Node
 
-  let(:connection) { double("connection") }
+  let(:connection) do
+    double('conn',
+      server_url: "https://api.opscode.com/organizations/vialstudios",
+      validator_client: "chef-validator",
+      ssh: {
+        user: "reset",
+        password: "lol"
+      }
+    )
+  end
+
+  describe "ClassMethods" do
+    subject { Ridley::Node }
+
+    describe "::bootstrap" do
+      let(:boot_options) do
+        {
+          validator_path: fixtures_path.join("reset.pem").to_s,
+          encrypted_data_bag_secret_path: fixtures_path.join("reset.pem").to_s
+        }
+      end
+
+      it "bootstraps a single node" do
+        pending
+        subject.bootstrap(connection, "33.33.33.10", boot_options)
+      end
+
+      it "bootstraps multiple nodes" do
+        pending
+        subject.bootstrap(connection, "33.33.33.10", "33.33.33.11", boot_options)
+      end
+    end
+  end
 
   subject { Ridley::Node.new(connection) }
 
@@ -244,5 +276,13 @@ describe Ridley::Node do
 
       subject.public_hostname.should eql("reset.internal.riotgames.com")
     end
+  end
+
+  describe "#chef_solo" do
+    pending
+  end
+
+  describe "#chef_client" do
+    pending
   end
 end

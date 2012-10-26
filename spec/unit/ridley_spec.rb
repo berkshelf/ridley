@@ -22,11 +22,5 @@ describe Ridley do
         subject.connection(config).should eql(conn)
       end
     end
-
-    describe "::log" do
-      it "returns the Ridley::Log singleton" do
-        subject.log.should eql(Ridley::Log)
-      end
-    end
   end
 end
