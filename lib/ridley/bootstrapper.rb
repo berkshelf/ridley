@@ -69,7 +69,7 @@ module Ridley
     def run
       workers = Array.new
       workers = contexts.collect do |context|
-        worker = SSH::Worker.new_link(current_actor, context.node_name, self.ssh_config)
+        worker = SSH::Worker.new_link(current_actor, context.host, self.ssh_config)
         worker.async.run(context.boot_command)
         worker
       end

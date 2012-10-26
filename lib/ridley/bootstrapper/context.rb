@@ -5,6 +5,8 @@ module Ridley
     # @author Jamie Winsor <jamie@vialstudios.com>
     class Context
       # @return [String]
+      attr_reader :host
+      # @return [String]
       attr_reader :node_name
       # @return [Ridley::Connection]
       attr_reader :connection
@@ -20,10 +22,12 @@ module Ridley
       attr_reader :environment
 
       # @param [Ridley::Connection] connection
-      # @param [String] node_name
+      # @param [String] host
       #   name of the node as identified in Chef
       # @option options [String] :validator_path
       #   filepath to the validator used to bootstrap the node (required)
+      # @option options [String] :node_name
+      #   
       # @option options [String] :bootstrap_proxy
       #   URL to a proxy server to bootstrap through (default: nil)
       # @option options [String] :encrypted_data_bag_secret_path
@@ -42,12 +46,13 @@ module Ridley
       #   bootstrap with sudo (default: true)
       # @option options [String] :template
       #   bootstrap template to use (default: omnibus)
-      def initialize(connection, node_name, options = {})
-        @node_name                      = node_name
+      def initialize(connection, host, options = {})
         @connection                     = connection
+        @host                           = host
         @validator_path                 = options.fetch(:validator_path) {
           raise Errors::ArgumentError, "A path to a validator is required for bootstrapping"
         }
+        @node_name                      = options.fetch(:node_name, nil)
         @bootstrap_proxy                = options.fetch(:bootstrap_proxy, nil)
         @encrypted_data_bag_secret_path = options.fetch(:encrypted_data_bag_secret_path, nil)
         @hints                          = options.fetch(:hints, Hash.new)
@@ -68,6 +73,11 @@ module Ridley
         end
 
         cmd
+      end
+
+      # @return [String]
+      def clean_command
+        "rm /etc/chef/first-boot.json; rm /etc/chef/validation.pem"
       end
 
       # @return [String]

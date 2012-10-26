@@ -4,7 +4,7 @@ describe Ridley::Bootstrapper do
   let(:connection) do
     double('conn',
       server_url: "https://api.opscode.com/organizations/vialstudios",
-      validator_client: "chef-validator",
+      validator_client: "vialstudios-validator",
       ssh: {
         user: "reset",
         password: "lol"
@@ -88,12 +88,25 @@ describe Ridley::Bootstrapper do
   end
 
   describe "#run" do
-    before(:each) do
-      subject.ssh_config[:timeout] = 0.5
+    let(:options) do
+      {
+        validator_path: "/Users/reset/.chef/vialstudios-validator.pem"
+      }
     end
 
-    it "returns an array of response objects" do
+    subject { Ridley::Bootstrapper.new(connection, nodes, options) }
+
+    before(:each) do
+      subject.ssh_config[:timeout] = 0.5
+      subject.ssh_config[:user] = "vagrant"
+      subject.ssh_config[:password] = "vagrant"
+    end
+
+    it "returns an array of response objects", focus: true do
+      p subject.contexts
       result = subject.run
+
+      puts result.first[1].stdout
 
       result.should be_a(Array)
     end
