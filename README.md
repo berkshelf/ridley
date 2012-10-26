@@ -345,6 +345,21 @@ And the same goes for setting an environment level override attribute
       obj.save
     end
 
+## Bootstrapping nodes
+
+    conn = Ridley.connection(
+      server_url: "https://api.opscode.com",
+      organization: "vialstudios",
+      validator_client: "vialstudios-validator",
+      validator_path: "/Users/reset/.chef/vialstudios-validator.pem",
+      ssh: {
+        user: "vagrant",
+        password: "vagrant"
+      }
+    )
+
+    conn.node.bootstrap("33.33.33.10", "33.33.33.11")
+
 # Authors and Contributors
 
 * Jamie Winsor (<jamie@vialstudios.com>)
