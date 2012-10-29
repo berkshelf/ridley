@@ -14,7 +14,7 @@ end
 group :development do
   gem 'yard'
   gem 'spork'
-  gem 'guard'
+  gem 'guard', '>= 1.5.0'
   gem 'guard-yard'
   gem 'guard-rspec'
   gem 'guard-spork', platforms: :ruby
@@ -33,7 +33,7 @@ group :development do
     end rescue Errno::ENOENT
 
   elsif RbConfig::CONFIG['target_os'] =~ /linux/i
-    gem 'libnotify',  '~> 0.7.1', require: false
+    gem 'libnotify',  '~> 0.8.0', require: false
     gem 'rb-inotify', require: false
 
   elsif RbConfig::CONFIG['target_os'] =~ /mswin|mingw/i
