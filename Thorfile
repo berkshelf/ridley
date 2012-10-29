@@ -5,25 +5,28 @@ require 'bundler'
 require 'bundler/setup'
 
 require 'ridley'
-require 'thor/rake_compat'
 
 class Default < Thor
-  include Thor::RakeCompat
-  Bundler::GemHelper.install_tasks
+  unless jruby?
+    require 'thor/rake_compat'
+    
+    include Thor::RakeCompat
+    Bundler::GemHelper.install_tasks
 
-  desc "build", "Build ridley-#{Ridley::VERSION}.gem into the pkg directory"
-  def build
-    Rake::Task["build"].execute
-  end
+    desc "build", "Build ridley-#{Ridley::VERSION}.gem into the pkg directory"
+    def build
+      Rake::Task["build"].execute
+    end
 
-  desc "install", "Build and install ridley-#{Ridley::VERSION}.gem into system gems"
-  def install
-    Rake::Task["install"].execute
-  end
+    desc "install", "Build and install ridley-#{Ridley::VERSION}.gem into system gems"
+    def install
+      Rake::Task["install"].execute
+    end
 
-  desc "release", "Create tag v#{Ridley::VERSION} and build and push ridley-#{Ridley::VERSION}.gem to Rubygems"
-  def release
-    Rake::Task["release"].execute
+    desc "release", "Create tag v#{Ridley::VERSION} and build and push ridley-#{Ridley::VERSION}.gem to Rubygems"
+    def release
+      Rake::Task["release"].execute
+    end
   end
 
   class Spec < Thor

@@ -1,15 +1,15 @@
+require 'chozo'
+require 'active_support/core_ext'
 require 'celluloid'
 require 'faraday'
 require 'addressable/uri'
-require 'yajl'
+require 'yajl' unless jruby?
 require 'multi_json'
 require 'active_model'
 require 'active_support/inflector'
-require 'active_support/core_ext'
 require 'forwardable'
 require 'set'
 require 'thread'
-require 'chozo/core_ext'
 
 require 'ridley/version'
 require 'ridley/errors'
