@@ -17,7 +17,6 @@ Gem::Specification.new do |s|
   s.required_ruby_version = ">= 1.9.1"
 
   s.add_runtime_dependency 'chozo', '>= 0.0.3'
-  s.add_runtime_dependency 'yajl-ruby'
   s.add_runtime_dependency 'mixlib-log'
   s.add_runtime_dependency 'mixlib-authentication'
   s.add_runtime_dependency 'addressable'
@@ -28,18 +27,4 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'celluloid'
   s.add_runtime_dependency 'net-ssh'
   s.add_runtime_dependency 'erubis'
-
-  s.add_development_dependency 'rake'
-  s.add_development_dependency 'rspec'
-  s.add_development_dependency 'fuubar'
-  s.add_development_dependency 'spork'
-  s.add_development_dependency 'yard'
-  s.add_development_dependency 'guard'
-  s.add_development_dependency 'guard-rspec'
-  s.add_development_dependency 'guard-spork'
-  s.add_development_dependency 'guard-yard'
-  s.add_development_dependency 'coolline'
-  s.add_development_dependency 'redcarpet'
-  s.add_development_dependency 'json_spec'
-  s.add_development_dependency 'webmock'
 end
