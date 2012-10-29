@@ -1,8 +1,8 @@
 require 'rubygems'
 require 'bundler'
-require 'spork'
+require 'chozo'
 
-Spork.prefork do
+def setup_rspec
   require 'rspec'
   require 'json_spec'
   require 'webmock/rspec'
@@ -25,6 +25,17 @@ Spork.prefork do
   end
 end
 
-Spork.each_run do
+if mri? && ENV['CI'] != 'true'
+  require 'spork'
+
+  Spork.prefork do
+    setup_rspec
+  end
+
+  Spork.each_run do
+    require 'ridley'
+  end
+else
   require 'ridley'
+  setup_rspec
 end
