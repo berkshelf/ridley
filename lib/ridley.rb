@@ -3,16 +3,17 @@ require 'active_support/core_ext'
 require 'celluloid'
 require 'faraday'
 require 'addressable/uri'
-require 'yajl' unless jruby?
 require 'multi_json'
 require 'active_model'
 require 'active_support/inflector'
 require 'forwardable'
-require 'set'
 require 'thread'
+require 'json/pure'
 
 require 'ridley/version'
 require 'ridley/errors'
+
+JSON.create_id = nil
 
 # @author Jamie Winsor <jamie@vialstudios.com>
 module Ridley
