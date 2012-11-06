@@ -58,7 +58,7 @@ module Ridley
       @hosts      = Array(hosts).collect(&:to_s).uniq
       @ssh_config = {
         user: options.fetch(:ssh_user),
-        password: options.fetch(:ssh_password),
+        password: options[:ssh_password],
         keys: options[:ssh_keys],
         timeout: (options[:ssh_timeout] || 1.5)
       }
@@ -68,36 +68,32 @@ module Ridley
       end
     end
 
-    # @param [String] command
-    #
-    # @return [Array]
+    # @return [SSH::ResponseSet]
     def run
-      workers = Array.new
-      workers = contexts.collect do |context|
-        worker = SSH::Worker.new_link(current_actor, context.host, self.ssh_config)
-        worker.async.run(context.boot_command)
-        worker
+      if contexts.length >= 2
+        pool = SSH::Worker.pool(size: contexts.length, args: [self.ssh_config])
+      else
+        pool = SSH::Worker.new(self.ssh_config)
       end
 
-      SSH::ResponseSet.new.tap do |responses|
-        until responses.length == workers.length
-          receive { |msg|
-            status, response = msg
-            
-            case status
-            when :ok
-              responses.add_ok(response)
-            when :error
-              responses.add_error(response)
-            else
-              error "SSH Failure: #{command}. terminating..."
-              terminate
-            end
-          }
+      responses = contexts.collect do |context|
+        pool.future.run(context.host, context.boot_command)
+      end.collect(&:value)
+
+      SSH::ResponseSet.new.tap do |response_set|
+        responses.each do |message|
+          status, response = message
+
+          case status
+          when :ok
+            response_set.add_ok(response)
+          when :error
+            response_set.add_error(response)
+          end
         end
       end
     ensure
-      workers.collect(&:terminate)
+      pool.terminate if pool
     end
   end
 end

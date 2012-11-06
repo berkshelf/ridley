@@ -5,21 +5,18 @@ module Ridley
     class Worker
       include Celluloid
       include Celluloid::Logger
-
-      # @param [Ridley::SSH] runner
-      # @param [String] host
+      
       # @param [Hash] options
-      def initialize(runner, host, options = {})
-        @runner  = runner
+      def initialize(options = {})
         @options = options
-        @host    = host
         @user    = options.fetch(:user)
       end
 
+      # @param [String] host
       # @param [String] command
       #
       # @return [Array]
-      def run(command)
+      def run(host, command)
         response = Response.new("", "")
         debug "Running SSH command: '#{command}' on: '#{host}' as: '#{user}'"
 
@@ -51,22 +48,22 @@ module Ridley
           ssh.loop
         end
 
-        debug "Ran SSH command: '#{command}' successful on: '#{host}' as: '#{user}'"
-
-        runner.mailbox << case response.exit_code
+        case response.exit_code
         when 0
+          debug "Successfully ran SSH command: '#{command}' on: '#{host}' as: '#{user}' and it succeeded"
           [ :ok, response ]
         else
+          debug "Successfully ran SSH command: '#{command}' on: '#{host}' as: '#{user}' but it failed"
           [ :error, response ]
         end
       rescue => e
-        runner.mailbox << [ :error, e.message ]
+        debug "Failed to run SSH command: '#{command}' on: '#{host}' as: '#{user}'"
+        [ :error, e.message ]
       end
 
       private
 
         attr_reader :runner
-        attr_reader :host
         attr_reader :user
         attr_reader :options
     end
