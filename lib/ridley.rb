@@ -8,7 +8,6 @@ require 'active_model'
 require 'active_support/inflector'
 require 'forwardable'
 require 'thread'
-require 'json/pure'
 
 require 'ridley/version'
 require 'ridley/errors'
