@@ -16,6 +16,7 @@ Gem::Specification.new do |s|
   s.version       = Ridley::VERSION
   s.required_ruby_version = ">= 1.9.1"
 
+  s.add_runtime_dependency 'json', '>= 1.5.0'
   s.add_runtime_dependency 'multi_json', '>= 1.0.4'
   s.add_runtime_dependency 'chozo', '>= 0.2.2'
   s.add_runtime_dependency 'mixlib-log'

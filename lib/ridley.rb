@@ -9,6 +9,12 @@ require 'active_support/inflector'
 require 'forwardable'
 require 'thread'
 
+if jruby?
+  require 'json/pure'
+else
+  require 'json/ext'
+end
+
 require 'ridley/version'
 require 'ridley/errors'
 
