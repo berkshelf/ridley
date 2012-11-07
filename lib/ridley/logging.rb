@@ -8,7 +8,7 @@ module Ridley
       def logger
         @logger ||= begin
           log = Logger.new(STDOUT)
-          log.level = Logger::INFO
+          log.level = Logger::WARN
           log
         end
       end
