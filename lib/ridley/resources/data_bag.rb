@@ -44,8 +44,8 @@ module Ridley
       # @return [Ridley::DataBag]
       def find!(connection, object)
         chef_id = object.respond_to?(:chef_id) ? object.chef_id : object
-        name, uri = connection.get("#{self.resource_path}/#{chef_id}").body.first
-        new(connection, name: name)
+        connection.get("#{self.resource_path}/#{chef_id}")
+        new(connection, name: chef_id)
       end
     end
 
