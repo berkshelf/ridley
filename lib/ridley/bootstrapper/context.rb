@@ -4,6 +4,18 @@ module Ridley
   class Bootstrapper
     # @author Jamie Winsor <jamie@vialstudios.com>
     class Context
+      class << self
+        def validate_options(options = {})
+          if options[:server_url].nil?
+            raise Errors::ArgumentError, "A server_url is required for bootstrapping"
+          end
+
+          if options[:validator_path].nil?
+            raise Errors::ArgumentError, "A path to a validator is required for bootstrapping"
+          end
+        end
+      end
+
       # @return [String]
       attr_reader :host
       # @return [String]
@@ -49,24 +61,22 @@ module Ridley
       # @option options [String] :template
       #   bootstrap template to use (default: omnibus)
       def initialize(host, options = {})
+        self.class.validate_options(options)
+
         @host                           = host
-        @server_url                     = options.fetch(:server_url) {
-          raise Errors::ArgumentError, "A server_url is required for bootstrapping"
-        }
-        @validator_path                 = options.fetch(:validator_path) {
-          raise Errors::ArgumentError, "A path to a validator is required for bootstrapping"
-        }
-        @node_name                      = options.fetch(:node_name, nil)
-        @validator_client               = options.fetch(:validator_client, "chef-validator")
-        @bootstrap_proxy                = options.fetch(:bootstrap_proxy, nil)
-        @encrypted_data_bag_secret_path = options.fetch(:encrypted_data_bag_secret_path, nil)
-        @hints                          = options.fetch(:hints, Hash.new)
-        @attributes                     = options.fetch(:attributes, Hash.new)
-        @run_list                       = options.fetch(:run_list, Array.new)
-        @chef_version                   = options.fetch(:chef_version, Ridley::CHEF_VERSION)
-        @environment                    = options.fetch(:environment, "_default")
-        @sudo                           = options.fetch(:sudo, true)
-        @template_file                  = options.fetch(:template, Bootstrapper.default_template)
+        @server_url                     = options[:server_url]
+        @validator_path                 = options[:validator_path]
+        @node_name                      = options[:node_name]
+        @validator_client               = options[:validator_client] || "chef-validator"
+        @bootstrap_proxy                = options[:bootstrap_proxy]
+        @encrypted_data_bag_secret_path = options[:encrypted_data_bag_secret_path]
+        @hints                          = options[:hints] || Hash.new
+        @attributes                     = options[:attributes] || Hash.new
+        @run_list                       = options[:run_list] || Array.new
+        @chef_version                   = options[:chef_version] || Ridley::CHEF_VERSION
+        @environment                    = options[:environment] || "_default"
+        @sudo                           = options[:sudo] || true
+        @template_file                  = options[:template] || Bootstrapper.default_template
       end
 
       # @return [String]
