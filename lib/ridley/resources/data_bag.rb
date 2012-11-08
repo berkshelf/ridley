@@ -4,19 +4,23 @@ module Ridley
   class DBIChainLink
     attr_reader :data_bag
     attr_reader :connection
+    attr_reader :klass
 
     # @param [Ridley::DataBag] data_bag
-    def initialize(data_bag, connection)
+    def initialize(data_bag, connection, options = {})
+      options[:encrypted] ||= false
+
       @data_bag = data_bag
       @connection = connection
+      @klass = options[:encrypted] ? Ridley::EncryptedDataBagItem : Ridley::DataBagItem
     end
 
     def new(*args)
-      Ridley::DataBagItem.send(:new, connection, data_bag, *args)
+      klass.send(:new, connection, data_bag, *args)
     end
 
     def method_missing(fun, *args, &block)
-      Ridley::DataBagItem.send(fun, connection, data_bag, *args, &block)
+      klass.send(fun, connection, data_bag, *args, &block)
     end
   end
 
@@ -56,7 +60,11 @@ module Ridley
     validates_presence_of :name
 
     def item
-      @dbi_link ||= DBIChainLink.new(self, connection)
+      DBIChainLink.new(self, connection)
+    end
+
+    def encrypted_item
+      DBIChainLink.new(self, connection, encrypted: true)
     end
   end
 

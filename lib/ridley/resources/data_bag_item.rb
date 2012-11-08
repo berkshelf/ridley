@@ -1,3 +1,5 @@
+require 'chef/encrypted_data_bag_item'
+
 module Ridley
   # @author Jamie Winsor <jamie@vialstudios.com>
   class DataBagItem
@@ -162,6 +164,14 @@ module Ridley
     rescue Errors::HTTPConflict
       self.attributes = self.class.update(connection, data_bag, self).attributes
       true
+    end
+
+    # Decrypts this data bag item.
+    #
+    # @return [Hash] decrypted attributes
+    def decrypt
+      decrypted_hash = Chef::EncryptedDataBagItem.new(self.attributes, connection.encrypted_data_bag_secret).to_hash
+      self.attributes = HashWithIndifferentAccess.new(decrypted_hash)
     end
 
     # @param [#to_hash] hash

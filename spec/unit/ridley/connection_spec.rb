@@ -5,13 +5,15 @@ describe Ridley::Connection do
   let(:client_name) { "reset" }
   let(:client_key) { fixtures_path.join("reset.pem").to_s }
   let(:organization) { "vialstudios" }
+  let(:encrypted_data_bag_secret_path) { fixtures_path.join("reset.pem").to_s }
 
   let(:config) do
     {
       server_url: server_url,
       client_name: client_name,
       client_key: client_key,
-      organization: organization
+      organization: organization,
+      encrypted_data_bag_secret_path: encrypted_data_bag_secret_path
     }
   end
 
@@ -192,6 +194,34 @@ describe Ridley::Connection do
         subject.stub(:organization).and_return("vialstudios")
 
         subject.api_type.should eql(:hosted)
+      end
+    end
+  end
+
+  describe "#encrypted_data_bag_secret" do
+    it "returns a string" do
+      subject.encrypted_data_bag_secret.should be_a(String)
+    end
+
+    context "when a encrypted_data_bag_secret_path is not provided" do
+      before(:each) do
+        subject.stub(:encrypted_data_bag_secret_path) { nil }
+      end
+
+      it "returns nil" do
+        subject.encrypted_data_bag_secret.should be_nil
+      end
+    end
+
+    context "when the file is not found at the given encrypted_data_bag_secret_path" do
+      before(:each) do
+        subject.stub(:encrypted_data_bag_secret_path) { fixtures_path.join("not.txt").to_s }
+      end
+
+      it "raises an EncryptedDataBagSecretNotFound erorr" do
+        lambda {
+          subject.encrypted_data_bag_secret
+        }.should raise_error(Ridley::Errors::EncryptedDataBagSecretNotFound)
       end
     end
   end
