@@ -28,4 +28,5 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'celluloid'
   s.add_runtime_dependency 'net-ssh'
   s.add_runtime_dependency 'erubis'
+  s.add_runtime_dependency 'chef', ">= 10.14.0"
 end
