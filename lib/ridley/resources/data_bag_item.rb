@@ -1,4 +1,6 @@
-require 'chef/encrypted_data_bag_item'
+require 'yaml'
+require 'openssl'
+require 'base64'
 
 module Ridley
   # @author Jamie Winsor <jamie@vialstudios.com>
@@ -170,8 +172,20 @@ module Ridley
     #
     # @return [Hash] decrypted attributes
     def decrypt
-      decrypted_hash = Chef::EncryptedDataBagItem.new(self.attributes, connection.encrypted_data_bag_secret).to_hash
+      decrypted_hash = Hash[attributes.map { |key, value| [key, decrypt_value(value)] }]
       self.attributes = HashWithIndifferentAccess.new(decrypted_hash)
+    end
+
+    def decrypt_value(value)
+      decoded_value = Base64.decode64(value)
+
+      cipher = OpenSSL::Cipher::Cipher.new('aes-256-cbc')
+      cipher.decrypt
+      cipher.pkcs5_keyivgen(connection.encrypted_data_bag_secret)
+      decrypted_value = cipher.update(decoded_value)
+      decrypted_value << cipher.final
+
+      YAML.load(decrypted_value)
     end
 
     # @param [#to_hash] hash
