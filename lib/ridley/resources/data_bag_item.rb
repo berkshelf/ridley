@@ -1,7 +1,3 @@
-require 'yaml'
-require 'openssl'
-require 'base64'
-
 module Ridley
   # @author Jamie Winsor <jamie@vialstudios.com>
   class DataBagItem
