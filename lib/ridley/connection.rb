@@ -99,6 +99,8 @@ module Ridley
       @validator_path   = options[:validator_path]
       @encrypted_data_bag_secret_path = options[:encrypted_data_bag_secret_path]
 
+      @client_key = File.expand_path @client_key
+
       unless @client_key.present? && File.exist?(@client_key)
         raise Errors::ClientKeyFileNotFound, "client key not found at: '#{@client_key}'"
       end
