@@ -60,11 +60,11 @@ module Ridley
     validates_presence_of :name
 
     def item
-      @dbi_link = DBIChainLink.new(self, connection)
+      DBIChainLink.new(self, connection)
     end
 
     def encrypted_item
-      @dbi_link = DBIChainLink.new(self, connection, encrypted: true)
+      DBIChainLink.new(self, connection, encrypted: true)
     end
   end
 
