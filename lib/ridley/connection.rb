@@ -156,6 +156,19 @@ module Ridley
       self.url_prefix.to_s
     end
 
+    # The encrypted data bag secret for this connection.
+    #
+    # @raise [Ridley::Errors::EncryptedDataBagSecretNotFound]
+    #
+    # @return [String, nil]
+    def encrypted_data_bag_secret
+      return nil if encrypted_data_bag_secret_path.nil?
+
+      IO.read(encrypted_data_bag_secret_path).chomp
+    rescue Errno::ENOENT => e
+      raise Errors::EncryptedDataBagSecretNotFound, "Encrypted data bag secret provided but not found at '#{encrypted_data_bag_secret_path}'"
+    end
+
     private
 
       attr_reader :conn

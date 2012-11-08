@@ -151,7 +151,7 @@ CONFIG
 
         IO.read(encrypted_data_bag_secret_path).chomp
       rescue Errno::ENOENT => encrypted_data_bag_secret
-        raise Errors::EncryptedDataBagSecretNotFound, "Error bootstrapping: Encrypted data bag secret provided but not found at '#{encrypted_data_bag_secret_path}"
+        raise Errors::EncryptedDataBagSecretNotFound, "Error bootstrapping: Encrypted data bag secret provided but not found at '#{encrypted_data_bag_secret_path}'"
       end
 
       private
