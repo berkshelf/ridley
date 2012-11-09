@@ -121,6 +121,12 @@ describe Ridley::Connection do
           subject.new(config)
         }.should raise_error(Ridley::Errors::ClientKeyFileNotFound)
       end
+
+      it "expands the path of the client_key" do
+        config[:client_key] = "~/"
+
+        subject.new(config).client_key.should_not == "~/"
+      end
     end
 
     describe "::sync" do
