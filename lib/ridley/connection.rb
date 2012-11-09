@@ -90,16 +90,14 @@ module Ridley
     def initialize(options = {})
       self.class.validate_options(options)
 
-      @client_name      = options.fetch(:client_name)
-      @client_key       = options.fetch(:client_key)
+      @client_name      = options[:client_name]
+      @client_key       = File.expand_path(options[:client_key])
       @organization     = options[:organization]
       @thread_count     = (options[:thread_count] || DEFAULT_THREAD_COUNT)
       @ssh              = (options[:ssh] || Hash.new)
       @validator_client = options[:validator_client]
       @validator_path   = options[:validator_path]
       @encrypted_data_bag_secret_path = options[:encrypted_data_bag_secret_path]
-
-      @client_key = File.expand_path @client_key
 
       unless @client_key.present? && File.exist?(@client_key)
         raise Errors::ClientKeyFileNotFound, "client key not found at: '#{@client_key}'"
