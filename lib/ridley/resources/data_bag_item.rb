@@ -178,8 +178,7 @@ module Ridley
       cipher = OpenSSL::Cipher::Cipher.new('aes-256-cbc')
       cipher.decrypt
       cipher.pkcs5_keyivgen(connection.encrypted_data_bag_secret)
-      decrypted_value = cipher.update(decoded_value)
-      decrypted_value << cipher.final
+      decrypted_value = cipher.update(decoded_value) + cipher.final
 
       YAML.load(decrypted_value)
     end
