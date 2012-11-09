@@ -41,13 +41,22 @@ describe Ridley::DataBagItem do
   end
 
   describe "#decrypt" do
-    it "decrypts an encrypted item" do
+    before(:each) do
       encrypted_data_bag_secret = File.read(fixtures_path.join("encrypted_data_bag_secret").to_s)
       connection.stub(:encrypted_data_bag_secret).and_return(encrypted_data_bag_secret)
+    end
 
+    it "decrypts an encrypted value" do
       subject.attributes[:test] = "Xk0E8lV9r4BhZzcg4wal0X4w9ZexN3azxMjZ9r1MCZc="
       subject.decrypt
       subject.attributes[:test][:database][:username].should == "test"
+    end
+
+    it "does not decrypt the id field" do
+      id = "dbi_id"
+      subject.attributes[:id] = id
+      subject.decrypt
+      subject.attributes[:id].should == id
     end
   end
 end

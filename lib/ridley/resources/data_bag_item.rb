@@ -168,7 +168,7 @@ module Ridley
     #
     # @return [Hash] decrypted attributes
     def decrypt
-      decrypted_hash = Hash[attributes.map { |key, value| [key, decrypt_value(value)] }]
+      decrypted_hash = Hash[attributes.map { |key, value| [key, key == "id" ? value : decrypt_value(value)] }]
       self.attributes = HashWithIndifferentAccess.new(decrypted_hash)
     end
 
