@@ -14,6 +14,22 @@ module Ridley
             raise Errors::ArgumentError, "A path to a validator is required for bootstrapping"
           end
         end
+
+        # A hash of default options to be used in the Context initializer
+        #
+        # @return [Hash]
+        def default_options
+          @default_options ||= {
+            validator_client: "chef-validator",
+            hints: Hash.new,
+            attributes: Hash.new,
+            run_list: Array.new,
+            chef_version: Ridley::CHEF_VERSION,
+            environment: "_default",
+            sudo: true,
+            template: Bootstrapper.default_template
+          }
+        end
       end
 
       # @return [String]
@@ -61,22 +77,23 @@ module Ridley
       # @option options [String] :template
       #   bootstrap template to use (default: omnibus)
       def initialize(host, options = {})
+        options = self.class.default_options.merge(options)
         self.class.validate_options(options)
 
         @host                           = host
         @server_url                     = options[:server_url]
         @validator_path                 = options[:validator_path]
         @node_name                      = options[:node_name]
-        @validator_client               = options[:validator_client] || "chef-validator"
+        @validator_client               = options[:validator_client]
         @bootstrap_proxy                = options[:bootstrap_proxy]
         @encrypted_data_bag_secret_path = options[:encrypted_data_bag_secret_path]
-        @hints                          = options[:hints] || Hash.new
-        @attributes                     = options[:attributes] || Hash.new
-        @run_list                       = options[:run_list] || Array.new
-        @chef_version                   = options[:chef_version] || Ridley::CHEF_VERSION
-        @environment                    = options[:environment] || "_default"
-        @sudo                           = options[:sudo] || true
-        @template_file                  = options[:template] || Bootstrapper.default_template
+        @hints                          = options[:hints]
+        @attributes                     = options[:attributes]
+        @run_list                       = options[:run_list]
+        @chef_version                   = options[:chef_version]
+        @environment                    = options[:environment]
+        @sudo                           = options[:sudo]
+        @template_file                  = options[:template]
       end
 
       # @return [String]

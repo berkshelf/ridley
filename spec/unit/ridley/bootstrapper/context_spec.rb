@@ -16,6 +16,20 @@ describe Ridley::Bootstrapper::Context do
     subject { Ridley::Bootstrapper::Context }
 
     describe "::new" do
+      it "sets a default value of 'true' to 'sudo'" do
+        options.delete(:sudo)
+        obj = subject.new(host, options)
+
+        obj.send(:sudo).should be_true
+      end
+
+      it "sets the value of sudo to 'false' if provided" do
+        options.merge!(sudo: false)
+        obj = subject.new(host, options)
+
+        obj.send(:sudo).should be_false
+      end
+
       context "when validator_path is not specified" do
         let(:options) { Hash.new }
 
