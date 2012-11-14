@@ -17,6 +17,16 @@ module Ridley
           raise ArgumentError, "Missing required option(s): #{missing.join(', ')}"
         end
       end
+
+      # A hash of default options to be used in the Connection initializer
+      #
+      # @return [Hash]
+      def default_options
+        {
+          thread_count: DEFAULT_THREAD_COUNT,
+          ssh: Hash.new
+        }
+      end
     end
 
     extend Forwardable
@@ -88,13 +98,14 @@ module Ridley
     # @option options [URI, String, Hash] :proxy
     #   URI, String, or Hash of HTTP proxy options
     def initialize(options = {})
+      options = self.class.default_options.merge(options)
       self.class.validate_options(options)
 
       @client_name      = options[:client_name]
       @client_key       = File.expand_path(options[:client_key])
       @organization     = options[:organization]
-      @thread_count     = (options[:thread_count] || DEFAULT_THREAD_COUNT)
-      @ssh              = (options[:ssh] || Hash.new)
+      @thread_count     = options[:thread_count]
+      @ssh              = options[:ssh]
       @validator_client = options[:validator_client]
       @validator_path   = options[:validator_path]
       @encrypted_data_bag_secret_path = options[:encrypted_data_bag_secret_path]
