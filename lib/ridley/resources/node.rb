@@ -34,13 +34,17 @@ module Ridley
       def bootstrap(connection, *args)
         options = args.last.is_a?(Hash) ? args.pop : Hash.new
 
-        options[:server_url] ||= connection.server_url
-        options[:ssh_user] ||= connection.ssh[:user]
-        options[:ssh_password] ||= connection.ssh[:password]
-        options[:ssh_timeout] ||= connection.ssh[:timeout]
-        options[:validator_path] ||= connection.validator_path
-        options[:validator_client] ||= connection.validator_client
-        options[:encrypted_data_bag_secret_path] ||= connection.encrypted_data_bag_secret_path
+        default_options = {
+          server_url: connection.server_url,
+          ssh_user: connection.ssh[:user],
+          ssh_password: connection.ssh[:password],
+          ssh_timeout: connection.ssh[:timeout],
+          validator_path: connection.validator_path,
+          validator_client: connection.validator_client,
+          encrypted_data_bag_secret_path: connection.encrypted_data_bag_secret_path
+        }
+
+        options = default_options.merge(options)
 
         Bootstrapper.new(args, options).run
       end
