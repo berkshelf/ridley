@@ -60,7 +60,8 @@ module Ridley
         user: options.fetch(:ssh_user),
         password: options[:ssh_password],
         keys: options[:ssh_keys],
-        timeout: (options[:ssh_timeout] || 1.5)
+        timeout: (options[:ssh_timeout] || 1.5),
+        sudo: (options[:sudo].nil? ? true : options[:sudo])
       }
 
       @contexts = @hosts.collect do |host|
