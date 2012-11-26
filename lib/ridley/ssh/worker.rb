@@ -5,11 +5,16 @@ module Ridley
     class Worker
       include Celluloid
       include Celluloid::Logger
+
+      attr_reader :sudo
+      attr_reader :user
+      attr_reader :options
       
       # @param [Hash] options
       def initialize(options = {})
+        @sudo    = options.delete(:sudo)
+        @user    = options[:user]
         @options = options
-        @user    = options.fetch(:user)
       end
 
       # @param [String] host
@@ -22,6 +27,10 @@ module Ridley
 
         Net::SSH.start(host, user, options) do |ssh|          
           ssh.open_channel do |channel|
+            if self.sudo
+              channel.request_pty
+            end
+
             channel.exec(command) do |ch, success|
               unless success
                 raise "FAILURE: could not execute command"
@@ -58,14 +67,12 @@ module Ridley
         end
       rescue => e
         debug "Failed to run SSH command: '#{command}' on: '#{host}' as: '#{user}'"
-        [ :error, e.message ]
+        [ :error, e ]
       end
 
       private
 
         attr_reader :runner
-        attr_reader :user
-        attr_reader :options
     end
   end
 end
