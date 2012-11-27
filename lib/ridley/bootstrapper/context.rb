@@ -155,7 +155,7 @@ CONFIG
       #
       # @return [String]
       def validation_key
-        IO.read(validator_path).chomp
+        IO.read(File.expand_path(validator_path)).chomp
       rescue Errno::ENOENT
         raise Errors::ValidatorNotFound, "Error bootstrapping: Validator not found at '#{validator_path}'"
       end
