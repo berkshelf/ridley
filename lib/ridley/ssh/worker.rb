@@ -67,6 +67,7 @@ module Ridley
         end
       rescue => e
         debug "Failed to run SSH command: '#{command}' on: '#{host}' as: '#{user}'"
+        debug "#{e.class}: #{e.message}"
         [ :error, e ]
       end
 
