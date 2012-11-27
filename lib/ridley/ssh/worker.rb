@@ -59,15 +59,15 @@ module Ridley
 
         case response.exit_code
         when 0
-          debug "Successfully ran SSH command: '#{command}' on: '#{host}' as: '#{user}' and it succeeded"
+          debug "Successfully ran SSH command on: '#{host}' as: '#{user}'"
           [ :ok, response ]
         else
-          debug "Successfully ran SSH command: '#{command}' on: '#{host}' as: '#{user}' but it failed"
+          error "Successfully ran SSH command on: '#{host}' as: '#{user}', but it failed"
           [ :error, response ]
         end
       rescue => e
-        debug "Failed to run SSH command: '#{command}' on: '#{host}' as: '#{user}'"
-        debug "#{e.class}: #{e.message}"
+        error "Failed to run SSH command on: '#{host}' as: '#{user}'"
+        error "#{e.class}: #{e.message}"
         [ :error, e ]
       end
 
