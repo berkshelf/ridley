@@ -8,6 +8,7 @@ require 'active_model'
 require 'active_support/inflector'
 require 'forwardable'
 require 'thread'
+require 'pathname'
 
 if jruby?
   require 'json/pure'
