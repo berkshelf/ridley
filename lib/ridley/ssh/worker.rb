@@ -38,12 +38,12 @@ module Ridley
 
               channel.on_data do |ch, data|
                 response.stdout += data
-                info data
+                info "NODE[#{host}] #{data}"
               end
 
               channel.on_extended_data do |ch, type, data|
                 response.stderr += data
-                info data
+                info "NODE[#{host}] #{data}"
               end
 
               channel.on_request("exit-status") do |ch, data|
