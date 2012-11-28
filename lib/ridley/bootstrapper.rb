@@ -78,6 +78,7 @@ module Ridley
       end
 
       responses = contexts.collect do |context|
+        info "Running bootstrap command on #{context.host}"
         pool.future.run(context.host, context.boot_command)
       end.collect(&:value)
 
