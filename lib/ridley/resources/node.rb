@@ -32,12 +32,13 @@ module Ridley
       #   @option options [String] :template
       #     bootstrap template to use (default: omnibus)
       def bootstrap(connection, *args)
-        options = args.last.is_a?(Hash) ? args.pop : Hash.new
+        options = args.extract_options!
 
         default_options = {
           server_url: connection.server_url,
           ssh_user: connection.ssh[:user],
           ssh_password: connection.ssh[:password],
+          ssh_keys: connection.ssh[:keys],
           ssh_timeout: connection.ssh[:timeout],
           validator_path: connection.validator_path,
           validator_client: connection.validator_client,
@@ -46,7 +47,7 @@ module Ridley
 
         options = default_options.merge(options)
 
-        Bootstrapper.new(args, options).run
+        Bootstrapper.new(*args, options).run
       end
     end
 

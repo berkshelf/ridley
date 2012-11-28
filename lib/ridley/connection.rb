@@ -73,20 +73,16 @@ module Ridley
     # @option options [String] :client_name
     #   name of the client used to authenticate with the Chef API
     # @option options [String] :client_key
-    #   filepath to the client's private key used to authenticate with
-    #   the Chef API
+    #   filepath to the client's private key used to authenticate with the Chef API
     # @option options [String] :organization
     #   the Organization to connect to. This is only used if you are connecting to
     #   private Chef or hosted Chef
-    # @option options [String] :validator_client
-    #   (default: nil)
-    # @option options [String] :validator_path
-    #   (default: nil)
-    # @option options [String] :encrypted_data_bag_secret_path
-    #   (default: nil)
-    # @option options [Integer] :thread_count
-    # @option options [Hash] :ssh
-    #   authentication credentials for bootstrapping or connecting to nodes (default: Hash.new)
+    # @option options [String] :validator_client (nil)
+    # @option options [String] :validator_path (nil)
+    # @option options [String] :encrypted_data_bag_secret_path (nil)
+    # @option options [Integer] :thread_count (DEFAULT_THREAD_COUNT)
+    # @option options [Hash] :ssh (Hash.new)
+    #   authentication credentials for bootstrapping or connecting to nodes
     # @option options [Hash] :params
     #   URI query unencoded key/value pairs
     # @option options [Hash] :headers

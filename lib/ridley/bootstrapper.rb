@@ -36,24 +36,24 @@ module Ridley
     # @option options [String] :validator_client
     # @option options [String] :validator_path
     #   filepath to the validator used to bootstrap the node (required)
-    # @option options [String] :bootstrap_proxy
-    #   URL to a proxy server to bootstrap through (default: nil)
-    # @option options [String] :encrypted_data_bag_secret_path
-    #   filepath on your host machine to your organizations encrypted data bag secret (default: nil)
-    # @option options [Hash] :hints
-    #   a hash of Ohai hints to place on the bootstrapped node (default: Hash.new)
-    # @option options [Hash] :attributes
-    #   a hash of attributes to use in the first Chef run (default: Hash.new)
-    # @option options [Array] :run_list
-    #   an initial run list to bootstrap with (default: Array.new)
-    # @option options [String] :chef_version
-    #   version of Chef to install on the node (default: {Ridley::CHEF_VERSION})
-    # @option options [String] :environment
-    #   environment to join the node to (default: '_default')
-    # @option options [Boolean] :sudo
+    # @option options [String] :bootstrap_proxy (nil)
+    #   URL to a proxy server to bootstrap through
+    # @option options [String] :encrypted_data_bag_secret_path (nil)
+    #   filepath on your host machine to your organizations encrypted data bag secret
+    # @option options [Hash] :hints (Hash.new)
+    #   a hash of Ohai hints to place on the bootstrapped node
+    # @option options [Hash] :attributes (Hash.new)
+    #   a hash of attributes to use in the first Chef run
+    # @option options [Array] :run_list (Array.new)
+    #   an initial run list to bootstrap with
+    # @option options [String] :chef_version (Ridley::CHEF_VERSION)
+    #   version of Chef to install on the node
+    # @option options [String] :environment ('_default')
+    #   environment to join the node to
+    # @option options [Boolean] :sudo (true)
     #   bootstrap with sudo (default: true)
-    # @option options [String] :template
-    #   bootstrap template to use (default: omnibus)
+    # @option options [String] :template ('omnibus')
+    #   bootstrap template to use
     def initialize(hosts, options = {})
       @hosts      = Array(hosts).collect(&:to_s).uniq
       @ssh_config = {
