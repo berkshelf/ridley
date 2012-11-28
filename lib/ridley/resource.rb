@@ -241,8 +241,15 @@ module Ridley
       self.attributes = self.class.create(connection, self).attributes
       true
     rescue Errors::HTTPConflict
-      self.attributes = self.class.update(connection, self).attributes
+      self.update
       true
+    end
+
+    def update
+      raise Errors::InvalidResource.new(self.errors) unless valid?
+
+      self.attributes = self.class.update(connection, self).attributes
+      self
     end
 
     # Reload the attributes of the instantiated resource

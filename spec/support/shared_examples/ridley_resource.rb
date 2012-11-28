@@ -254,4 +254,8 @@ shared_examples_for "a Ridley Resource" do |resource_klass|
       subject.attributes[:fake_attribute].should eql("some_value")
     end
   end
+
+  describe "#update" do
+    pending
+  end
 end
