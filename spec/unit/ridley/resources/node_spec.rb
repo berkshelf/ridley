@@ -35,6 +35,10 @@ describe Ridley::Node do
         subject.bootstrap(connection, "33.33.33.10", "33.33.33.11", boot_options)
       end
     end
+
+    describe "::merge_data" do
+      pending
+    end
   end
 
   subject { Ridley::Node.new(connection) }
@@ -283,6 +287,10 @@ describe Ridley::Node do
   end
 
   describe "#chef_client" do
+    pending
+  end
+
+  describe "#merge_data" do
     pending
   end
 end

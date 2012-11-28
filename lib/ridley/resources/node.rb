@@ -49,6 +49,16 @@ module Ridley
 
         Bootstrapper.new(*args, options).run
       end
+
+      # @param [Ridley::Cnonection] connection
+      # @param [Ridley::Node, String] target
+      # @option options [Array] :run_list
+      # @option options [Hash] :attributes
+      #
+      # @return [Ridley::Node]
+      def merge_data(connection, target, options = {})
+        find!(connection, target).merge_data(options)
+      end
     end
 
     include Ridley::Resource
@@ -190,6 +200,17 @@ module Ridley
       Ridley::SSH.start(self, connection.ssh) do |ssh|
         ssh.run("sudo chef-client").first
       end
+    end
+
+    # @option options [Array] :run_list
+    # @option options [Hash] :attributes
+    #
+    # @return [Ridley::Node]
+    def merge_data(options = {})
+      self.run_list = (self.run_list + options[:run_list]).uniq
+      self.normal   = self.normal.deep_merge(options[:attributes])
+
+      self.update
     end
   end
   
