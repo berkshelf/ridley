@@ -146,7 +146,7 @@ CONFIG
 
       # @return [String]
       def first_boot
-        attributes.merge(run_list: run_list).to_json
+        MultiJson.encode attributes.merge(run_list: run_list)
       end
 
       # The validation key to create a new client for the node
@@ -155,7 +155,7 @@ CONFIG
       #
       # @return [String]
       def validation_key
-        IO.read(validator_path).chomp
+        IO.read(File.expand_path(validator_path)).chomp
       rescue Errno::ENOENT
         raise Errors::ValidatorNotFound, "Error bootstrapping: Validator not found at '#{validator_path}'"
       end
