@@ -37,7 +37,14 @@ describe Ridley::Node do
     end
 
     describe "::merge_data" do
-      pending
+      it "finds the target node and sends it the merge_data message" do
+        data = double('data')
+        node = double('node')
+        node.should_receive(:merge_data).with(data)
+        subject.should_receive(:find!).and_return(node)
+
+        subject.merge_data(connection, node, data)
+      end
     end
   end
 
@@ -291,6 +298,44 @@ describe Ridley::Node do
   end
 
   describe "#merge_data" do
-    pending
+    before(:each) do
+      subject.name = "reset.riotgames.com"
+      subject.should_receive(:update)
+    end
+
+    it "appends items to the run_list" do
+      subject.merge_data(run_list: ["cook::one", "cook::two"])
+
+      subject.run_list.should =~ ["cook::one", "cook::two"]
+    end
+
+    it "ensures the run_list is unique if identical items are given" do
+      subject.run_list = [ "cook::one" ]
+      subject.merge_data(run_list: ["cook::one", "cook::two"])
+
+      subject.run_list.should =~ ["cook::one", "cook::two"]
+    end
+
+    it "deep merges attributes into the normal attributes" do
+      subject.normal = {
+        one: {
+          two: {
+            four: :deep
+          }
+        }
+      }
+      subject.merge_data(attributes: {
+        one: {
+          two: {
+            three: :deep
+          }
+        }
+      })
+
+      subject.normal[:one][:two].should have_key(:four)
+      subject.normal[:one][:two][:four].should eql(:deep)
+      subject.normal[:one][:two].should have_key(:three)
+      subject.normal[:one][:two][:three].should eql(:deep)
+    end
   end
 end
