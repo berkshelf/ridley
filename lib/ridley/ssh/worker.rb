@@ -38,10 +38,12 @@ module Ridley
 
               channel.on_data do |ch, data|
                 response.stdout += data
+                info "NODE[#{host}] #{data}"
               end
 
               channel.on_extended_data do |ch, type, data|
                 response.stderr += data
+                info "NODE[#{host}] #{data}"
               end
 
               channel.on_request("exit-status") do |ch, data|
@@ -63,6 +65,7 @@ module Ridley
           [ :ok, response ]
         else
           error "Successfully ran SSH command on: '#{host}' as: '#{user}', but it failed"
+          error response.stdout
           [ :error, response ]
         end
       rescue => e
