@@ -185,9 +185,9 @@ shared_examples_for "a Ridley Resource" do |resource_klass|
         subject.update
       end
 
-      it "returns self" do
+      it "returns true" do
         subject.class.should_receive(:update).with(anything, subject).and_return(updated)
-        subject.update.should eql(subject)
+        subject.update.should eql(true)
       end
     end
 
