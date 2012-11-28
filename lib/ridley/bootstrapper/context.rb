@@ -146,7 +146,7 @@ CONFIG
 
       # @return [String]
       def first_boot
-        attributes.merge(run_list: run_list).to_json
+        MultiJson.encode attributes.merge(run_list: run_list)
       end
 
       # The validation key to create a new client for the node
