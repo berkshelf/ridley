@@ -43,7 +43,7 @@ module Ridley
 
               channel.on_extended_data do |ch, type, data|
                 response.stderr += data
-                error data
+                info data
               end
 
               channel.on_request("exit-status") do |ch, data|
