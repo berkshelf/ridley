@@ -6,8 +6,8 @@ describe Ridley::SSH::ResponseSet do
   describe "#add_response" do
     it "accepts an array of responses" do
       responses = [
-        Ridley::SSH::Response.new,
-        Ridley::SSH::Response.new
+        Ridley::SSH::Response.new("one.riotgames.com"),
+        Ridley::SSH::Response.new("two.riotgames.com")
       ]
       subject.add_response(responses)
 
@@ -15,7 +15,7 @@ describe Ridley::SSH::ResponseSet do
     end
 
     it "accepts a single response" do
-      response = Ridley::SSH::Response.new
+      response = Ridley::SSH::Response.new("one.riotgames.com")
       subject.add_response(response)
 
       subject.responses.should have(1).item
