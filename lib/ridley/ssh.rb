@@ -47,16 +47,10 @@ module Ridley
         pool.future.run(node.public_hostname, command)
       end
 
-      ResponseSet.new.tap do |responses|
+      ResponseSet.new.tap do |response_set|
         futures.each do |future|
           status, response = future.value
-
-          case status
-          when :ok
-            responses.add_ok(response)
-          when :error
-            responses.add_error(response)
-          end
+          response_set.add_response(response)
         end
       end
     ensure

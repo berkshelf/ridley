@@ -22,7 +22,7 @@ module Ridley
       #
       # @return [Array]
       def run(host, command)
-        response = Response.new("", "")
+        response = Response.new
         debug "Running SSH command: '#{command}' on: '#{host}' as: '#{user}'"
 
         Net::SSH.start(host, user, options) do |ssh|          

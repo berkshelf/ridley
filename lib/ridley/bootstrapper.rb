@@ -85,13 +85,7 @@ module Ridley
       SSH::ResponseSet.new.tap do |response_set|
         responses.each do |message|
           status, response = message
-
-          case status
-          when :ok
-            response_set.add_ok(response)
-          when :error
-            response_set.add_error(response)
-          end
+          response_set.add_response(response)
         end
       end
     ensure
