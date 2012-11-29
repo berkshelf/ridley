@@ -12,9 +12,12 @@ module Ridley
       
       # @param [Hash] options
       def initialize(options = {})
+        options  = options.dup # allow for mutate within a pool
         @sudo    = options.delete(:sudo)
         @user    = options[:user]
         @options = options
+
+        @options[:paranoid] = false
       end
 
       # @param [String] host
@@ -22,7 +25,7 @@ module Ridley
       #
       # @return [Array]
       def run(host, command)
-        response = Response.new("", "")
+        response = Response.new(host)
         debug "Running SSH command: '#{command}' on: '#{host}' as: '#{user}'"
 
         Net::SSH.start(host, user, options) do |ssh|          
@@ -71,7 +74,9 @@ module Ridley
       rescue => e
         error "Failed to run SSH command on: '#{host}' as: '#{user}'"
         error "#{e.class}: #{e.message}"
-        [ :error, e ]
+        response.exit_code = -1
+        response.stderr = e.message
+        [ :error, response ]
       end
 
       private

@@ -71,31 +71,22 @@ module Ridley
 
     # @return [SSH::ResponseSet]
     def run
-      if contexts.length >= 2
-        pool = SSH::Worker.pool(size: contexts.length, args: [self.ssh_config])
-      else
-        pool = SSH::Worker.new(self.ssh_config)
+      workers = Array.new
+      futures = contexts.collect do |context|
+        info "Running bootstrap command on #{context.host}"
+
+        workers << worker = SSH::Worker.new_link(self.ssh_config.freeze)
+        worker.future.run(context.host, context.boot_command)
       end
 
-      responses = contexts.collect do |context|
-        info "Running bootstrap command on #{context.host}"
-        pool.future.run(context.host, context.boot_command)
-      end.collect(&:value)
-
       SSH::ResponseSet.new.tap do |response_set|
-        responses.each do |message|
-          status, response = message
-
-          case status
-          when :ok
-            response_set.add_ok(response)
-          when :error
-            response_set.add_error(response)
-          end
+        futures.each do |future|
+          status, response = future.value
+          response_set.add_response(response)
         end
       end
     ensure
-      pool.terminate if pool
+      workers.map(&:terminate)
     end
   end
 end

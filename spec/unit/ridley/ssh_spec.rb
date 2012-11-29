@@ -15,17 +15,34 @@ describe Ridley::SSH do
     subject { Ridley::SSH }
     
     describe "::start" do
-      pending
+      let(:options) do
+        {
+          user: "vagrant",
+          password: "vagrant"
+        }
+      end
+
+      it "evaluates within the context of a new SSH and returns the last item in the block" do
+        result = subject.start([node_one, node_two], options) do |ssh|
+          ssh.run("ls")
+        end
+
+        result.should be_a(Ridley::SSH::ResponseSet)
+      end
+
+      it "raises a LocalJumpError if a block is not provided" do        
+        expect {
+          subject.start([node_one, node_two], options)
+        }.to raise_error(LocalJumpError)
+      end
     end
   end
 
   subject { Ridley::SSH.new([node_one, node_two], user: "vagrant", password: "vagrant") }
 
-  describe "#workers" do
-    pending
-  end
-
   describe "#run" do
-    pending
+    it "returns an SSH::ResponseSet" do
+      subject.run("ls").should be_a(Ridley::SSH::ResponseSet)
+    end
   end
 end
