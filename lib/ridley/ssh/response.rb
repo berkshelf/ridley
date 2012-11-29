@@ -2,12 +2,15 @@ module Ridley
   class SSH
     # @author Jamie Winsor <jamie@vialstudios.com>
     class Response
-      attr_reader :stdout
-      attr_reader :stderr
-      attr_reader :exit_code
-      attr_reader :exit_signal
-      
-      def initialize(options = {})
+      attr_reader :host
+
+      attr_accessor :stdout
+      attr_accessor :stderr
+      attr_accessor :exit_code
+      attr_accessor :exit_signal
+
+      def initialize(host, options = {})
+        @host        = host
         @stdout      = options[:stdout] || String.new
         @stderr      = options[:stderr] || String.new
         @exit_code   = options[:exit_code] || -1

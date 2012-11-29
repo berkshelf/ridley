@@ -37,14 +37,10 @@ module Ridley
     #
     # @return [Array]
     def run(command)
-      if nodes.length >= 2
-        pool = SSH::Worker.pool(size: nodes.length, args: [self.options])
-      else
-        pool = SSH::Worker.new(self.options)
-      end
-
-      futures = nodes.collect do |node|
-        pool.future.run(node.public_hostname, command)
+      workers = Array.new
+      futures = self.nodes.collect do |node|
+        workers << worker = Worker.new_link(self.options.freeze)
+        worker.future.run(node.public_hostname, command)
       end
 
       ResponseSet.new.tap do |response_set|
@@ -54,7 +50,7 @@ module Ridley
         end
       end
     ensure
-      pool.terminate if pool
+      workers.map(&:terminate)
     end
   end
 end
