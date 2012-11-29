@@ -2,50 +2,59 @@ module Ridley
   class SSH
     # @author Jamie Winsor <jamie@vialstudios.com>
     class ResponseSet
-      # @return [Array<SSH::Response>]
-      attr_reader :oks
-      # @return [Array<SSH::Response>]
-      attr_reader :errors
+      extend Forwardable
+      include Enumerable
 
-      def initialize
-        @oks = Array.new
-        @errors = Array.new
+      attr_reader :failures
+      attr_reader :successes
+
+      def_delegator :responses, :each
+
+      def initialize(responses = Array.new)
+        @failures  = Array.new
+        @successes = Array.new
+
+        add_response Array(responses)
       end
 
-      # Add an "OK" response to the ResponseSet
+      # @param [SSH::Response, Array<SSH::Response>] response
       #
-      # @param [SSH::Response] response
-      def add_ok(response)
-        self.oks << response
-      end
+      # @return [Array<SSH::Response>]
+      def add_response(response)
+        if response.is_a?(Array)
+          until response.empty?
+            add_response(response.pop)
+          end
+          return responses
+        end
 
-      # Add an "Error" response to the ResponseSet
-      #
-      # @param [SSH::Response] response
-      def add_error(response)
-        self.errors << response
+        response.error? ? add_failure(response) : add_success(response)
+        responses
+      end
+      alias_method :<<, :add_response
+
+      def responses
+        successes + failures
       end
 
       # Return true if the response set contains any errors
       #
       # @return [Boolean]
       def has_errors?
-        self.errors.any?
+        self.failures.any?
       end
 
-      # Return one of the responses
-      #
-      # @return [SSH::Response]
-      def first
-        (self.oks + self.errors).first
-      end
+      private
 
-      # Returns how many responses are in the set
-      #
-      # @return [Integer]
-      def length
-        self.oks.length + self.errors.length
-      end
+        # @param [SSH::Response] response
+        def add_failure(response)
+          self.failures << response
+        end
+
+        # @param [SSH::Response] response
+        def add_success(response)
+          self.successes << response
+        end
     end
   end
 end

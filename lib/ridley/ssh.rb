@@ -29,46 +29,28 @@ module Ridley
     # @param [Hash] options
     #   @see Net::SSH
     def initialize(nodes, options = {})
-      @nodes   = nodes
+      @nodes   = Array(nodes)
       @options = options
-
-      self.options[:timeout] ||= 1.5
-    end
-
-    # @return [Array<SSH::Worker>]
-    def workers
-      @workers ||= Array(nodes).collect do |node|
-        Worker.new_link(current_actor, node.public_hostname, options)
-      end
     end
 
     # @param [String] command
     #
     # @return [Array]
     def run(command)
-      workers.collect { |worker| worker.async.run(command) }
+      workers = Array.new
+      futures = self.nodes.collect do |node|
+        workers << worker = Worker.new_link(self.options.freeze)
+        worker.future.run(node.public_hostname, command)
+      end
 
-      ResponseSet.new.tap do |responses|
-        until responses.length == workers.length
-          receive { |msg|
-            status, response = msg
-            
-            case status
-            when :ok
-              responses.add_ok(response)
-            when :error
-              responses.add_error(response)
-            else
-              error "SSH Failure: #{command}. terminating..."
-              terminate
-            end
-          }
+      ResponseSet.new.tap do |response_set|
+        futures.each do |future|
+          status, response = future.value
+          response_set.add_response(response)
         end
       end
-    end
-
-    def finalize
-      workers.collect(&:terminate)
+    ensure
+      workers.map(&:terminate)
     end
   end
 end
