@@ -146,12 +146,12 @@ shared_examples_for "a Ridley Resource" do |resource_klass|
       end
 
       context "when there is an HTTPConflict" do
-        it "sends an update message to the implemeneting class" do
+        it "sends the update message to self" do
           updated = double('updated')
           updated.stub(:[]).and_return(Hash.new)
           updated.stub(:attributes).and_return(Hash.new)
           subject.class.should_receive(:create).and_raise(Ridley::Errors::HTTPConflict.new(updated))
-          subject.class.should_receive(:update).with(connection, subject).and_return(updated)
+          subject.should_receive(:update).and_return(updated)
 
           subject.save
         end
@@ -161,9 +161,42 @@ shared_examples_for "a Ridley Resource" do |resource_klass|
     context "when the object is invalid" do
       before(:each) { subject.stub(:valid?).and_return(false) }
 
-      it "raises an InvalidObject error" do
+      it "raises an InvalidResource error" do
         lambda {
           subject.save
+        }.should raise_error(Ridley::Errors::InvalidResource)
+      end
+    end
+  end
+
+  describe "#update" do
+    context "when the object is valid" do   
+      let(:updated) do
+        updated = double('updated')
+        updated.stub(:[]).and_return(Hash.new)
+        updated.stub(:attributes).and_return(Hash.new)
+        updated
+      end
+
+      before(:each) { subject.stub(:valid?).and_return(true) }
+
+      it "sends an update message to the implementing class" do
+        subject.class.should_receive(:update).with(anything, subject).and_return(updated)
+        subject.update
+      end
+
+      it "returns true" do
+        subject.class.should_receive(:update).with(anything, subject).and_return(updated)
+        subject.update.should eql(true)
+      end
+    end
+
+    context "when the object is invalid" do
+      before(:each) { subject.stub(:valid?).and_return(false) }
+
+      it "raises an InvalidResource error" do
+        lambda {
+          subject.update
         }.should raise_error(Ridley::Errors::InvalidResource)
       end
     end

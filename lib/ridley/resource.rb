@@ -234,13 +234,26 @@ module Ridley
     #   if the resource does not pass validations
     #
     # @return [Boolean]
-    #   true if successful and false for failure
     def save
       raise Errors::InvalidResource.new(self.errors) unless valid?
 
       self.attributes = self.class.create(connection, self).attributes
       true
     rescue Errors::HTTPConflict
+      self.update
+      true
+    end
+
+    # Updates the instantiated resource on the target remote with any changes made
+    # to self
+    #
+    # @raise [Errors::InvalidResource]
+    #   if the resource does not pass validations
+    #
+    # @return [Boolean]
+    def update
+      raise Errors::InvalidResource.new(self.errors) unless valid?
+
       self.attributes = self.class.update(connection, self).attributes
       true
     end

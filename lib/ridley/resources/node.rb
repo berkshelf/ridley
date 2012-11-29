@@ -49,6 +49,24 @@ module Ridley
 
         Bootstrapper.new(*args, options).run
       end
+
+      # Merges the given data with the the data of the target node on the remote
+      #
+      # @param [Ridley::Cnonection] connection
+      # @param [Ridley::Node, String] target
+      #   node or identifier of the node to merge
+      # @option options [Array] :run_list
+      #   run list items to merge
+      # @option options [Hash] :attributes
+      #   attributes of normal precedence to merge
+      #
+      # @raise [Errors::HTTPNotFound]
+      #   if the target node is not found
+      #
+      # @return [Ridley::Node]
+      def merge_data(connection, target, options = {})
+        find!(connection, target).merge_data(options)
+      end
     end
 
     include Ridley::Resource
@@ -190,6 +208,28 @@ module Ridley
       Ridley::SSH.start(self, connection.ssh) do |ssh|
         ssh.run("sudo chef-client").first
       end
+    end
+
+    # Merges the instaniated nodes data with the given data and updates
+    # the remote with the merged results
+    #
+    # @option options [Array] :run_list
+    #   run list items to merge
+    # @option options [Hash] :attributes
+    #   attributes of normal precedence to merge
+    #
+    # @return [Ridley::Node]
+    def merge_data(options = {})
+      unless options[:run_list].nil?
+        self.run_list = (self.run_list + Array(options[:run_list])).uniq
+      end
+
+      unless options[:attributes].nil?
+        self.normal = self.normal.deep_merge(options[:attributes])
+      end
+
+      self.update
+      self
     end
   end
   
