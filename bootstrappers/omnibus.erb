@@ -64,6 +64,9 @@ cat <<'EOP'
 EOP
 ) > /etc/chef/client.rb
 
+<%# Remove client pem if it already exists -%>
+rm /etc/chef/client.pem
+
 (
 cat <<'EOP'
 <%= first_boot %>
