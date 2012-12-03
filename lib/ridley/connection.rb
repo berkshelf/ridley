@@ -32,15 +32,15 @@ module Ridley
     extend Forwardable
     include Ridley::DSL
 
-    attr_reader :client_name
-    attr_reader :client_key
     attr_reader :organization
-    attr_reader :ssh
 
-    attr_reader :validator_client
-    attr_reader :validator_path
-    attr_reader :encrypted_data_bag_secret_path
+    attr_accessor :client_name
+    attr_accessor :client_key
+    attr_accessor :validator_client
+    attr_accessor :validator_path
+    attr_accessor :encrypted_data_bag_secret_path
 
+    attr_accessor :ssh
     attr_accessor :thread_count
 
     def_delegator :conn, :build_url
