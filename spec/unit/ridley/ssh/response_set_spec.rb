@@ -1,6 +1,26 @@
 require 'spec_helper'
 
 describe Ridley::SSH::ResponseSet do
+  describe "ClassMethods" do
+    subject { described_class }
+
+    describe "::merge!" do
+      let(:target) { Ridley::SSH::ResponseSet.new }
+      let(:other) { Ridley::SSH::ResponseSet.new }
+
+      before(:each) do
+        other.add_response(Ridley::SSH::Response.new('host.local'))
+      end
+
+      it "returns the mutated target" do
+        result = subject.merge!(target, other)
+
+        result.should eql(target)
+        result.should have(1).item
+      end
+    end
+  end
+
   subject { described_class.new }
 
   describe "#add_response" do
@@ -55,6 +75,38 @@ describe Ridley::SSH::ResponseSet do
       subject.add_response(responses)
 
       subject.failures.should have(1).item
+    end
+  end
+
+  describe "#merge" do
+    let(:target) { Ridley::SSH::ResponseSet.new }
+    let(:other) { Ridley::SSH::ResponseSet.new }
+
+    before(:each) do
+      other.add_response(Ridley::SSH::Response.new('host.local'))
+    end
+
+    it "returns a new Ridley::SSH::ResponseSet object" do
+      result = target.merge(other)
+
+      result.should have(1).item
+      target.should have(0).items
+    end
+  end
+
+  describe "#merge!" do
+    let(:target) { Ridley::SSH::ResponseSet.new }
+    let(:other) { Ridley::SSH::ResponseSet.new }
+
+    before(:each) do
+      other.add_response(Ridley::SSH::Response.new('host.local'))
+    end
+
+    it "returns the mutated target" do
+      result = target.merge!(other)
+
+      result.should have(1).item
+      target.should have(1).item
     end
   end
 end

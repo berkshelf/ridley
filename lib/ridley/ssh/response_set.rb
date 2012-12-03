@@ -2,6 +2,23 @@ module Ridley
   class SSH
     # @author Jamie Winsor <jamie@vialstudios.com>
     class ResponseSet
+      class << self
+        # Merges the responses of the other ResponseSet with the target ResponseSet
+        # and returns the mutated target
+        #
+        # @param [SSH::ResponseSet] target
+        # @param [SSH::ResponseSet] other
+        #
+        # @return [SSH::ResponseSet]
+        def merge!(target, other)
+          if other.is_a?(self)
+            target.add_response(other.responses)
+          end
+
+          target
+        end
+      end
+
       extend Forwardable
       include Enumerable
 
@@ -42,6 +59,27 @@ module Ridley
       # @return [Boolean]
       def has_errors?
         self.failures.any?
+      end
+
+      # Merges the responses of another ResponseSet with self and returns
+      # a new instance of ResponseSet
+      #
+      # @param [Ridley::SSH::ResponseSet] other
+      #
+      # @return [Ridley::SSH::ResponseSet]
+      def merge(other)
+        target = self.class.new(self.responses) # Why the fuck can't I use #dup here?
+        self.class.merge!(target, other)
+      end
+
+      # Merges the respones of another ResponseSet with self and returns
+      # mutated self
+      #
+      # @param [Ridley::SSH::ResponseSet] other
+      #
+      # @return [self]
+      def merge!(other)
+        self.class.merge!(self, other)
       end
 
       private
