@@ -203,9 +203,14 @@ module Ridley
 
     # Run Chef-Client on the instantiated node
     #
+    # @param [Hash] options
+    #   a hash of options to pass to {Ridley::SSH.start}
+    #
     # @return [SSH::Response]
-    def chef_client
-      Ridley::SSH.start(self, connection.ssh) do |ssh|
+    def chef_client(options = {})
+      options = connection.ssh.merge(options)
+
+      Ridley::SSH.start(self, options) do |ssh|
         ssh.run("sudo chef-client").first
       end
     end

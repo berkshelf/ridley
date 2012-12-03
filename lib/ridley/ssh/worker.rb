@@ -28,7 +28,7 @@ module Ridley
         response = Response.new(host)
         debug "Running SSH command: '#{command}' on: '#{host}' as: '#{user}'"
 
-        Net::SSH.start(host, user, options) do |ssh|          
+        Net::SSH.start(host, user, options) do |ssh|
           ssh.open_channel do |channel|
             if self.sudo
               channel.request_pty
