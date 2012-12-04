@@ -216,20 +216,19 @@ module Ridley
       end
     end
 
-    # Put the connection's encrypted data bag secret onto the instantiated node
+    # Put the connection's encrypted data bag secret onto the instantiated node. If no
+    # encrypted data bag key path is set on the resource's connection then nil will be
+    # returned
     #
     # @param [Hash] options
     #   a hash of options to pass to {Ridley::SSH.start}
     #
-    # @raise [NoSecretKey] if no encrypted data bag secret key is configured on
-    #   the connection
-    #
-    # @return [SSH::Response]
+    # @return [SSH::Response, nil]
     def put_secret(options = {})
       if connection.encrypted_data_bag_secret_path.nil? ||
         !File.exists?(connection.encrypted_data_bag_secret_path)
 
-        raise NoSecretKey, "No encrypted data bag secret key configured for connection"
+        return nil
       end
 
       options = connection.ssh.merge(options)
