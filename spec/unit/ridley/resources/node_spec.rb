@@ -297,6 +297,10 @@ describe Ridley::Node do
     pending
   end
 
+  describe "#put_secret" do
+    pending
+  end
+
   describe "#merge_data" do
     before(:each) do
       subject.name = "reset.riotgames.com"

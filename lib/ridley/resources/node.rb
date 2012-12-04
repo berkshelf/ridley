@@ -210,8 +210,26 @@ module Ridley
     def chef_client(options = {})
       options = connection.ssh.merge(options)
 
+      Ridley.log.debug "Running Chef Client on: #{self.public_hostname}"
       Ridley::SSH.start(self, options) do |ssh|
         ssh.run("sudo chef-client").first
+      end
+    end
+
+    # Put the connection's encrypted data bag secret onto the instantiated node
+    #
+    # @param [Hash] options
+    #   a hash of options to pass to {Ridley::SSH.start}
+    #
+    # @return [SSH::Response, nil]
+    def put_secret(options = {})
+      options = connection.ssh.merge(options)
+      secret  = File.read(connection.encrypted_data_bag_secret_path).chomp
+      command = "echo '#{secret}' > /etc/chef/encrypted_data_bag_secret; chmod 0600 /etc/chef/encrypted_data_bag_secret"
+
+      Ridley.log.debug "Writing Encrypted Data Bag Secret to: #{self.public_hostname}"
+      Ridley::SSH.start(self, options) do |ssh|
+        ssh.run(command).first
       end
     end
 
