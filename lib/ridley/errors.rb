@@ -6,6 +6,7 @@ module Ridley
     class ArgumentError < InternalError; end
 
     class ValidatorNotFound < RidleyError; end
+    class NoSecretKey < RidleyError; end
 
     class InvalidResource < RidleyError
       attr_reader :errors

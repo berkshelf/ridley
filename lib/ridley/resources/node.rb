@@ -221,8 +221,17 @@ module Ridley
     # @param [Hash] options
     #   a hash of options to pass to {Ridley::SSH.start}
     #
-    # @return [SSH::Response, nil]
+    # @raise [NoSecretKey] if no encrypted data bag secret key is configured on
+    #   the connection
+    #
+    # @return [SSH::Response]
     def put_secret(options = {})
+      if connection.encrypted_data_bag_secret_path.nil? ||
+        !File.exists?(connection.encrypted_data_bag_secret_path)
+
+        raise NoSecretKey, "No encrypted data bag secret key configured for connection"
+      end
+
       options = connection.ssh.merge(options)
       secret  = File.read(connection.encrypted_data_bag_secret_path).chomp
       command = "echo '#{secret}' > /etc/chef/encrypted_data_bag_secret; chmod 0600 /etc/chef/encrypted_data_bag_secret"
