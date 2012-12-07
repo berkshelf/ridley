@@ -291,22 +291,12 @@ Given the previous example you could set the default node attribute with the `se
 
 ### Node Attributes
 
-Setting the `default[:my_app][:billing][:enabled]` node level default attribute on the node "jwinsor-1"
+Setting the `node[:my_app][:billing][:enabled]` node level attribute on the node "jwinsor-1"
 
     conn = Ridley.connection
     conn.sync do
       obj = node.find("jwinsor-1")
-      obj.set_default_attribute("my_app.billing.enabled", false)
-      obj.save
-    end
-
-Other attribute precedence levels can be set with their own respective set attribute functions
-
-    conn = Ridley.connection
-    conn.sync do
-      obj = node.find("jwinsor-1")
-      obj.set_override_attribute("my_app.proxy.enabled", false)
-      obj.set_normal_attribute("my_app.webapp.enabled", false)
+      obj.set_attribute("my_app.billing.enabled", false)
       obj.save
     end
 
