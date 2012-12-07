@@ -31,6 +31,8 @@ module Ridley
       #     bootstrap with sudo (default: true)
       #   @option options [String] :template
       #     bootstrap template to use (default: omnibus)
+      #
+      # @return [SSH::ResponseSet]
       def bootstrap(connection, *args)
         options = args.extract_options!
 
