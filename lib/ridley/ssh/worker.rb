@@ -12,8 +12,8 @@ module Ridley
       
       # @param [Hash] options
       def initialize(options = {})
-        options  = options.dup # allow for mutate within a pool
-        @sudo    = options.delete(:sudo)
+        options = options.dup
+        @sudo    = options[:sudo]
         @user    = options[:user]
         @options = options
 
@@ -28,7 +28,7 @@ module Ridley
         response = Response.new(host)
         debug "Running SSH command: '#{command}' on: '#{host}' as: '#{user}'"
 
-        Net::SSH.start(host, user, options) do |ssh|
+        Net::SSH.start(host, user, options.slice(*Net::SSH::VALID_OPTIONS)) do |ssh|
           ssh.open_channel do |channel|
             if self.sudo
               channel.request_pty
