@@ -25,14 +25,14 @@ module Ridley
     attr_reader :contexts
 
     # @return [Hash]
-    attr_reader :ssh_config
+    attr_reader :options
 
     # @param [Array<#to_s>] hosts
-    # @option options [String] :ssh_user
-    # @option options [String] :ssh_password
-    # @option options [Array<String>, String] :ssh_keys
-    # @option options [Float] :ssh_timeout
-    #   timeout value for SSH bootstrap (default: 1.5)
+    # @option options [Hash] :ssh
+    #   * :user (String) a shell user that will login to each node and perform the bootstrap command on (required)
+    #   * :password (String) the password for the shell user that will perform the bootstrap
+    #   * :keys (Array, String) an array of keys (or a single key) to authenticate the ssh user with instead of a password
+    #   * :timeout (Float) [5.0] timeout value for SSH bootstrap
     # @option options [String] :validator_client
     # @option options [String] :validator_path
     #   filepath to the validator used to bootstrap the node (required)
@@ -55,14 +55,15 @@ module Ridley
     # @option options [String] :template ('omnibus')
     #   bootstrap template to use
     def initialize(hosts, options = {})
-      @hosts      = Array(hosts).collect(&:to_s).uniq
-      @ssh_config = {
-        user: options.fetch(:ssh_user),
-        password: options[:ssh_password],
-        keys: options[:ssh_keys],
-        timeout: (options[:ssh_timeout] || 1.5),
-        sudo: (options[:sudo].nil? ? true : options[:sudo])
-      }
+      @hosts         = Array(hosts).collect(&:to_s).uniq
+      @options       = options.dup
+      @options[:ssh] ||= Hash.new
+      @options[:ssh] = {
+        timeout: 5.0,
+        sudo: true
+      }.merge(@options[:ssh])
+
+      @options[:sudo] = @options[:ssh][:sudo]
 
       @contexts = @hosts.collect do |host|
         Context.new(host, options)
@@ -75,7 +76,7 @@ module Ridley
       futures = contexts.collect do |context|
         info "Running bootstrap command on #{context.host}"
 
-        workers << worker = SSH::Worker.new_link(self.ssh_config.freeze)
+        workers << worker = SSH::Worker.new_link(self.options[:ssh].freeze)
         worker.future.run(context.host, context.boot_command)
       end
 
