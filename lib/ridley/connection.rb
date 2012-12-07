@@ -16,6 +16,12 @@ module Ridley
           missing.collect! { |opt| "'#{opt}'" }
           raise ArgumentError, "Missing required option(s): #{missing.join(', ')}"
         end
+
+        missing_values = options.slice(*REQUIRED_OPTIONS).select { |key, value| !value.present? }
+        unless missing_values.empty?
+          values = missing_values.keys.collect { |opt| "'#{opt}'" }
+          raise ArgumentError, "Missing value for required option(s): '#{values.join(', ')}'"
+        end
       end
 
       # A hash of default options to be used in the Connection initializer
