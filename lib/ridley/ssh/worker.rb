@@ -12,10 +12,9 @@ module Ridley
       
       # @param [Hash] options
       def initialize(options = {})
-        options = options.dup
-        @sudo    = options[:sudo]
-        @user    = options[:user]
-        @options = options
+        @options = options.dup
+        @sudo    = @options[:sudo]
+        @user    = @options[:user]
 
         @options[:paranoid] = false
       end
