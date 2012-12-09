@@ -36,6 +36,8 @@ module Ridley
     end
 
     extend Forwardable
+    
+    include Celluloid
     include Ridley::DSL
 
     attr_reader :organization
@@ -100,6 +102,13 @@ module Ridley
     # @option options [URI, String, Hash] :proxy
     #   URI, String, or Hash of HTTP proxy options
     def initialize(options = {})
+      configure(options)
+    end
+
+    # Configure this instance of Ridley::Connection
+    #
+    # @param [Hash] options
+    def configure(options)
       options = self.class.default_options.merge(options)
       self.class.validate_options(options)
 
