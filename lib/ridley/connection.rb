@@ -3,7 +3,10 @@ module Ridley
   class Connection
     class << self
       def sync(options, &block)
-        new(options).sync(&block)
+        conn = new(options)
+        conn.sync(&block)
+      ensure
+        conn.terminate if conn && conn.alive?
       end
       
       # @raise [ArgumentError]
@@ -36,6 +39,8 @@ module Ridley
     end
 
     extend Forwardable
+
+    include Celluloid
     include Ridley::DSL
 
     attr_reader :organization
@@ -88,7 +93,11 @@ module Ridley
     # @option options [String] :encrypted_data_bag_secret_path (nil)
     # @option options [Integer] :thread_count (DEFAULT_THREAD_COUNT)
     # @option options [Hash] :ssh (Hash.new)
-    #   authentication credentials for bootstrapping or connecting to nodes
+    #   * :user (String) a shell user that will login to each node and perform the bootstrap command on (required)
+    #   * :password (String) the password for the shell user that will perform the bootstrap
+    #   * :keys (Array, String) an array of keys (or a single key) to authenticate the ssh user with instead of a password
+    #   * :timeout (Float) [5.0] timeout value for SSH bootstrap
+    #   * :sudo (Boolean) [true] bootstrap with sudo
     # @option options [Hash] :params
     #   URI query unencoded key/value pairs
     # @option options [Hash] :headers
@@ -96,10 +105,17 @@ module Ridley
     # @option options [Hash] :request
     #   request options
     # @option options [Hash] :ssl
-    #   SSL options
+    #   * :verify (Boolean) [true] set to false to disable SSL verification
     # @option options [URI, String, Hash] :proxy
     #   URI, String, or Hash of HTTP proxy options
     def initialize(options = {})
+      configure(options)
+    end
+
+    # Configure this instance of Ridley::Connection
+    #
+    # @param [Hash] options
+    def configure(options)
       options = self.class.default_options.merge(options)
       self.class.validate_options(options)
 
