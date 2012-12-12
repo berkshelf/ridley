@@ -42,7 +42,13 @@ module Ridley
   autoload :SSH, 'ridley/ssh'
 
   class << self
-    attr_accessor :logger
+    extend Forwardable
+
+    def_delegator "Ridley::Logging", :logger
+    alias_method :log, :logger
+
+    def_delegator "Ridley::Logging", :logger=
+    def_delegator "Ridley::Logging", :set_logger
 
     def connection(*args)
       Connection.new(*args)
@@ -52,26 +58,11 @@ module Ridley
       Connection.sync(*args, &block)
     end
 
-    # @return [Logger]
-    def logger
-      Ridley::Logging.logger
-    end
-    alias_method :log, :logger
-
-    # @param [Logger, nil] obj
-    #
-    # @return [Logger]
-    def set_logger(obj)
-      Ridley::Logging.set_logger(obj)
-    end
-
     # @return [Pathname]
     def root
       @root ||= Pathname.new(File.expand_path('../', File.dirname(__FILE__)))
     end
   end
 end
-
-Celluloid.logger = Ridley.logger
 
 require 'ridley/middleware'
