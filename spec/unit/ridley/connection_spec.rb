@@ -17,6 +17,10 @@ describe Ridley::Connection do
     }
   end
 
+  it "exposes its options publicly" do
+    described_class::OPTIONS.should be_a Array
+  end
+
   describe "ClassMethods" do
     subject { Ridley::Connection }
 

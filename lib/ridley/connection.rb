@@ -72,6 +72,18 @@ module Ridley
 
     def_delegator :conn, :in_parallel
 
+    OPTIONS = [
+      :server_url,
+      :client_name,
+      :client_key,
+      :organization,
+      :validator_client,
+      :validator_path,
+      :encrypted_data_bag_secret_path,
+      :thread_count,
+      :ssl
+    ].freeze
+
     REQUIRED_OPTIONS = [
       :server_url,
       :client_name,
