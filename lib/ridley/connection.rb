@@ -42,6 +42,7 @@ module Ridley
 
     include Celluloid
     include Ridley::DSL
+    include Ridley::Logging
 
     attr_reader :organization
 
@@ -109,6 +110,7 @@ module Ridley
     # @option options [URI, String, Hash] :proxy
     #   URI, String, or Hash of HTTP proxy options
     def initialize(options = {})
+      log.info { "Ridley starting..." }
       configure(options)
     end
 
@@ -196,6 +198,10 @@ module Ridley
       IO.read(encrypted_data_bag_secret_path).chomp
     rescue Errno::ENOENT => e
       raise Errors::EncryptedDataBagSecretNotFound, "Encrypted data bag secret provided but not found at '#{encrypted_data_bag_secret_path}'"
+    end
+
+    def finalize
+      log.info { "Ridley stopping..." }
     end
 
     private
