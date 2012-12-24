@@ -168,7 +168,7 @@ module Ridley
         c.response :chef_response
         c.response :json
 
-        c.adapter Faraday.default_adapter
+        c.adapter :net_http_persistent
       end
     end
 
