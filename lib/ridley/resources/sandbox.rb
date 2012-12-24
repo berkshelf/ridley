@@ -3,15 +3,19 @@ module Ridley
     class << self
       # @param [Ridley::Connection] connection
       # @param [Array] checksums
+      # @option options [Integer] :size (12)
+      #   size of the upload pool
       #
       # @return [Ridley::Sandbox]
-      def create(connection, checksums = [])
+      def create(connection, checksums = [], options = {})
+        options.reverse_merge!(size: 12)
+
         sumhash = { checksums: Hash.new }.tap do |chks|
           Array(checksums).each { |chk| chks[:checksums][chk] = nil }
         end
 
         attrs = connection.post("sandboxes", sumhash.to_json).body
-        new(connection, attrs[:sandbox_id], attrs[:checksums])
+        pool(size: options[:size], args: [connection, attrs[:sandbox_id], attrs[:checksums]])
       end
 
       # Checksum the file at the given filepath for a Chef API.
@@ -43,7 +47,14 @@ module Ridley
         end
         digest.hexdigest
       end
+
+      def future(connection, *args)
+        puts connection
+        connection.future(*args)
+      end
     end
+
+    include Celluloid
 
     attr_reader :sandbox_id
     attr_reader :checksums
@@ -51,15 +62,36 @@ module Ridley
     def initialize(connection, id, checksums)
       @connection = connection
       @sandbox_id = id
-      @checksums = checksums
+      @checksums  = checksums
     end
 
     def checksum(chk_id)
       checksums.fetch(chk_id.to_sym)
     end
 
+    # Concurrently upload multiple files into a sandbox
+    #
+    # @param [Hash] checksums
+    #   a hash of file checksums and file paths
+    #
+    # @example uploading multiple checksums
+    #
+    #   sandbox.multi_upload(
+    #     "e5a0f6b48d0712382295ff30bec1f9cc" => "/Users/reset/code/rbenv-cookbook/recipes/default.rb",
+    #     "de6532a7fbe717d52020dc9f3ae47dbe" => "/Users/reset/code/rbenv-cookbook/recipes/ohai_plugin.rb"
+    #   )
+    def multi_upload(checksums)
+      checksums.collect do |chk_id, path|
+        future.upload(chk_id, path)
+      end.map(&:value)
+    end
+
+    # Upload one file into the sandbox for the given checksum id
+    #
     # @param [String] chk_id
+    #   checksum of the file being uploaded
     # @param [String] path
+    #   path to the file to upload
     #
     # @return [Hash, nil]
     def upload(chk_id, path)
@@ -85,9 +117,9 @@ module Ridley
       # value of the given checksum.
       conn = connection.send(:conn).dup
 
-      url = URI(checksum[:url])
+      url         = URI(checksum[:url])
       upload_path = url.path
-      url.path = ""
+      url.path    = ""
 
       conn.url_prefix = url.to_s
 
@@ -95,7 +127,7 @@ module Ridley
     end
 
     def commit
-      connection.put("sandboxes/#{sandbox_id}", { is_completed: true }.to_json).body
+      connection.put("sandboxes/#{sandbox_id}", MultiJson.encode(is_completed: true)).body
     end
 
     def to_s
