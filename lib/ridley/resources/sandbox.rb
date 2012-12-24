@@ -55,7 +55,6 @@ module Ridley
     end
 
     include Celluloid
-    include Celluloid::Logger
 
     attr_reader :sandbox_id
     attr_reader :checksums
