@@ -23,7 +23,7 @@ JSON.create_id = nil
 
 # @author Jamie Winsor <jamie@vialstudios.com>
 module Ridley
-  CHEF_VERSION = '10.16.2'.freeze
+  CHEF_VERSION = '10.16.4'.freeze
 
   autoload :Bootstrapper, 'ridley/bootstrapper'
   autoload :Client, 'ridley/resources/client'
@@ -64,5 +64,7 @@ module Ridley
     end
   end
 end
+
+Celluloid.logger = Ridley.logger
 
 require 'ridley/middleware'
