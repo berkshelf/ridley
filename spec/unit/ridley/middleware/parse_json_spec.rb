@@ -18,31 +18,31 @@ describe Ridley::Middleware::ParseJson do
     end
 
     describe "::json_response?" do
-      it "returns true if the value of content-type includes 'application/json'" do
+      it "returns true if the value of content-type includes 'application/json' and the body looks like JSON" do
         env = double('env')
         env.stub(:[]).with(:response_headers).and_return(
           'content-type' => 'application/json; charset=utf8'
-        )
-
-        subject.json_response?(env).should be_true
-      end
-
-      it "returns true if the value of content-type does not include 'application/json' and the body contains JSON" do
-        env = double('env')
-        env.stub(:[]).with(:response_headers).and_return(
-          'content-type' => 'text/plain'
         )
         subject.should_receive(:looks_like_json?).with(env).and_return(true)
 
         subject.json_response?(env).should be_true
       end
 
-      it "returns false if the value of content-type does not include 'application/json' and the body does not contain JSON" do
+      it "returns false if the value of content-type includes 'application/json' but the body does not look like JSON" do
+        env = double('env')
+        env.stub(:[]).with(:response_headers).and_return(
+          'content-type' => 'application/json; charset=utf8'
+        )
+        subject.should_receive(:looks_like_json?).with(env).and_return(false)
+
+        subject.json_response?(env).should be_false
+      end
+
+      it "returns false if the value of content-type does not include 'application/json'" do
         env = double('env')
         env.stub(:[]).with(:response_headers).and_return(
           'content-type' => 'text/plain'
         )
-        subject.should_receive(:looks_like_json?).with(env).and_return(false)
 
         subject.json_response?(env).should be_false
       end

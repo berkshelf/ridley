@@ -19,6 +19,8 @@ module Ridley
       ].freeze
       
       class << self
+        include Ridley::Logging
+        
         # Takes a string containing JSON and converts it to a Ruby hash
         # symbols for keys
         #
