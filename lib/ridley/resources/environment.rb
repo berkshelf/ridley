@@ -1,8 +1,6 @@
 module Ridley
   # @author Jamie Winsor <jamie@vialstudios.com>
-  class Environment
-    include Ridley::Resource
-    
+  class Environment < Ridley::Resource    
     class << self
       # Delete all of the environments on the remote connection. The
       # '_default' environment will never be deleted.
@@ -21,27 +19,20 @@ module Ridley
     set_chef_json_class "Chef::Environment"
     set_resource_path "environments"
 
-    attribute :name
-    validates_presence_of :name
+    attribute :name,
+      required: true
 
-    attribute :description, default: String.new
-    attribute :default_attributes, default: HashWithIndifferentAccess.new
-    attribute :override_attributes, default: HashWithIndifferentAccess.new
-    attribute :cookbook_versions, default: HashWithIndifferentAccess.new
+    attribute :description,
+      default: String.new
 
-    # @param [Hash] hash
-    def default_attributes=(hash)
-      super(HashWithIndifferentAccess.new(hash))
-    end
-
-    # @param [Hash] hash
-    def override_attributes=(hash)
-      super(HashWithIndifferentAccess.new(hash))
-    end
-
-    def cookbook_versions=(hash)
-      super(HashWithIndifferentAccess.new(hash))
-    end
+    attribute :default_attributes,
+      default: Hashie::Mash.new
+    
+    attribute :override_attributes,
+      default: Hashie::Mash.new
+    
+    attribute :cookbook_versions,
+      default: Hashie::Mash.new
 
     # Set an environment level default attribute given the dotted path representation of
     # the Chef attribute and value
