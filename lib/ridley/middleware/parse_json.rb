@@ -2,6 +2,8 @@ module Ridley
   module Middleware
     # @author Jamie Winsor <jamie@vialstudios.com>
     class ParseJson < Faraday::Response::Middleware
+      include Ridley::Logging
+
       JSON_TYPE  = 'application/json'.freeze
       
       BRACKETS   = [ 
@@ -17,6 +19,8 @@ module Ridley
       ].freeze
       
       class << self
+        include Ridley::Logging
+        
         # Takes a string containing JSON and converts it to a Ruby hash
         # symbols for keys
         #
@@ -47,7 +51,7 @@ module Ridley
         # @return [String]
         def response_type(env)
           if env[:response_headers][CONTENT_TYPE].nil?
-            Ridley.log.debug "Response did not specify a content type."
+            log.debug "Response did not specify a content type."
             return "text/html"
           end
 
@@ -62,7 +66,7 @@ module Ridley
         #
         # @return [Boolean]
         def json_response?(env)
-          response_type(env) == JSON_TYPE || looks_like_json?(env)
+          response_type(env) == JSON_TYPE && looks_like_json?(env)
         end
 
         # Examines the body of a request env and returns true if it appears
@@ -91,14 +95,13 @@ module Ridley
       end
 
       def on_complete(env)
-        if self.class.json_response?(env)
-          Ridley.log.debug("Parsing JSON Chef Response")
-          Ridley.log.debug(env)
+        log.debug(env)
 
+        if self.class.json_response?(env)
+          log.debug("Parsing Chef Response body as JSON")
           env[:body] = self.class.parse(env[:body])
         else
-          Ridley.log.debug("Chef Response was not JSON")
-          Ridley.log.debug(env)
+          log.debug("Chef Response did not contain a JSON body")
         end
       end
     end
