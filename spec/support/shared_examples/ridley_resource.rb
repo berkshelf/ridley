@@ -99,40 +99,6 @@ shared_examples_for "a Ridley Resource" do |resource_klass|
 
   subject { resource_klass.new(connection) }
 
-  describe "#attribute" do
-    it "returns the value of the attribute of the corresponding identifier" do
-      subject.attributes.each do |attr, value|
-        subject.attribute(attr).should eql(value)
-      end
-    end
-  end
-
-  describe "#attribute=" do
-    it "assigns the desired to the attribute of the corresponding identifier" do
-      subject.attributes.each do |attr, value|
-        subject.send(:attribute=, attr, "testval")
-      end
-
-      subject.attributes.each do |attr, value|
-        subject.attribute(attr).should eql("testval")
-      end
-    end
-  end
-
-  describe "#attributes" do
-    it "returns a hash of attributes" do
-      subject.attributes.should be_a(Hash)
-    end
-
-    it "includes attribute_defaults in the attributes" do
-      subject.class.stub(:attributes).and_return(Set.new([:val_one]))
-      subject.class.stub(:attribute_defaults).and_return(val_one: "value")
-
-      subject.attributes.should have_key(:val_one)
-      subject.attributes[:val_one].should eql("value")
-    end
-  end
-
   describe "#save" do
     context "when the object is valid" do
       before(:each) { subject.stub(:valid?).and_return(true) }

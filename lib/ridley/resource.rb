@@ -1,17 +1,7 @@
 module Ridley
   # @author Jamie Winsor <jamie@vialstudios.com>
-  module Resource
-    extend ActiveSupport::Concern
-    include ActiveModel::AttributeMethods
-    include ActiveModel::Validations
-    include ActiveModel::Serializers::JSON
-    include Comparable
-
-    included do
-      attribute_method_suffix('=')
-    end
-
-    module ClassMethods
+  class Resource
+    class << self
       # @return [String, nil]
       def chef_id
         @chef_id
@@ -60,29 +50,6 @@ module Ridley
       def set_chef_json_class(klass)
         @chef_json_class = klass
         attribute(:json_class, default: klass)
-      end
-
-      # @return [Set]
-      def attributes
-        @attributes ||= Set.new
-      end
-
-      # @return [Hash]
-      def attribute_defaults
-        @attribute_defaults ||= HashWithIndifferentAccess.new
-      end
-
-      # @param [String, Symbol] name
-      # @option options [Object] :default
-      #   defines the default value for the attribute
-      #
-      # @return [Set]
-      def attribute(name, options = {})
-        if options.has_key?(:default)
-          default_for_attribute(name, options[:default])
-        end
-        define_attribute_method(name)
-        attributes << name.to_sym
       end
 
       # @param [Ridley::Connection] connection
@@ -164,67 +131,30 @@ module Ridley
         resource = new(connection, object.to_hash)
         new(connection, connection.put("#{self.resource_path}/#{resource.chef_id}", resource.to_json).body)
       end
-
-      private
-
-        def default_for_attribute(name, value)
-          attribute_defaults[name.to_sym] = value
-        end
     end
+
+    include Chozo::VariaModel
+    include Comparable
 
     # @param [Ridley::Connection] connection
-    # @param [Hash] attributes
-    def initialize(connection, attributes = {})
+    # @param [Hash] new_attrs
+    def initialize(connection, new_attrs = {})
       @connection = connection
-      self.attributes = self.class.attribute_defaults.deep_merge(attributes)
+      mass_assign(new_attrs)
     end
 
-    # @param [String, Symbol] key
-    #
-    # @return [Object]
-    def attribute(key)
-      if instance_variable_defined?("@#{key}")
-        instance_variable_get("@#{key}")
-      else
-        self.class.attribute_defaults[key]
-      end
-    end
-    alias_method :[], :attribute
+    alias_method :attribute, :get_attribute
+    alias_method :[], :get_attribute
+    alias_method :attribute=, :set_attribute
+    alias_method :[]=, :set_attribute
 
-    # @param [String, Symbol] key
-    # @param [Object] value
-    #
-    # @return [Object]
-    def attribute=(key, value)
-      instance_variable_set("@#{key}", value)
-    end
-    alias_method :[]=, :attribute=
+    alias_method :attributes=, :mass_assign
 
     # @param [String, Symbol] key
     #
     # @return [Boolean]
     def attribute?(key)
       attribute(key).present?
-    end
-
-    # @return [Hash]
-    def attributes
-      {}.tap do |attrs|
-        self.class.attributes.each do |attr|
-          attrs[attr] = attribute(attr)
-        end
-      end
-    end
-
-    # @param [#to_hash] new_attributes
-    #
-    # @return [Hash]
-    def attributes=(new_attributes)
-      new_attributes.to_hash.symbolize_keys!
-
-      self.class.attributes.each do |attr_name|
-        send(:attribute=, attr_name, new_attributes[attr_name.to_sym])
-      end
     end
 
     # Creates a resource on the target remote or updates one if the resource
@@ -237,7 +167,7 @@ module Ridley
     def save
       raise Errors::InvalidResource.new(self.errors) unless valid?
 
-      self.attributes = self.class.create(connection, self).attributes
+      mass_assign(self.class.create(connection, self).attributes)
       true
     rescue Errors::HTTPConflict
       self.update
@@ -254,7 +184,7 @@ module Ridley
     def update
       raise Errors::InvalidResource.new(self.errors) unless valid?
 
-      self.attributes = self.class.update(connection, self).attributes
+      mass_assign(self.class.update(connection, self).attributes)
       true
     end
 
@@ -262,13 +192,13 @@ module Ridley
     #
     # @return [Object]
     def reload
-      self.attributes = self.class.find(connection, self).attributes
+      mass_assign(self.class.find(connection, self).attributes)
       self
     end
 
     # @return [String]
     def chef_id
-      attribute(self.class.chef_id)
+      get_attribute(self.class.chef_id)
     end
 
     # @param [String] json
@@ -277,7 +207,7 @@ module Ridley
     #
     # @return [Object]
     def from_json(json, options = {})
-      self.attributes = MultiJson.decode(json, options)
+      mass_assign(MultiJson.decode(json, options))
       self
     end
 
@@ -285,7 +215,7 @@ module Ridley
     #
     # @return [Object]
     def from_hash(hash)
-      self.attributes = hash.to_hash
+      mass_assign(hash.to_hash)
       self
     end
 
