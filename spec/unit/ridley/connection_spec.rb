@@ -153,7 +153,7 @@ describe Ridley::Connection do
       }.should raise_error(Ridley::Errors::InternalError)
     end
 
-    describe "HTTP Request" do
+    shared_examples "HTTP Request" do
       describe "#get" do
         it "appends the given path to the connection's server_uri path and sends a get request to it" do
           stub_request(:get, subject.build_url("cookbooks")).
@@ -189,6 +189,28 @@ describe Ridley::Connection do
             to_return(status: 200, body: "{}")
 
           subject.delete("cookbooks/nginx")
+        end
+      end
+    end
+
+    context "Direct connection" do
+      it_behaves_like "HTTP Request"
+    end
+
+    context "Proxied connection" do
+      describe "http_proxy" do
+        it_behaves_like "HTTP Request" do
+          before do
+            ENV['http_proxy'] = "http://proxy:8080"
+          end
+        end
+      end
+
+      describe "HTTP_PROXY" do
+        it_behaves_like "HTTP Request" do
+          before do
+            ENV['HTTP_PROXY'] = "http://proxy:8080"
+          end
         end
       end
     end

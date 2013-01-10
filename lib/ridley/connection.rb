@@ -8,7 +8,7 @@ module Ridley
       ensure
         conn.terminate if conn && conn.alive?
       end
-      
+
       # @raise [ArgumentError]
       #
       # @return [Boolean]
@@ -159,6 +159,10 @@ module Ridley
 
       unless organization.nil?
         uri_hash[:path] = "/organizations/#{organization}"
+      end
+
+      if proxy = (ENV['http_proxy'] || ENV['HTTP_PROXY'])
+        faraday_options[:proxy] = proxy
       end
 
       server_uri = Addressable::URI.new(uri_hash)
