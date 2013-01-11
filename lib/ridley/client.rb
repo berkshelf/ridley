@@ -151,37 +151,37 @@ module Ridley
 
     # @return [Ridley::ChainLink]
     def client
-      ChainLink.new(Celluloid::Actor.current, Ridley::ClientResource)
+      ChainLink.new(self.connection, Ridley::ClientResource)
     end
 
     # @return [Ridley::ChainLink]
     def cookbook
-      ChainLink.new(Celluloid::Actor.current, Ridley::CookbookResource)
+      ChainLink.new(self.connection, Ridley::CookbookResource)
     end
 
     # @return [Ridley::ChainLink]
     def data_bag
-      ChainLink.new(Celluloid::Actor.current, Ridley::DataBagResource)
+      ChainLink.new(self.connection, Ridley::DataBagResource)
     end
 
     # @return [Ridley::ChainLink]
     def environment
-      ChainLink.new(Celluloid::Actor.current, Ridley::EnvironmentResource)
+      ChainLink.new(self.connection, Ridley::EnvironmentResource)
     end
 
     # @return [Ridley::ChainLink]
     def node
-      ChainLink.new(Celluloid::Actor.current, Ridley::NodeResource)
+      ChainLink.new(self.connection, Ridley::NodeResource)
     end
 
     # @return [Ridley::ChainLink]
     def role
-      ChainLink.new(Celluloid::Actor.current, Ridley::RoleResource)
+      ChainLink.new(self.connection, Ridley::RoleResource)
     end
 
     # @return [Ridley::ChainLink]
     def sandbox
-      ChainLink.new(Celluloid::Actor.current, Ridley::SandboxResource)
+      ChainLink.new(self.connection, Ridley::SandboxResource)
     end
 
     # Creates an runs a new Ridley::Search
@@ -197,19 +197,19 @@ module Ridley
     #
     # @return [Hash]
     def search(index, query = nil, options = {})
-      Ridley::Search.new(Celluloid::Actor.current, index, query, options).run
+      Ridley::Search.new(self.connection, index, query, options).run
     end
 
     # Return the array of all possible search indexes for the including connection
     #
     # @example
-    #   conn = Ridley.connection(...)
+    #   conn = Ridley.new(...)
     #   conn.search_indexes => 
     #     [:client, :environment, :node, :role, :"ridley-two", :"ridley-one"]
     #
     # @return [Array<Symbol, String>]
     def search_indexes
-      Ridley::Search.indexes(Celluloid::Actor.current)
+      Ridley::Search.indexes(self.connection)
     end
 
     # @return [Symbol]
