@@ -1,6 +1,6 @@
 module Ridley
   # @author Jamie Winsor <jamie@vialstudios.com>
-  class Role < Ridley::Resource
+  class RoleResource < Ridley::Resource
     set_chef_id "name"
     set_chef_type "role"
     set_chef_json_class "Chef::Role"
@@ -62,15 +62,15 @@ module Ridley
   end
 
   module DSL
-    # Coerces instance functions into class functions on Ridley::Role. This coercion
+    # Coerces instance functions into class functions on Ridley::RoleResource. This coercion
     # sends an instance of the including class along to the class function.
     #
     # @see Ridley::ChainLink
     #
     # @return [Ridley::ChainLink]
-    #   a context object to delegate instance functions to class functions on Ridley::Role
+    #   a context object to delegate instance functions to class functions on Ridley::RoleResource
     def role
-      ChainLink.new(self, Ridley::Role)
+      ChainLink.new(self, Ridley::RoleResource)
     end
   end
 end
