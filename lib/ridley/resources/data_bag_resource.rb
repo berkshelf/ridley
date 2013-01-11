@@ -15,7 +15,7 @@ module Ridley
 
       @data_bag = data_bag
       @connection = connection
-      @klass = options[:encrypted] ? Ridley::EncryptedDataBagItem : Ridley::DataBagItem
+      @klass = options[:encrypted] ? Ridley::EncryptedDataBagItem : Ridley::DataBagItemResource
     end
 
     def new(*args)

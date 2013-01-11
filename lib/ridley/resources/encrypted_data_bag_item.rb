@@ -7,7 +7,7 @@ module Ridley
       # @param [Ridley::DataBagResource] data_bag
       # @param [String, #chef_id] object
       #
-      # @return [nil, Ridley::DataBagItem]
+      # @return [nil, Ridley::DataBagItemResource]
       def find(connection, data_bag, object)
         find!(connection, data_bag, object)
       rescue Errors::HTTPNotFound
@@ -23,7 +23,7 @@ module Ridley
       # @raise [Errors::HTTPNotFound]
       #   if a resource with the given chef_id is not found
       #
-      # @return [nil, Ridley::DataBagItem]
+      # @return [nil, Ridley::DataBagItemResource]
       def find!(connection, data_bag, object)
         data_bag_item = DataBagItem.find!(connection, data_bag, object)
         data_bag_item.decrypt

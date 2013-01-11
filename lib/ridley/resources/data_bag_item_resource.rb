@@ -1,6 +1,6 @@
 module Ridley
   # @author Jamie Winsor <jamie@vialstudios.com>
-  class DataBagItem < Ridley::Resource
+  class DataBagItemResource < Ridley::Resource
     class << self
       # @param [Ridley::Connection] connection
       #
@@ -15,7 +15,7 @@ module Ridley
       # @param [Ridley::DataBagResource] data_bag
       # @param [String, #chef_id] object
       #
-      # @return [nil, Ridley::DataBagItem]
+      # @return [nil, Ridley::DataBagItemResource]
       def find(connection, data_bag, object)
         find!(connection, data_bag, object)
       rescue Errors::HTTPNotFound
@@ -29,7 +29,7 @@ module Ridley
       # @raise [Errors::HTTPNotFound]
       #   if a resource with the given chef_id is not found
       #
-      # @return [Ridley::DataBagItem]
+      # @return [Ridley::DataBagItemResource]
       def find!(connection, data_bag, object)
         chef_id = object.respond_to?(:chef_id) ? object.chef_id : object
         new(connection, data_bag).from_hash(connection.get("#{data_bag.class.resource_path}/#{data_bag.name}/#{chef_id}").body)
@@ -39,7 +39,7 @@ module Ridley
       # @param [Ridley::DataBagResource] data_bag
       # @param [#to_hash] object
       #
-      # @return [Ridley::DataBagItem]
+      # @return [Ridley::DataBagItemResource]
       def create(connection, data_bag, object)
         resource = new(connection, data_bag, object.to_hash)
         unless resource.valid?
@@ -55,7 +55,7 @@ module Ridley
       # @param [Ridley::DataBagResource] data_bag
       # @param [String, #chef_id] object
       #
-      # @return [Ridley::DataBagItem]
+      # @return [Ridley::DataBagItemResource]
       def delete(connection, data_bag, object)
         chef_id = object.respond_to?(:chef_id) ? object.chef_id : object
         new(connection, data_bag).from_hash(connection.delete("#{data_bag.class.resource_path}/#{data_bag.name}/#{chef_id}").body)
@@ -64,7 +64,7 @@ module Ridley
       # @param [Ridley::Connection] connection
       # @param [Ridley::DataBagResource] data_bag
       #
-      # @return [Array<Ridley::DataBagItem>]
+      # @return [Array<Ridley::DataBagItemResource>]
       def delete_all(connection, data_bag)
         mutex = Mutex.new
         deleted = []
@@ -86,7 +86,7 @@ module Ridley
       # @param [Ridley::DataBagResource] data_bag
       # @param [#to_hash] object
       #
-      # @return [Ridley::DataBagItem]
+      # @return [Ridley::DataBagItemResource]
       def update(connection, data_bag, object)
         resource = new(connection, data_bag, object.to_hash)
         new(connection, data_bag).from_hash(

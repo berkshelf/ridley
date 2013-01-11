@@ -256,7 +256,7 @@ Unlike a role, node, client, or environment, a data bag is a container for other
     data_bag = conn.data_bag.create("ridley-test")
 
     data_bag.item.create(id: "appconfig", host: "reset.local", user: "jwinsor") => 
-      <#Ridley::DataBagItem: @id="appconfig", @host="reset.local", @user="jwinsor">
+      <#Ridley::DataBagItemResource: @id="appconfig", @host="reset.local", @user="jwinsor">
 
 ### Saving a Data Bag Item
 
