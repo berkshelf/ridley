@@ -1,5 +1,5 @@
-require 'ridley/resources/data_bag_item'
-require 'ridley/resources/encrypted_data_bag_item'
+require 'ridley/resources/data_bag_item_resource'
+require 'ridley/resources/encrypted_data_bag_item_resource'
 
 module Ridley
   # @author Jamie Winsor <jamie@vialstudios.com>
@@ -15,7 +15,7 @@ module Ridley
 
       @data_bag = data_bag
       @connection = connection
-      @klass = options[:encrypted] ? Ridley::EncryptedDataBagItem : Ridley::DataBagItemResource
+      @klass = options[:encrypted] ? Ridley::EncryptedDataBagItemResource : Ridley::DataBagItemResource
     end
 
     def new(*args)

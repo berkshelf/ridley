@@ -1,5 +1,5 @@
 module Ridley
-  class EncryptedDataBagItem
+  class EncryptedDataBagItemResource
     class << self
       # Finds a data bag item and decrypts it.
       #
