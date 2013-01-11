@@ -112,7 +112,7 @@ Calling `role.all` on the connection object will return an array of Ridley::Role
     conn = Ridley.connection(...)
     conn.node.all           => [<#Ridley::Node>]
     conn.role.all           => [<#Ridley::Role>]
-    conn.environment.all    => [<#Ridley::Environment>]
+    conn.environment.all    => [<#Ridley::EnvironmentResource>]
     conn.client.all         => [<#Ridley::ClientResource>]
     conn.cookbook.all       => [<#Ridley::CookbookResource>]
     conn.data_bag.all       => [<#Ridley::DataBagResource>]
