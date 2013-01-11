@@ -1,8 +1,6 @@
 module Ridley
   # @author Jamie Winsor <jamie@vialstudios.com>
-  class Client
-    include Ridley::Resource
-
+  class Client < Ridley::Resource
     class << self
       # Retrieves a client from the remote connection matching the given chef_id
       # and regenerates it's private key. An instance of the updated object will
@@ -28,25 +26,31 @@ module Ridley
     set_chef_json_class "Chef::ApiClient"
     set_resource_path "clients"
 
-    attribute :name
-    validates_presence_of :name
+    attribute :name,
+      type: String,
+      required: true
 
-    attribute :admin, default: false
-    validates_inclusion_of :admin, in: [ true, false ]
+    attribute :admin,
+      type: Boolean,
+      required: true,
+      default: false
 
-    attribute :validator, default: false
-    validates_inclusion_of :validator, in: [ true, false ]
+    attribute :validator,
+      type: Boolean,
+      required: true,
+      default: false
 
-    attribute :certificate
-    attribute :public_key
-    attribute :private_key
-    attribute :orgname
+    attribute :certificate,
+      type: String
 
-    def attributes
-      # @todo JW: reflect on the connection type to determine if we need to strip the
-      # json_class attribute. Only OHC/OPC needs this stripped.
-      super.except(:json_class)
-    end
+    attribute :public_key,
+      type: String
+
+    attribute :private_key,
+      type: [ String, Boolean ]
+
+    attribute :orgname,
+      type: String
 
     # Regenerates the private key of the instantiated client object. The new
     # private key will be set to the value of the 'private_key' accessor
@@ -57,6 +61,16 @@ module Ridley
     def regenerate_key
       self.private_key = true
       self.save
+    end
+
+    # Override to_json to reflect to massage the returned attributes based on the type
+    # of connection. Only OHC/OPC requires the json_class attribute is not present.
+    def to_json
+      if connection.hosted?
+        attributes.except(:json_class).to_json
+      else
+        super
+      end
     end
   end
 

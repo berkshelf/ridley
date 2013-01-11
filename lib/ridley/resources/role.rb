@@ -1,31 +1,28 @@
 module Ridley
   # @author Jamie Winsor <jamie@vialstudios.com>
-  class Role
-    include Ridley::Resource
-
+  class Role < Ridley::Resource
     set_chef_id "name"
     set_chef_type "role"
     set_chef_json_class "Chef::Role"
     set_resource_path "roles"
 
-    attribute :name
-    validates_presence_of :name
+    attribute :name,
+      required: true
 
-    attribute :description, default: String.new
-    attribute :default_attributes, default: HashWithIndifferentAccess.new
-    attribute :override_attributes, default: HashWithIndifferentAccess.new
-    attribute :run_list, default: Array.new
-    attribute :env_run_lists, default: Hash.new
+    attribute :description,
+      default: String.new
 
-    # @param [Hash] hash
-    def default_attributes=(hash)
-      super(HashWithIndifferentAccess.new(hash))
-    end
+    attribute :default_attributes,
+      default: Hashie::Mash.new
 
-    # @param [Hash] hash
-    def override_attributes=(hash)
-      super(HashWithIndifferentAccess.new(hash))
-    end
+    attribute :override_attributes,
+      default: Hashie::Mash.new
+
+    attribute :run_list,
+      default: Array.new
+
+    attribute :env_run_lists,
+      default: Hash.new
 
     # Set a role level override attribute given the dotted path representation of the Chef
     # attribute and value
