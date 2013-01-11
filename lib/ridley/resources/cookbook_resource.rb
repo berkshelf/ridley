@@ -1,6 +1,6 @@
 module Ridley
   # @author Jamie Winsor <jamie@vialstudios.com>
-  class Cookbook < Ridley::Resource
+  class CookbookResource < Ridley::Resource
     class << self
       # Save a new Cookbook Version of the given name, version with the
       # given manifest of files and checksums.
@@ -37,15 +37,15 @@ module Ridley
   end
 
   module DSL
-    # Coerces instance functions into class functions on Ridley::Cookbook. This coercion
+    # Coerces instance functions into class functions on Ridley::CookbookResource. This coercion
     # sends an instance of the including class along to the class function.
     #
     # @see Ridley::ChainLink
     #
     # @return [Ridley::ChainLink]
-    #   a context object to delegate instance functions to class functions on Ridley::Cookbook
+    #   a context object to delegate instance functions to class functions on Ridley::CookbookResource
     def cookbook
-      ChainLink.new(self, Ridley::Cookbook)
+      ChainLink.new(self, Ridley::CookbookResource)
     end
   end
 end
