@@ -1,9 +1,6 @@
 module Ridley
   # @author Jamie Winsor <jamie@vialstudios.com>
-  class DataBagItem
-    include ActiveModel::Validations
-    include ActiveModel::Serialization
-
+  class DataBagItem < Ridley::Resource
     class << self
       # @param [Ridley::Connection] connection
       #
@@ -98,52 +95,28 @@ module Ridley
       end
     end
 
+    set_assignment_mode :carefree
+
     # @return [Ridley::DataBag]
     attr_reader :data_bag
-    # @return [HashWithIndifferentAccess]
-    attr_reader :attributes
 
-    validates_presence_of :id
+    attribute :id,
+      type: String,
+      required: true
 
     # @param [Ridley::Connection] connection
     # @param [Ridley::DataBag] data_bag
-    # @param [#to_hash] attributes
-    def initialize(connection, data_bag, attributes = {})
-      @connection = connection
+    # @param [#to_hash] new_attrs
+    def initialize(connection, data_bag, new_attrs = {})
+      super(connection, new_attrs)
       @data_bag = data_bag
-      self.attributes = attributes
     end
 
     # Alias for accessing the value of the 'id' attribute
     #
     # @return [String]
     def chef_id
-      @attributes[:id]
-    end
-    alias_method :id, :chef_id
-
-    # @param [String, Symbol] key
-    #
-    # @return [Object]
-    def attribute(key)
-      @attributes[key]
-    end
-    alias_method :[], :attribute
-
-    # @param [String, Symbol] key
-    # @param [Object] value
-    #
-    # @return [Object]
-    def attribute=(key, value)
-      @attributes[key] = value
-    end
-    alias_method :[]=, :attribute=
-
-    # @param [#to_hash] new_attributes
-    #
-    # @return [HashWithIndifferentAccess]
-    def attributes=(new_attributes)
-      @attributes = HashWithIndifferentAccess.new(new_attributes.to_hash)
+      get_attribute(:id)
     end
 
     # Creates a resource on the target remote or updates one if the resource
@@ -157,10 +130,10 @@ module Ridley
     def save
       raise Errors::InvalidResource.new(self.errors) unless valid?
 
-      self.attributes = self.class.create(connection, data_bag, self).attributes
+      mass_assign(self.class.create(connection, data_bag, self).attributes)
       true
     rescue Errors::HTTPConflict
-      self.attributes = self.class.update(connection, data_bag, self).attributes
+      self.update
       true
     end
 
@@ -169,7 +142,7 @@ module Ridley
     # @return [Hash] decrypted attributes
     def decrypt
       decrypted_hash = Hash[attributes.map { |key, value| [key, key == "id" ? value : decrypt_value(value)] }]
-      self.attributes = HashWithIndifferentAccess.new(decrypted_hash)
+      mass_assign(decrypted_hash)
     end
 
     def decrypt_value(value)
@@ -183,27 +156,36 @@ module Ridley
       YAML.load(decrypted_value)
     end
 
+    # Reload the attributes of the instantiated resource
+    #
+    # @return [Object]
+    def reload
+      mass_assign(self.class.find(connection, data_bag, self).attributes)
+      self
+    end
+
+    # Updates the instantiated resource on the target remote with any changes made
+    # to self
+    #
+    # @raise [Errors::InvalidResource]
+    #   if the resource does not pass validations
+    #
+    # @return [Boolean]
+    def update
+      raise Errors::InvalidResource.new(self.errors) unless valid?
+
+      mass_assign(sself.class.update(connection, data_bag, self).attributes)
+      true
+    end
+
     # @param [#to_hash] hash
     #
     # @return [Object]
     def from_hash(hash)
       hash = HashWithIndifferentAccess.new(hash.to_hash)
 
-      self.attributes = hash.has_key?(:raw_data) ? hash[:raw_data] : hash
+      mass_assign(hash.has_key?(:raw_data) ? hash[:raw_data] : hash)
       self
-    end
-
-    # @option options [Boolean] :symbolize_keys
-    # @option options [Class, Symbol, String] :adapter
-    #
-    # @return [String]
-    def to_json(options = {})
-      MultiJson.encode(self.attributes, options)
-    end
-    alias_method :as_json, :to_json
-
-    def to_hash
-      self.attributes
     end
 
     def to_s
