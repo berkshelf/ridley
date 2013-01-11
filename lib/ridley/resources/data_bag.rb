@@ -25,9 +25,7 @@ module Ridley
   end
 
   # @author Jamie Winsor <jamie@vialstudios.com>
-  class DataBag
-    include Ridley::Resource
-
+  class DataBag < Ridley::Resource
     class << self
       # @param [Ridley::Connection] connection
       # @param [String, #chef_id] object
@@ -56,8 +54,8 @@ module Ridley
     set_chef_id "name"
     set_resource_path "data"
 
-    attribute :name
-    validates_presence_of :name
+    attribute :name,
+      required: true
 
     def item
       DBIChainLink.new(self, connection)

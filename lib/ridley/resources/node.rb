@@ -1,6 +1,6 @@
 module Ridley 
   # @author Jamie Winsor <jamie@vialstudios.com>
-  class Node
+  class Node < Ridley::Resource
     class << self
       # @overload bootstrap(connection, nodes, options = {})
       #   @param [Ridley::Connection] connection
@@ -68,50 +68,40 @@ module Ridley
       end
     end
 
-    include Ridley::Resource
-
     set_chef_id "name"
     set_chef_type "node"
     set_chef_json_class "Chef::Node"
     set_resource_path "nodes"
 
-    attribute :name
-    validates_presence_of :name
+    attribute :name,
+      required: true
 
-    attribute :chef_environment, default: "_default"
-    attribute :automatic, default: HashWithIndifferentAccess.new
-    attribute :normal, default: HashWithIndifferentAccess.new
-    attribute :default, default: HashWithIndifferentAccess.new
-    attribute :override, default: HashWithIndifferentAccess.new
-    attribute :run_list, default: Array.new
+    attribute :chef_environment,
+      default: "_default"
+
+    attribute :automatic,
+      default: Hashie::Mash.new
+
+    attribute :normal,
+      default: Hashie::Mash.new
+
+    attribute :default,
+      default: Hashie::Mash.new
+
+    attribute :override,
+      default: Hashie::Mash.new
+
+    attribute :run_list,
+      default: Array.new
 
     alias_method :normal_attributes, :normal
     alias_method :automatic_attributes, :automatic
     alias_method :default_attributes, :default
     alias_method :override_attributes, :override
 
-    # @param [Hash] hash
-    def normal=(hash)
-      super(HashWithIndifferentAccess.new(hash))
-    end
     alias_method :normal_attributes=, :normal=
-
-    # @param [Hash] hash
-    def automatic=(hash)
-      super(HashWithIndifferentAccess.new(hash))
-    end
     alias_method :automatic_attributes=, :automatic=
-
-    # @param [Hash] hash
-    def default=(hash)
-      super(HashWithIndifferentAccess.new(hash))
-    end
     alias_method :default_attributes=, :default=
-
-    # @param [Hash] hash
-    def override=(hash)
-      super(HashWithIndifferentAccess.new(hash))
-    end
     alias_method :override_attributes=, :override=
 
     # Set a node level normal attribute given the dotted path representation of the Chef
@@ -123,14 +113,14 @@ module Ridley
     # @example setting and saving a node level normal attribute
     #
     #   obj = node.find("jwinsor-1")
-    #   obj.set_attribute("my_app.billing.enabled", false)
+    #   obj.set_chef_attribute("my_app.billing.enabled", false)
     #   obj.save
     #
     # @param [String] key
     # @param [Object] value
     #
     # @return [HashWithIndifferentAccess]
-    def set_attribute(key, value)
+    def set_chef_attribute(key, value)
       attr_hash = HashWithIndifferentAccess.from_dotted_path(key, value)
       self.normal = self.normal.deep_merge(attr_hash)
     end

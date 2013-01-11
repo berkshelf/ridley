@@ -1,8 +1,6 @@
 module Ridley
   # @author Jamie Winsor <jamie@vialstudios.com>
-  class Cookbook    
-    include Ridley::Resource
-
+  class Cookbook < Ridley::Resource
     class << self
       # Save a new Cookbook Version of the given name, version with the
       # given manifest of files and checksums.
@@ -34,8 +32,8 @@ module Ridley
     set_chef_json_class "Chef::Cookbook"
     set_resource_path "cookbooks"
 
-    attribute :name
-    validates_presence_of :name
+    attribute :name,
+      required: true
   end
 
   module DSL
