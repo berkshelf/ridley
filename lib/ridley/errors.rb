@@ -15,7 +15,7 @@ module Ridley
       end
 
       def message
-        errors.full_messages.join(', ')
+        errors.values
       end
       alias_method :to_s, :message
     end
