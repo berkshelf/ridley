@@ -1,10 +1,10 @@
 require 'spec_helper'
 
-describe Ridley::DataBagItem do
+describe Ridley::DataBagItemResource do
   let(:connection) { double('connection') }
   let(:data_bag) { double('data_bag') }
 
-  subject { Ridley::DataBagItem.new(connection, data_bag) }
+  subject { Ridley::DataBagItemResource.new(connection, data_bag) }
 
   describe "::from_hash" do
     context "when JSON has a 'raw_data' field" do

@@ -101,12 +101,12 @@ describe Ridley::Search do
 
       subject { Ridley::Search.new(connection, index, query) }
 
-      it "returns an array of Ridley::Node" do
+      it "returns an array of Ridley::NodeResource" do
         connection.should_receive(:get).with("search/#{index}", q: query).and_return(response)
         result = subject.run
 
         result.should be_a(Array)
-        result.should each be_a(Ridley::Node)
+        result.should each be_a(Ridley::NodeResource)
       end
     end
 
@@ -136,12 +136,12 @@ describe Ridley::Search do
 
       subject { Ridley::Search.new(connection, index, query) }
 
-      it "returns an array of Ridley::Role" do
+      it "returns an array of Ridley::RoleResource" do
         connection.should_receive(:get).with("search/#{index}", q: query).and_return(response)
         result = subject.run
 
         result.should be_a(Array)
-        result.should each be_a(Ridley::Role)
+        result.should each be_a(Ridley::RoleResource)
       end
     end
 
@@ -170,12 +170,12 @@ describe Ridley::Search do
 
       subject { Ridley::Search.new(connection, index, query) }
 
-      it "returns an array of Ridley::Environment" do
+      it "returns an array of Ridley::EnvironmentResource" do
         connection.should_receive(:get).with("search/#{index}", q: query).and_return(response)
         result = subject.run
 
         result.should be_a(Array)
-        result.should each be_a(Ridley::Environment)
+        result.should each be_a(Ridley::EnvironmentResource)
       end
     end
 
@@ -205,12 +205,12 @@ describe Ridley::Search do
 
       subject { Ridley::Search.new(connection, index, query) }
 
-      it "returns an array of Ridley::Client" do
+      it "returns an array of Ridley::ClientResource" do
         connection.should_receive(:get).with("search/#{index}", q: query).and_return(response)
         result = subject.run
 
         result.should be_a(Array)
-        result.should each be_a(Ridley::Client)
+        result.should each be_a(Ridley::ClientResource)
       end
     end
   end

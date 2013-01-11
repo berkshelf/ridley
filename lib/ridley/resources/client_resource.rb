@@ -1,6 +1,6 @@
 module Ridley
   # @author Jamie Winsor <jamie@vialstudios.com>
-  class Client < Ridley::Resource
+  class ClientResource < Ridley::Resource
     class << self
       # Retrieves a client from the remote connection matching the given chef_id
       # and regenerates it's private key. An instance of the updated object will
@@ -13,7 +13,7 @@ module Ridley
       #   if a client with the given chef_id is not found
       # @raise [Errors::HTTPError]
       #
-      # @return [Ridley::Client]
+      # @return [Ridley::ClientResource]
       def regenerate_key(connection, client)
         obj = find!(connection, client)
         obj.regenerate_key
@@ -75,15 +75,15 @@ module Ridley
   end
 
   module DSL
-    # Coerces instance functions into class functions on Ridley::Client. This coercion
+    # Coerces instance functions into class functions on Ridley::ClientResource. This coercion
     # sends an instance of the including class along to the class function.
     #
     # @see Ridley::ChainLink
     #
     # @return [Ridley::ChainLink]
-    #   a context object to delegate instance functions to class functions on Ridley::Client
+    #   a context object to delegate instance functions to class functions on Ridley::ClientResource
     def client
-      ChainLink.new(self, Ridley::Client)
+      ChainLink.new(self, Ridley::ClientResource)
     end
   end
 end

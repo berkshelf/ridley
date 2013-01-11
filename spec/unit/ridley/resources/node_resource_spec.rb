@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-describe Ridley::Node do
-  it_behaves_like "a Ridley Resource", Ridley::Node
+describe Ridley::NodeResource do
+  it_behaves_like "a Ridley Resource", Ridley::NodeResource
 
   let(:connection) do
     double('conn',
@@ -15,7 +15,7 @@ describe Ridley::Node do
   end
 
   describe "ClassMethods" do
-    subject { Ridley::Node }
+    subject { Ridley::NodeResource }
 
     describe "::bootstrap" do
       let(:boot_options) do
@@ -48,7 +48,7 @@ describe Ridley::Node do
     end
   end
 
-  subject { Ridley::Node.new(connection) }
+  subject { Ridley::NodeResource.new(connection) }
 
   describe "#set_chef_attribute" do
     it "sets an normal node attribute at the nested path" do

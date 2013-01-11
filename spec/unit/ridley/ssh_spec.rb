@@ -4,11 +4,11 @@ describe Ridley::SSH do
   let(:connection) { double('conn', ssh: { user: "vagrant", password: "vagrant" }) }
 
   let(:node_one) do
-    Ridley::Node.new(connection, automatic: { cloud: { public_hostname: "33.33.33.10" } })
+    Ridley::NodeResource.new(connection, automatic: { cloud: { public_hostname: "33.33.33.10" } })
   end
 
   let(:node_two) do
-    Ridley::Node.new(connection, automatic: { cloud: { public_hostname: "33.33.33.11" } })
+    Ridley::NodeResource.new(connection, automatic: { cloud: { public_hostname: "33.33.33.11" } })
   end
 
   describe "ClassMethods" do

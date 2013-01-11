@@ -20,14 +20,14 @@ describe "Sandbox API operations", type: "acceptance" do
 
   let(:checksums) do
     [
-      Ridley::Sandbox.checksum(fixtures_path.join("recipe_one.rb")),
-      Ridley::Sandbox.checksum(fixtures_path.join("recipe_two.rb"))
+      Ridley::SandboxResource.checksum(fixtures_path.join("recipe_one.rb")),
+      Ridley::SandboxResource.checksum(fixtures_path.join("recipe_two.rb"))
     ]
   end
 
   describe "creating a new sandbox" do
-    it "returns an instance of Ridley::Sandbox" do
-      connection.sandbox.create(checksums).should be_a(Ridley::Sandbox)
+    it "returns an instance of Ridley::SandboxResource" do
+      connection.sandbox.create(checksums).should be_a(Ridley::SandboxResource)
     end
 
     it "contains a value for sandbox_id" do

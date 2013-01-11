@@ -18,14 +18,14 @@ module Ridley
   #
   #   The 'role' function is made available to the instance of Ridley::Connection by including
   #   Ridley::DSL. This function returns a Ridley::Context object which receives the 'all' message.
-  #   The Ridley::Context coerces the 'all' message into a message to the Ridley::Role class and
+  #   The Ridley::Context coerces the 'all' message into a message to the Ridley::RoleResource class and
   #   sends along the instance of Ridley::Connection that is chaining 'role.all'
   #
-  #   connection.role.all => Ridley::Role.all(connection)
+  #   connection.role.all => Ridley::RoleResource.all(connection)
   #
   #   Any additional arguments will also be passed to the class function of the Chef resource's class
   #
-  #   connection.role.find("reset") => Ridley::Role.find(connection, "reset")
+  #   connection.role.find("reset") => Ridley::RoleResource.find(connection, "reset")
   #
   # @example instantiating new resources
   #   class connection
@@ -33,7 +33,7 @@ module Ridley
   #   end
   #
   #   connection = Ridley::Connection.new
-  #   connection.role.new(name: "hello") => <#Ridley::Role: @name="hello">
+  #   connection.role.new(name: "hello") => <#Ridley::RoleResource: @name="hello">
   #
   #   New instances of resources can be instantiated by calling new on the Ridley::Context. These messages
   #   will be send to the Chef resource's class in Ridley and can be treated as a normal Ruby object. Each
@@ -45,14 +45,12 @@ module Ridley
   #   r.name = "other-name"
   #   r.save
   #
-  #   connection.role.find("new-role") => <#Ridley::Role: @name="new-role">
+  #   connection.role.find("new-role") => <#Ridley::RoleResource: @name="new-role">
   #
   # @see Ridley::Context
-  # @see Ridley::Role
+  # @see Ridley::RoleResource
   # @see Ridley::Connection
   module DSL; end
 end
 
-Dir["#{File.dirname(__FILE__)}/resources/*.rb"].sort.each do |path|
-  require "ridley/resources/#{File.basename(path, '.rb')}"
-end
+require 'ridley/resources'

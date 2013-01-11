@@ -1,11 +1,11 @@
 require 'spec_helper'
 
-describe Ridley::Role do
-  it_behaves_like "a Ridley Resource", Ridley::Role
+describe Ridley::RoleResource do
+  it_behaves_like "a Ridley Resource", Ridley::RoleResource
 
   let(:connection) { double("connection") }
 
-  subject { Ridley::Role.new(connection) }
+  subject { Ridley::RoleResource.new(connection) }
 
   describe "#set_override_attribute" do
     it "sets an override node attribute at the nested path" do

@@ -1,3 +1,6 @@
+require 'ridley/resources/data_bag_item_resource'
+require 'ridley/resources/encrypted_data_bag_item_resource'
+
 module Ridley
   # @author Jamie Winsor <jamie@vialstudios.com>
   # @api private
@@ -6,13 +9,13 @@ module Ridley
     attr_reader :connection
     attr_reader :klass
 
-    # @param [Ridley::DataBag] data_bag
+    # @param [Ridley::DataBagResource] data_bag
     def initialize(data_bag, connection, options = {})
       options[:encrypted] ||= false
 
       @data_bag = data_bag
       @connection = connection
-      @klass = options[:encrypted] ? Ridley::EncryptedDataBagItem : Ridley::DataBagItem
+      @klass = options[:encrypted] ? Ridley::EncryptedDataBagItemResource : Ridley::DataBagItemResource
     end
 
     def new(*args)
@@ -25,12 +28,12 @@ module Ridley
   end
 
   # @author Jamie Winsor <jamie@vialstudios.com>
-  class DataBag < Ridley::Resource
+  class DataBagResource < Ridley::Resource
     class << self
       # @param [Ridley::Connection] connection
       # @param [String, #chef_id] object
       #
-      # @return [nil, Ridley::DataBag]
+      # @return [nil, Ridley::DataBagResource]
       def find(connection, object)
         find!(connection, object)
       rescue Errors::HTTPNotFound
@@ -43,7 +46,7 @@ module Ridley
       # @raise [Errors::HTTPNotFound]
       #   if a resource with the given chef_id is not found
       #
-      # @return [Ridley::DataBag]
+      # @return [Ridley::DataBagResource]
       def find!(connection, object)
         chef_id = object.respond_to?(:chef_id) ? object.chef_id : object
         connection.get("#{self.resource_path}/#{chef_id}")
@@ -67,15 +70,15 @@ module Ridley
   end
 
   module DSL
-    # Coerces instance functions into class functions on Ridley::DataBag. This coercion
+    # Coerces instance functions into class functions on Ridley::DataBagResource. This coercion
     # sends an instance of the including class along to the class function.
     #
     # @see Ridley::ChainLink
     #
     # @return [Ridley::ChainLink]
-    #   a context object to delegate instance functions to class functions on Ridley::DataBag
+    #   a context object to delegate instance functions to class functions on Ridley::DataBagResource
     def data_bag
-      ChainLink.new(self, Ridley::DataBag)
+      ChainLink.new(self, Ridley::DataBagResource)
     end
   end
 end

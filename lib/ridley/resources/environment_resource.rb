@@ -1,13 +1,13 @@
 module Ridley
   # @author Jamie Winsor <jamie@vialstudios.com>
-  class Environment < Ridley::Resource    
+  class EnvironmentResource < Ridley::Resource
     class << self
       # Delete all of the environments on the remote connection. The
       # '_default' environment will never be deleted.
       #
       # @param [Ridley::Connection] connection
       #
-      # @return [Array<Ridley::Environment>]
+      # @return [Array<Ridley::EnvironmentResource>]
       def delete_all(connection)
         envs = all(connection).reject { |env| env.name.to_s == '_default' }
         envs.collect { |obj| delete(connection, obj) }
@@ -72,15 +72,15 @@ module Ridley
   end
 
   module DSL
-    # Coerces instance functions into class functions on Ridley::Environment. This coercion
+    # Coerces instance functions into class functions on Ridley::EnvironmentResource. This coercion
     # sends an instance of the including class along to the class function.
     #
     # @see Ridley::ChainLink
     #
     # @return [Ridley::ChainLink]
-    #   a context object to delegate instance functions to class functions on Ridley::Environment
+    #   a context object to delegate instance functions to class functions on Ridley::EnvironmentResource
     def environment
-      ChainLink.new(self, Ridley::Environment)
+      ChainLink.new(self, Ridley::EnvironmentResource)
     end
   end
 end

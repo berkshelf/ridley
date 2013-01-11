@@ -98,7 +98,7 @@ describe "DataBag API operations", type: "acceptance" do
     it "returns the deleted data bag item" do
       dbi = @databag.item.delete(attributes["id"])
 
-      dbi.should be_a(Ridley::DataBagItem)
+      dbi.should be_a(Ridley::DataBagItemResource)
       dbi.attributes.should eql(attributes)
     end
 
@@ -116,7 +116,7 @@ describe "DataBag API operations", type: "acceptance" do
     end
 
     it "returns the array of deleted data bag items" do
-      @databag.item.delete_all.should each be_a(Ridley::DataBagItem)
+      @databag.item.delete_all.should each be_a(Ridley::DataBagItemResource)
     end
 
     it "removes all data bag items from the data bag" do
