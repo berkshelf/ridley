@@ -76,7 +76,7 @@ module Ridley
       when :role
         response[:rows].collect { |row| Role.new(connection, row) }
       when :client
-        response[:rows].collect { |row| Client.new(connection, row) }
+        response[:rows].collect { |row| ClientResource.new(connection, row) }
       when :environment
         response[:rows].collect { |row| Environment.new(connection, row) }
       else

@@ -1,3 +1,6 @@
+require 'ridley/resources/data_bag_item'
+require 'ridley/resources/encrypted_data_bag_item'
+
 module Ridley
   # @author Jamie Winsor <jamie@vialstudios.com>
   # @api private

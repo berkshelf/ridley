@@ -113,7 +113,7 @@ Calling `role.all` on the connection object will return an array of Ridley::Role
     conn.node.all           => [<#Ridley::Node>]
     conn.role.all           => [<#Ridley::Role>]
     conn.environment.all    => [<#Ridley::Environment>]
-    conn.client.all         => [<#Ridley::Client>]
+    conn.client.all         => [<#Ridley::ClientResource>]
     conn.cookbook.all       => [<#Ridley::Cookbook>]
     conn.data_bag.all       => [<#Ridley::DataBag>]
 
@@ -229,14 +229,14 @@ _Delete by the `destroy` function on a resource object_
 _Regenerate function on a context with an id_
 
     conn = Ridley.connection(...)
-    conn.client.regenerate_key("jwinsor") => <#Ridley::Client: @name="jwinsor", @private_key="HIDDEN">
+    conn.client.regenerate_key("jwinsor") => <#Ridley::ClientResource: @name="jwinsor", @private_key="HIDDEN">
 
 _Regenerate function on an instantiated resource object_
 
     conn = Ridley.connection(...)
     obj = conn.client.find("jwinsor")
 
-    obj.regenerate_key => <#Ridley::Client: @name="jwinsor", @private_key="HIDDEN">
+    obj.regenerate_key => <#Ridley::ClientResource: @name="jwinsor", @private_key="HIDDEN">
 
 ## Manipulating Data Bags and Data Bag Items
 

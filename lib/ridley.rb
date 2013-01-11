@@ -1,5 +1,4 @@
 require 'chozo'
-require 'active_support/core_ext'
 require 'celluloid'
 require 'faraday'
 require 'addressable/uri'
@@ -25,19 +24,11 @@ module Ridley
   CHEF_VERSION = '10.16.4'.freeze
 
   autoload :Bootstrapper, 'ridley/bootstrapper'
-  autoload :Client, 'ridley/resources/client'
   autoload :Connection, 'ridley/connection'
   autoload :ChainLink, 'ridley/chain_link'
-  autoload :Cookbook, 'ridley/resources/cookbook'
-  autoload :DataBag, 'ridley/resources/data_bag'
-  autoload :DataBagItem, 'ridley/resources/data_bag_item'
   autoload :DSL, 'ridley/dsl'
-  autoload :Environment, 'ridley/resources/environment'
   autoload :Logging, 'ridley/logging'
-  autoload :Node, 'ridley/resources/node'
   autoload :Resource, 'ridley/resource'
-  autoload :Role, 'ridley/resources/role'
-  autoload :Search, 'ridley/resources/search'
   autoload :SSH, 'ridley/ssh'
 
   class << self
@@ -67,3 +58,4 @@ end
 Celluloid.logger = Ridley.logger
 
 require 'ridley/middleware'
+require 'ridley/resources'
