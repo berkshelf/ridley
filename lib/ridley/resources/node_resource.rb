@@ -1,6 +1,6 @@
 module Ridley 
   # @author Jamie Winsor <jamie@vialstudios.com>
-  class Node < Ridley::Resource
+  class NodeResource < Ridley::Resource
     class << self
       # @overload bootstrap(connection, nodes, options = {})
       #   @param [Ridley::Connection] connection
@@ -52,7 +52,7 @@ module Ridley
       # Merges the given data with the the data of the target node on the remote
       #
       # @param [Ridley::Cnonection] connection
-      # @param [Ridley::Node, String] target
+      # @param [Ridley::NodeResource, String] target
       #   node or identifier of the node to merge
       # @option options [Array] :run_list
       #   run list items to merge
@@ -62,7 +62,7 @@ module Ridley
       # @raise [Errors::HTTPNotFound]
       #   if the target node is not found
       #
-      # @return [Ridley::Node]
+      # @return [Ridley::NodeResource]
       def merge_data(connection, target, options = {})
         find!(connection, target).merge_data(options)
       end
@@ -238,7 +238,7 @@ module Ridley
     # @option options [Hash] :attributes
     #   attributes of normal precedence to merge
     #
-    # @return [Ridley::Node]
+    # @return [Ridley::NodeResource]
     def merge_data(options = {})
       unless options[:run_list].nil?
         self.run_list = (self.run_list + Array(options[:run_list])).uniq
@@ -254,15 +254,15 @@ module Ridley
   end
   
   module DSL
-    # Coerces instance functions into class functions on Ridley::Node. This coercion
+    # Coerces instance functions into class functions on Ridley::NodeResource. This coercion
     # sends an instance of the including class along to the class function.
     #
     # @see Ridley::ChainLink
     #
     # @return [Ridley::ChainLink]
-    #   a context object to delegate instance functions to class functions on Ridley::Node
+    #   a context object to delegate instance functions to class functions on Ridley::NodeResource
     def node
-      ChainLink.new(self, Ridley::Node)
+      ChainLink.new(self, Ridley::NodeResource)
     end
   end
 end

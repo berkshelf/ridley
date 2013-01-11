@@ -24,7 +24,7 @@ describe "Node API operations", type: "acceptance" do
 
   describe "finding a node" do
     let(:target) do
-      Ridley::Node.new(
+      Ridley::NodeResource.new(
         connection,
         name: "ridley-one"
       )
@@ -34,20 +34,20 @@ describe "Node API operations", type: "acceptance" do
       connection.node.create(target)
     end
 
-    it "returns a Ridley::Node object" do
+    it "returns a Ridley::NodeResource object" do
       connection.node.find(target.name).should eql(target)
     end
   end
 
   describe "creating a node" do
     let(:target) do
-      Ridley::Node.new(
+      Ridley::NodeResource.new(
         connection,
         name: "ridley-one"
       )
     end
     
-    it "returns a new Ridley::Node object" do
+    it "returns a new Ridley::NodeResource object" do
       connection.node.create(target).should eql(target)
     end
 
@@ -62,7 +62,7 @@ describe "Node API operations", type: "acceptance" do
 
   describe "deleting a node" do
     let(:target) do
-      Ridley::Node.new(
+      Ridley::NodeResource.new(
         connection,
         name: "ridley-one"
       )
@@ -103,11 +103,11 @@ describe "Node API operations", type: "acceptance" do
       end
     end
 
-    it "returns an array of Ridley::Node objects" do
+    it "returns an array of Ridley::NodeResource objects" do
       connection.sync do
         obj = node.all
         
-        obj.should each be_a(Ridley::Node)
+        obj.should each be_a(Ridley::NodeResource)
         obj.should have(2).nodes
       end
     end
@@ -115,7 +115,7 @@ describe "Node API operations", type: "acceptance" do
 
   describe "updating a node" do
     let(:target) do
-      Ridley::Node.new(
+      Ridley::NodeResource.new(
         connection,
         name: "ridley-one"
       )

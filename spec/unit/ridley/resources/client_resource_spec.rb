@@ -1,12 +1,12 @@
 require 'spec_helper'
 
-describe Ridley::Client do
-  it_behaves_like "a Ridley Resource", Ridley::Client
+describe Ridley::ClientResource do
+  it_behaves_like "a Ridley Resource", Ridley::ClientResource
 
   let(:connection) { double('connection') }
 
   describe "ClassMethods" do
-    subject { Ridley::Client }
+    subject { Ridley::ClientResource }
 
     describe "::regenerate_key" do
       let(:client) { double('client', name: "ridley-test") }
@@ -28,7 +28,7 @@ describe Ridley::Client do
   end
 
   subject do
-    Ridley::Client.new(connection, name: "ridley-test", admin: false)
+    Ridley::ClientResource.new(connection, name: "ridley-test", admin: false)
   end
 
   describe "#regenerate_key" do

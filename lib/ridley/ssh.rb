@@ -8,7 +8,7 @@ module Ridley
     autoload :Worker, 'ridley/ssh/worker'
 
     class << self
-      # @param [Ridley::Node, Array<Ridley::Node>] nodes
+      # @param [Ridley::NodeResource, Array<Ridley::NodeResource>] nodes
       # @param [Hash] options
       def start(nodes, options = {}, &block)
         runner = new(nodes, options)
@@ -25,7 +25,7 @@ module Ridley
     attr_reader :nodes
     attr_reader :options
 
-    # @param [Ridley::Node, Array<Ridley::Node>] nodes
+    # @param [Ridley::NodeResource, Array<Ridley::NodeResource>] nodes
     # @param [Hash] options
     #   @see Net::SSH
     def initialize(nodes, options = {})

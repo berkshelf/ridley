@@ -107,15 +107,15 @@ You use a connection to interact with the resources on the remote Chef server it
     conn = Ridley.connection(...)
     conn.role.all           => []
 
-Calling `role.all` on the connection object will return an array of Ridley::Role objects. All of the resources can be listed, not just Roles:
+Calling `role.all` on the connection object will return an array of Ridley::RoleResource objects. All of the resources can be listed, not just Roles:
 
     conn = Ridley.connection(...)
-    conn.node.all           => [<#Ridley::Node>]
-    conn.role.all           => [<#Ridley::Role>]
-    conn.environment.all    => [<#Ridley::Environment>]
-    conn.client.all         => [<#Ridley::Client>]
-    conn.cookbook.all       => [<#Ridley::Cookbook>]
-    conn.data_bag.all       => [<#Ridley::DataBag>]
+    conn.node.all           => [<#Ridley::NodeResource>]
+    conn.role.all           => [<#Ridley::RoleResource>]
+    conn.environment.all    => [<#Ridley::EnvironmentResource>]
+    conn.client.all         => [<#Ridley::ClientResource>]
+    conn.cookbook.all       => [<#Ridley::CookbookResource>]
+    conn.data_bag.all       => [<#Ridley::DataBagResource>]
 
 ### Creating a resource
 
@@ -127,12 +127,12 @@ _Create by instantiate and save_
     obj = conn.role.new
 
     obj.name = "reset"
-    obj.save => <#Ridley::Role: @name="reset">
+    obj.save => <#Ridley::RoleResource: @name="reset">
 
 _Create by the `create` function with attribute hash_
 
     conn = Ridley.connection(...)
-    conn.role.create(name: "reset") => <#Ridley::Role: @name="reset">
+    conn.role.create(name: "reset") => <#Ridley::RoleResource: @name="reset">
 
 _Create by the `create` function with a resource object_
 
@@ -140,7 +140,7 @@ _Create by the `create` function with a resource object_
     obj = conn.role.new
 
     obj.name = "reset"
-    conn.role.create(obj) => <#Ridley::Role: @name="reset">
+    conn.role.create(obj) => <#Ridley::RoleResource: @name="reset">
 
 Each of these methods is identical, it is up to you on how you'd like to create new resources.
 
@@ -154,8 +154,8 @@ If you were following allong in the previous section we created a role named `re
 
     conn = Ridley.connection(...)
 
-    conn.role.find("reset") => <#Ridley::Role: @name="reset">
-    conn.role.find!("reset") => <#Ridley::Role: @name="reset">
+    conn.role.find("reset") => <#Ridley::RoleResource: @name="reset">
+    conn.role.find!("reset") => <#Ridley::RoleResource: @name="reset">
 
 Now if we attempt to find a role that does not exist on the Chef server
 
@@ -183,7 +183,7 @@ Like creating a resource, updating a resource can also be expressed a few differ
 _Update by the `update` function with an id and attribute hash_
 
     conn = Ridley.connection(...)
-    conn.role.update("reset", description: "testing updates!") => <#Ridley::Role: @name="reset", @description="testing updates!">
+    conn.role.update("reset", description: "testing updates!") => <#Ridley::RoleResource: @name="reset", @description="testing updates!">
 
 _Update by the `update` function with a resource object_
 
@@ -191,7 +191,7 @@ _Update by the `update` function with a resource object_
     obj = conn.role.find("reset")
     obj.description = "resource object!"
 
-    conn.role.update(obj) => <#Ridley::Role: @name="reset", @description="resource object!">
+    conn.role.update(obj) => <#Ridley::RoleResource: @name="reset", @description="resource object!">
 
 _Update by saving a resource object_
 
@@ -199,7 +199,7 @@ _Update by saving a resource object_
     obj = conn.role.find("reset")
 
     obj.description = "saving an object!"
-    obj.save => <#Ridley::Role: @name="reset", @description="saving an object!">
+    obj.save => <#Ridley::RoleResource: @name="reset", @description="saving an object!">
 
 ### Deleting a resource
 
@@ -208,14 +208,14 @@ Like creating or updating a resource, there are a few ways deleting a resource c
 _Delete by the `delete` function with an id_
 
     conn = Ridley.connection(...)
-    conn.role.delete("reset") => <#Ridley::Role: @name="reset">
+    conn.role.delete("reset") => <#Ridley::RoleResource: @name="reset">
 
 _Delete by the `delete` function with a resource object_
 
     conn = Ridley.connection(...)
     obj = conn.role.find("reset")
 
-    conn.role.delete(obj) => <#Ridley::Role: @name="reset">
+    conn.role.delete(obj) => <#Ridley::RoleResource: @name="reset">
 
 _Delete by the `destroy` function on a resource object_
 
@@ -229,14 +229,14 @@ _Delete by the `destroy` function on a resource object_
 _Regenerate function on a context with an id_
 
     conn = Ridley.connection(...)
-    conn.client.regenerate_key("jwinsor") => <#Ridley::Client: @name="jwinsor", @private_key="HIDDEN">
+    conn.client.regenerate_key("jwinsor") => <#Ridley::ClientResource: @name="jwinsor", @private_key="HIDDEN">
 
 _Regenerate function on an instantiated resource object_
 
     conn = Ridley.connection(...)
     obj = conn.client.find("jwinsor")
 
-    obj.regenerate_key => <#Ridley::Client: @name="jwinsor", @private_key="HIDDEN">
+    obj.regenerate_key => <#Ridley::ClientResource: @name="jwinsor", @private_key="HIDDEN">
 
 ## Manipulating Data Bags and Data Bag Items
 
@@ -256,7 +256,7 @@ Unlike a role, node, client, or environment, a data bag is a container for other
     data_bag = conn.data_bag.create("ridley-test")
 
     data_bag.item.create(id: "appconfig", host: "reset.local", user: "jwinsor") => 
-      <#Ridley::DataBagItem: @id="appconfig", @host="reset.local", @user="jwinsor">
+      <#Ridley::DataBagItemResource: @id="appconfig", @host="reset.local", @user="jwinsor">
 
 ### Saving a Data Bag Item
 

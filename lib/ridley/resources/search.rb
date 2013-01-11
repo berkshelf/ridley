@@ -72,13 +72,13 @@ module Ridley
 
       case index
       when :node
-        response[:rows].collect { |row| Node.new(connection, row) }
+        response[:rows].collect { |row| Ridley::NodeResource.new(connection, row) }
       when :role
-        response[:rows].collect { |row| Role.new(connection, row) }
+        response[:rows].collect { |row| Ridley::RoleResource.new(connection, row) }
       when :client
-        response[:rows].collect { |row| Client.new(connection, row) }
+        response[:rows].collect { |row| Ridley::ClientResource.new(connection, row) }
       when :environment
-        response[:rows].collect { |row| Environment.new(connection, row) }
+        response[:rows].collect { |row| Ridley::EnvironmentResource.new(connection, row) }
       else
         response[:rows]
       end
@@ -92,9 +92,9 @@ module Ridley
 
       def query_options
         {}.tap do |options|
-          options[:q] = self.query unless self.query.nil?
-          options[:sort] = self.sort unless self.sort.nil?
-          options[:rows] = self.rows unless self.rows.nil?
+          options[:q]     = self.query unless self.query.nil?
+          options[:sort]  = self.sort unless self.sort.nil?
+          options[:rows]  = self.rows unless self.rows.nil?
           options[:start] = self.start unless self.start.nil?
         end
       end

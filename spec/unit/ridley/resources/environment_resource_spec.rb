@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-describe Ridley::Environment do
-  it_behaves_like "a Ridley Resource", Ridley::Environment
+describe Ridley::EnvironmentResource do
+  it_behaves_like "a Ridley Resource", Ridley::EnvironmentResource
 
   let(:connection) { double("connection") }
 
@@ -34,7 +34,7 @@ describe Ridley::Environment do
   end
 
   describe "ClassMethods" do
-    subject { Ridley::Environment }
+    subject { Ridley::EnvironmentResource }
 
     describe "::initialize" do
       before(:each) do
@@ -73,7 +73,7 @@ describe Ridley::Environment do
 
   let(:connection) { double('connection') }
 
-  subject { Ridley::Environment.new(connection) }
+  subject { Ridley::EnvironmentResource.new(connection) }
 
   describe "#set_override_attribute" do
     it "sets an override node attribute at the nested path" do
