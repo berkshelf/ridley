@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency 'json', '>= 1.5.0'
   s.add_runtime_dependency 'multi_json', '>= 1.0.4'
-  s.add_runtime_dependency 'chozo', '>= 0.4.0'
+  s.add_runtime_dependency 'chozo', '>= 0.4.1'
   s.add_runtime_dependency 'mixlib-log'
   s.add_runtime_dependency 'mixlib-authentication'
   s.add_runtime_dependency 'addressable'
