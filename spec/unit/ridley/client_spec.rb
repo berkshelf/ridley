@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Ridley::Connection do
+describe Ridley::Client do
   let(:server_url) { "https://api.opscode.com" }
   let(:client_name) { "reset" }
   let(:client_key) { fixtures_path.join("reset.pem").to_s }
@@ -17,12 +17,8 @@ describe Ridley::Connection do
     }
   end
 
-  it "exposes its options publicly" do
-    described_class::OPTIONS.should be_a Array
-  end
-
   describe "ClassMethods" do
-    subject { Ridley::Connection }
+    subject { described_class }
 
     describe "::initialize" do
       let(:server_url) { "https://api.opscode.com/some_path" }
@@ -133,78 +129,30 @@ describe Ridley::Connection do
       end
     end
 
-    describe "::sync" do
-      it "raises a Ridley::Errors::InternalError if no block is given" do
+    describe "::open" do
+      it "raises a LocalJumpError if no block is given" do
         lambda {
-          subject.sync(config)
-        }.should raise_error(Ridley::Errors::InternalError)
+          subject.open(config)
+        }.should raise_error(LocalJumpError)
       end
     end
   end
 
   subject do
-    Ridley::Connection.new(config)
+    described_class.new(config)
   end
 
-  describe "#sync" do
-    it "raises a Ridley::Errors::InternalError if no block is given" do
-      lambda {
-        subject.sync
-      }.should raise_error(Ridley::Errors::InternalError)
+  describe "#api_type" do
+    it "returns :foss if the organization is not set" do
+      subject.stub(:organization).and_return(nil)
+
+      subject.api_type.should eql(:foss)
     end
 
-    describe "HTTP Request" do
-      describe "#get" do
-        it "appends the given path to the connection's server_uri path and sends a get request to it" do
-          stub_request(:get, subject.build_url("cookbooks")).
-            to_return(status: 200, body: "{}")
+    it "returns :hosted if the organization is set" do
+      subject.stub(:organization).and_return("vialstudios")
 
-          subject.get("cookbooks")
-        end
-      end
-
-      describe "#put" do
-        it "appends the given path to the connection's server_uri path and sends a put request to it" do
-          stub_request(:put, subject.build_url("cookbooks")).
-            with(body: "content").
-            to_return(status: 200, body: "{}")
-
-          subject.put("cookbooks", "content")
-        end
-      end
-
-      describe "#post" do
-        it "appends the given path to the connection's server_uri path and sends a post request to it" do
-          stub_request(:post, subject.build_url("cookbooks")).
-            with(body: "content").
-            to_return(status: 200, body: "{}")
-
-          subject.post("cookbooks", "content")
-        end
-      end
-
-      describe "#delete" do
-        it "appends the given path to the connection's server_uri path and sends a delete request to it" do
-          stub_request(:delete, subject.build_url("cookbooks/nginx")).
-            to_return(status: 200, body: "{}")
-
-          subject.delete("cookbooks/nginx")
-        end
-      end
-    end
-
-    describe "api_type" do
-      it "returns :foss if the organization is not set" do
-        subject.stub(:organization).and_return(nil)
-
-        subject.api_type.should eql(:foss)
-      end
-
-      it "returns :hosted if the organization is set" do
-        subject.stub(:organization).and_return("vialstudios")
-
-        subject.api_type.should eql(:hosted)
-      end
+      subject.api_type.should eql(:hosted)
     end
   end
 

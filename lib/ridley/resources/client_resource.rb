@@ -73,17 +73,4 @@ module Ridley
       end
     end
   end
-
-  module DSL
-    # Coerces instance functions into class functions on Ridley::ClientResource. This coercion
-    # sends an instance of the including class along to the class function.
-    #
-    # @see Ridley::ChainLink
-    #
-    # @return [Ridley::ChainLink]
-    #   a context object to delegate instance functions to class functions on Ridley::ClientResource
-    def client
-      ChainLink.new(self, Ridley::ClientResource)
-    end
-  end
 end

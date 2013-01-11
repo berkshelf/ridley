@@ -35,17 +35,4 @@ module Ridley
     attribute :name,
       required: true
   end
-
-  module DSL
-    # Coerces instance functions into class functions on Ridley::CookbookResource. This coercion
-    # sends an instance of the including class along to the class function.
-    #
-    # @see Ridley::ChainLink
-    #
-    # @return [Ridley::ChainLink]
-    #   a context object to delegate instance functions to class functions on Ridley::CookbookResource
-    def cookbook
-      ChainLink.new(self, Ridley::CookbookResource)
-    end
-  end
 end

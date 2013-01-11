@@ -99,34 +99,4 @@ module Ridley
         end
       end
     end
-
-  module DSL
-    # Creates an runs a new Ridley::Search
-    #
-    # @see Ridley::Search#run
-    #
-    # @param [String, Symbol] index
-    # @param [String, nil] query
-    #
-    # @option options [String] :sort
-    # @option options [Integer] :rows
-    # @option options [Integer] :start
-    #
-    # @return [Hash]
-    def search(index, query = nil, options = {})
-      Search.new(self, index, query, options).run
-    end
-
-    # Return the array of all possible search indexes for the including connection
-    #
-    # @example
-    #   conn = Ridley.connection(...)
-    #   conn.search_indexes => 
-    #     [:client, :environment, :node, :role, :"ridley-two", :"ridley-one"]
-    #
-    # @return [Array<Symbol, String>]
-    def search_indexes
-      Search.indexes(self)
-    end
-  end
 end
