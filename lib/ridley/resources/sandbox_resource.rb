@@ -1,12 +1,12 @@
 module Ridley
-  class Sandbox
+  class SandboxResource
     class << self
       # @param [Ridley::Connection] connection
       # @param [Array] checksums
       # @option options [Integer] :size (12)
       #   size of the upload pool
       #
-      # @return [Ridley::Sandbox]
+      # @return [Ridley::SandboxResource]
       def create(connection, checksums = [], options = {})
         options.reverse_merge!(size: 12)
 
@@ -140,15 +140,15 @@ module Ridley
   end
 
   module DSL
-    # Coerces instance functions into class functions on Ridley::Sandbox. This coercion
+    # Coerces instance functions into class functions on Ridley::SandboxResource. This coercion
     # sends an instance of the including class along to the class function.
     #
     # @see Ridley::ChainLink
     #
     # @return [Ridley::ChainLink]
-    #   a context object to delegate instance functions to class functions on Ridley::Sandbox
+    #   a context object to delegate instance functions to class functions on Ridley::SandboxResource
     def sandbox
-      ChainLink.new(self, Ridley::Sandbox)
+      ChainLink.new(self, Ridley::SandboxResource)
     end
   end
 end
