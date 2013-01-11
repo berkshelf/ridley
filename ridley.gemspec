@@ -19,12 +19,11 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency 'json', '>= 1.5.0'
   s.add_runtime_dependency 'multi_json', '>= 1.0.4'
-  s.add_runtime_dependency 'chozo', '>= 0.4.0'
+  s.add_runtime_dependency 'chozo', '>= 0.4.1'
   s.add_runtime_dependency 'mixlib-log'
   s.add_runtime_dependency 'mixlib-authentication'
   s.add_runtime_dependency 'addressable'
   s.add_runtime_dependency 'faraday'
-  s.add_runtime_dependency 'activemodel', '>= 3.2.0'
   s.add_runtime_dependency 'activesupport', '>= 3.2.0'
   s.add_runtime_dependency 'celluloid'
   s.add_runtime_dependency 'net-ssh'
