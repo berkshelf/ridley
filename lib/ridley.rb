@@ -45,6 +45,10 @@ module Ridley
       Client.new(*args)
     end
 
+    def open(*args, &block)
+      Client.open(*args, &block)
+    end
+
     # @return [Pathname]
     def root
       @root ||= Pathname.new(File.expand_path('../', File.dirname(__FILE__)))
