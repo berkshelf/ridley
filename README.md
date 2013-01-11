@@ -110,7 +110,7 @@ You use a connection to interact with the resources on the remote Chef server it
 Calling `role.all` on the connection object will return an array of Ridley::Role objects. All of the resources can be listed, not just Roles:
 
     conn = Ridley.connection(...)
-    conn.node.all           => [<#Ridley::Node>]
+    conn.node.all           => [<#Ridley::NodeResource>]
     conn.role.all           => [<#Ridley::Role>]
     conn.environment.all    => [<#Ridley::EnvironmentResource>]
     conn.client.all         => [<#Ridley::ClientResource>]

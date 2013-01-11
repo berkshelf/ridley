@@ -101,12 +101,12 @@ describe Ridley::Search do
 
       subject { Ridley::Search.new(connection, index, query) }
 
-      it "returns an array of Ridley::Node" do
+      it "returns an array of Ridley::NodeResource" do
         connection.should_receive(:get).with("search/#{index}", q: query).and_return(response)
         result = subject.run
 
         result.should be_a(Array)
-        result.should each be_a(Ridley::Node)
+        result.should each be_a(Ridley::NodeResource)
       end
     end
 

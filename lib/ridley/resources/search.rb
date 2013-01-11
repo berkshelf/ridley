@@ -72,7 +72,7 @@ module Ridley
 
       case index
       when :node
-        response[:rows].collect { |row| Ridley::Node.new(connection, row) }
+        response[:rows].collect { |row| Ridley::NodeResource.new(connection, row) }
       when :role
         response[:rows].collect { |row| Ridley::Role.new(connection, row) }
       when :client
