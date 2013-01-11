@@ -178,62 +178,6 @@ shared_examples_for "a Ridley Resource" do |resource_klass|
     end
   end
 
-  describe "#from_hash" do
-    before(:each) do
-      subject.class.attribute(:name)
-      @object = subject.from_hash(name: "reset")
-    end
-
-    it "returns an instance of the implementing class" do
-      @object.should be_a(subject.class)
-    end
-
-    it "assigns the attributes to the values of the corresponding keys in the given Hash" do
-      @object.name.should eql("reset")
-    end
-  end
-
-  describe "#to_hash" do
-    it "returns a hash" do
-      subject.to_hash.should be_a(Hash)
-    end
-
-    it "delegates to .attributes" do
-      subject.should_receive(:attributes)
-
-      subject.to_hash
-    end
-  end
-
-  describe "#to_json" do
-    it "serializes the objects attributes using MultiJson" do
-      MultiJson.should_receive(:encode).with(subject.attributes, kind_of(Hash))
-
-      subject.to_json
-    end
-
-    it "returns the seralized value" do
-      MultiJson.stub(:encode).and_return("{}")
-
-      subject.to_json.should eql("{}")
-    end
-  end
-
-  describe "#from_json" do
-    before(:each) do
-      subject.class.attribute(:name)
-      @object = subject.from_json(%({"name": "reset"}))
-    end
-
-    it "returns an instance of the implementing class" do
-      @object.should be_a(subject.class)
-    end
-
-    it "assigns the attributes to the values of the corresponding keys in the given JSON" do
-      @object.name.should eql("reset")
-    end
-  end
-
   describe "#reload" do
     let(:updated_subject) { double('updated_subject', attributes: { fake_attribute: "some_value" }) }
 

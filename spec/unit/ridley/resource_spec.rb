@@ -11,12 +11,6 @@ describe Ridley::Resource do
     it_behaves_like "a Ridley Resource", subject.call
 
     describe "::initialize" do
-      it "has an empty Hash for attributes if no attributes have been defined" do
-        klass = subject.new(connection)
-
-        klass.attributes.should be_empty
-      end
-
       it "mass assigns the given attributes" do
         new_attrs = {
           name: "a name"

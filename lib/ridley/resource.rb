@@ -143,20 +143,6 @@ module Ridley
       mass_assign(new_attrs)
     end
 
-    alias_method :attribute, :get_attribute
-    alias_method :[], :get_attribute
-    alias_method :attribute=, :set_attribute
-    alias_method :[]=, :set_attribute
-
-    alias_method :attributes=, :mass_assign
-
-    # @param [String, Symbol] key
-    #
-    # @return [Boolean]
-    def attribute?(key)
-      attribute(key).present?
-    end
-
     # Creates a resource on the target remote or updates one if the resource
     # already exists.
     #
@@ -199,37 +185,6 @@ module Ridley
     # @return [String]
     def chef_id
       get_attribute(self.class.chef_id)
-    end
-
-    # @param [String] json
-    # @option options [Boolean] :symbolize_keys
-    # @option options [Class, Symbol, String] :adapter
-    #
-    # @return [Object]
-    def from_json(json, options = {})
-      mass_assign(MultiJson.decode(json, options))
-      self
-    end
-
-    # @param [#to_hash] hash
-    #
-    # @return [Object]
-    def from_hash(hash)
-      mass_assign(hash.to_hash)
-      self
-    end
-
-    # @option options [Boolean] :symbolize_keys
-    # @option options [Class, Symbol, String] :adapter
-    #
-    # @return [String]
-    def to_json(options = {})
-      MultiJson.encode(self.attributes, options)
-    end
-    alias_method :as_json, :to_json
-
-    def to_hash
-      self.attributes
     end
 
     def to_s
