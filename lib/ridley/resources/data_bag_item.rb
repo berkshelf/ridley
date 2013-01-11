@@ -12,7 +12,7 @@ module Ridley
       end
 
       # @param [Ridley::Connection] connection
-      # @param [Ridley::DataBag] data_bag
+      # @param [Ridley::DataBagResource] data_bag
       # @param [String, #chef_id] object
       #
       # @return [nil, Ridley::DataBagItem]
@@ -23,7 +23,7 @@ module Ridley
       end
 
       # @param [Ridley::Connection] connection
-      # @param [Ridley::DataBag] data_bag
+      # @param [Ridley::DataBagResource] data_bag
       # @param [String, #chef_id] object
       #
       # @raise [Errors::HTTPNotFound]
@@ -36,7 +36,7 @@ module Ridley
       end
 
       # @param [Ridley::Connection] connection
-      # @param [Ridley::DataBag] data_bag
+      # @param [Ridley::DataBagResource] data_bag
       # @param [#to_hash] object
       #
       # @return [Ridley::DataBagItem]
@@ -52,7 +52,7 @@ module Ridley
       end
 
       # @param [Ridley::Connection] connection
-      # @param [Ridley::DataBag] data_bag
+      # @param [Ridley::DataBagResource] data_bag
       # @param [String, #chef_id] object
       #
       # @return [Ridley::DataBagItem]
@@ -62,7 +62,7 @@ module Ridley
       end
 
       # @param [Ridley::Connection] connection
-      # @param [Ridley::DataBag] data_bag
+      # @param [Ridley::DataBagResource] data_bag
       #
       # @return [Array<Ridley::DataBagItem>]
       def delete_all(connection, data_bag)
@@ -83,7 +83,7 @@ module Ridley
       end
 
       # @param [Ridley::Connection] connection
-      # @param [Ridley::DataBag] data_bag
+      # @param [Ridley::DataBagResource] data_bag
       # @param [#to_hash] object
       #
       # @return [Ridley::DataBagItem]
@@ -97,7 +97,7 @@ module Ridley
 
     set_assignment_mode :carefree
 
-    # @return [Ridley::DataBag]
+    # @return [Ridley::DataBagResource]
     attr_reader :data_bag
 
     attribute :id,
@@ -105,7 +105,7 @@ module Ridley
       required: true
 
     # @param [Ridley::Connection] connection
-    # @param [Ridley::DataBag] data_bag
+    # @param [Ridley::DataBagResource] data_bag
     # @param [#to_hash] new_attrs
     def initialize(connection, data_bag, new_attrs = {})
       super(connection, new_attrs)

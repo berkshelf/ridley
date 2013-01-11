@@ -1,12 +1,12 @@
 require 'spec_helper'
 
-describe Ridley::DataBag do
-  it_behaves_like "a Ridley Resource", Ridley::DataBag
+describe Ridley::DataBagResource do
+  it_behaves_like "a Ridley Resource", Ridley::DataBagResource
 
   let(:connection) { double('connection') }
 
   describe "ClassMethods" do
-    subject { Ridley::DataBag }
+    subject { Ridley::DataBagResource }
 
     describe "::create_item" do
       pending

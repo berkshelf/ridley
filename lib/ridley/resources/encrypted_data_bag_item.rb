@@ -4,7 +4,7 @@ module Ridley
       # Finds a data bag item and decrypts it.
       #
       # @param [Ridley::Connection] connection
-      # @param [Ridley::DataBag] data_bag
+      # @param [Ridley::DataBagResource] data_bag
       # @param [String, #chef_id] object
       #
       # @return [nil, Ridley::DataBagItem]
@@ -17,7 +17,7 @@ module Ridley
       # Finds a data bag item and decrypts it. Throws an exception if the item doesn't exist.
       #
       # @param [Ridley::Connection] connection
-      # @param [Ridley::DataBag] data_bag
+      # @param [Ridley::DataBagResource] data_bag
       # @param [String, #chef_id] object
       #
       # @raise [Errors::HTTPNotFound]
@@ -35,7 +35,7 @@ module Ridley
     attr_reader :attributes
 
     # @param [Ridley::Connection] connection
-    # @param [Ridley::DataBag] data_bag
+    # @param [Ridley::DataBagResource] data_bag
     # @param [#to_hash] attributes
     def initialize(connection, data_bag, attributes = {})
       @connection = connection
