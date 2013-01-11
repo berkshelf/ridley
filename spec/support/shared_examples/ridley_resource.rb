@@ -1,5 +1,5 @@
 shared_examples_for "a Ridley Resource" do |resource_klass|
-  let(:connection) { double('connection') }
+  let(:connection) { double('connection', hosted?: true) }
   let(:active_connection) { double('active-connection') }
   let(:response) { double('response') }
 

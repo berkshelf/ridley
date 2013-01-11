@@ -47,7 +47,7 @@ module Ridley
       type: String
 
     attribute :private_key,
-      type: String
+      type: [ String, Boolean ]
 
     attribute :orgname,
       type: String
@@ -61,6 +61,16 @@ module Ridley
     def regenerate_key
       self.private_key = true
       self.save
+    end
+
+    # Override to_json to reflect to massage the returned attributes based on the type
+    # of connection. Only OHC/OPC requires the json_class attribute is not present.
+    def to_json
+      if connection.hosted?
+        attributes.except(:json_class).to_json
+      else
+        super
+      end
     end
   end
 
