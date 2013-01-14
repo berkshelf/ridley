@@ -24,6 +24,7 @@ module Ridley
   CHEF_VERSION = '10.16.4'.freeze
 
   autoload :Bootstrapper, 'ridley/bootstrapper'
+  autoload :Client, 'ridley/client'
   autoload :Connection, 'ridley/connection'
   autoload :ChainLink, 'ridley/chain_link'
   autoload :DSL, 'ridley/dsl'
@@ -40,12 +41,12 @@ module Ridley
     def_delegator "Ridley::Logging", :logger=
     def_delegator "Ridley::Logging", :set_logger
 
-    def connection(*args)
-      Connection.new(*args)
+    def new(*args)
+      Client.new(*args)
     end
 
-    def sync(*args, &block)
-      Connection.sync(*args, &block)
+    def open(*args, &block)
+      Client.open(*args, &block)
     end
 
     # @return [Pathname]

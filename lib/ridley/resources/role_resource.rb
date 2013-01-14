@@ -60,17 +60,4 @@ module Ridley
       self.default_attributes = self.default_attributes.deep_merge(attr_hash)
     end
   end
-
-  module DSL
-    # Coerces instance functions into class functions on Ridley::RoleResource. This coercion
-    # sends an instance of the including class along to the class function.
-    #
-    # @see Ridley::ChainLink
-    #
-    # @return [Ridley::ChainLink]
-    #   a context object to delegate instance functions to class functions on Ridley::RoleResource
-    def role
-      ChainLink.new(self, Ridley::RoleResource)
-    end
-  end
 end

@@ -70,16 +70,11 @@ module Ridley
         deleted = []
         resources = all(connection, data_bag)
 
-        connection.thread_count.times.collect do
-          Thread.new(connection, data_bag, resources, deleted) do |connection, data_bag, resources, deleted|
-            while resource = mutex.synchronize { resources.pop }
-              result = delete(connection, data_bag, resource)
-              mutex.synchronize { deleted << result }
-            end
-          end
-        end.each(&:join)
-
-        deleted
+        resources.collect do |resource|
+          Celluloid::Future.new {
+            delete(connection, data_bag, resource)
+          }
+        end.map(&:value)
       end
 
       # @param [Ridley::Connection] connection

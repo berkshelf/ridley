@@ -70,17 +70,4 @@ module Ridley
       self.override_attributes = self.override_attributes.deep_merge(attr_hash)
     end
   end
-
-  module DSL
-    # Coerces instance functions into class functions on Ridley::EnvironmentResource. This coercion
-    # sends an instance of the including class along to the class function.
-    #
-    # @see Ridley::ChainLink
-    #
-    # @return [Ridley::ChainLink]
-    #   a context object to delegate instance functions to class functions on Ridley::EnvironmentResource
-    def environment
-      ChainLink.new(self, Ridley::EnvironmentResource)
-    end
-  end
 end

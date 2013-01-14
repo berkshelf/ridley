@@ -68,17 +68,4 @@ module Ridley
       DBIChainLink.new(self, connection, encrypted: true)
     end
   end
-
-  module DSL
-    # Coerces instance functions into class functions on Ridley::DataBagResource. This coercion
-    # sends an instance of the including class along to the class function.
-    #
-    # @see Ridley::ChainLink
-    #
-    # @return [Ridley::ChainLink]
-    #   a context object to delegate instance functions to class functions on Ridley::DataBagResource
-    def data_bag
-      ChainLink.new(self, Ridley::DataBagResource)
-    end
-  end
 end
