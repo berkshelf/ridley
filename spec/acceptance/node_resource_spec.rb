@@ -88,7 +88,7 @@ describe "Node API operations", type: "acceptance" do
       connection.sync do
         node.delete_all
 
-        connection.node.all.should have(0).nodes
+        node.all.should have(0).nodes
       end
     end
   end
