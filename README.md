@@ -40,9 +40,9 @@ An optional organization option can be specified if you are working with Hosted 
 
 __NOTE: You do not want to specify an `organization` if you are connecting to an Open Source Chef server.__
 
-Connections can also be instantiated by a helper function: `Ridley.connection`
+Connections can also be instantiated by a helper function: `Ridley.new`
 
-    Ridley.connection(
+    Ridley.new(
       server_url: "https://api.opscode.com",
       client_name: "reset",
       client_key: "/Users/reset/.chef/reset.pem",
@@ -60,7 +60,7 @@ Using a connection object you can interact with collections of resources on a Ch
 
 Here is a simple example of instantiating a new connection and listing all of the roles on a Chef server.
 
-    conn = Ridley.connection(...)
+    conn = Ridley.new(...)
     conn.role.all => []
 
 For more information scroll down to the Manipulating Chef Resources section of this README.
@@ -69,7 +69,7 @@ For more information scroll down to the Manipulating Chef Resources section of t
 
 An alternative syntax is provided if you want to perform multiple requests, in order, on a connection.
 
-    conn = Ridley.connection(...)
+    conn = Ridley.new(...)
 
     conn.sync do
       role.all
@@ -104,12 +104,12 @@ All resource can be listed, created, retrieved, updated, or destroyed. Some reso
 
 You use a connection to interact with the resources on the remote Chef server it is pointing to. For example, if you wanted to get a list of all of the roles on your Chef server:
 
-    conn = Ridley.connection(...)
+    conn = Ridley.new(...)
     conn.role.all           => []
 
 Calling `role.all` on the connection object will return an array of Ridley::RoleResource objects. All of the resources can be listed, not just Roles:
 
-    conn = Ridley.connection(...)
+    conn = Ridley.new(...)
     conn.node.all           => [<#Ridley::NodeResource>]
     conn.role.all           => [<#Ridley::RoleResource>]
     conn.environment.all    => [<#Ridley::EnvironmentResource>]
@@ -123,7 +123,7 @@ A new resource can be created in a few ways
 
 _Create by instantiate and save_
 
-    conn = Ridley.connection(...)
+    conn = Ridley.new(...)
     obj = conn.role.new
 
     obj.name = "reset"
@@ -131,12 +131,12 @@ _Create by instantiate and save_
 
 _Create by the `create` function with attribute hash_
 
-    conn = Ridley.connection(...)
+    conn = Ridley.new(...)
     conn.role.create(name: "reset") => <#Ridley::RoleResource: @name="reset">
 
 _Create by the `create` function with a resource object_
 
-    conn = Ridley.connection(...)
+    conn = Ridley.new(...)
     obj = conn.role.new
 
     obj.name = "reset"
@@ -152,14 +152,14 @@ Both `find` and `find!` will return a resource but if the resource is not found 
 
 If you were following allong in the previous section we created a role named `reset`. We'll assume that role has been created in this next example.
 
-    conn = Ridley.connection(...)
+    conn = Ridley.new(...)
 
     conn.role.find("reset") => <#Ridley::RoleResource: @name="reset">
     conn.role.find!("reset") => <#Ridley::RoleResource: @name="reset">
 
 Now if we attempt to find a role that does not exist on the Chef server
 
-    conn = Ridley.connection(...)
+    conn = Ridley.new(...)
 
     conn.role.find("not_there") => nil
     conn.role.find!("not_there") =>
@@ -182,12 +182,12 @@ Like creating a resource, updating a resource can also be expressed a few differ
 
 _Update by the `update` function with an id and attribute hash_
 
-    conn = Ridley.connection(...)
+    conn = Ridley.new(...)
     conn.role.update("reset", description: "testing updates!") => <#Ridley::RoleResource: @name="reset", @description="testing updates!">
 
 _Update by the `update` function with a resource object_
 
-    conn = Ridley.connection(...)
+    conn = Ridley.new(...)
     obj = conn.role.find("reset")
     obj.description = "resource object!"
 
@@ -195,7 +195,7 @@ _Update by the `update` function with a resource object_
 
 _Update by saving a resource object_
 
-    conn = Ridley.connection(...)
+    conn = Ridley.new(...)
     obj = conn.role.find("reset")
 
     obj.description = "saving an object!"
@@ -207,19 +207,19 @@ Like creating or updating a resource, there are a few ways deleting a resource c
 
 _Delete by the `delete` function with an id_
 
-    conn = Ridley.connection(...)
+    conn = Ridley.new(...)
     conn.role.delete("reset") => <#Ridley::RoleResource: @name="reset">
 
 _Delete by the `delete` function with a resource object_
 
-    conn = Ridley.connection(...)
+    conn = Ridley.new(...)
     obj = conn.role.find("reset")
 
     conn.role.delete(obj) => <#Ridley::RoleResource: @name="reset">
 
 _Delete by the `destroy` function on a resource object_
 
-    conn = Ridley.connection(...)
+    conn = Ridley.new(...)
     obj = conn.role.find("reset")
 
     obj.destroy => true
@@ -228,12 +228,12 @@ _Delete by the `destroy` function on a resource object_
 
 _Regenerate function on a context with an id_
 
-    conn = Ridley.connection(...)
+    conn = Ridley.new(...)
     conn.client.regenerate_key("jwinsor") => <#Ridley::ClientResource: @name="jwinsor", @private_key="HIDDEN">
 
 _Regenerate function on an instantiated resource object_
 
-    conn = Ridley.connection(...)
+    conn = Ridley.new(...)
     obj = conn.client.find("jwinsor")
 
     obj.regenerate_key => <#Ridley::ClientResource: @name="jwinsor", @private_key="HIDDEN">
@@ -242,7 +242,7 @@ _Regenerate function on an instantiated resource object_
 
 A data bag is managed exactly the same as any other Chef resource
 
-    conn = Ridley.connection(...)
+    conn = Ridley.new(...)
     conn.data_bag.create("ridley-test")
 
 You can create, delete, update, or retrieve a data bag exactly how you would expect if you read through the
@@ -252,7 +252,7 @@ Unlike a role, node, client, or environment, a data bag is a container for other
 
 ### Creating a Data Bag Item
 
-    conn = Ridley.connection(...)
+    conn = Ridley.new(...)
     data_bag = conn.data_bag.create("ridley-test")
 
     data_bag.item.create(id: "appconfig", host: "reset.local", user: "jwinsor") => 
@@ -260,7 +260,7 @@ Unlike a role, node, client, or environment, a data bag is a container for other
 
 ### Saving a Data Bag Item
 
-    conn = Ridley.connection(...)
+    conn = Ridley.new(...)
     data_bag = conn.data_bag.create("ridley-test")
 
     dbi = data_bag.item.new
@@ -270,7 +270,7 @@ Unlike a role, node, client, or environment, a data bag is a container for other
 
 ## Searching
 
-    conn = Ridley.connection(...)
+    conn = Ridley.new(...)
     conn.search(:node)
     conn.search(:node, "name:ridley-test.local")
 
@@ -293,7 +293,7 @@ Given the previous example you could set the default node attribute with the `se
 
 Setting the `node[:my_app][:billing][:enabled]` node level attribute on the node "jwinsor-1"
 
-    conn = Ridley.connection
+    conn = Ridley.new
     conn.sync do
       obj = node.find("jwinsor-1")
       obj.set_attribute("my_app.billing.enabled", false)
@@ -304,7 +304,7 @@ Setting the `node[:my_app][:billing][:enabled]` node level attribute on the node
 
 Setting a default environment attribute is just like setting a node level default attribute
 
-    conn = Ridley.connection
+    conn = Ridley.new
     conn.sync do
       obj = environment.find("production")
       obj.set_default_attribute("my_app.proxy.enabled", false)
@@ -313,7 +313,7 @@ Setting a default environment attribute is just like setting a node level defaul
 
 And the same goes for setting an environment level override attribute
 
-    conn = Ridley.connection
+    conn = Ridley.new
     conn.sync do
       obj = environment.find("production")
       obj.set_override_attribute("my_app.webapp.enabled", false)
@@ -322,7 +322,7 @@ And the same goes for setting an environment level override attribute
 
 ### Role Attributes
 
-    conn = Ridley.connection
+    conn = Ridley.new
     conn.sync do
       obj = role.find("why_god_why")
       obj.set_default_attribute("my_app.proxy.enabled", false)
@@ -337,7 +337,7 @@ And the same goes for setting an environment level override attribute
 
 ## Bootstrapping nodes
 
-    conn = Ridley.connection(
+    conn = Ridley.new(
       server_url: "https://api.opscode.com",
       organization: "vialstudios",
       validator_client: "vialstudios-validator",

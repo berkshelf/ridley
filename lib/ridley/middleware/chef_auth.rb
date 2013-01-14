@@ -4,6 +4,8 @@ module Ridley
   module Middleware
     # @author Jamie Winsor <jamie@vialstudios.com>
     class ChefAuth < Faraday::Middleware
+      include Ridley::Logging
+
       attr_reader :client_name
       attr_reader :client_key
 
@@ -26,7 +28,8 @@ module Ridley
         env[:request_headers] = default_headers.merge(env[:request_headers]).merge(authentication_headers)
         env[:request_headers] = env[:request_headers].merge('Content-Length' => env[:body].bytesize.to_s) if env[:body]
 
-        Ridley.log.debug(env)
+        log.debug { "Performing Authenticated Chef Request: "}
+        log.debug { env }
 
         @app.call(env)
       end

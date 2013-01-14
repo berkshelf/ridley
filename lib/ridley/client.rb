@@ -65,7 +65,10 @@ module Ridley
     def_delegator :connection, :port
     def_delegator :connection, :path_prefix
 
-    attr_reader :organization
+    def_delegator :connection, :client_key
+    def_delegator :connection, :client_key=
+    def_delegator :connection, :client_name
+    def_delegator :connection, :client_name=
 
     attr_accessor :client_name
     attr_accessor :client_key
@@ -80,13 +83,9 @@ module Ridley
     #   name of the client used to authenticate with the Chef API
     # @option options [String] :client_key
     #   filepath to the client's private key used to authenticate with the Chef API
-    # @option options [String] :organization
-    #   the Organization to connect to. This is only used if you are connecting to
-    #   private Chef or hosted Chef
     # @option options [String] :validator_client (nil)
     # @option options [String] :validator_path (nil)
     # @option options [String] :encrypted_data_bag_secret_path (nil)
-    # @option options [Integer] :thread_count (DEFAULT_THREAD_COUNT)
     # @option options [Hash] :ssh (Hash.new)
     #   * :user (String) a shell user that will login to each node and perform the bootstrap command on (required)
     #   * :password (String) the password for the shell user that will perform the bootstrap
@@ -111,40 +110,16 @@ module Ridley
       )
       self.class.validate_options(options)
 
-      @client_name      = options[:client_name]
-      @client_key       = File.expand_path(options[:client_key])
-      @organization     = options[:organization]
-      @thread_count     = options[:thread_count]
       @ssh              = options[:ssh]
       @validator_client = options[:validator_client]
       @validator_path   = options[:validator_path]
       @encrypted_data_bag_secret_path = options[:encrypted_data_bag_secret_path]
 
-      unless @client_key.present? && File.exist?(@client_key)
-        raise Errors::ClientKeyFileNotFound, "client key not found at: '#{@client_key}'"
-      end
-
-      uri_hash = Addressable::URI.parse(options[:server_url]).to_hash.slice(:scheme, :host, :port)
-
-      unless uri_hash[:port]
-        uri_hash[:port] = (uri_hash[:scheme] == "https" ? 443 : 80)
-      end
-
-      if org_match = options[:server_url].match(/.*\/organizations\/(.*)/)
-        @organization ||= org_match[1]
-      end
-
-      unless organization.nil?
-        uri_hash[:path] = "/organizations/#{organization}"
-      end
-
-      server_uri = Addressable::URI.new(uri_hash)
-
       super(Celluloid::Registry.new)
       pool(Ridley::Connection, size: 4, args: [
-        server_uri,
-        @client_name,
-        @client_key,
+        options[:server_url],
+        options[:client_name],
+        options[:client_key],
         options.slice(*Connection::VALID_OPTIONS)
       ], as: :connection_pool)
     end
@@ -212,11 +187,6 @@ module Ridley
       Ridley::Search.indexes(self.connection)
     end
 
-    # @return [Symbol]
-    def api_type
-      organization.nil? ? :foss : :hosted
-    end
-
     # The encrypted data bag secret for this connection.
     #
     # @raise [Ridley::Errors::EncryptedDataBagSecretNotFound]
@@ -228,16 +198,6 @@ module Ridley
       IO.read(encrypted_data_bag_secret_path).chomp
     rescue Errno::ENOENT => e
       raise Errors::EncryptedDataBagSecretNotFound, "Encrypted data bag secret provided but not found at '#{encrypted_data_bag_secret_path}'"
-    end
-
-    # @return [Boolean]
-    def hosted?
-      api_type == :hosted
-    end
-
-    # @return [Boolean]
-    def foss?
-      api_type == :foss
     end
 
     def server_url
@@ -252,6 +212,7 @@ module Ridley
       @self_before_instance_eval = eval("self", block.binding)
       instance_eval(&block)
     end
+    alias_method :sync, :evaluate
 
     def finalize
       connection.terminate if connection.alive?

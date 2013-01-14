@@ -11,6 +11,10 @@ module Ridley
       :proxy
     ]
 
+    attr_reader :organization
+    attr_reader :client_key
+    attr_reader :client_name
+
     # @param [String] :server_url
     # @param [String] :client_name
     # @param [String] :client_key
@@ -26,17 +30,55 @@ module Ridley
     # @option options [URI, String, Hash] :proxy
     #   URI, String, or Hash of HTTP proxy options
     def initialize(server_url, client_name, client_key, options = {})
+      @client_name  = client_name
+      @client_key   = File.expand_path(client_key)
+
       options = options.reverse_merge(
-        url: server_url,
         builder: Faraday::Builder.new { |b|
-          b.adapter :net_http_persistent
           b.request :chef_auth, client_name, client_key
           b.response :chef_response
           b.response :json
+
+          b.adapter :net_http_persistent
         }
       )
 
-      super(options)
+      unless @client_key.present? && File.exist?(@client_key)
+        raise Errors::ClientKeyFileNotFound, "client key not found at: '#{@client_key}'"
+      end
+
+      uri_hash = Addressable::URI.parse(server_url).to_hash.slice(:scheme, :host, :port)
+
+      unless uri_hash[:port]
+        uri_hash[:port] = (uri_hash[:scheme] == "https" ? 443 : 80)
+      end
+
+      if org_match = server_url.match(/.*\/organizations\/(.*)/)
+        @organization = org_match[1]
+      end
+
+      unless @organization.nil?
+        uri_hash[:path] = "/organizations/#{@organization}"
+      end
+
+      server_uri = Addressable::URI.new(uri_hash)
+
+      super(server_uri, options)
+    end
+
+    # @return [Symbol]
+    def api_type
+      organization.nil? ? :foss : :hosted
+    end
+
+    # @return [Boolean]
+    def hosted?
+      api_type == :hosted
+    end
+
+    # @return [Boolean]
+    def foss?
+      api_type == :foss
     end
 
     def server_url
