@@ -138,17 +138,4 @@ module Ridley
 
       attr_reader :connection
   end
-
-  module DSL
-    # Coerces instance functions into class functions on Ridley::SandboxResource. This coercion
-    # sends an instance of the including class along to the class function.
-    #
-    # @see Ridley::ChainLink
-    #
-    # @return [Ridley::ChainLink]
-    #   a context object to delegate instance functions to class functions on Ridley::SandboxResource
-    def sandbox
-      ChainLink.new(self, Ridley::SandboxResource)
-    end
-  end
 end

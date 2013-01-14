@@ -6,20 +6,12 @@ describe Ridley do
   describe "ClassMethods" do
     subject { Ridley }
 
-    describe "::sync" do
-      it "delegates to Ridley::Connection.sync" do
-        Ridley::Connection.should_receive(:sync).with(config)
-
-        subject.sync(config) do; end
-      end
-    end
-
-    describe "::connection" do
+    describe "::new" do
       it "creates a new Ridley::Connection" do
-        conn = double('conn')
-        Ridley::Connection.should_receive(:new).with(config).and_return(conn)
+        client = double('client')
+        Ridley::Client.should_receive(:new).with(config).and_return(client)
 
-        subject.connection(config).should eql(conn)
+        subject.new(config).should eql(client)
       end
     end
   end

@@ -1,17 +1,15 @@
 require 'spec_helper'
 
 describe "Environment API operations", type: "acceptance" do
-  let(:server_url) { "https://api.opscode.com" }
+  let(:server_url) { "https://api.opscode.com/organizations/ridley" }
   let(:client_name) { "reset" }
   let(:client_key) { "/Users/reset/.chef/reset.pem" }
-  let(:organization) { "ridley" }
 
   let(:connection) do
-    Ridley.connection(
+    Ridley.new(
       server_url: server_url,
       client_name: client_name,
-      client_key: client_key,
-      organization: organization
+      client_key: client_key
     )
   end
 

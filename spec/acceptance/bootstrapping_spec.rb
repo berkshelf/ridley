@@ -7,7 +7,7 @@ describe "Bootstrapping a node", type: "acceptance" do
   let(:organization) { "vialstudios" }
 
   let(:connection) do
-    Ridley.connection(
+    Ridley.new(
       server_url: server_url,
       client_name: client_name,
       client_key: client_key,
