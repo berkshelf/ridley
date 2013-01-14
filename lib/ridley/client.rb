@@ -112,8 +112,20 @@ module Ridley
 
       @ssh              = options[:ssh]
       @validator_client = options[:validator_client]
-      @validator_path   = options[:validator_path]
-      @encrypted_data_bag_secret_path = options[:encrypted_data_bag_secret_path]
+
+      options[:client_key] = File.expand_path(options[:client_key])
+
+      if options[:validator_path]
+        @validator_path = File.expand_path(options[:validator_path])
+      end
+
+      if options[:encrypted_data_bag_secret_path]
+        @encrypted_data_bag_secret_path = File.expand_path(options[:encrypted_data_bag_secret_path])
+      end
+
+      unless options[:client_key].present? && File.exist?(options[:client_key])
+        raise Errors::ClientKeyFileNotFound, "client key not found at: '#{options[:client_key]}'"
+      end
 
       super(Celluloid::Registry.new)
       pool(Ridley::Connection, size: 4, args: [

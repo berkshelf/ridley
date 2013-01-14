@@ -31,7 +31,7 @@ module Ridley
     #   URI, String, or Hash of HTTP proxy options
     def initialize(server_url, client_name, client_key, options = {})
       @client_name  = client_name
-      @client_key   = File.expand_path(client_key)
+      @client_key   = client_key
 
       options = options.reverse_merge(
         builder: Faraday::Builder.new { |b|
@@ -42,10 +42,6 @@ module Ridley
           b.adapter :net_http_persistent
         }
       )
-
-      unless @client_key.present? && File.exist?(@client_key)
-        raise Errors::ClientKeyFileNotFound, "client key not found at: '#{@client_key}'"
-      end
 
       uri_hash = Addressable::URI.parse(server_url).to_hash.slice(:scheme, :host, :port)
 

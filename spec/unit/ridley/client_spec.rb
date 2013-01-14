@@ -45,25 +45,6 @@ describe Ridley::Client do
         end
       end
 
-      describe "specifying an 'organization' option" do
-        before(:each) do
-          @conn = subject.new(
-            server_url: server_url,
-            client_name: client_name,
-            client_key: client_key,
-            organization: organization
-          )
-        end
-
-        it "assigns the value of the 'organization' option to an 'organization' attribute" do
-          @conn.organization.should eql(organization)
-        end
-
-        it "sets the 'path_prefix' of the connection the organization sub URI" do
-          @conn.path_prefix.should eql("/organizations/#{organization}")
-        end
-      end
-
       describe "with a server_url containing an organization" do
         before(:each) do
           @conn = subject.new(
@@ -79,7 +60,7 @@ describe Ridley::Client do
         end
 
         it "assigns the value of the 'organization' option to an 'organization' attribute" do
-          @conn.organization.should eql(organization)
+          @conn.connection.organization.should eql(organization)
         end
 
         it "sets the 'path_prefix' of the connection the organization sub URI" do
@@ -140,20 +121,6 @@ describe Ridley::Client do
 
   subject do
     described_class.new(config)
-  end
-
-  describe "#api_type" do
-    it "returns :foss if the organization is not set" do
-      subject.stub(:organization).and_return(nil)
-
-      subject.api_type.should eql(:foss)
-    end
-
-    it "returns :hosted if the organization is set" do
-      subject.stub(:organization).and_return("vialstudios")
-
-      subject.api_type.should eql(:hosted)
-    end
   end
 
   describe "#encrypted_data_bag_secret" do
