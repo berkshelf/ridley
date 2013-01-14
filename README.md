@@ -21,9 +21,9 @@ Require Ridley into your application
 
     require 'ridley'
 
-## Creating a new connection
+## Creating a new Ridley client
 
-    conn = Ridley::Connection.new(
+    conn = Ridley.new(
       server_url: "https://api.opscode.com",
       client_name: "reset",
       client_key: "/Users/reset/.chef/reset.pem",
@@ -38,15 +38,12 @@ Creating a new connection requires you to specify at minimum:
 
 An optional organization option can be specified if you are working with Hosted or Private Chef (OHC/OPC). For a full list of available options see the [yard documentation](http://rubydoc.info/gems/ridley).
 
-__NOTE: You do not want to specify an `organization` if you are connecting to an Open Source Chef server.__
-
 Connections can also be instantiated by a helper function: `Ridley.new`
 
     Ridley.new(
       server_url: "https://api.opscode.com",
       client_name: "reset",
-      client_key: "/Users/reset/.chef/reset.pem",
-      organization: "ridley"
+      client_key: "/Users/reset/.chef/reset.pem"
     )
 
 Using a connection object you can interact with collections of resources on a Chef server. Resources are:
