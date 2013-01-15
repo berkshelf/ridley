@@ -52,89 +52,88 @@ module Ridley
         attribute(:json_class, default: klass)
       end
 
-      # @param [Ridley::Connection] connection
+      # @param [Ridley::Client] client
       #
       # @return [Array<Object>]
-      def all(connection)
-        connection.get(self.resource_path).body.collect do |identity, location|
-          new(connection, self.chef_id => identity)
+      def all(client)
+        client.connection.get(self.resource_path).body.collect do |identity, location|
+          new(client, self.chef_id => identity)
         end
       end
       
-      # @param [Ridley::Connection] connection
+      # @param [Ridley::Client] client
       # @param [String, #chef_id] object
       #
       # @return [nil, Object]
-      def find(connection, object)
-        find!(connection, object)
+      def find(client, object)
+        find!(client, object)
       rescue Errors::HTTPNotFound
         nil
       end
 
-      # @param [Ridley::Connection] connection
+      # @param [Ridley::Client] client
       # @param [String, #chef_id] object
       #
       # @raise [Errors::HTTPNotFound]
       #   if a resource with the given chef_id is not found
       #
       # @return [Object]
-      def find!(connection, object)
+      def find!(client, object)
         chef_id = object.respond_to?(:chef_id) ? object.chef_id : object
-        new(connection, connection.get("#{self.resource_path}/#{chef_id}").body)
+        new(client, client.connection.get("#{self.resource_path}/#{chef_id}").body)
       end
 
-      # @param [Ridley::Connection] connection
+      # @param [Ridley::Client] client
       # @param [#to_hash] object
       #
       # @return [Object]
-      def create(connection, object)
-        resource = new(connection, object.to_hash)
-        new_attributes = connection.post(self.resource_path, resource.to_json).body
+      def create(client, object)
+        resource = new(client, object.to_hash)
+        new_attributes = client.connection.post(self.resource_path, resource.to_json).body
         resource.attributes = resource.attributes.deep_merge(new_attributes)
         resource
       end
 
-      # @param [Ridley::Connection] connection
+      # @param [Ridley::Client] client
       # @param [String, #chef_id] object
       #
       # @return [Object]
-      def delete(connection, object)
+      def delete(client, object)
         chef_id = object.respond_to?(:chef_id) ? object.chef_id : object
-        new(connection, connection.delete("#{self.resource_path}/#{chef_id}").body)
+        new(client, client.connection.delete("#{self.resource_path}/#{chef_id}").body)
       end
 
-      # @param [Ridley::Connection] connection
+      # @param [Ridley::Client] client
       #
       # @return [Array<Object>]
-      def delete_all(connection)
+      def delete_all(client)
         mutex = Mutex.new
         deleted = []
-        resources = all(connection)
 
-        resources.collect do |resource|
+        all(client).collect do |resource|
           Celluloid::Future.new {
-            delete(connection, resource)
+            delete(client, resource)
           }
         end.map(&:value)
       end
 
-      # @param [Ridley::Connection] connection
+      # @param [Ridley::Client] client
       # @param [#to_hash] object
       #
       # @return [Object]
-      def update(connection, object)
-        resource = new(connection, object.to_hash)
-        new(connection, connection.put("#{self.resource_path}/#{resource.chef_id}", resource.to_json).body)
+      def update(client, object)
+        resource = new(client, object.to_hash)
+        new(client, client.connection.put("#{self.resource_path}/#{resource.chef_id}", resource.to_json).body)
       end
     end
 
     include Chozo::VariaModel
     include Comparable
 
-    # @param [Ridley::Connection] connection
+    # @param [Ridley::Client] client
     # @param [Hash] new_attrs
-    def initialize(connection, new_attrs = {})
-      @connection = connection
+    def initialize(client, new_attrs = {})
+      @client = client
       mass_assign(new_attrs)
     end
 
@@ -148,7 +147,7 @@ module Ridley
     def save
       raise Errors::InvalidResource.new(self.errors) unless valid?
 
-      mass_assign(self.class.create(connection, self).attributes)
+      mass_assign(self.class.create(client, self).attributes)
       true
     rescue Errors::HTTPConflict
       self.update
@@ -165,7 +164,7 @@ module Ridley
     def update
       raise Errors::InvalidResource.new(self.errors) unless valid?
 
-      mass_assign(self.class.update(connection, self).attributes)
+      mass_assign(self.class.update(client, self).attributes)
       true
     end
 
@@ -173,7 +172,7 @@ module Ridley
     #
     # @return [Object]
     def reload
-      mass_assign(self.class.find(connection, self).attributes)
+      mass_assign(self.class.find(client, self).attributes)
       self
     end
 
@@ -210,6 +209,6 @@ module Ridley
 
     private
 
-      attr_reader :connection
+      attr_reader :client
   end
 end

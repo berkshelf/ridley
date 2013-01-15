@@ -6,51 +6,54 @@ module Ridley
   # @api private
   class DBIChainLink
     attr_reader :data_bag
-    attr_reader :connection
+    attr_reader :client
     attr_reader :klass
 
     # @param [Ridley::DataBagResource] data_bag
-    def initialize(data_bag, connection, options = {})
+    # @param [Ridley::Client] client
+    #
+    # @option options [Boolean] :encrypted (false)
+    def initialize(data_bag, client, options = {})
       options[:encrypted] ||= false
 
       @data_bag = data_bag
-      @connection = connection
+      @client = client
       @klass = options[:encrypted] ? Ridley::EncryptedDataBagItemResource : Ridley::DataBagItemResource
     end
 
     def new(*args)
-      klass.send(:new, connection, data_bag, *args)
+      klass.send(:new, client, data_bag, *args)
     end
 
     def method_missing(fun, *args, &block)
-      klass.send(fun, connection, data_bag, *args, &block)
+      klass.send(fun, client, data_bag, *args, &block)
     end
   end
 
   # @author Jamie Winsor <jamie@vialstudios.com>
   class DataBagResource < Ridley::Resource
     class << self
-      # @param [Ridley::Connection] connection
+      # @param [Ridley::Client] client
       # @param [String, #chef_id] object
       #
       # @return [nil, Ridley::DataBagResource]
-      def find(connection, object)
-        find!(connection, object)
+      def find(client, object)
+        find!(client, object)
       rescue Errors::HTTPNotFound
         nil
       end
 
-      # @param [Ridley::Connection] connection
+      # @param [Ridley::Client] client
       # @param [String, #chef_id] object
       #
       # @raise [Errors::HTTPNotFound]
       #   if a resource with the given chef_id is not found
       #
       # @return [Ridley::DataBagResource]
-      def find!(connection, object)
+      def find!(client, object)
         chef_id = object.respond_to?(:chef_id) ? object.chef_id : object
-        connection.get("#{self.resource_path}/#{chef_id}")
-        new(connection, name: chef_id)
+        client.connection.get("#{self.resource_path}/#{chef_id}")
+        new(client, name: chef_id)
       end
     end
 
@@ -61,11 +64,11 @@ module Ridley
       required: true
 
     def item
-      DBIChainLink.new(self, connection)
+      DBIChainLink.new(self, client)
     end
 
     def encrypted_item
-      DBIChainLink.new(self, connection, encrypted: true)
+      DBIChainLink.new(self, client, encrypted: true)
     end
   end
 end

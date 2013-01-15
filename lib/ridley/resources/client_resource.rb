@@ -6,16 +6,16 @@ module Ridley
       # and regenerates it's private key. An instance of the updated object will
       # be returned and have a value set for the 'private_key' accessor.
       #
-      # @param [Ridley::Connection] connection
-      # @param [String, #chef_id] client
+      # @param [Ridley::Client] client
+      # @param [String, #chef_id] chef_client
       #
       # @raise [Errors::HTTPNotFound]
       #   if a client with the given chef_id is not found
       # @raise [Errors::HTTPError]
       #
       # @return [Ridley::ClientResource]
-      def regenerate_key(connection, client)
-        obj = find!(connection, client)
+      def regenerate_key(client, chef_client)
+        obj = find!(client, chef_client)
         obj.regenerate_key
         obj
       end
@@ -66,7 +66,7 @@ module Ridley
     # Override to_json to reflect to massage the returned attributes based on the type
     # of connection. Only OHC/OPC requires the json_class attribute is not present.
     def to_json
-      if connection.hosted?
+      if client.connection.hosted?
         attributes.except(:json_class).to_json
       else
         super

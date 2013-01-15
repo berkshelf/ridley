@@ -139,37 +139,37 @@ module Ridley
 
     # @return [Ridley::ChainLink]
     def client
-      ChainLink.new(self.connection, Ridley::ClientResource)
+      ChainLink.new(Actor.current, Ridley::ClientResource)
     end
 
     # @return [Ridley::ChainLink]
     def cookbook
-      ChainLink.new(self.connection, Ridley::CookbookResource)
+      ChainLink.new(Actor.current, Ridley::CookbookResource)
     end
 
     # @return [Ridley::ChainLink]
     def data_bag
-      ChainLink.new(self.connection, Ridley::DataBagResource)
+      ChainLink.new(Actor.current, Ridley::DataBagResource)
     end
 
     # @return [Ridley::ChainLink]
     def environment
-      ChainLink.new(self.connection, Ridley::EnvironmentResource)
+      ChainLink.new(Actor.current, Ridley::EnvironmentResource)
     end
 
     # @return [Ridley::ChainLink]
     def node
-      ChainLink.new(self.connection, Ridley::NodeResource)
+      ChainLink.new(Actor.current, Ridley::NodeResource)
     end
 
     # @return [Ridley::ChainLink]
     def role
-      ChainLink.new(self.connection, Ridley::RoleResource)
+      ChainLink.new(Actor.current, Ridley::RoleResource)
     end
 
     # @return [Ridley::ChainLink]
     def sandbox
-      ChainLink.new(self.connection, Ridley::SandboxResource)
+      ChainLink.new(Actor.current, Ridley::SandboxResource)
     end
 
     # Creates an runs a new Ridley::Search
@@ -185,7 +185,7 @@ module Ridley
     #
     # @return [Hash]
     def search(index, query = nil, options = {})
-      Ridley::Search.new(self.connection, index, query, options).run
+      Ridley::Search.new(Actor.current, index, query, options).run
     end
 
     # Return the array of all possible search indexes for the including connection
@@ -197,7 +197,7 @@ module Ridley
     #
     # @return [Array<Symbol, String>]
     def search_indexes
-      Ridley::Search.indexes(self.connection)
+      Ridley::Search.indexes(Actor.current)
     end
 
     # The encrypted data bag secret for this connection.

@@ -2,8 +2,8 @@ module Ridley
   # @author Jamie Winsor <jamie@vialstudios.com>
   class NodeResource < Ridley::Resource
     class << self
-      # @overload bootstrap(connection, nodes, options = {})
-      #   @param [Ridley::Connection] connection
+      # @overload bootstrap(client, nodes, options = {})
+      #   @param [Ridley::Client] client
       #   @param [Array<String>, String] nodes
       #   @param [Hash] ssh
       #     * :user (String) a shell user that will login to each node and perform the bootstrap command on (required)
@@ -33,15 +33,15 @@ module Ridley
       #     bootstrap template to use (default: omnibus)
       #
       # @return [SSH::ResponseSet]
-      def bootstrap(connection, *args)
+      def bootstrap(client, *args)
         options = args.extract_options!
 
         default_options = {
-          server_url: connection.server_url,
-          validator_path: connection.validator_path,
-          validator_client: connection.validator_client,
-          encrypted_data_bag_secret_path: connection.encrypted_data_bag_secret_path,
-          ssh: connection.ssh
+          server_url: client.server_url,
+          validator_path: client.validator_path,
+          validator_client: client.validator_client,
+          encrypted_data_bag_secret_path: client.encrypted_data_bag_secret_path,
+          ssh: client.ssh
         }
 
         options = default_options.merge(options)
@@ -51,7 +51,7 @@ module Ridley
 
       # Merges the given data with the the data of the target node on the remote
       #
-      # @param [Ridley::Cnonection] connection
+      # @param [Ridley::Client] client
       # @param [Ridley::NodeResource, String] target
       #   node or identifier of the node to merge
       # @option options [Array] :run_list
@@ -63,8 +63,8 @@ module Ridley
       #   if the target node is not found
       #
       # @return [Ridley::NodeResource]
-      def merge_data(connection, target, options = {})
-        find!(connection, target).merge_data(options)
+      def merge_data(client, target, options = {})
+        find!(client, target).merge_data(options)
       end
     end
 
@@ -197,7 +197,7 @@ module Ridley
     #
     # @return [SSH::Response]
     def chef_client(options = {})
-      options = connection.ssh.merge(options)
+      options = client.ssh.merge(options)
 
       Ridley.log.debug "Running Chef Client on: #{self.public_hostname}"
       Ridley::SSH.start(self, options) do |ssh|
@@ -205,8 +205,8 @@ module Ridley
       end
     end
 
-    # Put the connection's encrypted data bag secret onto the instantiated node. If no
-    # encrypted data bag key path is set on the resource's connection then nil will be
+    # Put the client's encrypted data bag secret onto the instantiated node. If no
+    # encrypted data bag key path is set on the resource's client then nil will be
     # returned
     #
     # @param [Hash] options
@@ -214,14 +214,14 @@ module Ridley
     #
     # @return [SSH::Response, nil]
     def put_secret(options = {})
-      if connection.encrypted_data_bag_secret_path.nil? ||
-        !File.exists?(connection.encrypted_data_bag_secret_path)
+      if client.encrypted_data_bag_secret_path.nil? ||
+        !File.exists?(client.encrypted_data_bag_secret_path)
 
         return nil
       end
 
-      options = connection.ssh.merge(options)
-      secret  = File.read(connection.encrypted_data_bag_secret_path).chomp
+      options = client.ssh.merge(options)
+      secret  = File.read(client.encrypted_data_bag_secret_path).chomp
       command = "echo '#{secret}' > /etc/chef/encrypted_data_bag_secret; chmod 0600 /etc/chef/encrypted_data_bag_secret"
 
       Ridley.log.debug "Writing Encrypted Data Bag Secret to: #{self.public_hostname}"

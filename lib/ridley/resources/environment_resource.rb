@@ -2,15 +2,15 @@ module Ridley
   # @author Jamie Winsor <jamie@vialstudios.com>
   class EnvironmentResource < Ridley::Resource
     class << self
-      # Delete all of the environments on the remote connection. The
-      # '_default' environment will never be deleted.
+      # Delete all of the environments on the client. The '_default' environment
+      # will never be deleted.
       #
-      # @param [Ridley::Connection] connection
+      # @param [Ridley::Client] client
       #
       # @return [Array<Ridley::EnvironmentResource>]
-      def delete_all(connection)
-        envs = all(connection).reject { |env| env.name.to_s == '_default' }
-        envs.collect { |obj| delete(connection, obj) }
+      def delete_all(client)
+        envs = all(client).reject { |env| env.name.to_s == '_default' }
+        envs.collect { |obj| delete(client, obj) }
       end
     end
 
