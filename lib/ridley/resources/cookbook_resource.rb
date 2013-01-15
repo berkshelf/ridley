@@ -14,18 +14,18 @@ module Ridley
         raise NotImplementedError
       end
 
-      # @param [Ridley::Connection] connection
+      # @param [Ridley::Client] client
       # @param [String, #chef_id] object
       # @param [String] version
       #
       # @return [nil, CookbookResource]
-      def find(connection, object, version = nil)
-        find!(connection, object, version)
+      def find(client, object, version = nil)
+        find!(client, object, version)
       rescue Errors::HTTPNotFound
         nil
       end
 
-      # @param [Ridley::Connection] connection
+      # @param [Ridley::Client] client
       # @param [String, #chef_id] object
       # @param [String] version
       #
@@ -33,7 +33,7 @@ module Ridley
       #   if a resource with the given chef_id is not found
       #
       # @return [CookbookResource]
-      def find!(connection, object, version = nil)
+      def find!(client, object, version = nil)
         chef_id   = object.respond_to?(:chef_id) ? object.chef_id : object
         fetch_uri = "#{self.resource_path}/#{chef_id}"
         
@@ -41,13 +41,13 @@ module Ridley
           fetch_uri = File.join(fetch_uri, version)
         end
 
-        new(connection, connection.get(fetch_uri).body)
+        new(client, client.get(fetch_uri).body)
       end
 
       # Save a new Cookbook Version of the given name, version with the
       # given manifest of files and checksums.
       #
-      # @param [Ridley::Connection] connection
+      # @param [Ridley::Client] client
       # @param [String] name
       # @param [String] version
       # @param [String] manifest
@@ -58,14 +58,14 @@ module Ridley
       # @option options [Boolean] :force
       #
       # @return [Hash]
-      def save(connection, name, version, manifest, options = {})
+      def save(client, name, version, manifest, options = {})
         freeze = options.fetch(:freeze, false)
         force  = options.fetch(:force, false)
 
         url = "cookbooks/#{name}/#{version}"
         url << "?force=true" if force
 
-        connection.put(url, manifest)
+        client.put(url, manifest)
       end
 
       def update(*args)

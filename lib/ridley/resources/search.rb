@@ -3,20 +3,20 @@ module Ridley
     class << self
       # Returns an array of possible search indexes to be search on
       #
-      # @param [Ridley::Connection] connection
+      # @param [Ridley::Client] client
       #
       # @example
       #
-      #   Search.indexes(connection) => [ :client, :environment, :node, :role ]
+      #   Search.indexes(client) => [ :client, :environment, :node, :role ]
       #
       # @return [Array<String, Symbol>]
-      def indexes(connection)
-        connection.get("search").body.collect { |name, _| name }
+      def indexes(client)
+        client.connection.get("search").body.collect { |name, _| name }
       end
     end
 
-    # @return [Ridley::Connection]
-    attr_reader :connection
+    # @return [Ridley::Client]
+    attr_reader :client
     attr_reader :index
     attr_reader :query
     
@@ -24,7 +24,7 @@ module Ridley
     attr_accessor :rows
     attr_accessor :start
 
-    # @param [Ridley::Connection] connection
+    # @param [Ridley::Client] client
     # @param [#to_sym] index
     # @param [#to_s] query
     #
@@ -34,20 +34,19 @@ module Ridley
     #   how many rows to return
     # @option options [Integer] :start
     #   the result number to start from
-    def initialize(connection, index, query, options = {})
-      @connection = connection
-      @index      = index.to_sym
-      @query      = query
-
-      @sort       = options[:sort]
-      @rows       = options[:rows]
-      @start      = options[:start]
+    def initialize(client, index, query, options = {})
+      @client = client
+      @index  = index.to_sym
+      @query  = query
+      @sort   = options[:sort]
+      @rows   = options[:rows]
+      @start  = options[:start]
     end
 
-    # Executes the built up query on the search's connection
+    # Executes the built up query on the search's client
     #
     # @example
-    #   Search.new(connection, :role)
+    #   Search.new(client, :role)
     #   search.run => 
     #     {
     #       total: 1,
@@ -68,17 +67,17 @@ module Ridley
     #
     # @return [Hash]
     def run
-      response = connection.get(query_uri, query_options).body
+      response = client.connection.get(query_uri, query_options).body
 
       case index
       when :node
-        response[:rows].collect { |row| Ridley::NodeResource.new(connection, row) }
+        response[:rows].collect { |row| Ridley::NodeResource.new(client, row) }
       when :role
-        response[:rows].collect { |row| Ridley::RoleResource.new(connection, row) }
+        response[:rows].collect { |row| Ridley::RoleResource.new(client, row) }
       when :client
-        response[:rows].collect { |row| Ridley::ClientResource.new(connection, row) }
+        response[:rows].collect { |row| Ridley::ClientResource.new(client, row) }
       when :environment
-        response[:rows].collect { |row| Ridley::EnvironmentResource.new(connection, row) }
+        response[:rows].collect { |row| Ridley::EnvironmentResource.new(client, row) }
       else
         response[:rows]
       end

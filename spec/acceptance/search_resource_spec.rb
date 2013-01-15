@@ -5,7 +5,7 @@ describe "Search API operations", type: "acceptance" do
   let(:client_name) { "reset" }
   let(:client_key) { "/Users/reset/.chef/reset.pem" }
 
-  let(:connection) do
+  let(:client) do
     Ridley.new(
       server_url: server_url,
       client_name: client_name,
@@ -18,7 +18,7 @@ describe "Search API operations", type: "acceptance" do
 
   describe "listing indexes" do
     it "returns an array of indexes" do
-      indexes = connection.search_indexes
+      indexes = client.search_indexes
 
       indexes.should include("role")
       indexes.should include("node")
@@ -30,7 +30,7 @@ describe "Search API operations", type: "acceptance" do
   describe "searching an index that doesn't exist" do
     it "it raises a Ridley::Errors::HTTPNotFound error" do
       lambda {
-        connection.search(:notthere)
+        client.search(:notthere)
       }.should raise_error(Ridley::Errors::HTTPNotFound)
     end
   end
