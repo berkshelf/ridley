@@ -20,25 +20,9 @@ describe "Cookbook API operations", type: "acceptance" do
     pending
   end
 
-  describe "creating a cookbook" do
-    pending
-  end
-
-  describe "deleting a cookbook" do
-    pending
-  end
-
-  describe "deleting all cookbooks" do
-    pending
-  end
-
   describe "listing all cookbooks" do
     it "should return an array of environment objects" do
       connection.cookbook.all.should each be_a(Ridley::CookbookResource)
     end
-  end
-
-  describe "updating a cookbook" do
-    pending
   end
 end
