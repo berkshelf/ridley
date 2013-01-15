@@ -2,6 +2,48 @@ module Ridley
   # @author Jamie Winsor <jamie@vialstudios.com>
   class CookbookResource < Ridley::Resource
     class << self
+      def create(*args)
+        raise NotImplementedError
+      end
+
+      def delete(*args)
+        raise NotImplementedError
+      end
+
+      def delete_all(*args)
+        raise NotImplementedError
+      end
+
+      # @param [Ridley::Connection] connection
+      # @param [String, #chef_id] object
+      # @param [String] version
+      #
+      # @return [nil, CookbookResource]
+      def find(connection, object, version = nil)
+        find!(connection, object, version)
+      rescue Errors::HTTPNotFound
+        nil
+      end
+
+      # @param [Ridley::Connection] connection
+      # @param [String, #chef_id] object
+      # @param [String] version
+      #
+      # @raise [Errors::HTTPNotFound]
+      #   if a resource with the given chef_id is not found
+      #
+      # @return [CookbookResource]
+      def find!(connection, object, version = nil)
+        chef_id   = object.respond_to?(:chef_id) ? object.chef_id : object
+        fetch_uri = "#{self.resource_path}/#{chef_id}"
+        
+        unless version.nil?
+          fetch_uri = File.join(fetch_uri, version)
+        end
+
+        new(connection, connection.get(fetch_uri).body)
+      end
+
       # Save a new Cookbook Version of the given name, version with the
       # given manifest of files and checksums.
       #
@@ -25,6 +67,10 @@ module Ridley
 
         connection.put(url, manifest)
       end
+
+      def update(*args)
+        raise NotImplementedError
+      end
     end
 
     set_chef_id "name"
@@ -34,5 +80,42 @@ module Ridley
 
     attribute :name,
       required: true
+
+    # Broken until resolved: https://github.com/reset/chozo/issues/17
+    # attribute :attributes,
+    #   type: Array
+
+    attribute :cookbook_name,
+      type: String
+
+    attribute :definitions,
+      type: Array
+
+    attribute :files,
+      type: Array
+
+    attribute :libraries,
+      type: Array
+
+    attribute :metadata,
+      type: Hashie::Mash
+
+    attribute :providers,
+      type: Array
+
+    attribute :recipes,
+      type: Array
+
+    attribute :resources,
+      type: Array
+
+    attribute :root_files,
+      type: Array
+
+    attribute :templates,
+      type: Array
+
+    attribute :version,
+      type: String
   end
 end
