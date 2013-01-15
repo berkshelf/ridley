@@ -1,7 +1,11 @@
 require 'spec_helper'
 
-describe Ridley::Search do
-  let(:connection) { double('connection') }
+describe Ridley::Search do\
+  let(:client) do
+    double('client',
+      connection: double('connection')
+    )
+  end
   let(:index) { :role }
   let(:query) { "*:*" }
   let(:response) do
@@ -19,21 +23,21 @@ describe Ridley::Search do
     subject { Ridley::Search }
 
     describe "::indexes" do
-      it "sends a get request to the connection to receive the indexes" do
-        connection.should_receive(:get).with("search").and_return(response)
+      it "sends a get request to the client to receive the indexes" do
+        client.connection.should_receive(:get).with("search").and_return(response)
 
-        subject.indexes(connection)
+        subject.indexes(client)
       end
     end
   end
 
   describe "#run" do
     subject do
-      Ridley::Search.new(connection, index, query)
+      Ridley::Search.new(client, index, query)
     end
 
-    it "sends a get request to the connection to the index's location with the given query" do
-      connection.should_receive(:get).with("search/#{index}", q: query).and_return(response)
+    it "sends a get request to the client to the index's location with the given query" do
+      client.connection.should_receive(:get).with("search/#{index}", q: query).and_return(response)
 
       subject.run
     end
@@ -42,8 +46,8 @@ describe Ridley::Search do
       let(:sort) { "DESC" }
       before(:each) { subject.sort = sort }
 
-      it "sends a get request to the connection with a query parameter for 'set'" do
-        connection.should_receive(:get).with("search/#{index}", q: query, sort: sort).and_return(response)
+      it "sends a get request to the client with a query parameter for 'set'" do
+        client.connection.should_receive(:get).with("search/#{index}", q: query, sort: sort).and_return(response)
 
         subject.run
       end
@@ -53,8 +57,8 @@ describe Ridley::Search do
       let(:start) { 1 }
       before(:each) { subject.start = start }
 
-      it "sends a get request to the connection with a query parameter for 'start'" do
-        connection.should_receive(:get).with("search/#{index}", q: query, start: start).and_return(response)
+      it "sends a get request to the client with a query parameter for 'start'" do
+        client.connection.should_receive(:get).with("search/#{index}", q: query, start: start).and_return(response)
 
         subject.run
       end
@@ -64,8 +68,8 @@ describe Ridley::Search do
       let(:rows) { 1 }
       before(:each) { subject.rows = rows }
 
-      it "sends a get request to the connection with a query parameter for 'rows'" do
-        connection.should_receive(:get).with("search/#{index}", q: query, rows: rows).and_return(response)
+      it "sends a get request to the client with a query parameter for 'rows'" do
+        client.connection.should_receive(:get).with("search/#{index}", q: query, rows: rows).and_return(response)
 
         subject.run
       end
@@ -99,10 +103,10 @@ describe Ridley::Search do
         )
       end
 
-      subject { Ridley::Search.new(connection, index, query) }
+      subject { Ridley::Search.new(client, index, query) }
 
       it "returns an array of Ridley::NodeResource" do
-        connection.should_receive(:get).with("search/#{index}", q: query).and_return(response)
+        client.connection.should_receive(:get).with("search/#{index}", q: query).and_return(response)
         result = subject.run
 
         result.should be_a(Array)
@@ -134,10 +138,10 @@ describe Ridley::Search do
         )
       end
 
-      subject { Ridley::Search.new(connection, index, query) }
+      subject { Ridley::Search.new(client, index, query) }
 
       it "returns an array of Ridley::RoleResource" do
-        connection.should_receive(:get).with("search/#{index}", q: query).and_return(response)
+        client.connection.should_receive(:get).with("search/#{index}", q: query).and_return(response)
         result = subject.run
 
         result.should be_a(Array)
@@ -168,10 +172,10 @@ describe Ridley::Search do
         )
       end
 
-      subject { Ridley::Search.new(connection, index, query) }
+      subject { Ridley::Search.new(client, index, query) }
 
       it "returns an array of Ridley::EnvironmentResource" do
-        connection.should_receive(:get).with("search/#{index}", q: query).and_return(response)
+        client.connection.should_receive(:get).with("search/#{index}", q: query).and_return(response)
         result = subject.run
 
         result.should be_a(Array)
@@ -203,10 +207,10 @@ describe Ridley::Search do
         )
       end
 
-      subject { Ridley::Search.new(connection, index, query) }
+      subject { Ridley::Search.new(client, index, query) }
 
       it "returns an array of Ridley::ClientResource" do
-        connection.should_receive(:get).with("search/#{index}", q: query).and_return(response)
+        client.connection.should_receive(:get).with("search/#{index}", q: query).and_return(response)
         result = subject.run
 
         result.should be_a(Array)

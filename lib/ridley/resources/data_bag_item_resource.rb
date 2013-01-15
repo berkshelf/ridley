@@ -2,27 +2,27 @@ module Ridley
   # @author Jamie Winsor <jamie@vialstudios.com>
   class DataBagItemResource < Ridley::Resource
     class << self
-      # @param [Ridley::Connection] connection
+      # @param [Ridley::Client] client
       #
       # @return [Array<Object>]
-      def all(connection, data_bag)
-        connection.get("#{data_bag.class.resource_path}/#{data_bag.name}").body.collect do |id, location|
-          new(connection, data_bag, id: id)
+      def all(client, data_bag)
+        client.connection.get("#{data_bag.class.resource_path}/#{data_bag.name}").body.collect do |id, location|
+          new(client, data_bag, id: id)
         end
       end
 
-      # @param [Ridley::Connection] connection
+      # @param [Ridley::Client] client
       # @param [Ridley::DataBagResource] data_bag
       # @param [String, #chef_id] object
       #
       # @return [nil, Ridley::DataBagItemResource]
-      def find(connection, data_bag, object)
-        find!(connection, data_bag, object)
+      def find(client, data_bag, object)
+        find!(client, data_bag, object)
       rescue Errors::HTTPNotFound
         nil
       end
 
-      # @param [Ridley::Connection] connection
+      # @param [Ridley::Client] client
       # @param [Ridley::DataBagResource] data_bag
       # @param [String, #chef_id] object
       #
@@ -30,62 +30,61 @@ module Ridley
       #   if a resource with the given chef_id is not found
       #
       # @return [Ridley::DataBagItemResource]
-      def find!(connection, data_bag, object)
+      def find!(client, data_bag, object)
         chef_id = object.respond_to?(:chef_id) ? object.chef_id : object
-        new(connection, data_bag).from_hash(connection.get("#{data_bag.class.resource_path}/#{data_bag.name}/#{chef_id}").body)
+        new(client, data_bag).from_hash(client.connection.get("#{data_bag.class.resource_path}/#{data_bag.name}/#{chef_id}").body)
       end
 
-      # @param [Ridley::Connection] connection
+      # @param [Ridley::Client] client
       # @param [Ridley::DataBagResource] data_bag
       # @param [#to_hash] object
       #
       # @return [Ridley::DataBagItemResource]
-      def create(connection, data_bag, object)
-        resource = new(connection, data_bag, object.to_hash)
+      def create(client, data_bag, object)
+        resource = new(client, data_bag, object.to_hash)
         unless resource.valid?
           raise Errors::InvalidResource.new(resource.errors)
         end
 
-        new_attributes = connection.post("#{data_bag.class.resource_path}/#{data_bag.name}", resource.to_json).body
+        new_attributes = client.connection.post("#{data_bag.class.resource_path}/#{data_bag.name}", resource.to_json).body
         resource.from_hash(resource.attributes.deep_merge(new_attributes))
         resource
       end
 
-      # @param [Ridley::Connection] connection
+      # @param [Ridley::Client] client
       # @param [Ridley::DataBagResource] data_bag
       # @param [String, #chef_id] object
       #
       # @return [Ridley::DataBagItemResource]
-      def delete(connection, data_bag, object)
+      def delete(client, data_bag, object)
         chef_id = object.respond_to?(:chef_id) ? object.chef_id : object
-        new(connection, data_bag).from_hash(connection.delete("#{data_bag.class.resource_path}/#{data_bag.name}/#{chef_id}").body)
+        new(client, data_bag).from_hash(client.connection.delete("#{data_bag.class.resource_path}/#{data_bag.name}/#{chef_id}").body)
       end
 
-      # @param [Ridley::Connection] connection
+      # @param [Ridley::Client] client
       # @param [Ridley::DataBagResource] data_bag
       #
       # @return [Array<Ridley::DataBagItemResource>]
-      def delete_all(connection, data_bag)
+      def delete_all(client, data_bag)
         mutex = Mutex.new
         deleted = []
-        resources = all(connection, data_bag)
 
-        resources.collect do |resource|
+        all(client, data_bag).collect do |resource|
           Celluloid::Future.new {
-            delete(connection, data_bag, resource)
+            delete(client, data_bag, resource)
           }
         end.map(&:value)
       end
 
-      # @param [Ridley::Connection] connection
+      # @param [Ridley::Client] client
       # @param [Ridley::DataBagResource] data_bag
       # @param [#to_hash] object
       #
       # @return [Ridley::DataBagItemResource]
-      def update(connection, data_bag, object)
-        resource = new(connection, data_bag, object.to_hash)
-        new(connection, data_bag).from_hash(
-          connection.put("#{data_bag.class.resource_path}/#{data_bag.name}/#{resource.chef_id}", resource.to_json).body
+      def update(client, data_bag, object)
+        resource = new(client, data_bag, object.to_hash)
+        new(client, data_bag).from_hash(
+          client.connection.put("#{data_bag.class.resource_path}/#{data_bag.name}/#{resource.chef_id}", resource.to_json).body
         )
       end
     end
@@ -99,11 +98,11 @@ module Ridley
       type: String,
       required: true
 
-    # @param [Ridley::Connection] connection
+    # @param [Ridley::Client] client
     # @param [Ridley::DataBagResource] data_bag
     # @param [#to_hash] new_attrs
-    def initialize(connection, data_bag, new_attrs = {})
-      super(connection, new_attrs)
+    def initialize(client, data_bag, new_attrs = {})
+      super(client, new_attrs)
       @data_bag = data_bag
     end
 
@@ -125,7 +124,7 @@ module Ridley
     def save
       raise Errors::InvalidResource.new(self.errors) unless valid?
 
-      mass_assign(self.class.create(connection, data_bag, self).attributes)
+      mass_assign(self.class.create(client, data_bag, self).attributes)
       true
     rescue Errors::HTTPConflict
       self.update
@@ -145,7 +144,7 @@ module Ridley
 
       cipher = OpenSSL::Cipher::Cipher.new('aes-256-cbc')
       cipher.decrypt
-      cipher.pkcs5_keyivgen(connection.encrypted_data_bag_secret)
+      cipher.pkcs5_keyivgen(client.encrypted_data_bag_secret)
       decrypted_value = cipher.update(decoded_value) + cipher.final
 
       YAML.load(decrypted_value)
@@ -155,7 +154,7 @@ module Ridley
     #
     # @return [Object]
     def reload
-      mass_assign(self.class.find(connection, data_bag, self).attributes)
+      mass_assign(self.class.find(client, data_bag, self).attributes)
       self
     end
 
@@ -169,7 +168,7 @@ module Ridley
     def update
       raise Errors::InvalidResource.new(self.errors) unless valid?
 
-      mass_assign(sself.class.update(connection, data_bag, self).attributes)
+      mass_assign(sself.class.update(client, data_bag, self).attributes)
       true
     end
 
@@ -186,10 +185,5 @@ module Ridley
     def to_s
       self.attributes
     end
-
-    private
-
-      # @return [Ridley::Connection]
-      attr_reader :connection
   end
 end

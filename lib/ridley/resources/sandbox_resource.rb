@@ -1,21 +1,21 @@
 module Ridley
   class SandboxResource
     class << self
-      # @param [Ridley::Connection] connection
+      # @param [Ridley::Client] client
       # @param [Array] checksums
       # @option options [Integer] :size (12)
       #   size of the upload pool
       #
       # @return [Ridley::SandboxResource]
-      def create(connection, checksums = [], options = {})
+      def create(client, checksums = [], options = {})
         options.reverse_merge!(size: 12)
 
         sumhash = { checksums: Hash.new }.tap do |chks|
           Array(checksums).each { |chk| chks[:checksums][chk] = nil }
         end
 
-        attrs = connection.post("sandboxes", sumhash.to_json).body
-        pool(size: options[:size], args: [connection, attrs[:sandbox_id], attrs[:checksums]])
+        attrs = client.connection.post("sandboxes", sumhash.to_json).body
+        pool(size: options[:size], args: [client, attrs[:sandbox_id], attrs[:checksums]])
       end
 
       # Checksum the file at the given filepath for a Chef API.
@@ -47,11 +47,6 @@ module Ridley
         end
         digest.hexdigest
       end
-
-      def future(connection, *args)
-        puts connection
-        connection.future(*args)
-      end
     end
 
     include Celluloid
@@ -59,8 +54,8 @@ module Ridley
     attr_reader :sandbox_id
     attr_reader :checksums
 
-    def initialize(connection, id, checksums)
-      @connection = connection
+    def initialize(client, id, checksums)
+      @client     = client
       @sandbox_id = id
       @checksums  = checksums
     end
@@ -112,10 +107,10 @@ module Ridley
       # to the same Chef API that the Sandbox creation request was
       # sent to.
       #
-      # The connection object is duplicated to ensure all of our connection
+      # The client object is duplicated to ensure all of our client
       # settings persist, but the scheme, host, and port are set to the
       # value of the given checksum.
-      conn = connection.send(:conn).dup
+      conn = client.send(:conn).dup
 
       url         = URI(checksum[:url])
       upload_path = url.path
@@ -127,7 +122,7 @@ module Ridley
     end
 
     def commit
-      connection.put("sandboxes/#{sandbox_id}", MultiJson.encode(is_completed: true)).body
+      client.put("sandboxes/#{sandbox_id}", MultiJson.encode(is_completed: true)).body
     end
 
     def to_s
@@ -136,6 +131,6 @@ module Ridley
 
     private
 
-      attr_reader :connection
+      attr_reader :client
   end
 end
