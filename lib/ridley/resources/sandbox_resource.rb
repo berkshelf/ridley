@@ -1,28 +1,37 @@
 module Ridley
   class SandboxResource
     class << self
+      # Create a new Sandbox on the client's Chef Server. A Sandbox requires an
+      # array of file checksums which lets the Chef Server know what the signature
+      # of the contents to be uploaded will look like.
+      #
       # @param [Ridley::Client] client
       # @param [Array] checksums
-      # @option options [Integer] :size (12)
-      #   size of the upload pool
+      #   a hash of file checksums
       #
-      # @return [Ridley::SandboxResource]
-      def create(client, checksums = [], options = {})
-        options.reverse_merge!(size: 12)
-
+      # @example using the Ridley client to create a sandbox
+      #   client.sandbox.create([
+      #     "385ea5490c86570c7de71070bce9384a",
+      #     "f6f73175e979bd90af6184ec277f760c",
+      #     "2e03dd7e5b2e6c8eab1cf41ac61396d5"
+      #   ])
+      #
+      # @return [Array<Ridley::SandboxResource>]
+      def create(client, checksums = [])
         sumhash = { checksums: Hash.new }.tap do |chks|
           Array(checksums).each { |chk| chks[:checksums][chk] = nil }
         end
 
-        attrs = client.connection.post("sandboxes", sumhash.to_json).body
-        pool(size: options[:size], args: [client, attrs[:sandbox_id], attrs[:checksums]])
+        new(client, client.connection.post("sandboxes", MultiJson.encode(sumhash)).body)
       end
 
-      # Checksum the file at the given filepath for a Chef API.
+      # Return the checksum of the contents of the file at the given filepath
       #
       # @param [String] path
+      #   file to checksum
       #
       # @return [String]
+      #   the binary checksum of the contents of the file
       def checksum(path)
         File.open(path, 'rb') { |f| checksum_io(f, Digest::MD5.new) }
       end
@@ -49,15 +58,22 @@ module Ridley
       end
     end
 
-    include Celluloid
+    include Chozo::VariaModel
 
-    attr_reader :sandbox_id
-    attr_reader :checksums
+    attribute :uri,
+      type: String
 
-    def initialize(client, id, checksums)
-      @client     = client
-      @sandbox_id = id
-      @checksums  = checksums
+    attribute :checksums,
+      type: Hash
+
+    attribute :sandbox_id,
+      type: String
+
+    # @param [Ridley::Client] client
+    # @param [Hash] new_attrs
+    def initialize(client, new_attrs = {})
+      @client = client
+      mass_assign(new_attrs)
     end
 
     def checksum(chk_id)
