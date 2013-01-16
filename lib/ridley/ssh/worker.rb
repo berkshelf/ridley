@@ -8,11 +8,12 @@ module Ridley
 
       attr_reader :sudo
       attr_reader :user
+      # @return [Hashie::Mash]
       attr_reader :options
       
       # @param [Hash] options
       def initialize(options = {})
-        @options = options.dup
+        @options = Hashie::Mash.new(options)
         @sudo    = @options[:sudo]
         @user    = @options[:user]
 
