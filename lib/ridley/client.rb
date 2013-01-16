@@ -51,9 +51,9 @@ module Ridley
     end
 
     REQUIRED_OPTIONS = [
-      "server_url",
-      "client_name",
-      "client_key"
+      :server_url,
+      :client_name,
+      :client_key
     ].freeze
 
     extend Forwardable
@@ -105,9 +105,9 @@ module Ridley
     #   URI, String, or Hash of HTTP proxy options
     def initialize(options = {})
       log.info { "Ridley starting..." }
-      options = Hashie::Mash.new options.reverse_merge(
+      options = options.reverse_merge(
         ssh: Hash.new
-      )
+      ).deep_symbolize_keys
       self.class.validate_options(options)
 
       @ssh              = options[:ssh]

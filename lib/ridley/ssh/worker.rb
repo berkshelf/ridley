@@ -13,7 +13,7 @@ module Ridley
       
       # @param [Hash] options
       def initialize(options = {})
-        @options = Hashie::Mash.new(options)
+        @options = options.deep_symbolize_keys
         @sudo    = @options[:sudo]
         @user    = @options[:user]
 
