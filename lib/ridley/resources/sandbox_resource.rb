@@ -60,14 +60,18 @@ module Ridley
 
     include Chozo::VariaModel
 
+    attribute :sandbox_id,
+      type: String
+
     attribute :uri,
       type: String
 
     attribute :checksums,
       type: Hash
 
-    attribute :sandbox_id,
-      type: String
+    attribute :is_completed,
+      type: Boolean,
+      default: false
 
     # @param [Ridley::Client] client
     # @param [Hash] new_attrs
@@ -138,7 +142,8 @@ module Ridley
     end
 
     def commit
-      client.put("sandboxes/#{sandbox_id}", MultiJson.encode(is_completed: true)).body
+      response = client.connection.put("sandboxes/#{sandbox_id}", MultiJson.encode(is_completed: true)).body
+      set_attribute(:is_completed, response[:is_completed])
     end
 
     def to_s
