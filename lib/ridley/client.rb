@@ -105,8 +105,7 @@ module Ridley
     #   URI, String, or Hash of HTTP proxy options
     def initialize(options = {})
       log.info { "Ridley starting..." }
-      
-      options = options.reverse_merge(
+      options = Hashie::Mash.new(options).reverse_merge(
         ssh: Hash.new
       )
       self.class.validate_options(options)
