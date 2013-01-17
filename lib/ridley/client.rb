@@ -71,8 +71,6 @@ module Ridley
     def_delegator :connection, :client_name
     def_delegator :connection, :client_name=
 
-    attr_accessor :client_name
-    attr_accessor :client_key
     attr_accessor :validator_client
     attr_accessor :validator_path
     attr_accessor :encrypted_data_bag_secret_path
