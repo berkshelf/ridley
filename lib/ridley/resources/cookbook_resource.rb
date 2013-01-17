@@ -41,7 +41,7 @@ module Ridley
           fetch_uri = File.join(fetch_uri, version)
         end
 
-        new(client, client.get(fetch_uri).body)
+        new(client, client.connection.get(fetch_uri).body)
       end
 
       # Save a new Cookbook Version of the given name, version with the
@@ -65,7 +65,7 @@ module Ridley
         url = "cookbooks/#{name}/#{version}"
         url << "?force=true" if force
 
-        client.put(url, manifest)
+        client.connection.put(url, manifest)
       end
 
       def update(*args)
