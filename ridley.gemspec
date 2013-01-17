@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'mixlib-log'
   s.add_runtime_dependency 'mixlib-authentication'
   s.add_runtime_dependency 'addressable'
-  s.add_runtime_dependency 'faraday'
+  s.add_runtime_dependency 'faraday', '>= 0.8.4'
   s.add_runtime_dependency 'activesupport', '>= 3.2.0'
   s.add_runtime_dependency 'celluloid'
   s.add_runtime_dependency 'net-ssh'
