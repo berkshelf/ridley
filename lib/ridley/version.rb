@@ -1,3 +1,3 @@
 module Ridley
-  VERSION = "0.7.0.beta"
+  VERSION = "0.7.0.rc1"
 end
