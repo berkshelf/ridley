@@ -13,9 +13,6 @@ describe Ridley::SandboxResource do
     ).sandbox
   end
 
-  # before(:all) { WebMock.allow_net_connect! }
-  # after(:all) { WebMock.disable_net_connect! }
-
   describe "ClassMethods" do
     describe "::create" do
       let(:checksums) { Hash.new }
@@ -161,6 +158,15 @@ describe Ridley::SandboxResource do
 
         subject.is_completed.should be_false
       end
+    end
+  end
+
+  describe "#upload" do
+    it "delegates self to SandboxUploader.upload" do
+      checksums = double('checksums')
+      Ridley::SandboxUploader.should_receive(:upload).with(subject, checksums)
+
+      subject.upload(checksums)
     end
   end
 end

@@ -30,6 +30,7 @@ module Ridley
   autoload :DSL, 'ridley/dsl'
   autoload :Logging, 'ridley/logging'
   autoload :Resource, 'ridley/resource'
+  autoload :SandboxUploader, 'ridley/sandbox_uploader'
   autoload :SSH, 'ridley/ssh'
 
   class << self
