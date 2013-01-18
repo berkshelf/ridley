@@ -20,6 +20,14 @@ module Ridley
       alias_method :to_s, :message
     end
 
+    class UnknownCookbookFileType < RidleyError
+      attr_reader :type
+
+      def initialize(type)
+        @type = type
+      end
+    end
+
     class BootstrapError < RidleyError; end
     class ClientKeyFileNotFound < BootstrapError; end
     class EncryptedDataBagSecretNotFound < BootstrapError; end
