@@ -19,7 +19,7 @@ module Ridley
       # @param [String] version
       #
       # @return [nil, CookbookResource]
-      def find(client, object, version = nil)
+      def find(client, object, version)
         find!(client, object, version)
       rescue Errors::HTTPNotFound
         nil
@@ -33,15 +33,9 @@ module Ridley
       #   if a resource with the given chef_id is not found
       #
       # @return [CookbookResource]
-      def find!(client, object, version = nil)
-        chef_id   = object.respond_to?(:chef_id) ? object.chef_id : object
-        fetch_uri = "#{self.resource_path}/#{chef_id}"
-        
-        unless version.nil?
-          fetch_uri = File.join(fetch_uri, version)
-        end
-
-        new(client, client.connection.get(fetch_uri).body)
+      def find!(client, object, version)
+        chef_id = object.respond_to?(:chef_id) ? object.chef_id : object
+        new(client, client.connection.get("#{self.resource_path}/#{chef_id}/#{version}").body)
       end
 
       # Save a new Cookbook Version of the given name, version with the
