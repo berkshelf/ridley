@@ -89,33 +89,101 @@ module Ridley
       type: String
 
     attribute :definitions,
-      type: Array
+      type: Array,
+      default: Array.new
 
     attribute :files,
-      type: Array
+      type: Array,
+      default: Array.new
 
     attribute :libraries,
-      type: Array
+      type: Array,
+      default: Array.new
 
     attribute :metadata,
       type: Hashie::Mash
 
     attribute :providers,
-      type: Array
+      type: Array,
+      default: Array.new
 
     attribute :recipes,
-      type: Array
+      type: Array,
+      default: Array.new
 
     attribute :resources,
-      type: Array
+      type: Array,
+      default: Array.new
 
     attribute :root_files,
-      type: Array
+      type: Array,
+      default: Array.new
 
     attribute :templates,
-      type: Array
+      type: Array,
+      default: Array.new
 
     attribute :version,
       type: String
+
+    # Download a single file from a cookbook
+    #
+    # @param [#to_sym] filetype
+    #   the type of file to download. These are broken up into the following types in Chef:
+    #     - attribute (unsupported until resolved https://github.com/reset/chozo/issues/17)
+    #     - definition
+    #     - file
+    #     - library
+    #     - provider
+    #     - recipe
+    #     - resource
+    #     - root_file
+    #     - template
+    #   these types are where the files are stored in your cookbook's structure. For example, a
+    #   recipe would be stored in the recipes directory while a root_file is stored at the root
+    #   of your cookbook
+    # @param [String] name
+    #   name of the file to download
+    # @param [String] destination
+    #   where to download the file to
+    #
+    # @return [nil]
+    def download_file(filetype, name, destination)
+      download_fun(filetype).call(name, destination)
+    end
+
+    private
+
+      # Return a lambda for downloading a file from the cookbook of the given type
+      # 
+      # @param [#to_sym] filetype
+      #
+      # @return [lambda]
+      #   a lambda which takes to parameters: target and path. Target is the URL to download from
+      #   and path is the location on disk to steam the contents of the remote URL to.
+      def download_fun(filetype)
+        collection = case filetype.to_sym
+        when :attribute
+          raise Errors::InternalError, "downloading attribute files is not yet supported: https://github.com/reset/chozo/issues/17"
+        when :definition; method(:definitions)
+        when :file; method(:files)
+        when :library; method(:libraries)
+        when :provider; method(:providers)
+        when :recipe; method(:recipes)
+        when :resource; method(:resources)
+        when :root_file; method(:root_files)
+        when :template; method(:templates)
+        else
+          raise Errors::UnknownCookbookFileType.new(filetype)
+        end
+
+        ->(target, destination) {
+          files = collection.call # JW: always chaining .call.find results in a nil value. WHY?
+          file  = files.find { |f| f[:name] == target }
+          return nil if file.nil?
+
+          client.connection.stream(file[:url], destination)
+        }
+      end
   end
 end

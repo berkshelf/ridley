@@ -1,3 +1,5 @@
+require 'open-uri'
+
 module Ridley
   # @author Jamie Winsor <jamie@vialstudios.com>
   class Connection < Faraday::Connection
@@ -15,9 +17,9 @@ module Ridley
     attr_reader :client_key
     attr_reader :client_name
 
-    # @param [String] :server_url
-    # @param [String] :client_name
-    # @param [String] :client_key
+    # @param [String] server_url
+    # @param [String] client_name
+    # @param [String] client_key
     #
     # @option options [Hash] :params
     #   URI query unencoded key/value pairs
@@ -79,6 +81,40 @@ module Ridley
 
     def server_url
       self.url_prefix.to_s
+    end
+
+    # Stream the response body of a remote URL to a file on the local file system
+    #
+    # @param [String] target
+    #   a URL to stream the response body from
+    # @param [String] destination
+    #   a location on disk to stream the content of the response body to
+    def stream(target, destination)
+      FileUtils.mkdir_p(File.dirname(destination))
+
+      target  = Addressable::URI.parse(target)
+      headers = Middleware::ChefAuth.authentication_headers(
+        client_name,
+        client_key,
+        http_method: "GET",
+        host: target.host,
+        path: target.path
+      )
+
+      unless ssl[:verify]
+        headers.merge!(ssl_verify_mode: OpenSSL::SSL::VERIFY_NONE)
+      end
+
+      local = Tempfile.new('ridley-stream')
+      local.binmode
+
+      open(target, 'rb', headers) do |remote|
+        local.write(remote.read)
+      end
+      
+      FileUtils.mv(local.path, destination)
+    ensure
+      local.close(true)
     end
   end
 end

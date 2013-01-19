@@ -22,6 +22,10 @@ def setup_rspec
       Ridley.logger = nil
       Celluloid.logger = nil
     end
+
+    config.before(:each) do
+      clean_tmp_path
+    end
   end
 end
 
