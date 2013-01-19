@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Ridley::SandboxResource do
   let(:server_url) { "https://api.opscode.com/organizations/vialstudios" }
   let(:client_name) { "reset" }
-  let(:client_key) { "/Users/reset/.chef/reset.pem" }
+  let(:client_key) { fixtures_path.join("reset.pem") }
 
   let(:sandbox) do
     Ridley.new(

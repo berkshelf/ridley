@@ -65,6 +65,14 @@ module Ridley
       def update(*args)
         raise NotImplementedError
       end
+
+      def versions(client, name)
+        response = client.connection.get("#{self.resource_path}/#{name}").body
+
+        response[name]["versions"].collect do |cb_ver|
+          cb_ver["version"]
+        end
+      end
     end
 
     set_chef_id "name"
