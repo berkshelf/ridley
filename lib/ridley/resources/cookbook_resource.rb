@@ -178,7 +178,7 @@ module Ridley
         end
 
         ->(target, destination) {
-          file = collection.call.find { |f| f.name == target }
+          file = collection.call.find { |f| f[:name] == target }
           return nil if file.nil?
 
           client.connection.stream(file[:url], destination)

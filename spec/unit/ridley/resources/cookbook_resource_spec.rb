@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Ridley::CookbookResource do
-  let(:client) { double('client') }
+  let(:client) { double('client', connection: double('connection')) }
 
   subject { described_class.new(client) }
 
@@ -9,12 +9,12 @@ describe Ridley::CookbookResource do
     let(:destination) { tmp_path.join('fake.file') }
 
     before(:each) do
-      subject.stub(:root_files) { [double('file', name: 'metadata.rb', url: "http://test.it/file")] }
+      subject.stub(:root_files) { [ { name: 'metadata.rb', url: "http://test.it/file" } ] }
     end
 
     it "downloads the file from the file's url" do
-      pending
-      
+      client.connection.should_receive(:stream).with("http://test.it/file", destination)
+
       subject.download_file(:root_file, "metadata.rb", destination)
     end
 
