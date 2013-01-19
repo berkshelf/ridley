@@ -90,6 +90,8 @@ module Ridley
     # @param [String] destination
     #   a location on disk to stream the content of the response body to
     def stream(target, destination)
+      FileUtils.mkdir_p(File.dirname(destination))
+
       target  = Addressable::URI.parse(target)
       headers = Middleware::ChefAuth.authentication_headers(
         client_name,
@@ -99,11 +101,20 @@ module Ridley
         path: target.path
       )
 
-      File.open(destination, 'wb') do |local|
-        open(target, 'rb', headers) do |remote|
-          local.write(remote.read)
-        end
+      unless ssl[:verify]
+        headers.merge!(ssl_verify_mode: OpenSSL::SSL::VERIFY_NONE)
       end
+
+      local = Tempfile.new('ridley-stream')
+      local.binmode
+
+      open(target, 'rb', headers) do |remote|
+        local.write(remote.read)
+      end
+      
+      FileUtils.mv(local.path, destination)
+    ensure
+      local.close(true)
     end
   end
 end

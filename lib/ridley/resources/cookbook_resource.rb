@@ -178,7 +178,8 @@ module Ridley
         end
 
         ->(target, destination) {
-          file = collection.call.find { |f| f[:name] == target }
+          files = collection.call # JW: always chaining .call.find results in a nil value. WHY?
+          file  = files.find { |f| f[:name] == target }
           return nil if file.nil?
 
           client.connection.stream(file[:url], destination)

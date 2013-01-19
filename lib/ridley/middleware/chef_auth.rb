@@ -56,7 +56,7 @@ module Ridley
           http_method: env[:method],
           host: env[:url].host,
           path: env[:url].path,
-          body: env[:body]
+          body: env[:body] || ''
         }
         authentication_headers = self.class.authentication_headers(client_name, client_key, signing_options)
 
