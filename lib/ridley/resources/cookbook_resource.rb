@@ -180,7 +180,8 @@ module Ridley
         ->(target, destination) {
           file = collection.call.find { |f| f.name == target }
           return nil if file.nil?
-          client.connection.get(file[:url])
+
+          client.connection.stream(file[:url], destination)
         }
       end
   end
