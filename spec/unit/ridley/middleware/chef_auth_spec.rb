@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Ridley::Middleware::ChefAuth do
   let(:server_url) { "https://api.opscode.com/organizations/vialstudios/" }
 
-  describe "ClassMethods", focus: true do
+  describe "ClassMethods" do
     subject { described_class }
 
     describe "#authentication_headers" do
