@@ -1,4 +1,5 @@
 require 'open-uri'
+require 'tempfile'
 
 module Ridley
   # @author Jamie Winsor <jamie@vialstudios.com>
