@@ -71,11 +71,12 @@ module Ridley
     def_delegator :connection, :client_name
     def_delegator :connection, :client_name=
 
+    attr_reader :options
+
     attr_accessor :validator_client
     attr_accessor :validator_path
     attr_accessor :encrypted_data_bag_secret_path
     attr_accessor :ssh
-    attr_reader :options
 
     # @option options [String] :server_url
     #   URL to the Chef API
@@ -104,36 +105,34 @@ module Ridley
     #   URI, String, or Hash of HTTP proxy options
     def initialize(options = {})
       log.info { "Ridley starting..." }
-      options = options.reverse_merge(
+      @options = options.reverse_merge(
         ssh: Hash.new
       ).deep_symbolize_keys
-      self.class.validate_options(options)
+      self.class.validate_options(@options)
 
-      @ssh              = options[:ssh]
-      @validator_client = options[:validator_client]
+      @ssh              = @options[:ssh]
+      @validator_client = @options[:validator_client]
 
-      options[:client_key] = File.expand_path(options[:client_key])
+      @options[:client_key] = File.expand_path(@options[:client_key])
 
-      if options[:validator_path]
-        @validator_path = File.expand_path(options[:validator_path])
+      if @options[:validator_path]
+        @validator_path = File.expand_path(@options[:validator_path])
       end
 
-      if options[:encrypted_data_bag_secret_path]
-        @encrypted_data_bag_secret_path = File.expand_path(options[:encrypted_data_bag_secret_path])
+      if @options[:encrypted_data_bag_secret_path]
+        @encrypted_data_bag_secret_path = File.expand_path(@options[:encrypted_data_bag_secret_path])
       end
 
-      unless options[:client_key].present? && File.exist?(options[:client_key])
-        raise Errors::ClientKeyFileNotFound, "client key not found at: '#{options[:client_key]}'"
+      unless @options[:client_key].present? && File.exist?(@options[:client_key])
+        raise Errors::ClientKeyFileNotFound, "client key not found at: '#{@options[:client_key]}'"
       end
-
-      @options = options
 
       super(Celluloid::Registry.new)
       pool(Ridley::Connection, size: 4, args: [
-        options[:server_url],
-        options[:client_name],
-        options[:client_key],
-        options.slice(*Connection::VALID_OPTIONS)
+        @options[:server_url],
+        @options[:client_name],
+        @options[:client_key],
+        @options.slice(*Connection::VALID_OPTIONS)
       ], as: :connection_pool)
     end
 
