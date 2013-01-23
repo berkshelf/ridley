@@ -109,7 +109,7 @@ module Ridley
       upload_path = url.path
       url.path    = ""
 
-      Faraday.new(url) do |c|
+      Faraday.new(url, client.options.slice(*Connection::VALID_OPTIONS)) do |c|
         c.request :chef_auth, client.client_name, client.client_key
         c.adapter :net_http
       end.put(upload_path, contents, headers)
