@@ -114,7 +114,7 @@ module Ridley
       
       FileUtils.mv(local.path, destination)
     ensure
-      local.close(true)
+      local.close(true) unless local.nil?
     end
   end
 end
