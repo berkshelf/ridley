@@ -4,7 +4,8 @@ describe Ridley::SandboxUploader do
   let(:client) do
     double('client',
       client_name: 'reset',
-      client_key: fixtures_path.join('reset.pem')
+      client_key: fixtures_path.join('reset.pem'),
+      options: {}
     )
   end
 

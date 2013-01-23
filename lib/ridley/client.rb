@@ -75,6 +75,7 @@ module Ridley
     attr_accessor :validator_path
     attr_accessor :encrypted_data_bag_secret_path
     attr_accessor :ssh
+    attr_reader :options
 
     # @option options [String] :server_url
     #   URL to the Chef API
@@ -124,6 +125,8 @@ module Ridley
       unless options[:client_key].present? && File.exist?(options[:client_key])
         raise Errors::ClientKeyFileNotFound, "client key not found at: '#{options[:client_key]}'"
       end
+
+      @options = options
 
       super(Celluloid::Registry.new)
       pool(Ridley::Connection, size: 4, args: [
