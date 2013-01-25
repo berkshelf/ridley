@@ -2,6 +2,33 @@ module Ridley
   # @author Jamie Winsor <jamie@vialstudios.com>
   class CookbookResource < Ridley::Resource
     class << self
+      # List all of the cookbooks and their versions present on the remote
+      #
+      # @example return value
+      #   {
+      #     "ant" => [
+      #       "0.10.1"
+      #     ],
+      #     "apache2" => [
+      #       "1.4.0"
+      #     ]
+      #   } 
+      #
+      # @param [Ridley::Client] client
+      #
+      # @return [Hash]
+      #   a hash containing keys which represent cookbook names and values which contain
+      #   an array of strings representing the available versions
+      def all(client)
+        response = client.connection.get(self.resource_path).body
+        
+        {}.tap do |cookbooks|
+          response.each do |name, details|
+            cookbooks[name] = details["versions"].collect { |version| version["version"] }
+          end
+        end
+      end
+
       def create(*args)
         raise NotImplementedError
       end

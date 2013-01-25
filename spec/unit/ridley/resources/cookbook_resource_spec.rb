@@ -18,7 +18,54 @@ describe Ridley::CookbookResource do
       )
     end
 
-    describe "#versions" do
+    describe "::all" do
+      subject { described_class.all(client) }
+
+      before(:each) do
+        stub_request(:get, File.join(server_url, "cookbooks")).
+          to_return(status: 200, body: {
+            "ant" => {
+              "url" => "https://api.opscode.com/organizations/vialstudios/cookbooks/ant",
+              "versions" => [ 
+                {
+                  "url" => "https://api.opscode.com/organizations/vialstudios/cookbooks/ant/0.10.1",
+                  "version" => "0.10.1"
+                }
+              ]
+            },
+            "apache2" => {
+              "url" => "https://api.opscode.com/organizations/vialstudios/cookbooks/apache2",
+              "versions" => [
+                {
+                  "url" => "https://api.opscode.com/organizations/vialstudios/cookbooks/apache2/1.4.0",
+                  "version" => "1.4.0"
+                }
+              ]
+            }
+          }
+        )
+      end
+
+      it "returns a Hash" do
+        subject.should be_a(Hash)
+      end
+
+      it "contains a key for each cookbook" do
+        subject.should include("ant")
+        subject.should include("apache2")
+      end
+
+      it "contains an array of versions for each cookbook" do
+        subject["ant"].should be_a(Array)
+        subject["ant"].should have(1).item
+        subject["ant"].should include("0.10.1")
+        subject["apache2"].should be_a(Array)
+        subject["apache2"].should have(1).item
+        subject["apache2"].should include("1.4.0")
+      end
+    end
+
+    describe "::versions" do
       let(:cookbook) { "artifact" }      
       subject { described_class.versions(client, cookbook) }
 
