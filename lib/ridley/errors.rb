@@ -5,6 +5,7 @@ module Ridley
     class InternalError < RidleyError; end
     class ArgumentError < InternalError; end
 
+    class ResourceNotFound < RidleyError; end
     class ValidatorNotFound < RidleyError; end
 
     class InvalidResource < RidleyError

@@ -67,7 +67,7 @@ module Ridley
       # @return [nil, Object]
       def find(client, object)
         find!(client, object)
-      rescue Errors::HTTPNotFound
+      rescue Errors::ResourceNotFound
         nil
       end
 
@@ -81,6 +81,8 @@ module Ridley
       def find!(client, object)
         chef_id = object.respond_to?(:chef_id) ? object.chef_id : object
         new(client, client.connection.get("#{self.resource_path}/#{chef_id}").body)
+      rescue Errors::HTTPNotFound => ex
+        raise Errors::ResourceNotFound, ex
       end
 
       # @param [Ridley::Client] client
