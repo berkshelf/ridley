@@ -80,6 +80,14 @@ module Ridley
       api_type == :foss
     end
 
+    # Override Faraday::Connection#run_request to catch exceptions from {Ridley::Middleware} that
+    # we expect. Caught exceptions are re-raised with Celluloid#abort so we don't crash the connection.
+    def run_request(*args)
+      super
+    rescue Errors::HTTPError => ex
+      abort(ex)
+    end
+
     def server_url
       self.url_prefix.to_s
     end
