@@ -76,6 +76,7 @@ module Ridley
     # Notify the Chef Server that uploading to this sandbox has completed
     def commit
       response = client.connection.put("sandboxes/#{sandbox_id}", MultiJson.encode(is_completed: true)).body
+      raise response if response.is_a?(Exception)
       set_attribute(:is_completed, response[:is_completed])
     end
 
