@@ -92,6 +92,14 @@ module Ridley
       self.url_prefix.to_s
     end
 
+    def put(*args)
+      begin
+        super
+      rescue Ridley::Errors::RidleyError => exception
+        exception
+      end
+    end
+
     # Stream the response body of a remote URL to a file on the local file system
     #
     # @param [String] target

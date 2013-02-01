@@ -86,7 +86,9 @@ module Ridley
         url = "cookbooks/#{name}/#{version}"
         url << "?force=true" if force
 
-        client.connection.put(url, manifest)
+        response = client.connection.put(url, manifest)
+        raise response if response.is_a?(Exception)
+        response
       end
 
       def update(*args)

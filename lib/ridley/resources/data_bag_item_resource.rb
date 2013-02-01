@@ -83,8 +83,10 @@ module Ridley
       # @return [Ridley::DataBagItemResource]
       def update(client, data_bag, object)
         resource = new(client, data_bag, object.to_hash)
+        response = client.connection.put("#{data_bag.class.resource_path}/#{data_bag.name}/#{resource.chef_id}", resource.to_json)
+        raise if response.is_a?(Exception)
         new(client, data_bag).from_hash(
-          client.connection.put("#{data_bag.class.resource_path}/#{data_bag.name}/#{resource.chef_id}", resource.to_json).body
+          response.body
         )
       end
     end
