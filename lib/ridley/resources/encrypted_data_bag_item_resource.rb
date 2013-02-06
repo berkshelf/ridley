@@ -26,7 +26,7 @@ module Ridley
       #
       # @return [nil, Ridley::DataBagItemResource]
       def find!(client, data_bag, object)
-        data_bag_item = DataBagItem.find!(client, data_bag, object)
+        data_bag_item = DataBagItemResource.find!(client, data_bag, object)
         data_bag_item.decrypt
         new(client, data_bag, data_bag_item.attributes)
       end
