@@ -33,28 +33,36 @@ module Ridley
         raise NotImplementedError
       end
 
+      # Delete a cookbook of the given name and version on the remote Chef server
+      #
       # @param [Ridley::Client] client
-      # @param [String, #chef_id] object
+      # @param [String] name
       # @param [String] version
       #
       # @option options [Boolean] purge (false)
       #
-      # @return [CookbookResource]
-      def delete(client, object, version, options = {})
+      # @return [Boolean]
+      def delete(client, name, version, options = {})
         options = options.reverse_merge(purge: false)
-        chef_id = object.respond_to?(:chef_id) ? object.chef_id : object
-        new(client.connection.delete("#{self.resource_path}/#{chef_id}/#{version}?purge=true").body)
+        url = "#{self.resource_path}/#{name}/#{version}"
+        url += "?purge=true" if options[:purge]
+
+        client.connection.delete(url).body
+        true
+      rescue Errors::HTTPNotFound
+        true
       end
 
+      # Delete all of the versions of a given cookbook on the remote Chef server
+      #
       # @param [Ridley::Client] client
-      # @param [String, #chef_id] object
+      # @param [String] name
+      #   name of the cookbook to delete
       #
       # @option options [Boolean] purge (false)
-      #
-      # @return [Array<CookbookResource>]
-      def delete_all(client, object, options = {})
-        versions(client, name).collect do |version_info|
-          delete(client, object, version_info["version"], options)
+      def delete_all(client, name, options = {})
+        versions(client, name).each do |version|
+          delete(client, name, version, options)
         end
       end
 

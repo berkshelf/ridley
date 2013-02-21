@@ -65,6 +65,45 @@ describe Ridley::CookbookResource do
       end
     end
 
+    describe "::delete" do
+      let(:name) { "ant" }
+      let(:version) { "1.0.0" }
+
+      it "sends a DELETE to the cookbook version URL" do
+        stub_request(:delete, File.join(server_url, "cookbooks", name, version)).
+          to_return(status: 200, body: {})
+
+        described_class.delete(client, name, version)
+      end
+
+      context "when :purge is true" do
+        it "appends ?purge=true to the end of the URL" do
+          stub_request(:delete, File.join(server_url, "cookbooks", name, "#{version}?purge=true")).
+            to_return(status: 200, body: {})
+
+          described_class.delete(client, name, version, purge: true)
+        end
+      end
+    end
+
+    describe "::delete_all" do
+      let(:name) { "ant" }
+      let(:versions) { ["1.0.0", "1.2.0", "2.0.0"] }
+      let(:options) { Hash.new }
+
+      subject { described_class }
+
+      it "deletes each version of the cookbook" do
+        subject.should_receive(:versions).with(client, name).and_return(versions)
+
+        versions.each do |version|
+          subject.should_receive(:delete).with(client, name, version, options)
+        end
+
+        subject.delete_all(client, name, options)
+      end
+    end
+
     describe "::versions" do
       let(:cookbook) { "artifact" }      
       subject { described_class.versions(client, cookbook) }
