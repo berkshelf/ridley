@@ -14,12 +14,14 @@ module Ridley
         end
       end
 
+      include Ridley::Logging
+
       def on_complete(env)
-        Ridley.log.debug("Handling Chef Response")
-        Ridley.log.debug(env)
+        log.debug { "==> handling Chef response" }
+        log.debug { "request env: #{env}" }
         
         unless self.class.success?(env)
-          Ridley.log.debug("Error encounted in Chef Response")
+          log.debug { "** error encounted in Chef response" }
           raise Errors::HTTPError.fabricate(env)
         end
       end

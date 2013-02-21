@@ -12,10 +12,13 @@ module Ridley
         # @param [String] client_name
         # @param [String] client_key
         #
+        # @option options [String] :host
+        #
         # @see {#signing_object} for options
         def authentication_headers(client_name, client_key, options = {})
           rsa_key = OpenSSL::PKey::RSA.new(File.read(client_key))
-          signing_object(client_name, options).sign(rsa_key)
+          headers = signing_object(client_name, options).sign(rsa_key).merge(host: options[:host])
+          headers.inject({}) { |memo, kv| memo["#{kv[0].to_s.upcase}"] = kv[1];memo }
         end
 
         # Create a signing object for a Request to a Chef Server
@@ -23,7 +26,6 @@ module Ridley
         # @param [String] client_name
         #
         # @option options [String] :http_method
-        # @option options [String] :host
         # @option options [String] :path
         # @option options [String] :body
         # @option options [Time] :timestamp
@@ -34,7 +36,8 @@ module Ridley
             body: String.new,
             timestamp: Time.now.utc.iso8601
           )
-          options[:user_id] = client_name
+          options[:user_id]       = client_name
+          options[:proto_version] = "1.0"
 
           SignedHeaderAuth.signing_object(options)
         end
@@ -54,7 +57,7 @@ module Ridley
       def call(env)
         signing_options = {
           http_method: env[:method],
-          host: env[:url].host,
+          host: env[:url].host || "localhost",
           path: env[:url].path,
           body: env[:body] || ''
         }
@@ -63,8 +66,8 @@ module Ridley
         env[:request_headers] = default_headers.merge(env[:request_headers]).merge(authentication_headers)
         env[:request_headers] = env[:request_headers].merge('Content-Length' => env[:body].bytesize.to_s) if env[:body]
 
-        log.debug { "Performing Authenticated Chef Request: "}
-        log.debug { env }
+        log.debug { "==> performing authenticated Chef request as '#{client_name}'"}
+        log.debug { "request env: #{env}"}
 
         @app.call(env)
       end

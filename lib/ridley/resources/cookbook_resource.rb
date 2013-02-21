@@ -33,12 +33,29 @@ module Ridley
         raise NotImplementedError
       end
 
-      def delete(*args)
-        raise NotImplementedError
+      # @param [Ridley::Client] client
+      # @param [String, #chef_id] object
+      # @param [String] version
+      #
+      # @option options [Boolean] purge (false)
+      #
+      # @return [CookbookResource]
+      def delete(client, object, version, options = {})
+        options = options.reverse_merge(purge: false)
+        chef_id = object.respond_to?(:chef_id) ? object.chef_id : object
+        new(client.connection.delete("#{self.resource_path}/#{chef_id}/#{version}?purge=true").body)
       end
 
-      def delete_all(*args)
-        raise NotImplementedError
+      # @param [Ridley::Client] client
+      # @param [String, #chef_id] object
+      #
+      # @option options [Boolean] purge (false)
+      #
+      # @return [Array<CookbookResource>]
+      def delete_all(client, object, options = {})
+        versions(client, name).collect do |version_info|
+          delete(client, object, version_info["version"], options)
+        end
       end
 
       # @param [Ridley::Client] client

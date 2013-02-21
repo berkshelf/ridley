@@ -21,7 +21,7 @@ JSON.create_id = nil
 
 # @author Jamie Winsor <jamie@vialstudios.com>
 module Ridley
-  CHEF_VERSION = '10.16.4'.freeze
+  CHEF_VERSION = '11.4.0'.freeze
 
   autoload :Bootstrapper, 'ridley/bootstrapper'
   autoload :Client, 'ridley/client'

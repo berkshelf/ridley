@@ -51,7 +51,7 @@ module Ridley
         # @return [String]
         def response_type(env)
           if env[:response_headers][CONTENT_TYPE].nil?
-            log.debug "Response did not specify a content type."
+            log.debug { "response did not specify a content type" }
             return "text/html"
           end
 
@@ -98,10 +98,10 @@ module Ridley
         log.debug(env)
 
         if self.class.json_response?(env)
-          log.debug("Parsing Chef Response body as JSON")
+          log.debug { "==> parsing Chef response body as JSON" }
           env[:body] = self.class.parse(env[:body])
         else
-          log.debug("Chef Response did not contain a JSON body")
+          log.debug { "==> Chef response did not contain a JSON body" }
         end
       end
     end
