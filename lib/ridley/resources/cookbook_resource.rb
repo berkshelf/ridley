@@ -90,6 +90,20 @@ module Ridley
         new(client, client.connection.get("#{self.resource_path}/#{chef_id}/#{version}").body)
       end
 
+      # Return the latest version of the given cookbook found on the remote Chef server
+      #
+      # @param [Ridley::Client] client
+      # @param [String] name
+      #
+      # @return [String, nil]
+      def latest_version(client, name)
+        ver = versions(client, name).collect do |version|
+          Solve::Version.new(version)
+        end.sort.last
+
+        ver.nil? ? nil : ver.to_s
+      end
+
       # Save a new Cookbook Version of the given name, version with the
       # given manifest of files and checksums.
       #
@@ -118,6 +132,15 @@ module Ridley
         raise NotImplementedError
       end
 
+      # Return a list of versions for the given cookbook present on the remote Chef server
+      #
+      # @param [Ridley::Client] client
+      # @param [String] name
+      #
+      # @example
+      #   versions(client, "nginx") => [ "1.0.0", "1.2.0" ]
+      #
+      # @return [Array<String>]
       def versions(client, name)
         response = client.connection.get("#{self.resource_path}/#{name}").body
 

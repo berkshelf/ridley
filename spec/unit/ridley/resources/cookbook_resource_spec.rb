@@ -104,6 +104,33 @@ describe Ridley::CookbookResource do
       end
     end
 
+    describe "::latest_version" do
+      let(:name) { "ant" }
+      subject { described_class }
+
+      before(:each) do
+        subject.should_receive(:versions).with(client, name).and_return(versions)
+      end
+
+      context "when the cookbook has no versions" do
+        let(:versions) { Array.new }
+
+        it "returns nil" do
+          subject.latest_version(client, name).should be_nil
+        end
+      end
+
+      context "when the cookbook has versions" do
+        let(:versions) do
+          [ "1.0.0", "1.2.0", "3.0.0", "1.4.1" ]
+        end
+
+        it "returns nil" do
+          subject.latest_version(client, name).should eql("3.0.0")
+        end
+      end
+    end
+
     describe "::versions" do
       let(:cookbook) { "artifact" }      
       subject { described_class.versions(client, cookbook) }
