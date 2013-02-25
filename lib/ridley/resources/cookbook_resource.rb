@@ -262,6 +262,7 @@ module Ridley
     # @return [String]
     #   the path to the directory the cookbook was downloaded to
     def download(destination = Dir.mktmpdir)
+      destination = File.expand_path(destination)
       log.debug { "downloading cookbook: '#{name}'" }
 
       FILE_TYPES.each do |filetype|
@@ -362,7 +363,8 @@ module Ridley
           file  = files.find { |f| f[:name] == target }
           return nil if file.nil?
 
-          log.debug { "downloading '#{filetype}' file: #{file}" }
+          destination = File.expand_path(destination)
+          log.debug { "downloading '#{filetype}' file: #{file} to: '#{destination}'" }
 
           client.connection.stream(file[:url], destination)
         }
