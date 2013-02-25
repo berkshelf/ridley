@@ -347,7 +347,7 @@ module Ridley
         when :attribute, :attributes; method(:attributes)
         when :definition, :definitions; method(:definitions)
         when :file, :files; method(:files)
-        when :library, :libaries; method(:libraries)
+        when :library, :libraries; method(:libraries)
         when :provider, :providers; method(:providers)
         when :recipe, :recipes; method(:recipes)
         when :resource, :resources; method(:resources)

@@ -27,6 +27,10 @@ module Ridley
       def initialize(type)
         @type = type
       end
+
+      def to_s
+        "filetype: '#{type}'"
+      end
     end
 
     class BootstrapError < RidleyError; end
