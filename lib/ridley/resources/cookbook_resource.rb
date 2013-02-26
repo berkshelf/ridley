@@ -66,6 +66,25 @@ module Ridley
         end
       end
 
+      # Download the entire cookbook
+      #
+      # @param [Ridley::Client] client
+      # @param [String] name
+      # @param [String] version
+      # @param [String] destination (Dir.mktmpdir)
+      #   the place to download the cookbook too. If no value is provided the cookbook
+      #   will be downloaded to a temporary location
+      #
+      # @return [String]
+      #   the path to the directory the cookbook was downloaded to
+      def download(client, name, version, destination = Dir.mktmpdir)
+        cookbook = find(client, name, version)
+        
+        unless cookbook.nil?
+          cookbook.download(destination)
+        end
+      end
+
       # @param [Ridley::Client] client
       # @param [String, #chef_id] object
       # @param [String] version
@@ -102,6 +121,23 @@ module Ridley
         end.sort.last
 
         ver.nil? ? nil : ver.to_s
+      end
+
+      # Return the version of the given cookbook which best stasifies the given constraint
+      #
+      # @param [Ridley::Client] client
+      # @param [String] name
+      #   name of the cookbook
+      # @param [String, Solve::Constraint] constraint
+      #   constraint to solve for
+      #
+      # @return [CookbookResource, nil]
+      #   returns the cookbook resource for the best solution or nil if no solution exists
+      def satisfy(client, name, constraint)
+        version = Solve::Solver.satisfy_best(constraint, versions(client, name)).to_s
+        find(client, name, version)
+      rescue Solve::Errors::NoSolutionError
+        nil
       end
 
       # Save a new Cookbook Version of the given name, version with the
@@ -150,6 +186,20 @@ module Ridley
       end
     end
 
+    include Ridley::Logging
+
+    FILE_TYPES = [
+      :resources,
+      :providers,
+      :recipes,
+      :definitions,
+      :libraries,
+      :attributes,
+      :files,
+      :templates,
+      :root_files
+    ].freeze
+
     set_chef_id "name"
     set_chef_type "cookbook"
     set_chef_json_class "Chef::Cookbook"
@@ -158,9 +208,9 @@ module Ridley
     attribute :name,
       required: true
 
-    # Broken until resolved: https://github.com/reset/chozo/issues/17
-    # attribute :attributes,
-    #   type: Array
+    attribute :attributes,
+      type: Array,
+      default: Array.new
 
     attribute :cookbook_name,
       type: String
@@ -203,6 +253,31 @@ module Ridley
     attribute :version,
       type: String
 
+    # Download the entire cookbook
+    #
+    # @param [String] destination (Dir.mktmpdir)
+    #   the place to download the cookbook too. If no value is provided the cookbook
+    #   will be downloaded to a temporary location
+    #
+    # @return [String]
+    #   the path to the directory the cookbook was downloaded to
+    def download(destination = Dir.mktmpdir)
+      destination = File.expand_path(destination)
+      log.debug { "downloading cookbook: '#{name}'" }
+
+      FILE_TYPES.each do |filetype|
+        next unless manifest.has_key?(filetype)
+
+        manifest[filetype].each do |file|
+          file_destination = File.join(destination, file[:path].gsub('/', File::SEPARATOR))
+          FileUtils.mkdir_p(File.dirname(file_destination))
+          download_file(filetype, file[:name], file_destination)
+        end
+      end
+
+      destination
+    end
+
     # Download a single file from a cookbook
     #
     # @param [#to_sym] filetype
@@ -229,6 +304,36 @@ module Ridley
       download_fun(filetype).call(name, destination)
     end
 
+    # A hash containing keys for all of the different cookbook filetypes with values
+    # representing each file of that type this cookbook contains
+    #
+    # @example
+    #   {
+    #     root_files: [
+    #       {
+    #         :name => "afile.rb",
+    #         :path => "files/ubuntu-9.10/afile.rb",
+    #         :checksum => "2222",
+    #         :specificity => "ubuntu-9.10"
+    #       },
+    #     ],
+    #     templates: [ manifest_record1, ... ],
+    #     ...
+    #   }
+    #
+    # @return [Hash]
+    def manifest
+      {}.tap do |manifest|
+        FILE_TYPES.each do |filetype|
+          manifest[filetype] = get_attribute(filetype)
+        end
+      end
+    end
+
+    def to_s
+      "#{name}: #{manifest}"
+    end
+
     private
 
       # Return a lambda for downloading a file from the cookbook of the given type
@@ -240,16 +345,15 @@ module Ridley
       #   and path is the location on disk to steam the contents of the remote URL to.
       def download_fun(filetype)
         collection = case filetype.to_sym
-        when :attribute
-          raise Errors::InternalError, "downloading attribute files is not yet supported: https://github.com/reset/chozo/issues/17"
-        when :definition; method(:definitions)
-        when :file; method(:files)
-        when :library; method(:libraries)
-        when :provider; method(:providers)
-        when :recipe; method(:recipes)
-        when :resource; method(:resources)
-        when :root_file; method(:root_files)
-        when :template; method(:templates)
+        when :attribute, :attributes; method(:attributes)
+        when :definition, :definitions; method(:definitions)
+        when :file, :files; method(:files)
+        when :library, :libraries; method(:libraries)
+        when :provider, :providers; method(:providers)
+        when :recipe, :recipes; method(:recipes)
+        when :resource, :resources; method(:resources)
+        when :root_file, :root_files; method(:root_files)
+        when :template, :templates; method(:templates)
         else
           raise Errors::UnknownCookbookFileType.new(filetype)
         end
@@ -258,6 +362,9 @@ module Ridley
           files = collection.call # JW: always chaining .call.find results in a nil value. WHY?
           file  = files.find { |f| f[:name] == target }
           return nil if file.nil?
+
+          destination = File.expand_path(destination)
+          log.debug { "downloading '#{filetype}' file: #{file} to: '#{destination}'" }
 
           client.connection.stream(file[:url], destination)
         }
