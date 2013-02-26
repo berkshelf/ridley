@@ -120,7 +120,8 @@ module Ridley
       open(target, 'rb', headers) do |remote|
         local.write(remote.read)
       end
-      
+
+      local.flush
       FileUtils.mv(local.path, destination)
     rescue OpenURI::HTTPError => ex
       abort(ex)
