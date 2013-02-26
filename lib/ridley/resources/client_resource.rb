@@ -67,7 +67,7 @@ module Ridley
     # of connection. Only OHC/OPC requires the json_class attribute is not present.
     def to_json
       if client.connection.hosted?
-        attributes.except(:json_class).to_json
+        to_hash.except(:json_class).to_json
       else
         super
       end

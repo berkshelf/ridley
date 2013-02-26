@@ -47,7 +47,7 @@ module Ridley
         end
 
         new_attributes = client.connection.post("#{data_bag.class.resource_path}/#{data_bag.name}", resource.to_json).body
-        resource.from_hash(resource.attributes.deep_merge(new_attributes))
+        resource.mass_assign(new_attributes)
         resource
       end
 
@@ -98,6 +98,9 @@ module Ridley
       type: String,
       required: true
 
+    alias_method :attributes=, :mass_assign
+    alias_method :attributes, :_attributes_
+
     # @param [Ridley::Client] client
     # @param [Ridley::DataBagResource] data_bag
     # @param [#to_hash] new_attrs
@@ -124,7 +127,7 @@ module Ridley
     def save
       raise Errors::InvalidResource.new(self.errors) unless valid?
 
-      mass_assign(self.class.create(client, data_bag, self).attributes)
+      mass_assign(self.class.create(client, data_bag, self)._attributes_)
       true
     rescue Errors::HTTPConflict
       self.update
@@ -135,7 +138,7 @@ module Ridley
     #
     # @return [Hash] decrypted attributes
     def decrypt
-      decrypted_hash = Hash[attributes.map { |key, value| [key, key == "id" ? value : decrypt_value(value)] }]
+      decrypted_hash = Hash[_attributes_.map { |key, value| [key, key == "id" ? value : decrypt_value(value)] }]
       mass_assign(decrypted_hash)
     end
 
@@ -154,7 +157,7 @@ module Ridley
     #
     # @return [Object]
     def reload
-      mass_assign(self.class.find(client, data_bag, self).attributes)
+      mass_assign(self.class.find(client, data_bag, self)._attributes_)
       self
     end
 
@@ -168,7 +171,7 @@ module Ridley
     def update
       raise Errors::InvalidResource.new(self.errors) unless valid?
 
-      mass_assign(sself.class.update(client, data_bag, self).attributes)
+      mass_assign(sself.class.update(client, data_bag, self)._attributes_)
       true
     end
 
@@ -176,14 +179,10 @@ module Ridley
     #
     # @return [Object]
     def from_hash(hash)
-      hash = HashWithIndifferentAccess.new(hash.to_hash)
+      hash = Hashie::Mash.new(hash.to_hash)
 
       mass_assign(hash.has_key?(:raw_data) ? hash[:raw_data] : hash)
       self
-    end
-
-    def to_s
-      self.attributes
     end
   end
 end

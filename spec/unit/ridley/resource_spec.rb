@@ -82,20 +82,6 @@ describe Ridley::Resource do
     Class.new(Ridley::Resource).new(connection)
   end
 
-  describe "#attributes=" do
-    subject do
-      Class.new(Ridley::Resource) do
-        attribute :name
-      end.new(connection)
-    end
-
-    it "assigns the hash of attributes to the objects attributes" do
-      subject.attributes = { name: "reset" }
-
-      subject.attributes[:name].should eql("reset")
-    end
-  end
-
   describe "comparable" do
     subject do
       Class.new(Ridley::Resource) do
@@ -112,8 +98,8 @@ describe Ridley::Resource do
 
     context "given two objects with the same value for their 'chef_id'" do
       before(:each) do
-        one.attributes = { name: "reset", other_extra: "stuff" }
-        two.attributes = { name: "reset", extra: "stuff" }
+        one.mass_assign(name: "reset", other_extra: "stuff")
+        two.mass_assign(name: "reset", extra: "stuff")
       end
 
       it "is equal" do
@@ -123,8 +109,8 @@ describe Ridley::Resource do
 
     context "given two objects with different values for their 'chef_id'" do
       before(:each) do
-        one.attributes = { name: "jamie", other_extra: "stuff" }
-        two.attributes = { name: "winsor", extra: "stuff" }
+        one.mass_assign(name: "jamie", other_extra: "stuff")
+        two.mass_assign(name: "winsor", extra: "stuff")
       end
 
       it "is not equal" do
@@ -149,8 +135,8 @@ describe Ridley::Resource do
 
     context "given an array of objects with the same value for their 'chef_id'" do
       let(:nodes) do
-        one.attributes = { name: "reset", other_extra: "stuff" }
-        two.attributes = { name: "reset", extra: "stuff" }
+        one.mass_assign(name: "reset", other_extra: "stuff")
+        two.mass_assign(name: "reset", extra: "stuff")
 
         [ one, two ]
       end
@@ -162,8 +148,8 @@ describe Ridley::Resource do
 
     context "given an array of objects with different values for their 'chef_id'" do
       let(:nodes) do
-        one.attributes = { name: "jamie", other_extra: "stuff" }
-        two.attributes = { name: "winsor", extra: "stuff" }
+        one.mass_assign(name: "jamie", other_extra: "stuff")
+        two.mass_assign(name: "winsor", extra: "stuff")
 
         [ one, two ]
       end

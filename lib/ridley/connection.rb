@@ -122,6 +122,8 @@ module Ridley
       end
       
       FileUtils.mv(local.path, destination)
+    rescue OpenURI::HTTPError => ex
+      abort(ex)
     ensure
       local.close(true) unless local.nil?
     end

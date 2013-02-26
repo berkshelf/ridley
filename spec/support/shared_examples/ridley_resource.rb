@@ -106,7 +106,7 @@ shared_examples_for "a Ridley Resource" do |resource_klass|
 
       it "sends a create message to the implementing class" do
         updated = double('updated')
-        updated.stub(:attributes).and_return(Hash.new)
+        updated.stub(:_attributes_).and_return(Hash.new)
         subject.class.should_receive(:create).with(client, subject).and_return(updated)
 
         subject.save
@@ -116,7 +116,7 @@ shared_examples_for "a Ridley Resource" do |resource_klass|
         it "sends the update message to self" do
           updated = double('updated')
           updated.stub(:[]).and_return(Hash.new)
-          updated.stub(:attributes).and_return(Hash.new)
+          updated.stub(:_attributes_).and_return(Hash.new)
           subject.class.should_receive(:create).and_raise(Ridley::Errors::HTTPConflict.new(updated))
           subject.should_receive(:update).and_return(updated)
 
@@ -141,7 +141,7 @@ shared_examples_for "a Ridley Resource" do |resource_klass|
       let(:updated) do
         updated = double('updated')
         updated.stub(:[]).and_return(Hash.new)
-        updated.stub(:attributes).and_return(Hash.new)
+        updated.stub(:_attributes_).and_return(Hash.new)
         updated
       end
 
@@ -173,14 +173,14 @@ shared_examples_for "a Ridley Resource" do |resource_klass|
     it "returns the value of the chef_id attribute" do
       subject.class.attribute(:name)
       subject.class.stub(:chef_id) { :name }
-      subject.attributes = { name: "reset" }
+      subject.mass_assign(name: "reset")
 
       subject.chef_id.should eql("reset")
     end
   end
 
   describe "#reload" do
-    let(:updated_subject) { double('updated_subject', attributes: { fake_attribute: "some_value" }) }
+    let(:updated_subject) { double('updated_subject', _attributes_: { fake_attribute: "some_value" }) }
 
     before(:each) do
       subject.class.attribute(:fake_attribute)
@@ -194,8 +194,7 @@ shared_examples_for "a Ridley Resource" do |resource_klass|
     it "sets the attributes of self to include those of the reloaded object" do
       subject.reload
 
-      subject.attributes.should have_key(:fake_attribute)
-      subject.attributes[:fake_attribute].should eql("some_value")
+      subject.get_attribute(:fake_attribute).should eql("some_value")
     end
   end
 end

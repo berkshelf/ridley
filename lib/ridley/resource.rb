@@ -92,7 +92,7 @@ module Ridley
       def create(client, object)
         resource = new(client, object.to_hash)
         new_attributes = client.connection.post(self.resource_path, resource.to_json).body
-        resource.attributes = resource.attributes.deep_merge(new_attributes)
+        resource.mass_assign(resource._attributes_.deep_merge(new_attributes))
         resource
       end
 
@@ -149,7 +149,7 @@ module Ridley
     def save
       raise Errors::InvalidResource.new(self.errors) unless valid?
 
-      mass_assign(self.class.create(client, self).attributes)
+      mass_assign(self.class.create(client, self)._attributes_)
       true
     rescue Errors::HTTPConflict
       self.update
@@ -166,7 +166,7 @@ module Ridley
     def update
       raise Errors::InvalidResource.new(self.errors) unless valid?
 
-      mass_assign(self.class.update(client, self).attributes)
+      mass_assign(self.class.update(client, self)._attributes_)
       true
     end
 
@@ -174,7 +174,7 @@ module Ridley
     #
     # @return [Object]
     def reload
-      mass_assign(self.class.find(client, self).attributes)
+      mass_assign(self.class.find(client, self)._attributes_)
       self
     end
 
@@ -184,7 +184,7 @@ module Ridley
     end
 
     def to_s
-      self.attributes
+      "#{self.chef_id}: #{self._attributes_}"
     end
 
     # @param [Object] other
