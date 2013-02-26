@@ -2,8 +2,6 @@ source :rubygems
 
 gemspec
 
-gem 'chozo', github: 'reset/chozo'
-
 platforms :jruby do
   gem 'jruby-openssl'
 end
