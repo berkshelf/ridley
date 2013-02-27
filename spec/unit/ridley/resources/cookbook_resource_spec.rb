@@ -211,7 +211,7 @@ describe Ridley::CookbookResource do
   end
 
   describe "#download_file" do
-    let(:destination) { tmp_path.join('fake.file') }
+    let(:destination) { tmp_path.join('fake.file').to_s }
 
     before(:each) do
       subject.stub(:root_files) { [ { name: 'metadata.rb', url: "http://test.it/file" } ] }
