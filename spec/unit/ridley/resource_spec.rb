@@ -8,7 +8,7 @@ describe Ridley::Resource do
       Class.new(Ridley::Resource)
     end
 
-    it_behaves_like "a Ridley Resource", subject.call
+    it_behaves_like "a Ridley Resource", Class.new(Ridley::Resource)
 
     describe "::initialize" do
       it "mass assigns the given attributes" do
