@@ -150,22 +150,62 @@ module Ridley
       #   a JSON blob containing file names, file paths, and checksums for each
       #   that describe the cookbook version being uploaded.
       #
-      # @option options [Boolean] :freeze
       # @option options [Boolean] :force
+      #   Upload the Cookbook even if the version already exists and is frozen on
+      #   the target Chef Server
+      # @option options [Boolean] :freeze
+      #   Freeze the uploaded Cookbook on the Chef Server so that it cannot be
+      #   overwritten
       #
       # @return [Hash]
       def save(client, name, version, manifest, options = {})
-        freeze = options.fetch(:freeze, false)
-        force  = options.fetch(:force, false)
+        options.reverse_merge(force: false, freeze: false)
 
         url = "cookbooks/#{name}/#{version}"
-        url << "?force=true" if force
+        url << "?force=true" if options[:force]
 
         client.connection.put(url, manifest)
       end
 
       def update(*args)
         raise NotImplementedError
+      end
+
+      # Uploads a cookbook to the remote Chef server from the contents of a filepath
+      #
+      # @param [Ridley::Client] client
+      # @param [String] path
+      #   path to a cookbook on local disk
+      #
+      # @option options [String] :name
+      #   automatically populated by the metadata of the cookbook at the given path, but
+      #   in the event that the metadata does not contain a name it can be specified with
+      #   this option
+      # @option options [Boolean] :force (false)
+      #   Upload the Cookbook even if the version already exists and is frozen on
+      #   the target Chef Server
+      # @option options [Boolean] :freeze (false)
+      #   Freeze the uploaded Cookbook on the Chef Server so that it cannot be
+      #   overwritten
+      # @option options [Boolean] :validate (true)
+      #   Validate the contents of the cookbook before uploading
+      #
+      # @return [Hash]
+      def upload(client, path, options = {})
+        options   = options.reverse_merge(validate: true, force: false, freeze: false)
+        cookbook  = Ridley::Chef::Cookbook.from_path(path, options.slice(:name))
+
+        if options[:validate]
+          cookbook.validate
+        end
+
+        name      = options[:name] || cookbook.name
+        checksums = cookbook.checksums.dup
+        sandbox   = client.sandbox.create(checksums.keys)
+
+        sandbox.upload(checksums)
+        sandbox.commit
+        save(client, name, cookbook.version, cookbook.to_json, options.slice(:force, :freeze))
       end
 
       # Return a list of versions for the given cookbook present on the remote Chef server
