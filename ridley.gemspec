@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency 'json', '>= 1.5.0'
   s.add_runtime_dependency 'multi_json', '>= 1.0.4'
-  s.add_runtime_dependency 'chozo', '>= 0.5.0'
+  s.add_runtime_dependency 'chozo', '>= 0.6.0'
   s.add_runtime_dependency 'mixlib-log', '>= 1.3.0'
   s.add_runtime_dependency 'mixlib-shellout', '>= 1.1.0'
   s.add_runtime_dependency 'mixlib-config', '>= 1.1.0'
