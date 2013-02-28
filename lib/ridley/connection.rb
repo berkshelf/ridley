@@ -1,4 +1,5 @@
 require 'open-uri'
+require 'retryable'
 require 'tempfile'
 
 module Ridley
@@ -17,6 +18,9 @@ module Ridley
     attr_reader :organization
     attr_reader :client_key
     attr_reader :client_name
+    # @return [Integer]
+    #   how many retries to attempt on HTTP requests
+    attr_reader :retries
 
     # @param [String] server_url
     # @param [String] client_name
@@ -38,6 +42,7 @@ module Ridley
       options      = options.reverse_merge(retries: 5)
       @client_name = client_name
       @client_key  = client_key
+      @retries     = options[:retries]
 
       options = options.reverse_merge(
         builder: Faraday::Builder.new { |b|
@@ -128,8 +133,10 @@ module Ridley
       local = Tempfile.new('ridley-stream')
       local.binmode
 
-      open(target, 'rb', headers) do |remote|
-        local.write(remote.read)
+      retryable(tries: retries, on: OpenURI::HTTPError) do
+        open(target, 'rb', headers) do |remote|
+          local.write(remote.read)
+        end
       end
 
       local.flush

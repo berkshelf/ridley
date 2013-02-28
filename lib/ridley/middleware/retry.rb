@@ -1,6 +1,6 @@
-# Remove this file after the release of Faraday 0.9.x
-# Borrowed and modified from: {https://github.com/lostisland/faraday/blob/master/lib/faraday/request/retry.rb}
 module Ridley
+  # @author Jamie Winsor <jamie@vialstudios.com>
+  #
   # Catches exceptions and retries each request a limited number of times.
   #
   # @example
@@ -9,6 +9,9 @@ module Ridley
   #     conn.request :retry, max: 2, interval: 0.05, exceptions: [CustomException, Faraday::Timeout::Error]
   #     conn.adapter ...
   #   end
+  #
+  # @note Borrowed and modified from: {https://github.com/lostisland/faraday/blob/master/lib/faraday/request/retry.rb}
+  #   use the Faraday official middleware after the release of 0.9.x
   class Middleware::Retry < Faraday::Middleware
     # @option options [Integer] :max
     #   maximum number of retries
