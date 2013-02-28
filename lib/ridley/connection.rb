@@ -26,6 +26,8 @@ module Ridley
     #   URI query unencoded key/value pairs
     # @option options [Hash] :headers
     #   unencoded HTTP header key/value pairs
+    # #option options [Integer] :retries (5)
+    #   retry requests on 5XX failures
     # @option options [Hash] :request
     #   request options
     # @option options [Hash] :ssl
@@ -33,14 +35,23 @@ module Ridley
     # @option options [URI, String, Hash] :proxy
     #   URI, String, or Hash of HTTP proxy options
     def initialize(server_url, client_name, client_key, options = {})
-      @client_name  = client_name
-      @client_key   = client_key
+      options      = options.reverse_merge(retries: 5)
+      @client_name = client_name
+      @client_key  = client_key
 
       options = options.reverse_merge(
         builder: Faraday::Builder.new { |b|
-          b.request :chef_auth, client_name, client_key
-          b.response :chef_response
           b.response :json
+          b.request :retry,
+            max: options[:retries],
+            interval: 0.05,
+            exceptions: [
+              Ridley::Errors::HTTP5XXError,
+              Errno::ETIMEDOUT,
+              Faraday::Error::TimeoutError
+            ]
+          b.response :chef_response
+          b.request :chef_auth, client_name, client_key
 
           b.adapter :net_http_persistent
         }

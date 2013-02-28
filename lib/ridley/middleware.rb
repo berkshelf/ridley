@@ -6,14 +6,18 @@ module Ridley
     require 'ridley/middleware/parse_json'
     require 'ridley/middleware/chef_response'
     require 'ridley/middleware/chef_auth'
+    require 'ridley/middleware/retry'
 
     Faraday.register_middleware :request,
-      chef_auth: -> { ChefAuth }
+      chef_auth: -> { Ridley::Middleware::ChefAuth }
+
+    Faraday.register_middleware :request,
+      retry: -> { Ridley::Middleware::Retry }
 
     Faraday.register_middleware :response,
-      json: -> { ParseJson }
+      json: -> { Ridley::Middleware::ParseJson }
 
     Faraday.register_middleware :response,
-      chef_response: -> { ChefResponse }
+      chef_response: -> { Ridley::Middleware::ChefResponse }
   end
 end
