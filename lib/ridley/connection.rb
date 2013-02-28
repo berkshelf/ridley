@@ -1,4 +1,5 @@
 require 'open-uri'
+require 'retryable'
 require 'tempfile'
 
 module Ridley
@@ -17,6 +18,12 @@ module Ridley
     attr_reader :organization
     attr_reader :client_key
     attr_reader :client_name
+    # @return [Integer]
+    #   how many retries to attempt on HTTP requests
+    attr_reader :retries
+    # @return [Float]
+    #   time to wait between retries
+    attr_reader :retry_interval
 
     # @param [String] server_url
     # @param [String] client_name
@@ -26,6 +33,10 @@ module Ridley
     #   URI query unencoded key/value pairs
     # @option options [Hash] :headers
     #   unencoded HTTP header key/value pairs
+    # @option options [Integer] :retries (5)
+    #   retry requests on 5XX failures
+    # @option options [Float] :retry_interval (0.5)
+    #   how often we should pause between retries
     # @option options [Hash] :request
     #   request options
     # @option options [Hash] :ssl
@@ -33,14 +44,25 @@ module Ridley
     # @option options [URI, String, Hash] :proxy
     #   URI, String, or Hash of HTTP proxy options
     def initialize(server_url, client_name, client_key, options = {})
-      @client_name  = client_name
-      @client_key   = client_key
+      options         = options.reverse_merge(retries: 5, retry_interval: 0.5)
+      @client_name    = client_name
+      @client_key     = client_key
+      @retries        = options[:retries]
+      @retry_interval = options[:retry_interval]
 
       options = options.reverse_merge(
         builder: Faraday::Builder.new { |b|
-          b.request :chef_auth, client_name, client_key
-          b.response :chef_response
           b.response :json
+          b.request :retry,
+            max: @retries,
+            interval: @retry_interval,
+            exceptions: [
+              Ridley::Errors::HTTP5XXError,
+              Errno::ETIMEDOUT,
+              Faraday::Error::TimeoutError
+            ]
+          b.response :chef_response
+          b.request :chef_auth, client_name, client_key
 
           b.adapter :net_http_persistent
         }
@@ -117,8 +139,10 @@ module Ridley
       local = Tempfile.new('ridley-stream')
       local.binmode
 
-      open(target, 'rb', headers) do |remote|
-        local.write(remote.read)
+      retryable(tries: retries, on: OpenURI::HTTPError, sleep: retry_interval) do
+        open(target, 'rb', headers) do |remote|
+          local.write(remote.read)
+        end
       end
 
       local.flush

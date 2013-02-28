@@ -9,6 +9,33 @@ describe Ridley::Connection do
     described_class.new(server_url, client_name, client_key)
   end
 
+  describe "configurable retries" do
+    before(:each) do
+      stub_request(:get, "https://api.opscode.com/organizations/vialstudios").to_return(status: 500, body: "")
+    end
+
+    it "attempts five (5) retries by default" do
+      expect {
+        subject.get('organizations/vialstudios')
+      }.to raise_error
+      a_request(:get, "https://api.opscode.com/organizations/vialstudios").should have_been_made.times(6)
+    end
+
+    context "given a configured count of two (2) retries" do
+      subject do
+        described_class.new(server_url, client_name, client_key, retries: 2)
+      end
+
+      it "attempts two (2) retries" do
+        expect {
+          subject.get('organizations/vialstudios')
+        }.to raise_error
+
+        a_request(:get, "https://api.opscode.com/organizations/vialstudios").should have_been_made.times(3)
+      end
+    end
+  end
+
   describe "#api_type" do
     it "returns :foss if the organization is not set" do
       subject.stub(:organization).and_return(nil)

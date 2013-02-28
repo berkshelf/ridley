@@ -87,18 +87,21 @@ module Ridley
       end
     end
 
-    class HTTPBadRequest < HTTPError; register_error(400); end
-    class HTTPUnauthorized < HTTPError; register_error(401); end
-    class HTTPForbidden < HTTPError; register_error(403); end
-    class HTTPNotFound < HTTPError; register_error(404); end
-    class HTTPMethodNotAllowed < HTTPError; register_error(405); end
-    class HTTPRequestTimeout < HTTPError; register_error(408); end
-    class HTTPConflict < HTTPError; register_error(409); end
+    class HTTP4XXError < HTTPError; end
+    class HTTP5XXError < HTTPError; end
+
+    class HTTPBadRequest < HTTP4XXError; register_error(400); end
+    class HTTPUnauthorized < HTTP4XXError; register_error(401); end
+    class HTTPForbidden < HTTP4XXError; register_error(403); end
+    class HTTPNotFound < HTTP4XXError; register_error(404); end
+    class HTTPMethodNotAllowed < HTTP4XXError; register_error(405); end
+    class HTTPRequestTimeout < HTTP4XXError; register_error(408); end
+    class HTTPConflict < HTTP4XXError; register_error(409); end
     
-    class HTTPInternalServerError < HTTPError; register_error(500); end
-    class HTTPNotImplemented < HTTPError; register_error(501); end
-    class HTTPBadGateway < HTTPError; register_error(502); end
-    class HTTPServiceUnavailable < HTTPError; register_error(503); end
-    class HTTPGatewayTimeout < HTTPError; register_error(504); end
+    class HTTPInternalServerError < HTTP5XXError; register_error(500); end
+    class HTTPNotImplemented < HTTP5XXError; register_error(501); end
+    class HTTPBadGateway < HTTP5XXError; register_error(502); end
+    class HTTPServiceUnavailable < HTTP5XXError; register_error(503); end
+    class HTTPGatewayTimeout < HTTP5XXError; register_error(504); end
   end
 end
