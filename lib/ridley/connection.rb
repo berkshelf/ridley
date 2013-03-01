@@ -8,9 +8,8 @@ module Ridley
     include Celluloid
 
     VALID_OPTIONS = [
-      :params,
-      :headers,
-      :request,
+      :retries,
+      :retry_interval,
       :ssl,
       :proxy
     ]
@@ -29,16 +28,10 @@ module Ridley
     # @param [String] client_name
     # @param [String] client_key
     #
-    # @option options [Hash] :params
-    #   URI query unencoded key/value pairs
-    # @option options [Hash] :headers
-    #   unencoded HTTP header key/value pairs
     # @option options [Integer] :retries (5)
     #   retry requests on 5XX failures
     # @option options [Float] :retry_interval (0.5)
     #   how often we should pause between retries
-    # @option options [Hash] :request
-    #   request options
     # @option options [Hash] :ssl
     #   * :verify (Boolean) [true] set to false to disable SSL verification
     # @option options [URI, String, Hash] :proxy
@@ -50,23 +43,21 @@ module Ridley
       @retries        = options[:retries]
       @retry_interval = options[:retry_interval]
 
-      options = options.reverse_merge(
-        builder: Faraday::Builder.new { |b|
-          b.response :json
-          b.request :retry,
-            max: @retries,
-            interval: @retry_interval,
-            exceptions: [
-              Ridley::Errors::HTTP5XXError,
-              Errno::ETIMEDOUT,
-              Faraday::Error::TimeoutError
-            ]
-          b.response :chef_response
-          b.request :chef_auth, client_name, client_key
+      options[:builder] = Faraday::Builder.new do |b|
+        b.response :json
+        b.request :retry,
+          max: @retries,
+          interval: @retry_interval,
+          exceptions: [
+            Ridley::Errors::HTTP5XXError,
+            Errno::ETIMEDOUT,
+            Faraday::Error::TimeoutError
+          ]
+        b.response :chef_response
+        b.request :chef_auth, client_name, client_key
 
-          b.adapter :net_http_persistent
-        }
-      )
+        b.adapter :net_http_persistent
+      end
 
       uri_hash = Addressable::URI.parse(server_url).to_hash.slice(:scheme, :host, :port)
 
