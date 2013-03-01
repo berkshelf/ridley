@@ -28,7 +28,8 @@ module Ridley
         #
         # @return [Hash]
         def parse(body)
-          HashWithIndifferentAccess.new MultiJson.decode(body)
+          result = MultiJson.decode(body)
+          result.is_a?(Hash) ? Hashie::Mash.new(result) : result
         end
 
         # Extracts the type of the response from the response headers
