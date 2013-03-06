@@ -87,9 +87,15 @@ module Ridley
       end
     end
 
+    class HTTP3XXError < HTTPError; end
     class HTTP4XXError < HTTPError; end
     class HTTP5XXError < HTTPError; end
 
+    # 3XX
+    class HTTPMovedPermanently < HTTP3XXError; register_error(301); end
+    class HTTPFound < HTTP3XXError; register_error(302); end
+
+    # 4XX
     class HTTPBadRequest < HTTP4XXError; register_error(400); end
     class HTTPUnauthorized < HTTP4XXError; register_error(401); end
     class HTTPForbidden < HTTP4XXError; register_error(403); end
@@ -97,7 +103,8 @@ module Ridley
     class HTTPMethodNotAllowed < HTTP4XXError; register_error(405); end
     class HTTPRequestTimeout < HTTP4XXError; register_error(408); end
     class HTTPConflict < HTTP4XXError; register_error(409); end
-    
+
+    # 5XX
     class HTTPInternalServerError < HTTP5XXError; register_error(500); end
     class HTTPNotImplemented < HTTP5XXError; register_error(501); end
     class HTTPBadGateway < HTTP5XXError; register_error(502); end
