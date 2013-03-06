@@ -39,6 +39,16 @@ module Ridley
     class ClientKeyFileNotFound < BootstrapError; end
     class EncryptedDataBagSecretNotFound < BootstrapError; end
 
+    # Exception thrown when the maximum amount of requests is exceeded.
+    class RedirectLimitReached < RidleyError
+      attr_reader :response
+
+      def initialize(response)
+        super "too many redirects; last one to: #{response['location']}"
+        @response = response
+      end
+    end
+
     class HTTPError < RidleyError
       class << self
         def fabricate(env)
