@@ -60,7 +60,6 @@ module Ridley
       end
 
       uri_hash = Addressable::URI.parse(server_url).to_hash.slice(:scheme, :host, :port)
-
       unless uri_hash[:port]
         uri_hash[:port] = (uri_hash[:scheme] == "https" ? 443 : 80)
       end
@@ -69,13 +68,8 @@ module Ridley
         @organization = org_match[1]
       end
 
-      unless @organization.nil?
-        uri_hash[:path] = "/organizations/#{@organization}"
-      end
-
-      server_uri = Addressable::URI.new(uri_hash)
-
-      super(server_uri, options)
+      super(Addressable::URI.new(uri_hash), options)
+      @headers[:user_agent] = "Ridley v#{Ridley::VERSION}"
     end
 
     # @return [Symbol]
