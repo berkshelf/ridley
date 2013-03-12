@@ -171,7 +171,7 @@ module Ridley
     def update
       raise Errors::InvalidResource.new(self.errors) unless valid?
 
-      mass_assign(sself.class.update(client, data_bag, self)._attributes_)
+      mass_assign(self.class.update(client, data_bag, self)._attributes_)
       true
     end
 
