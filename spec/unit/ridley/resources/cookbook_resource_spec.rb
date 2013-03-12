@@ -203,8 +203,8 @@ describe Ridley::CookbookResource do
         }
       end
 
-      subject.should_receive(:download_file).with(:recipes, "default.rb", anything)
-      subject.should_receive(:download_file).with(:files, "README", anything)
+      subject.should_receive(:download_file).with(:recipes, "recipes/default.rb", anything)
+      subject.should_receive(:download_file).with(:files, "files/default/plugins/README", anything)
 
       subject.download
     end
@@ -214,7 +214,7 @@ describe Ridley::CookbookResource do
     let(:destination) { tmp_path.join('fake.file').to_s }
 
     before(:each) do
-      subject.stub(:root_files) { [ { name: 'metadata.rb', url: "http://test.it/file" } ] }
+      subject.stub(:root_files) { [ { path: 'metadata.rb', url: "http://test.it/file" } ] }
     end
 
     it "downloads the file from the file's url" do
