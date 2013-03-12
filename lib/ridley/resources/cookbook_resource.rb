@@ -311,7 +311,7 @@ module Ridley
         manifest[filetype].each do |file|
           file_destination = File.join(destination, file[:path].gsub('/', File::SEPARATOR))
           FileUtils.mkdir_p(File.dirname(file_destination))
-          download_file(filetype, file[:name], file_destination)
+          download_file(filetype, file[:path], file_destination)
         end
       end
 
@@ -400,7 +400,7 @@ module Ridley
 
         ->(target, destination) {
           files = collection.call # JW: always chaining .call.find results in a nil value. WHY?
-          file  = files.find { |f| f[:name] == target }
+          file  = files.find { |f| f[:path] == target }
           return nil if file.nil?
 
           destination = File.expand_path(destination)
