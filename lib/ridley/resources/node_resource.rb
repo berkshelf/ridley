@@ -54,6 +54,7 @@ module Ridley
       # @param [Ridley::Client] client
       # @param [Ridley::NodeResource, String] target
       #   node or identifier of the node to merge
+      #
       # @option options [Array] :run_list
       #   run list items to merge
       # @option options [Hash] :attributes
