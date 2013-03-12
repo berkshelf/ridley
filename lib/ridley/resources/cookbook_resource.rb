@@ -334,14 +334,14 @@ module Ridley
     #   these types are where the files are stored in your cookbook's structure. For example, a
     #   recipe would be stored in the recipes directory while a root_file is stored at the root
     #   of your cookbook
-    # @param [String] name
-    #   name of the file to download
+    # @param [String] path
+    #   path of the file to download
     # @param [String] destination
     #   where to download the file to
     #
     # @return [nil]
-    def download_file(filetype, name, destination)
-      download_fun(filetype).call(name, destination)
+    def download_file(filetype, path, destination)
+      download_fun(filetype).call(path, destination)
     end
 
     # A hash containing keys for all of the different cookbook filetypes with values
