@@ -1,4 +1,5 @@
 # Ridley
+[![Gem Version](https://badge.fury.io/rb/ridley.png)](http://badge.fury.io/rb/ridley)
 [![Build Status](https://secure.travis-ci.org/reset/ridley.png?branch=master)](http://travis-ci.org/reset/ridley)
 [![Dependency Status](https://gemnasium.com/reset/ridley.png?travis)](https://gemnasium.com/reset/ridley)
 [![Code Climate](https://codeclimate.com/badge.png)](https://codeclimate.com/github/reset/ridley)
