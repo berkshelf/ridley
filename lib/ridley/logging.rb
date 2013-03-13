@@ -1,7 +1,7 @@
 require 'logger'
 
 module Ridley
-  # @author Jamie Winsor <jamie@vialstudios.com>
+  # @author Jamie Winsor <reset@riotgames.com>
   module Logging
     class << self
       # @return [Logger]

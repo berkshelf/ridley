@@ -1,5 +1,5 @@
 module Ridley
-  # @author Jamie Winsor <jamie@vialstudios.com>
+  # @author Jamie Winsor <reset@riotgames.com>
   module Errors
     class RidleyError < StandardError; end
     class InternalError < RidleyError; end

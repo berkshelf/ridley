@@ -1,5 +1,5 @@
 module Ridley
-  # @author Jamie Winsor <jamie@vialstudios.com>
+  # @author Jamie Winsor <reset@riotgames.com>
   class EncryptedDataBagItemResource
     class << self
       # Finds a data bag item and decrypts it.

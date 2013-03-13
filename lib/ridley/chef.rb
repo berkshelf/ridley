@@ -1,5 +1,5 @@
 module Ridley
-  # @author Jamie Winsor <jamie@vialstudios.com>
+  # @author Jamie Winsor <reset@riotgames.com>
   #
   # Classes and modules used for integrating with a Chef Server, the Chef community
   # site, and Chef Cookbooks

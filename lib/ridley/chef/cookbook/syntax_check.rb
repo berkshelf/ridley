@@ -1,6 +1,6 @@
 module Ridley::Chef
   class Cookbook
-    # @author Jamie Winsor <jamie@vialstudios.com>
+    # @author Jamie Winsor <reset@riotgames.com>
     #
     # Encapsulates the process of validating the ruby syntax of files in Chef
     # cookbooks.

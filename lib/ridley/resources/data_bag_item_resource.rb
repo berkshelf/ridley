@@ -1,5 +1,5 @@
 module Ridley
-  # @author Jamie Winsor <jamie@vialstudios.com>
+  # @author Jamie Winsor <reset@riotgames.com>
   class DataBagItemResource < Ridley::Resource
     class << self
       # @param [Ridley::Client] client

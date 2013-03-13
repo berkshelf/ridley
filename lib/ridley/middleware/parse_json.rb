@@ -1,6 +1,6 @@
 module Ridley
   module Middleware
-    # @author Jamie Winsor <jamie@vialstudios.com>
+    # @author Jamie Winsor <reset@riotgames.com>
     class ParseJson < Faraday::Response::Middleware
       include Ridley::Logging
 

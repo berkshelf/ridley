@@ -1,7 +1,7 @@
 require 'net/ssh'
 
 module Ridley
-  # @author Jamie Winsor <jamie@vialstudios.com>
+  # @author Jamie Winsor <reset@riotgames.com>
   class SSH
     autoload :Response, 'ridley/ssh/response'
     autoload :ResponseSet, 'ridley/ssh/response_set'

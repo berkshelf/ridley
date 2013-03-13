@@ -1,5 +1,5 @@
 module Ridley
-  # @author Jamie Winsor <jamie@vialstudios.com>
+  # @author Jamie Winsor <reset@riotgames.com>
   class RoleResource < Ridley::Resource
     set_chef_id "name"
     set_chef_type "role"

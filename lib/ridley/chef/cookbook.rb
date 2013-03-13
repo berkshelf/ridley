@@ -1,5 +1,5 @@
 module Ridley::Chef
-  # @author Jamie Winsor <jamie@vialstudios.com>
+  # @author Jamie Winsor <reset@riotgames.com>
   class Cookbook
     autoload :Metadata, 'ridley/chef/cookbook/metadata'
     autoload :SyntaxCheck, 'ridley/chef/cookbook/syntax_check'

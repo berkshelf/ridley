@@ -1,5 +1,5 @@
 module Ridley
-  # @author Jamie Winsor <jamie@vialstudios.com>
+  # @author Jamie Winsor <reset@riotgames.com>
   class SandboxResource
     class << self
       # Create a new Sandbox on the client's Chef Server. A Sandbox requires an

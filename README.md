@@ -349,4 +349,4 @@ And the same goes for setting an environment level override attribute
 
 # Authors and Contributors
 
-* Jamie Winsor (<jamie@vialstudios.com>)
+* Jamie Winsor (<reset@riotgames.com>)

@@ -1,6 +1,6 @@
 module Ridley::Chef
   class Cookbook
-    # @author Jamie Winsor <jamie@vialstudios.com>
+    # @author Jamie Winsor <reset@riotgames.com>
     #
     # Borrowed and modified from: {https://raw.github.com/opscode/chef/11.4.0/lib/chef/cookbook/metadata.rb}
     #

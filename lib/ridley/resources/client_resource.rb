@@ -1,5 +1,5 @@
 module Ridley
-  # @author Jamie Winsor <jamie@vialstudios.com>
+  # @author Jamie Winsor <reset@riotgames.com>
   class ClientResource < Ridley::Resource
     class << self
       # Retrieves a client from the remote connection matching the given chef_id

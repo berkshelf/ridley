@@ -2,7 +2,7 @@ require 'ridley/resources/data_bag_item_resource'
 require 'ridley/resources/encrypted_data_bag_item_resource'
 
 module Ridley
-  # @author Jamie Winsor <jamie@vialstudios.com>
+  # @author Jamie Winsor <reset@riotgames.com>
   # @api private
   class DBIChainLink
     attr_reader :data_bag
@@ -30,7 +30,7 @@ module Ridley
     end
   end
 
-  # @author Jamie Winsor <jamie@vialstudios.com>
+  # @author Jamie Winsor <reset@riotgames.com>
   class DataBagResource < Ridley::Resource
     class << self
       # @param [Ridley::Client] client

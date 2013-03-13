@@ -3,7 +3,7 @@ require 'retryable'
 require 'tempfile'
 
 module Ridley
-  # @author Jamie Winsor <jamie@vialstudios.com>
+  # @author Jamie Winsor <reset@riotgames.com>
   class Connection < Faraday::Connection
     include Celluloid
 

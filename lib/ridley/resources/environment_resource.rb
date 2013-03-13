@@ -1,5 +1,5 @@
 module Ridley
-  # @author Jamie Winsor <jamie@vialstudios.com>
+  # @author Jamie Winsor <reset@riotgames.com>
   class EnvironmentResource < Ridley::Resource
     class << self
       # Delete all of the environments on the client. The '_default' environment

@@ -1,7 +1,7 @@
 require 'digest'
 
 module Ridley::Chef
-  # @author Jamie Winsor <jamie@vialstudios.com>
+  # @author Jamie Winsor <reset@riotgames.com>
   #
   # Borrowed and modified from: {https://github.com/opscode/chef/blob/11.4.0/lib/chef/digester.rb}
   class Digester

@@ -2,7 +2,7 @@ require 'erubis'
 
 module Ridley
   class Bootstrapper
-    # @author Jamie Winsor <jamie@vialstudios.com>
+    # @author Jamie Winsor <reset@riotgames.com>
     class Context
       class << self
         def validate_options(options = {})

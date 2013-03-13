@@ -2,7 +2,7 @@ require 'mixlib/authentication/signedheaderauth'
 
 module Ridley
   module Middleware
-    # @author Jamie Winsor <jamie@vialstudios.com>
+    # @author Jamie Winsor <reset@riotgames.com>
     class ChefAuth < Faraday::Middleware
       class << self
         include Mixlib::Authentication

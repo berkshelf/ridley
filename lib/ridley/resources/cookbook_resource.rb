@@ -1,5 +1,5 @@
 module Ridley
-  # @author Jamie Winsor <jamie@vialstudios.com>
+  # @author Jamie Winsor <reset@riotgames.com>
   class CookbookResource < Ridley::Resource
     class << self
       # List all of the cookbooks and their versions present on the remote

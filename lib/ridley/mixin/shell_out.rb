@@ -1,7 +1,7 @@
 require 'mixlib/shellout'
 
 module Ridley::Mixin
-  # @author Jamie Winsor <jamie@vialstudios.com>
+  # @author Jamie Winsor <reset@riotgames.com>
   module ShellOut
     # @return [Mixlib::ShellOut]
     def shell_out(*command_args)

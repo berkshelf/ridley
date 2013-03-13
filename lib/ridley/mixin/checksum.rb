@@ -1,5 +1,5 @@
 module Ridley::Mixin
-  # @author Jamie Winsor <jamie@vialstudios.com>
+  # @author Jamie Winsor <reset@riotgames.com>
   #
   # Inspired by and dependency-free replacement for
   # {https://github.com/opscode/chef/blob/11.4.0/lib/chef/mixin/checksum.rb}
