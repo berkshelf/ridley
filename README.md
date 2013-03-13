@@ -350,3 +350,5 @@ And the same goes for setting an environment level override attribute
 # Authors and Contributors
 
 * Jamie Winsor (<reset@riotgames.com>)
+
+Thank you to all of our [Contributors](https://github.com/RiotGames/ridley/graphs/contributors), testers, and users.
