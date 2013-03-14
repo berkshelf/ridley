@@ -32,7 +32,7 @@ module Ridley
         File.open(path, 'rb') { |f| checksum_io(f, Digest::MD5.new) }
       end
 
-      # Return a base64 encoded checksum of the contents of hte given file. This is the expected
+      # Return a base64 encoded checksum of the contents of the given file. This is the expected
       # format of sandbox checksums given to the Chef Server.
       #
       # @param [String] path
@@ -43,7 +43,7 @@ module Ridley
         Base64.encode64([checksum(path)].pack("H*")).strip
       end
 
-      # Return a base64 encoded checksum of the contents of hte given string. This is the expected
+      # Return a base64 encoded checksum of the contents of the given string. This is the expected
       # format of sandbox checksums given to the Chef Server.
       #
       # @param [String] content
