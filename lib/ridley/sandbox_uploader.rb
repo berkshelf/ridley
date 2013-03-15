@@ -43,17 +43,6 @@ module Ridley
         Base64.encode64([checksum(path)].pack("H*")).strip
       end
 
-      # Return a base64 encoded checksum of the contents of the given string. This is the expected
-      # format of sandbox checksums given to the Chef Server.
-      #
-      # @param [String] content
-      #
-      # @return [String]
-      #   a base64 encoded checksum
-      def checksum64_string(string)
-        Base64.encode64([Digest::MD5.digest(string)].pack("H*")).strip
-      end
-
       # @param [String] io
       # @param [Object] digest
       #
@@ -81,7 +70,7 @@ module Ridley
     # Concurrently upload multiple files into a sandbox
     #
     # @param [Hash] checksums
-    #   a hash of file checksums and file paths or IO objects
+    #   a hash of file checksums and file paths
     #
     # @example uploading multiple checksums
     #
@@ -90,8 +79,8 @@ module Ridley
     #     "de6532a7fbe717d52020dc9f3ae47dbe" => "/Users/reset/code/rbenv-cookbook/recipes/ohai_plugin.rb"
     #   )
     def multi_upload(checksums)
-      checksums.collect do |chk_id, path_or_io|
-        future.upload(chk_id, path_or_io)
+      checksums.collect do |chk_id, path|
+        future.upload(chk_id, path)
       end.map(&:value)
     end
 
@@ -99,31 +88,22 @@ module Ridley
     #
     # @param [String] chk_id
     #   checksum of the file being uploaded
-    # @param [String, #read] path_or_io
-    #   path to the file to upload or an IO which returns the content
+    # @param [String] path
+    #   path to the file to upload
     #
     # @return [Hash, nil]
-    def upload(chk_id, path_or_io)
+    def upload(chk_id, path)
       checksum = self.checksum(chk_id)
       
       unless checksum[:needs_upload]
         return nil
       end
 
-      if path_or_io.respond_to? :read
-        io = path_or_io
-      elsif path_or_io.kind_of? String
-        io = File.open(path_or_io, 'rb')
-      else
-        raise ArgumentError, "Expected a String or an IO, but got #{path_or_io.inspect}"
-      end
-
-      contents = io.read
-
       headers  = {
         'Content-Type' => 'application/x-binary',
-        'content-md5' => self.class.checksum64_string(contents)
+        'content-md5' => self.class.checksum64(path)
       }
+      contents = File.open(path, 'rb') { |f| f.read }
 
       url         = URI(checksum[:url])
       upload_path = url.path
