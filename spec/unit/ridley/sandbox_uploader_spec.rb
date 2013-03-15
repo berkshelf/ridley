@@ -100,31 +100,5 @@ describe Ridley::SandboxUploader do
         subject.upload(chk_id, path).should be_nil
       end
     end
-
-    context "when the checksum is passed with an IO" do
-
-      let(:chk_id){ 'UnqwASktfBA=' }
-
-      let(:checksums) do
-        {
-          chk_id => {
-            url: "https://api.opscode.com/organizations/vialstudios/sandboxes/bd091b150b0a4578b97771af6abf3e05",
-            needs_upload: true
-          }
-        }
-      end
-
-      let(:sandbox) do
-        Ridley::SandboxResource.new(client, checksums: checksums)
-      end
-
-      it "accepts something that responds to read" do
-        stub_request(:put, checksums[chk_id][:url])
-        io = double("io")
-        io.should_receive(:read).once.and_return("Some content")
-        subject.upload(chk_id, io)
-      end
-
-    end
   end
 end
