@@ -36,15 +36,19 @@ describe Ridley::SandboxUploader do
     end
 
     describe "::checksum" do
-      it "returns a string" do
-        subject.checksum(fixtures_path.join('reset.pem')).should be_a(String)
-      end
+      subject { described_class.checksum(path) }
+
+      let(:path) { fixtures_path.join('reset.pem') }
+
+      it { should eq("a0608f1eb43ee4cca510bf95f8d209f7") }
     end
 
     describe "::checksum64" do
-      it "returns a string" do
-        subject.checksum64(fixtures_path.join('reset.pem')).should be_a(String)
-      end
+      subject { described_class.checksum64(path) }
+
+      let(:path) { fixtures_path.join('reset.pem') }
+
+      it { should eq("oGCPHrQ+5MylEL+V+NIJ9w==") }
     end
   end
 
