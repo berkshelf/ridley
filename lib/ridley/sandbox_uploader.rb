@@ -24,6 +24,17 @@ module Ridley
         Base64.encode64([checksum(path)].pack("H*")).strip
       end
 
+      # Return a base64 encoded checksum of the contents of hte given string. This is the expected
+      # format of sandbox checksums given to the Chef Server.
+      #
+      # @param [String] content
+      #
+      # @return [String]
+      #   a base64 encoded checksum
+      def checksum64_string(string)
+        Base64.encode64([Digest::MD5.hexdigest(string)].pack("H*")).strip
+      end
+
       # @param [String] io
       # @param [Object] digest
       #
@@ -53,22 +64,35 @@ module Ridley
     # @param [Ridley::SandboxObject] sandbox
     # @param [String] chk_id
     #   checksum of the file being uploaded
-    # @param [String] path
-    #   path to the file to upload
+    # @param [String, #read] path_or_io
+    #   path to the file to upload, or an IO ducktype
     #
     # @return [Hash, nil]
-    def upload(sandbox, chk_id, path)
+    def upload(sandbox, chk_id, path_or_io)
       checksum = sandbox.checksum(chk_id)
-
       unless checksum[:needs_upload]
         return nil
       end
 
+      if path_or_io.respond_to? :read
+        io = path_or_io
+      elsif path_or_io.kind_of? String
+        io = File.open(path_or_io, 'rb')
+      else
+        raise Ridley::Errors::ArgumentError, "Expected a String or an IO, but got #{path_or_io.inspect}"
+      end
+
+      contents = io.read
+      calculated_checksum = self.class.checksum64_string(contents)
+      expected_checksum = Base64.encode64([chk_id].pack('H*')).strip
+      unless expected_checksum == calculated_checksum
+        raise Ridley::Errors::ArgumentError, "Tried to upload #{path_or_io.inspect} for id #{chk_id} with wrong checksum ( calculated: #{calculated_checksum}, expected: #{expected_checksum} )."
+      end
+
       headers  = {
         'Content-Type' => 'application/x-binary',
-        'content-md5' => self.class.checksum64(path)
+        'content-md5' => calculated_checksum
       }
-      contents = File.open(path, 'rb') { |f| f.read }
 
       url         = URI(checksum[:url])
       upload_path = url.path
