@@ -40,13 +40,21 @@ describe Ridley::SandboxUploader do
 
       it { should eq("oGCPHrQ+5MylEL+V+NIJ9w==") }
     end
+
+    describe "::checksum64_string" do
+      it "returns the same as ::checksum64" do
+        subject.checksum64_string(File.read(fixtures_path.join('reset.pem'))).should == subject.checksum64(fixtures_path.join('reset.pem'))
+      end
+    end
+
   end
 
   subject { described_class.new(client_name, client_key, {}) }
 
   describe "#upload" do
-    let(:chk_id) { "oGCPHrQ+5MylEL+V+NIJ9w==" }
+    let(:chk_id) { "a0608f1eb43ee4cca510bf95f8d209f7" }
     let(:path) { fixtures_path.join('reset.pem').to_s }
+    let(:different_path) { fixtures_path.join('recipe_one.rb').to_s }
 
     before do
       connection.stub(foss?: false)
@@ -66,6 +74,10 @@ describe Ridley::SandboxUploader do
         stub_request(:put, checksums[chk_id][:url])
 
         subject.upload(sandbox, chk_id, path)
+      end
+
+      it "refuses to upload a wrong file" do
+        expect{ subject.upload(sandbox, chk_id, different_path) }.to raise_error(Ridley::Errors::ArgumentError)
       end
     end
 
@@ -107,5 +119,36 @@ describe Ridley::SandboxUploader do
         subject.upload(sandbox, chk_id, path)
       end
     end
+
+    context "when the checksum is passed with an IO" do
+
+      let(:chk_id){ 'b53227da4280f0e18270f21dd77c91d0' }
+
+      let(:checksums) do
+        {
+          chk_id => {
+            url: "https://api.opscode.com/organizations/vialstudios/sandboxes/bd091b150b0a4578b97771af6abf3e05",
+            needs_upload: true
+          }
+        }
+      end
+
+      let(:sandbox) { Ridley::SandboxObject.new(resource, checksums: checksums) }
+
+      it "accepts something that responds to read" do
+        stub_request(:put, checksums[chk_id][:url])
+        io = double("io")
+        io.should_receive(:read).once.and_return("Some content")
+        subject.upload(sandbox, chk_id, io)
+      end
+
+      it "refuses uploading something with a wrong checksum" do
+        io = double("io")
+        io.should_receive(:read).once.and_return("A different content")
+        expect{ subject.upload(sandbox, chk_id, io) }.to raise_error(Ridley::Errors::ArgumentError)
+      end
+
+    end
+
   end
 end
