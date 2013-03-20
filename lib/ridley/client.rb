@@ -103,8 +103,13 @@ module Ridley
     #   * :verify (Boolean) [true] set to false to disable SSL verification
     # @option options [URI, String, Hash] :proxy
     #   URI, String, or Hash of HTTP proxy options
+    #
+    # @raise [Errors::ClientKeyFileNotFound] if the option for :client_key does not contain
+    #   a file path pointing to a readable client key
     def initialize(options = {})
       log.info { "Ridley starting..." }
+      super()
+
       @options = options.reverse_merge(
         ssh: Hash.new
       ).deep_symbolize_keys
@@ -127,7 +132,6 @@ module Ridley
         raise Errors::ClientKeyFileNotFound, "client key not found at: '#{@options[:client_key]}'"
       end
 
-      super(Celluloid::Registry.new)
       pool(Ridley::Connection, size: 4, args: [
         @options[:server_url],
         @options[:client_name],
@@ -227,16 +231,14 @@ module Ridley
     alias_method :sync, :evaluate
 
     def finalize
-      connection.terminate if connection.alive?
+      connection.terminate if connection && connection.alive?
     end
 
     def connection
-      registry[:connection_pool]
+      @registry[:connection_pool]
     end
 
     private
-
-      attr_reader :registry
 
       def method_missing(method, *args, &block)
         if block_given?

@@ -28,7 +28,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'faraday', '>= 0.8.4'
   s.add_runtime_dependency 'activesupport', '>= 3.2.0'
   s.add_runtime_dependency 'solve', '>= 0.4.1'
-  s.add_runtime_dependency 'celluloid'
+  s.add_runtime_dependency 'celluloid', '~> 0.13.0'
   s.add_runtime_dependency 'net-ssh'
   s.add_runtime_dependency 'erubis'
   s.add_runtime_dependency 'net-http-persistent', '>= 2.8'
