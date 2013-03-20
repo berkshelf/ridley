@@ -105,6 +105,8 @@ module Ridley
     #   URI, String, or Hash of HTTP proxy options
     def initialize(options = {})
       log.info { "Ridley starting..." }
+      super()
+
       @options = options.reverse_merge(
         ssh: Hash.new
       ).deep_symbolize_keys
@@ -127,7 +129,6 @@ module Ridley
         raise Errors::ClientKeyFileNotFound, "client key not found at: '#{@options[:client_key]}'"
       end
 
-      super(Celluloid::Registry.new)
       pool(Ridley::Connection, size: 4, args: [
         @options[:server_url],
         @options[:client_name],
@@ -227,16 +228,14 @@ module Ridley
     alias_method :sync, :evaluate
 
     def finalize
-      connection.terminate if connection.alive?
+      connection.terminate if connection && connection.alive?
     end
 
     def connection
-      registry[:connection_pool]
+      @registry[:connection_pool]
     end
 
     private
-
-      attr_reader :registry
 
       def method_missing(method, *args, &block)
         if block_given?
