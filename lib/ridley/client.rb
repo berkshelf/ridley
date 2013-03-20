@@ -103,6 +103,9 @@ module Ridley
     #   * :verify (Boolean) [true] set to false to disable SSL verification
     # @option options [URI, String, Hash] :proxy
     #   URI, String, or Hash of HTTP proxy options
+    #
+    # @raise [Errors::ClientKeyFileNotFound] if the option for :client_key does not contain
+    #   a file path pointing to a readable client key
     def initialize(options = {})
       log.info { "Ridley starting..." }
       super()
