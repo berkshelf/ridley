@@ -143,10 +143,6 @@ module Ridley
       # @param [Ridley::Chef::Cookbook] cookbook
       #   the cookbook to save
       #
-      # @option options [String] :name
-      #   automatically populated by the metadata of the cookbook at the given path, but
-      #   in the event that the metadata does not contain a name it can be specified with
-      #   this option
       # @option options [Boolean] :force
       #   Upload the Cookbook even if the version already exists and is frozen on
       #   the target Chef Server
@@ -163,10 +159,9 @@ module Ridley
       def update(client, cookbook, options = {})
         options.reverse_merge(force: false, freeze: false)
 
-        name            = options[:name] || cookbook.cookbook_name
         cookbook.frozen = options[:freeze]
 
-        url = "cookbooks/#{name}/#{cookbook.version}"
+        url = "cookbooks/#{cookbook.cookbook_name}/#{cookbook.version}"
         url << "?force=true" if options[:force]
 
         client.connection.put(url, cookbook.to_json)
@@ -208,7 +203,7 @@ module Ridley
 
         sandbox.upload(checksums)
         sandbox.commit
-        update(client, cookbook, options.slice(:force, :freeze, :name))
+        update(client, cookbook, options.slice(:force, :freeze))
       end
 
       # Return a list of versions for the given cookbook present on the remote Chef server
