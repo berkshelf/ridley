@@ -143,7 +143,7 @@ module Ridley::Chef
       rescue Mixlib::ShellOut::ShellCommandFailed
         file_relative_path = erb_file[/^#{Regexp.escape(cookbook_path+File::Separator)}(.*)/, 1]
         log.error { "Erb template #{file_relative_path} has a syntax error:" }
-        result.stderr.each_line { |l| Ridley.log..fatal(l.chomp) }
+        result.stderr.each_line { |l| Ridley.log.fatal(l.chomp) }
         false
       end
 
