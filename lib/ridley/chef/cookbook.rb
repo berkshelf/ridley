@@ -74,6 +74,9 @@ module Ridley::Chef
     #     }
     attr_reader :manifest
 
+    # @return [Boolean]
+    attr_accessor :frozen
+
     def_delegator :@metadata, :version
 
     def initialize(name, path, metadata)
@@ -92,6 +95,7 @@ module Ridley::Chef
         providers: Array.new,
         root_files: Array.new
       )
+      @frozen        = false
 
       load_files
     end
@@ -183,13 +187,13 @@ module Ridley::Chef
       result[:cookbook_name] = cookbook_name
       result[:version]       = version
       result[:metadata]      = metadata
+      result[:frozen?]       = frozen
       result.to_hash
     end
 
     def to_json(*args)
       result               = self.to_hash
       result['json_class'] = CHEF_JSON_CLASS
-      result['frozen?']    = false
       result.to_json(*args)
     end
 
