@@ -170,11 +170,11 @@ module Ridley::Chef
     def validate
       raise IOError, "No Cookbook found at: #{path}" unless path.exist?
 
-      unless quietly { syntax_checker.validate_ruby_files }
-        raise Ridley::Errors::CookbookSyntaxError, "Invalid ruby files in cookbook: #{name} (#{version})."
+      unless syntax_checker.validate_ruby_files
+        raise Ridley::Errors::CookbookSyntaxError, "Invalid ruby files in cookbook: #{cookbook_name} (#{version})."
       end
-      unless quietly { syntax_checker.validate_templates }
-        raise Ridley::Errors::CookbookSyntaxError, "Invalid template files in cookbook: #{name} (#{version})."
+      unless syntax_checker.validate_templates
+        raise Ridley::Errors::CookbookSyntaxError, "Invalid template files in cookbook: #{cookbook_name} (#{version})."
       end
 
       true
