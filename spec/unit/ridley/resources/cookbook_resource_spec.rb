@@ -175,7 +175,7 @@ describe Ridley::CookbookResource do
       pending
     end
 
-    describe "::save" do
+    describe "::update" do
       pending
     end
   end

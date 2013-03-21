@@ -29,10 +29,6 @@ module Ridley
         end
       end
 
-      def create(*args)
-        raise NotImplementedError
-      end
-
       # Delete a cookbook of the given name and version on the remote Chef server
       #
       # @param [Ridley::Client] client
@@ -140,7 +136,7 @@ module Ridley
         nil
       end
 
-      # Save a new Cookbook Version of the given name, version with the
+      # Update or create a new Cookbook Version of the given name, version with the
       # given manifest of files and checksums.
       #
       # @param [Ridley::Client] client
@@ -164,7 +160,7 @@ module Ridley
       #   regardless.
       #
       # @return [Hash]
-      def save(client, cookbook, options = {})
+      def update(client, cookbook, options = {})
         options.reverse_merge(force: false, freeze: false)
 
         name            = options[:name] || cookbook.cookbook_name
@@ -177,10 +173,7 @@ module Ridley
       rescue Ridley::Errors::HTTPConflict => ex
         raise Ridley::Errors::FrozenCookbook, ex
       end
-
-      def update(*args)
-        raise NotImplementedError
-      end
+      alias_method :create, :update
 
       # Uploads a cookbook to the remote Chef server from the contents of a filepath
       #
@@ -215,7 +208,7 @@ module Ridley
 
         sandbox.upload(checksums)
         sandbox.commit
-        save(client, cookbook, options.slice(:force, :freeze, :name))
+        update(client, cookbook, options.slice(:force, :freeze, :name))
       end
 
       # Return a list of versions for the given cookbook present on the remote Chef server
