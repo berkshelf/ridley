@@ -6,6 +6,7 @@ describe Ridley::CookbookResource do
   subject { described_class.new(client) }
 
   describe "ClassMethods" do
+    subject { described_class }
     let(:server_url) { "https://api.opscode.com/organizations/vialstudios" }
     let(:client_name) { "reset" }
     let(:client_key) { fixtures_path.join("reset.pem") }
@@ -132,7 +133,7 @@ describe Ridley::CookbookResource do
     end
 
     describe "::versions" do
-      let(:cookbook) { "artifact" }      
+      let(:cookbook) { "artifact" }
       subject { described_class.versions(client, cookbook) }
 
       before(:each) do
@@ -168,6 +169,14 @@ describe Ridley::CookbookResource do
         subject.should include("1.1.0")
         subject.should include("1.2.0")
       end
+    end
+
+    describe "::upload" do
+      pending
+    end
+
+    describe "::save" do
+      pending
     end
   end
 

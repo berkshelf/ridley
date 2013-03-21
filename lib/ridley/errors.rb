@@ -49,6 +49,8 @@ module Ridley
       end
     end
 
+    class FrozenCookbook < RidleyError; end
+
     class HTTPError < RidleyError
       class << self
         def fabricate(env)
