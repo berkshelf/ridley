@@ -150,6 +150,10 @@ describe Ridley::Chef::Cookbook do
   describe "#to_hash" do
     subject { cookbook.to_hash }
 
+    it "has a :frozen? flag" do
+      subject.should have_key(:frozen?)
+    end
+
     it "has a :recipes key with a value of an Array Hashes" do
       subject.should have_key(:recipes)
       subject[:recipes].should be_a(Array)
@@ -407,6 +411,10 @@ describe Ridley::Chef::Cookbook do
     it "has a 'json_class' key with Cookbook::CHEF_JSON_CLASS  as the value" do
       @json.should have_json_path('json_class')
       parse_json(@json)['json_class'].should eql(Ridley::Chef::Cookbook::CHEF_JSON_CLASS)
+    end
+
+    it "has a 'frozen?' flag" do
+      @json.should have_json_path('frozen?')
     end
   end
 end
