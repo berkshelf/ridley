@@ -125,7 +125,7 @@ module Ridley::Chef
       end
 
       def validate_template(erb_file)
-        result = shell_out("erubis -x #{erb_file} | ruby -c")
+        result = quietly { shell_out("erubis -x #{erb_file} | ruby -c") }
         result.error!
         true
       rescue Mixlib::ShellOut::ShellCommandFailed
@@ -136,7 +136,7 @@ module Ridley::Chef
       end
 
       def validate_ruby_file(ruby_file)
-        result = shell_out("ruby -c #{ruby_file}")
+        result = quietly { shell_out("ruby -c #{ruby_file}") }
         result.error!
         true
       rescue Mixlib::ShellOut::ShellCommandFailed
