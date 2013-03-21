@@ -12,9 +12,9 @@ module Ridley::Chef
     # Licensed under the Apache License, Version 2.0 (the "License");
     # you may not use this file except in compliance with the License.
     # You may obtain a copy of the License at
-    # 
+    #
     #     http://www.apache.org/licenses/LICENSE-2.0
-    # 
+    #
     # Unless required by applicable law or agreed to in writing, software
     # distributed under the License is distributed on an "AS IS" BASIS,
     # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -91,13 +91,7 @@ module Ridley::Chef
       end
 
       def untested_ruby_files
-        ruby_files.reject do |file|
-          if validated?(file)
-            true
-          else
-            false
-          end
-        end
+        ruby_files.reject { |file| validated?(file) }
       end
 
       def template_files
@@ -105,13 +99,7 @@ module Ridley::Chef
       end
 
       def untested_template_files
-        template_files.reject do |file| 
-          if validated?(file)
-            true
-          else
-            false
-          end
-        end
+        template_files.reject { |file| validated?(file) }
       end
 
       def validated?(file)
