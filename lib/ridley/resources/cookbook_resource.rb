@@ -194,6 +194,14 @@ module Ridley
         options   = options.reverse_merge(validate: true, force: false, freeze: false)
         cookbook  = Ridley::Chef::Cookbook.from_path(path, options.slice(:name))
 
+        unless (existing = find(client, cookbook.cookbook_name, cookbook.version)).nil?
+          if existing.frozen? && options[:force] == false
+            msg = "The cookbook #{cookbook.cookbook_name} (#{cookbook.version}) already exists and is"
+            msg << " frozen on the Chef server. Use the 'force' option to override."
+            raise Ridley::Errors::FrozenCookbook, msg
+          end
+        end
+
         if options[:validate]
           cookbook.validate
         end
@@ -290,6 +298,9 @@ module Ridley
 
     attribute :version,
       type: String
+
+    attribute :frozen?,
+      type: Boolean
 
     # Download the entire cookbook
     #
