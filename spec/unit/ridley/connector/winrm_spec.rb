@@ -1,6 +1,15 @@
 require 'spec_helper'
 
 describe Ridley::Connector::WinRM do
+  let(:connection) { double('conn', ssh: { user: "vagrant", password: "vagrant" }) }
+
+  let(:node_one) do
+    Ridley::NodeResource.new(connection, automatic: { cloud: { public_hostname: "33.33.33.10" } })
+  end
+
+  let(:node_two) do
+    Ridley::NodeResource.new(connection, automatic: { cloud: { public_hostname: "33.33.33.11" } })
+  end
 
   describe "ClassMethods" do
     subject { Ridley::Connector::WinRM }
@@ -14,11 +23,25 @@ describe Ridley::Connector::WinRM do
       end
 
       it "evaluates within the context of a new WinRM and returns the last item in the block" do
-        result = subject.start([], options) do |winrm|
+        result = subject.start([node_one, node_two], options) do |winrm|
           winrm.run("dir")
         end
-        result.should be_a(Ridley::Connector::WinRM::ResponseSet)
+        result.should be_a(Ridley::Connector::ResponseSet)
       end
+
+      it "raises a LocalJumpError if a block is not provided" do
+        expect {
+          subject.start([node_one, node_two], options)
+        }.to raise_error(LocalJumpError)
+      end
+    end
+  end
+
+  subject { Ridley::Connector::WinRM.new([node_one, node_two], user: 'Administrator', password: 'password1') }
+
+  describe "#run" do
+    it "returns a ResponseSet" do
+      subject.run("dir").should be_a(Ridley::Connector::ResponseSet)
     end
   end
 end

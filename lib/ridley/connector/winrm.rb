@@ -4,7 +4,6 @@ module Ridley
   module Connector
     # @author Kyle Allan <kallan@riotgames.com>
     class WinRM
-      autoload :ResponseSet, 'ridley/connector/winrm/response_set'
       autoload :Worker, 'ridley/connector/winrm/worker'
 
       class << self
@@ -32,10 +31,10 @@ module Ridley
         workers = Array.new
         futures = self.nodes.collect do |node|
           workers << worker = Worker.new_link(self.options.freeze)
-          worker.future.run(node, command)
+          worker.future.run(node.public_hostname, command)
         end
 
-        Ridley::Connector::SSH::ResponseSet.new.tap do |response_set|
+        Ridley::Connector::ResponseSet.new.tap do |response_set|
           futures.each do |future|
             status, response = future.value
             response_set.add_response(response)

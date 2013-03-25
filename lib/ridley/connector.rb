@@ -4,6 +4,8 @@ require 'timeout'
 module Ridley
   # @author Kyle Allan <kallan@riotgames.com>
   module Connector
+    autoload :Response, 'ridley/connector/response'
+    autoload :ResponseSet, 'ridley/connector/response_set'
     autoload :SSH, 'ridley/connector/ssh'
     autoload :WinRM, 'ridley/connector/winrm'
 

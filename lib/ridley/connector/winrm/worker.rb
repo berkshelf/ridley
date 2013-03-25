@@ -16,7 +16,7 @@ module Ridley
         end
 
         def run(host, command)
-          response = Ridley::Connector::SSH::Response.new(host)
+          response = Ridley::Connector::Response.new(host)
           debug "Running WinRM Command: '#{command}' on: '#{host}' as: '#{user}'"
 
           endpoint = "http://#{host}:#{Ridley::Connector::DEFAULT_WINRM_PORT}/wsman"
@@ -29,15 +29,15 @@ module Ridley
 
           case response.exit_code
           when 0
-            debug "Successfully ran SSH command on: '#{host}' as: '#{user}'"
+            debug "Successfully ran WinRM command on: '#{host}' as: '#{user}'"
             [ :ok, response ]
           else
-            error "Successfully ran SSH command on: '#{host}' as: '#{user}', but it failed"
+            error "Successfully ran WinRM command on: '#{host}' as: '#{user}', but it failed"
             error response.stdout
             [ :error, response ]
           end
         rescue => e
-          error "Failed to run SSH command on: '#{host}' as: '#{user}'"
+          error "Failed to run WinRM command on: '#{host}' as: '#{user}'"
           error "#{e.class}: #{e.message}"
           response.exit_code = -1
           response.stderr = e.message

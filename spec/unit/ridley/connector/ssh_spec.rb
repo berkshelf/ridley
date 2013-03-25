@@ -27,7 +27,7 @@ describe Ridley::Connector::SSH do
           ssh.run("ls")
         end
 
-        result.should be_a(Ridley::Connector::SSH::ResponseSet)
+        result.should be_a(Ridley::Connector::ResponseSet)
       end
 
       it "raises a LocalJumpError if a block is not provided" do        
@@ -42,7 +42,7 @@ describe Ridley::Connector::SSH do
 
   describe "#run" do
     it "returns an SSH::ResponseSet" do
-      subject.run("ls").should be_a(Ridley::Connector::SSH::ResponseSet)
+      subject.run("ls").should be_a(Ridley::Connector::ResponseSet)
     end
   end
 end

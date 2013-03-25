@@ -4,8 +4,6 @@ module Ridley
   module Connector
     # @author Jamie Winsor <reset@riotgames.com>
     class SSH
-      autoload :Response, 'ridley/connector/ssh/response'
-      autoload :ResponseSet, 'ridley/connector/ssh/response_set'
       autoload :Worker, 'ridley/connector/ssh/worker'
 
       class << self
