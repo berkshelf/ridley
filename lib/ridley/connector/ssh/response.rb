@@ -1,5 +1,5 @@
 module Ridley
-  module Connectors
+  module Connector
     class SSH
       # @author Jamie Winsor <reset@riotgames.com>
       class Response

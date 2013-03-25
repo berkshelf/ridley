@@ -15,7 +15,7 @@ describe Ridley::Bootstrapper::Context do
   describe "ClassMethods" do
     subject { Ridley::Bootstrapper::Context }
 
-    before(:each) { Ridley::Connectors.stub(:best_connector_for) }
+    before(:each) { Ridley::Connector.stub(:best_connector_for) }
 
     describe "::new" do
       it "sets a default value of 'true' to 'sudo'" do
@@ -58,7 +58,7 @@ describe Ridley::Bootstrapper::Context do
   end
 
   subject do 
-    Ridley::Connectors.stub(:best_connector_for)
+    Ridley::Connector.stub(:best_connector_for)
     Ridley::Bootstrapper::Context.new(host, options) 
   end
 

@@ -34,7 +34,7 @@ module Ridley
   autoload :Mixin, 'ridley/mixin'
   autoload :Resource, 'ridley/resource'
   autoload :SandboxUploader, 'ridley/sandbox_uploader'
-  autoload :Connectors, 'ridley/connectors'
+  autoload :Connector, 'ridley/connector'
 
   class << self
     extend Forwardable

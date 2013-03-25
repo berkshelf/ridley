@@ -1,5 +1,5 @@
 module Ridley
-  module Connectors
+  module Connector
     class WinRM
       class Worker
       end

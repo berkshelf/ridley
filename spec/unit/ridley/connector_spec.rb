@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Ridley::Connectors do
+describe Ridley::Connector do
   
   subject do
     described_class

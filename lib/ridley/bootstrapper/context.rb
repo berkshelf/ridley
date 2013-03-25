@@ -82,7 +82,7 @@ module Ridley
         self.class.validate_options(options)
 
         @host                           = host
-        @connector                      = Connectors.best_connector_for(host)
+        @connector                      = Connector.best_connector_for(host)
         @server_url                     = options[:server_url]
         @validator_path                 = options[:validator_path]
         @node_name                      = options[:node_name]

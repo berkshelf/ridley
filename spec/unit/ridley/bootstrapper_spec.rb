@@ -18,6 +18,8 @@ describe Ridley::Bootstrapper do
     }
   end
 
+  before(:each) { Ridley::Connector.stub(:best_connector_for) }
+
   describe "ClassMethods" do
     subject { Ridley::Bootstrapper }
 

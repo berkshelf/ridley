@@ -3,9 +3,9 @@ require 'timeout'
 
 module Ridley
   # @author Kyle Allan <kallan@riotgames.com>
-  module Connectors
-    autoload :SSH, 'ridley/connectors/ssh'
-    autoload :WinRM, 'ridley/connectors/winrm'
+  module Connector
+    autoload :SSH, 'ridley/connector/ssh'
+    autoload :WinRM, 'ridley/connector/winrm'
 
     DEFAULT_SSH_PORT   = 22.freeze
     DEFAULT_WINRM_PORT = 5985.freeze

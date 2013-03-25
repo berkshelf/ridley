@@ -1,5 +1,5 @@
 module Ridley
-  module Connectors
+  module Connector
     # @author Kyle Allan <kallan@riotgames.com>
     class WinRM
     end

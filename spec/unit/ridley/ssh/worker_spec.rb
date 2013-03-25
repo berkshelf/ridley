@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Ridley::Connectors::SSH::Worker do
+describe Ridley::Connector::SSH::Worker do
   describe "ClassMethods" do
     subject { described_class }
 
