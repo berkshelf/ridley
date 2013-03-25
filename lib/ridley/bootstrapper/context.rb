@@ -24,7 +24,6 @@ module Ridley
             hints: Hash.new,
             attributes: Hash.new,
             run_list: Array.new,
-            chef_version: Ridley::CHEF_VERSION,
             environment: "_default",
             sudo: true,
             template: Bootstrapper.default_template
@@ -69,7 +68,7 @@ module Ridley
       # @option options [Array] :run_list
       #   an initial run list to bootstrap with (default: Array.new)
       # @option options [String] :chef_version
-      #   version of Chef to install on the node (default: {Ridley::CHEF_VERSION})
+      #   version of Chef to install on the node (default: nil)
       # @option options [String] :environment
       #   environment to join the node to (default: '_default')
       # @option options [Boolean] :sudo
