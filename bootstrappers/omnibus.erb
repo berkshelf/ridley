@@ -10,20 +10,32 @@ exists() {
   fi
 }
 
-requested_chef_version="<%= chef_version %>"
-installed_chef_version=$(which chef-client &>/dev/null && chef-client -v | cut -f 2 -d " ")
+install_chef() {
+  install_sh="http://opscode.com/chef/install.sh"
+  proxy_string="<%= "--proxy=on " if bootstrap_proxy %>"
 
-install_sh="http://opscode.com/chef/install.sh"
-version_string="-v $requested_chef_version"
+  if [[ $requested_chef_version != "" ]]; then
+    version_string="-v $requested_chef_version"
+  else
+    version_string=""
+  fi
 
-if [[ $installed_chef_version != $requested_chef_version ]]; then
   if exists wget; then
-    bash <(wget <%= "--proxy=on " if bootstrap_proxy %> ${install_sh} -O -) ${version_string}
+    bash <(wget ${proxy_string} ${install_sh} -O -) ${version_string}
   else
     if exists curl; then
-      bash <(curl -L <%= "--proxy=on " if bootstrap_proxy %> ${install_sh}) ${version_string}
+      bash <(curl -L ${proxy_string} ${install_sh}) ${version_string}
     fi
   fi
+}
+
+requested_chef_version="<%= chef_version %>"
+installed_chef_version="$(which chef-client &>/dev/null && chef-client -v | cut -f 2 -d " ")"
+
+if [[ ! $installed_chef_version ]]; then
+  install_chef
+elif [[ ($requested_chef_version != "") && ($installed_chef_version != $requested_chef_version) ]]; then
+  install_chef
 fi
 
 mkdir -p /etc/chef

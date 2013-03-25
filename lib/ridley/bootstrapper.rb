@@ -46,7 +46,7 @@ module Ridley
     #   a hash of attributes to use in the first Chef run
     # @option options [Array] :run_list (Array.new)
     #   an initial run list to bootstrap with
-    # @option options [String] :chef_version (Ridley::CHEF_VERSION)
+    # @option options [String] :chef_version (nil)
     #   version of Chef to install on the node
     # @option options [String] :environment ('_default')
     #   environment to join the node to
