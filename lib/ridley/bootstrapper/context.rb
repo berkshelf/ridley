@@ -33,6 +33,8 @@ module Ridley
 
       # @return [String]
       attr_reader :host
+      # @return [Ridley::Connector]
+      attr_reader :connector
       # @return [String]
       attr_reader :node_name
       # @return [String]
@@ -80,6 +82,7 @@ module Ridley
         self.class.validate_options(options)
 
         @host                           = host
+        @connector                      = Connectors.best_connector_for(host)
         @server_url                     = options[:server_url]
         @validator_path                 = options[:validator_path]
         @node_name                      = options[:node_name]

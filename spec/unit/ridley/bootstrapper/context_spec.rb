@@ -15,6 +15,8 @@ describe Ridley::Bootstrapper::Context do
   describe "ClassMethods" do
     subject { Ridley::Bootstrapper::Context }
 
+    before(:each) { Ridley::Connectors.stub(:best_connector_for) }
+
     describe "::new" do
       it "sets a default value of 'true' to 'sudo'" do
         options.delete(:sudo)
@@ -48,14 +50,17 @@ describe Ridley::Bootstrapper::Context do
           }
         end
 
-        it "sets a value for validation_key" do
+        it "sets a value for validation_key" do        
           subject.new(host, options).validation_key.should_not be_nil
         end
       end
     end
   end
 
-  subject { Ridley::Bootstrapper::Context.new(host, options) }
+  subject do 
+    Ridley::Connectors.stub(:best_connector_for)
+    Ridley::Bootstrapper::Context.new(host, options) 
+  end
 
   describe "#boot_command" do
     it "returns a string" do
