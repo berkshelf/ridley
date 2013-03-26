@@ -1,5 +1,12 @@
 module Ridley
   # @author Jamie Winsor <reset@riotgames.com>
+  #
+  # @example listing all clients
+  #   conn = Ridley.new(...)
+  #   conn.client.all #=> [
+  #     #<Ridley::ClientResource chef_id:'reset'>,
+  #     #<Ridley::ClientResource chef_id:'reset-validator'>
+  #   ]
   class ClientResource < Ridley::Resource
     class << self
       # Retrieves a client from the remote connection matching the given chef_id

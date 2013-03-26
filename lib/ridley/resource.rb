@@ -184,7 +184,7 @@ module Ridley
     end
 
     def to_s
-      "#{self.chef_id}: #{self._attributes_}"
+      "#<#{self.class} chef_id:#{self.chef_id}, attributes:#{self._attributes_}>"
     end
 
     # @param [Object] other
