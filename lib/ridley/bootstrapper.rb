@@ -64,9 +64,9 @@ module Ridley
       futures = contexts.collect do |context|
         info "Running bootstrap command on #{context.host}"
 
-        workers << worker = context.connector::Worker.new_link(self.options[:ssh].freeze)
+        workers << worker = context.connector::Worker.new_link(context.host, self.options[:ssh].freeze)
 
-        worker.future.run(context.host, context.boot_command)
+        worker.future.run(context.boot_command)
       end
 
       Connector::ResponseSet.new.tap do |response_set|

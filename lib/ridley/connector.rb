@@ -14,16 +14,16 @@ module Ridley
 
     class << self
       def best_connector_for(host)
-        if default_connector_port_open?(host, DEFAULT_SSH_PORT)
+        if connector_port_open?(host, DEFAULT_SSH_PORT)
           Ridley::Connector::SSH
-        elsif default_connector_port_open?(host, DEFAULT_WINRM_PORT)
+        elsif connector_port_open?(host, DEFAULT_WINRM_PORT)
           Ridley::Connector::WinRM
         else
           raise Ridley::Errors::UnknownConnector, "No connection method available on #{host}"
         end
       end
 
-      def default_connector_port_open?(host, port)
+      def connector_port_open?(host, port)
         Timeout::timeout(1) do
           begin
             socket = TCPSocket.new(host, port)

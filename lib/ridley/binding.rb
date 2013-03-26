@@ -56,10 +56,10 @@ module Ridley
     #
     # @return [String, nil]
     def encrypted_data_bag_secret
-      return nil if encrypted_data_bag_secret_path.nil?
+      return unless encrypted_data_bag_secret_path
 
       IO.read(encrypted_data_bag_secret_path).chomp
-    rescue Errno::ENOENT => encrypted_data_bag_secret
+    rescue Errno::ENOENT
       raise Errors::EncryptedDataBagSecretNotFound, "Error bootstrapping: Encrypted data bag secret provided but not found at '#{encrypted_data_bag_secret_path}'"
     end
 

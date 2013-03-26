@@ -73,6 +73,14 @@ CONFIG
       templates_path.join('windows_omnibus.erb').to_s
     end
 
+    def encrypted_data_bag_secret
+      return unless encrypted_data_bag_secret_path
+
+      escape_and_echo(IO.read(encrypted_data_bag_secret_path).chomp)
+    rescue Errno::ENOENT
+      raise Errors::EncryptedDataBagSecretNotFound, "Error bootstrapping: Encrypted data bag secret provided but not found at '#{encrypted_data_bag_secret_path}'"      
+    end
+
     def win_wget
       win_wget = <<-WGET
 url = WScript.Arguments.Named("url")

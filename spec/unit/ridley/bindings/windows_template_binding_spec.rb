@@ -55,4 +55,24 @@ describe Ridley::WindowsTemplateBinding do
     end
   end
 
+  describe "#escape_and_echo" do
+    let(:output) { "foo()" }
+
+    it "adds 'echo.' to the beginning of each line and escapes special batch characters" do
+      subject.escape_and_echo(output).should eq("echo.foo^(^)")
+    end
+  end
+
+  describe "#win_wget" do
+    it "returns a string" do
+      subject.win_wget.should be_a(String)
+    end
+  end
+
+  describe "#win_wget_ps" do
+    it "returns a string" do
+      subject.win_wget_ps.should be_a(String)
+    end
+  end
+
 end

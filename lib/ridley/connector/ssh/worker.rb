@@ -9,23 +9,24 @@ module Ridley
 
         attr_reader :sudo
         attr_reader :user
+        attr_reader :host
         # @return [Hashie::Mash]
         attr_reader :options
         
         # @param [Hash] options
-        def initialize(options = {})
+        def initialize(host, options = {})
           @options = options.deep_symbolize_keys
+          @host    = host
           @sudo    = @options[:sudo]
           @user    = @options[:user]
 
           @options[:paranoid] = false
         end
 
-        # @param [String] host
         # @param [String] command
         #
         # @return [Array]
-        def run(host, command)
+        def run(command)
           response = Ridley::Connector::Response.new(host)
           debug "Running SSH command: '#{command}' on: '#{host}' as: '#{user}'"
 

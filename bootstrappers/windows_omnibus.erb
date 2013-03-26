@@ -1,24 +1,26 @@
-@rem Author:: Kyle Allan (<kallan@riotgames.com>)
-@rem Original Author:
-@rem
-@rem Author:: Seth Chisamore (<schisamo@opscode.com>)
-@rem Copyright:: Copyright (c) 2011 Opscode, Inc.
-@rem License:: Apache License, Version 2.0
-@rem
-@rem Licensed under the Apache License, Version 2.0 (the "License");
-@rem you may not use this file except in compliance with the License.
-@rem You may obtain a copy of the License at
-@rem
-@rem     http://www.apache.org/licenses/LICENSE-2.0
-@rem
-@rem Unless required by applicable law or agreed to in writing, software
-@rem distributed under the License is distributed on an "AS IS" BASIS,
-@rem WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-@rem See the License for the specific language governing permissions and
-@rem limitations under the License.
-@rem
+@echo off
 
-@setlocal
+rem Author:: Kyle Allan (<kallan@riotgames.com>)
+rem Original Author:
+rem
+rem Author:: Seth Chisamore (<schisam@oopscode.com>)
+rem Copyright:: Copyright (c) 2011 Opscode, Inc.
+rem License:: Apache License, Version 2.0
+rem
+rem Licensed under the Apache License, Version 2.0 (the "License");
+rem you may not use this file except in compliance with the License.
+rem You may obtain a copy of the License at
+rem
+rem     http://www.apache.org/licenses/LICENSE-2.0
+rem
+rem Unless required by applicable law or agreed to in writing, software
+rem distributed under the License is distributed on an "AS IS" BASIS,
+rem WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+rem See the License for the specific language governing permissions and
+rem limitations under the License.
+rem
+
+setlocal
 
 <%= "SETX HTTP_PROXY \"#{bootstrap_proxy}\"" if bootstrap_proxy %>
 mkdir <%= bootstrap_directory %>
@@ -31,70 +33,70 @@ mkdir <%= bootstrap_directory %>
  <%= win_wget_ps %>
 )
 
-@rem Determine the version and the architecture
+rem Determine the version and the architecture
 
 FOR /F "tokens=1-8 delims=.[] " %%A IN ('ver') DO (
-@set WinMajor=%%D
-@set WinMinor=%%E
-@set WinBuild=%%F
+set WinMajor=%%D
+set WinMinor=%%E
+set WinBuild=%%F
 )
 
 goto Version%WinMajor%.%WinMinor%
 
-@rem If this is an unknown version of windows set the default
-@set MACHINE_OS=2008r2
+rem If this is an unknown version of windows set the default
+set MACHINE_OS=2008r2
 goto architecture
 
 :Version6.0
-@set MACHINE_OS=2008
+set MACHINE_OS=2008
 goto architecture
 
 :Version5.2
-@set MACHINE_OS=2003r2
+set MACHINE_OS=2003r2
 goto architecture
 
 :Version6.1
-@set MACHINE_OS=2008r2
+set MACHINE_OS=2008r2
 goto architecture
 
 :Version6.2
-@set MACHINE_OS=2012
+set MACHINE_OS=2012
 goto architecture
 
 :architecture
 
 goto Architecture%PROCESSOR_ARCHITECTURE%
 
-@rem If this is an unknown architecture set the default
-@set MACHINE_ARCH=i686
+rem If this is an unknown architecture set the default
+set MACHINE_ARCH=i686
 goto install
 
 :Architecturex86
-@set MACHINE_ARCH=i686
+set MACHINE_ARCH=i686
 goto install
 
 :Architectureamd64
-@set MACHINE_ARCH=x86_64
+set MACHINE_ARCH=x86_64
 goto install
 
 :install
-@rem Install Chef using chef-client MSI installer
+rem Install Chef using chef-client MSI installer
 
-@set "VERSION_STRING=<%= chef_version ? "latest" : chef_version %>"
-@set "REMOTE_SOURCE_MSI_URL=https://www.opscode.com/chef/download?p=windows&pv=%MACHINE_OS%&m=%MACHINE_ARCH%&v=%VERSION_STRING%"
-@set "LOCAL_DESTINATION_MSI_PATH=<%= local_download_path %>"
-@set "FALLBACK_QUERY_STRING=&DownloadContext=PowerShell"
+set "VERSION_STRING=<%= chef_version ? "latest" : chef_version %>"
+set "REMOTE_SOURCE_MSI_URL=https://www.opscode.com/chef/download?p=windows&pv=%MACHINE_OS%&m=%MACHINE_ARCH%&v=%VERSION_STRING%"
+set "LOCAL_DESTINATION_MSI_PATH=<%= local_download_path %>"
+set "FALLBACK_QUERY_STRING=&DownloadContext=PowerShell"
 
 cscript /nologo <%= bootstrap_directory %>\wget.vbs /url:"%REMOTE_SOURCE_MSI_URL%" /path:"%LOCAL_DESTINATION_MSI_PATH%"
 
-@rem Work around issues found in Windows Server 2012 around job objects not respecting WSMAN memory quotas
-@rem that cause the MSI download process to exceed the quota even when it is increased by administrators.
-@rem Retry the download using a more memory-efficient mechanism that only works if PowerShell is available.
-@if ERRORLEVEL 1 (      
+rem Work around issues found in Windows Server 2012 around job objects not respecting WSMAN memory quotas
+rem that cause the MSI download process to exceed the quota even when it is increased by administrators.
+rem Retry the download using a more memory-efficient mechanism that only works if PowerShell is available.
+if ERRORLEVEL 1 (      
     echo Warning: Failed to download "%REMOTE_SOURCE_MSI_URL%" to "%LOCAL_DESTINATION_MSI_PATH%"
     echo Warning: Retrying download with PowerShell if available
     if EXIST "%LOCAL_DESTINATION_MSI_PATH%" del /f /q "%LOCAL_DESTINATION_MSI_PATH%"
-    @powershell -ExecutionPolicy Unrestricted -NoProfile -NonInteractive "& '<%= bootstrap_directory %>\wget.ps1' '%REMOTE_SOURCE_MSI_URL%%FALLBACK_QUERY_STRING%' '%LOCAL_DESTINATION_MSI_PATH%'"
+    powershell -ExecutionPolicy Unrestricted -NoProfile -NonInteractive "& '<%= bootstrap_directory %>\wget.ps1' '%REMOTE_SOURCE_MSI_URL%%FALLBACK_QUERY_STRING%' '%LOCAL_DESTINATION_MSI_PATH%'"
 
     if NOT ERRORLEVEL 1 (
         echo Download succeeded
@@ -106,7 +108,7 @@ cscript /nologo <%= bootstrap_directory %>\wget.vbs /url:"%REMOTE_SOURCE_MSI_URL
 
 <%= install_chef %>
 
-@endlocal
+endlocal
 
 > <%= bootstrap_directory %>\validation.pem (
  <%= validation_key %>
