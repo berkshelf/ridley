@@ -15,7 +15,18 @@ module Ridley
       end
     end
 
+    attr_reader :template_file
+    attr_reader :bootstrap_proxy
+    attr_reader :chef_version
     attr_reader :default_options
+    attr_reader :validator_path
+    attr_reader :encrypted_data_bag_secret_path
+    attr_reader :server_url
+    attr_reader :validator_client
+    attr_reader :node_name
+    attr_reader :attributes
+    attr_reader :run_list
+    attr_reader :environment
 
     # A hash of default options to be used in the Context initializer
     #

@@ -52,18 +52,6 @@ describe Ridley::Bootstrapper do
         end
       end
     end
-
-    describe "::templates_path" do
-      it "returns a pathname" do
-        subject.templates_path.should be_a(Pathname)
-      end
-    end
-
-    describe "::default_template" do
-      it "returns a string" do
-        subject.default_template.should be_a(String)
-      end
-    end
   end
 
   subject { Ridley::Bootstrapper.new(nodes, options) }

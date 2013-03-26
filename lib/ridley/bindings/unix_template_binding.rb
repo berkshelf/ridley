@@ -2,19 +2,8 @@ module Ridley
   # @author Kyle Allan <kallan@riotgames.com>
   class UnixTemplateBinding < Ridley::Binding
 
-    attr_reader :template_file
-    attr_reader :bootstrap_proxy
-    attr_reader :chef_version
     attr_reader :sudo
-    attr_reader :validator_path
-    attr_reader :encrypted_data_bag_secret_path
     attr_reader :hints
-    attr_reader :server_url
-    attr_reader :validator_client
-    attr_reader :node_name
-    attr_reader :attributes
-    attr_reader :run_list
-    attr_reader :environment
 
     def initialize(options = {})
       options = default_options.merge(options)
