@@ -30,7 +30,7 @@ module Ridley
 
         Net::SSH.start(host, user, options.slice(*Net::SSH::VALID_OPTIONS)) do |ssh|
           ssh.open_channel do |channel|
-            if self.sudo
+            unless self.sudo
               channel.request_pty
             end
 
