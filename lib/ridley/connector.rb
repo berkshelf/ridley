@@ -15,9 +15,9 @@ module Ridley
     class << self
       def best_connector_for(host)
         if default_connector_port_open?(host, DEFAULT_SSH_PORT)
-          :SSH
+          Ridley::Connector::SSH
         elsif default_connector_port_open?(host, DEFAULT_WINRM_PORT)
-          :WinRM
+          Ridley::Connector::WinRM
         else
           raise Ridley::Errors::UnknownConnector, "No connection method available on #{host}"
         end

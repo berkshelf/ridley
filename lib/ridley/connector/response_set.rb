@@ -6,10 +6,10 @@ module Ridley
         # Merges the responses of the other ResponseSet with the target ResponseSet
         # and returns the mutated target
         #
-        # @param [SSH::ResponseSet] target
-        # @param [SSH::ResponseSet] other
+        # @param [Connector::ResponseSet] target
+        # @param [Connector::ResponseSet] other
         #
-        # @return [SSH::ResponseSet]
+        # @return [Connector::ResponseSet]
         def merge!(target, other)
           if other.is_a?(self)
             target.add_response(other.responses)
@@ -34,9 +34,9 @@ module Ridley
         add_response Array(responses)
       end
 
-      # @param [SSH::Response, Array<SSH::Response>] response
+      # @param [Connector::Response, Array<Connector::Response>] response
       #
-      # @return [Array<SSH::Response>]
+      # @return [Array<Connector::Response>]
       def add_response(response)
         if response.is_a?(Array)
           until response.empty?
@@ -64,9 +64,9 @@ module Ridley
       # Merges the responses of another ResponseSet with self and returns
       # a new instance of ResponseSet
       #
-      # @param [Ridley::SSH::ResponseSet] other
+      # @param [Ridley::Connector::ResponseSet] other
       #
-      # @return [Ridley::SSH::ResponseSet]
+      # @return [Ridley::Connector::ResponseSet]
       def merge(other)
         target = self.class.new(self.responses) # Why the fuck can't I use #dup here?
         self.class.merge!(target, other)
@@ -75,7 +75,7 @@ module Ridley
       # Merges the respones of another ResponseSet with self and returns
       # mutated self
       #
-      # @param [Ridley::SSH::ResponseSet] other
+      # @param [Ridley::Connector::ResponseSet] other
       #
       # @return [self]
       def merge!(other)
@@ -84,12 +84,12 @@ module Ridley
 
       private
 
-        # @param [SSH::Response] response
+        # @param [Connector::Response] response
         def add_failure(response)
           self.failures << response
         end
 
-        # @param [SSH::Response] response
+        # @param [Connector::Response] response
         def add_success(response)
           self.successes << response
         end

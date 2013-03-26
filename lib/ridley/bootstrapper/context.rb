@@ -5,29 +5,15 @@ module Ridley
     # @author Jamie Winsor <reset@riotgames.com>
     class Context
       class << self
-        def validate_options(options = {})
-          if options[:server_url].nil?
-            raise Errors::ArgumentError, "A server_url is required for bootstrapping"
+        def create(host, options = {})
+          connector = Connector.best_connector_for(host)
+          case connector.to_s
+          when Ridley::Connector::SSH.to_s
+            template_binding = Ridley::Binding::UnixTemplateBinding.new
+          when Ridley::Connector::WinRM.to_s
+            template_binding = Ridley::Binding::WindowsTemplateBinding.new
           end
-
-          if options[:validator_path].nil?
-            raise Errors::ArgumentError, "A path to a validator is required for bootstrapping"
-          end
-        end
-
-        # A hash of default options to be used in the Context initializer
-        #
-        # @return [Hash]
-        def default_options
-          @default_options ||= {
-            validator_client: "chef-validator",
-            hints: Hash.new,
-            attributes: Hash.new,
-            run_list: Array.new,
-            environment: "_default",
-            sudo: true,
-            template: Bootstrapper.default_template
-          }
+          new(host, connector, template_binding, options)
         end
       end
 
@@ -35,6 +21,8 @@ module Ridley
       attr_reader :host
       # @return [Ridley::Connector]
       attr_reader :connector
+      # @return [Ridley::Binding]
+      attr_reader :template_binding
       # @return [String]
       attr_reader :node_name
       # @return [String]
@@ -54,6 +42,10 @@ module Ridley
 
       # @param [String] host
       #   name of the node as identified in Chef
+      # @param [Ridley::Connector] connector
+      #   either the SSH or WinRM Connector class
+      # @param [Ridley::Binding] template_binding
+      #   an instance of either the UnixTemplateBinding or WindowsTemplateBinding class
       # @option options [String] :validator_path
       #   filepath to the validator used to bootstrap the node (required)
       # @option options [String] :node_name
@@ -77,12 +69,13 @@ module Ridley
       #   bootstrap with sudo (default: true)
       # @option options [String] :template
       #   bootstrap template to use (default: omnibus)
-      def initialize(host, options = {})
+      def initialize(host, connector, template_binding, options = {})
         options = self.class.default_options.merge(options)
         self.class.validate_options(options)
 
         @host                           = host
-        @connector                      = Connector.best_connector_for(host)
+        @connector                      = connector
+        @template_binding               = template_binding
         @server_url                     = options[:server_url]
         @validator_path                 = options[:validator_path]
         @node_name                      = options[:node_name]

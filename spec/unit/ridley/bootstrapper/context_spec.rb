@@ -20,14 +20,14 @@ describe Ridley::Bootstrapper::Context do
     describe "::new" do
       it "sets a default value of 'true' to 'sudo'" do
         options.delete(:sudo)
-        obj = subject.new(host, options)
+        obj = subject.create(host, options)
 
         obj.send(:sudo).should be_true
       end
 
       it "sets the value of sudo to 'false' if provided" do
         options.merge!(sudo: false)
-        obj = subject.new(host, options)
+        obj = subject.create(host, options)
 
         obj.send(:sudo).should be_false
       end
@@ -37,7 +37,7 @@ describe Ridley::Bootstrapper::Context do
 
         it "raises an ArgumentError" do
           lambda {
-            subject.new(host, options)
+            subject.create(host, options)
           }.should raise_error(Ridley::Errors::ArgumentError)
         end
       end
@@ -51,7 +51,7 @@ describe Ridley::Bootstrapper::Context do
         end
 
         it "sets a value for validation_key" do        
-          subject.new(host, options).validation_key.should_not be_nil
+          subject.create(host, options).validation_key.should_not be_nil
         end
       end
     end
@@ -59,7 +59,7 @@ describe Ridley::Bootstrapper::Context do
 
   subject do 
     Ridley::Connector.stub(:best_connector_for)
-    Ridley::Bootstrapper::Context.new(host, options) 
+    Ridley::Bootstrapper::Context.create(host, options) 
   end
 
   describe "#boot_command" do

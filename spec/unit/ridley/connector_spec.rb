@@ -38,16 +38,16 @@ describe Ridley::Connector do
     let(:host) {"127.0.0.1"}
     
     context "when an SSH port is open" do
-      it "returns :SSH" do
+      it "returns Ridley::Connector::SSH" do
         subject.stub(:default_connector_port_open?).and_return(true)
-        subject.best_connector_for(host).should eq(:SSH)
+        subject.best_connector_for(host).should eq(Ridley::Connector::SSH)
       end
     end
 
     context "when an SSH port isnt open and a WinRM port is open" do
-      it "returns :WinRM" do
+      it "returns Ridley::Connector::WinRM" do
         subject.stub(:default_connector_port_open?).and_return(false, true)
-        subject.best_connector_for(host).should eq(:WinRM)
+        subject.best_connector_for(host).should eq(Ridley::Connector::WinRM)
       end
     end
 

@@ -3,18 +3,6 @@ module Ridley
   class Bootstrapper
     autoload :Context, 'ridley/bootstrapper/context'
 
-    class << self
-      # @return [Pathname]
-      def templates_path
-        Ridley.root.join('bootstrappers')
-      end
-
-      # @return [String]
-      def default_template
-        templates_path.join('omnibus.erb').to_s
-      end
-    end
-
     include Celluloid
     include Celluloid::Logger
 
@@ -66,7 +54,7 @@ module Ridley
       @options[:sudo] = @options[:ssh][:sudo]
 
       @contexts = @hosts.collect do |host|
-        Context.new(host, options)
+        Context.create(host, options)
       end
     end
 
@@ -76,11 +64,12 @@ module Ridley
       futures = contexts.collect do |context|
         info "Running bootstrap command on #{context.host}"
 
-        workers << worker = SSH::Worker.new_link(self.options[:ssh].freeze)
+        workers << worker = context.connector::Worker.new_link(self.options[:ssh].freeze)
+
         worker.future.run(context.host, context.boot_command)
       end
 
-      SSH::ResponseSet.new.tap do |response_set|
+      Connector::ResponseSet.new.tap do |response_set|
         futures.each do |future|
           status, response = future.value
           response_set.add_response(response)
