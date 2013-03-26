@@ -80,7 +80,7 @@ goto install
 :install
 @rem Install Chef using chef-client MSI installer
 
-@set "VERSION_STRING=<% chef_version.nil? "latest" : chef_version %>"
+@set "VERSION_STRING=<%= chef_version ? "latest" : chef_version %>"
 @set "REMOTE_SOURCE_MSI_URL=https://www.opscode.com/chef/download?p=windows&pv=%MACHINE_OS%&m=%MACHINE_ARCH%&v=%VERSION_STRING%"
 @set "LOCAL_DESTINATION_MSI_PATH=<%= local_download_path %>"
 @set "FALLBACK_QUERY_STRING=&DownloadContext=PowerShell"
@@ -123,8 +123,9 @@ cscript /nologo <%= bootstrap_directory %>\wget.vbs /url:"%REMOTE_SOURCE_MSI_URL
 )
 
 > <%= bootstrap_directory %>\first-boot.json (
- <%= run_list %>
+ <%= first_boot %>
 )
 
-<%= start_chef %>
+<%= set_path %>
 
+<%= chef_run %>
