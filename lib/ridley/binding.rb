@@ -13,6 +13,20 @@ module Ridley
           raise Errors::ArgumentError, "A path to a validator is required for bootstrapping"
         end
       end
+
+      # A hash of default options to be used in the Context initializer
+      #
+      # @return [Hash]
+      def default_options
+        @default_options ||= {
+          validator_client: "chef-validator",
+          hints: Hash.new,
+          attributes: Hash.new,
+          run_list: Array.new,
+          environment: "_default",
+          sudo: true
+        }
+      end
     end
 
     attr_reader :template_file
@@ -27,21 +41,6 @@ module Ridley
     attr_reader :attributes
     attr_reader :run_list
     attr_reader :environment
-
-    # A hash of default options to be used in the Context initializer
-    #
-    # @return [Hash]
-    def default_options
-      @default_options ||= {
-        validator_client: "chef-validator",
-        hints: Hash.new,
-        attributes: Hash.new,
-        run_list: Array.new,
-        environment: "_default",
-        sudo: true,
-        template: default_template
-      }
-    end
 
     # @return [Pathname]
     def templates_path

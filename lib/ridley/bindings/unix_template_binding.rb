@@ -6,7 +6,8 @@ module Ridley
     attr_reader :hints
 
     def initialize(options = {})
-      options = default_options.merge(options)
+      options = Ridley::Binding.default_options.merge(options)
+      options[:template] ||= default_template
       self.class.validate_options(options)
 
       @template_file                  = options[:template]

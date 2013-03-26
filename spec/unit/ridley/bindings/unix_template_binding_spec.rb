@@ -11,6 +11,30 @@ describe Ridley::UnixTemplateBinding do
     }
   end
   
+  describe "ClassMethods" do
+    subject { described_class }
+    
+    describe "::new" do
+      context "when no sudo option is passed through" do
+        it "sets a default value of 'true' to 'sudo'" do
+          options.delete(:sudo)
+          obj = subject.new(options)
+
+          obj.send(:sudo).should be_true
+        end
+      end
+
+      context "when the sudo option is passed through as false" do
+        it "sets the value of sudo to 'false' if provided" do
+          options.merge!(sudo: false)
+          obj = subject.new(options)
+
+          obj.send(:sudo).should be_false
+        end
+      end
+    end
+  end
+
   subject { Ridley::UnixTemplateBinding.new(options) }
 
   describe "#boot_command" do
@@ -40,6 +64,12 @@ describe Ridley::UnixTemplateBinding do
   describe "#default_template" do
     it "returns a string" do
       subject.default_template.should be_a(String)
+    end
+  end
+
+  describe "#bootstrap_directory" do
+    it "returns a string" do
+      subject.bootstrap_directory.should be_a(String)
     end
   end
 end
