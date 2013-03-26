@@ -1,3 +1,5 @@
+require 'erubis'
+
 module Ridley
   # @author Kyle Allan <kallan@riotgames.com>
   class Binding
