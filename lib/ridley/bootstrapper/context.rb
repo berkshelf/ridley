@@ -6,11 +6,11 @@ module Ridley
     class Context
       class << self
         def create(host, options = {})
-          connector = Connector.best_connector_for(host)
+          connector = HostConnector.best_connector_for(host)
           case connector.to_s
-          when Ridley::Connector::SSH.to_s
+          when Ridley::HostConnector::SSH.to_s
             template_binding = Ridley::UnixTemplateBinding.new(options)
-          when Ridley::Connector::WinRM.to_s
+          when Ridley::HostConnector::WinRM.to_s
             template_binding = Ridley::WindowsTemplateBinding.new(options)
           end
           new(host, connector, template_binding)

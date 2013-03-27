@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Ridley::Connector::SSH do
+describe Ridley::HostConnector::SSH do
   let(:connection) { double('conn', ssh: { user: "vagrant", password: "vagrant" }) }
 
   let(:node_one) do
@@ -12,7 +12,7 @@ describe Ridley::Connector::SSH do
   end
 
   describe "ClassMethods" do
-    subject { Ridley::Connector::SSH }
+    subject { Ridley::HostConnector::SSH }
     
     describe "::start" do
       let(:options) do
@@ -27,7 +27,7 @@ describe Ridley::Connector::SSH do
           ssh.run("ls")
         end
 
-        result.should be_a(Ridley::Connector::ResponseSet)
+        result.should be_a(Ridley::HostConnector::ResponseSet)
       end
 
       it "raises a LocalJumpError if a block is not provided" do        
@@ -38,11 +38,11 @@ describe Ridley::Connector::SSH do
     end
   end
 
-  subject { Ridley::Connector::SSH.new([node_one, node_two], user: "vagrant", password: "vagrant") }
+  subject { Ridley::HostConnector::SSH.new([node_one, node_two], user: "vagrant", password: "vagrant") }
 
   describe "#run" do
     it "returns an SSH::ResponseSet" do
-      subject.run("ls").should be_a(Ridley::Connector::ResponseSet)
+      subject.run("ls").should be_a(Ridley::HostConnector::ResponseSet)
     end
   end
 end

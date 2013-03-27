@@ -3,11 +3,11 @@ require 'timeout'
 
 module Ridley
   # @author Kyle Allan <kallan@riotgames.com>
-  module Connector
-    autoload :Response, 'ridley/connector/response'
-    autoload :ResponseSet, 'ridley/connector/response_set'
-    autoload :SSH, 'ridley/connector/ssh'
-    autoload :WinRM, 'ridley/connector/winrm'
+  module HostConnector
+    autoload :Response, 'ridley/host_connector/response'
+    autoload :ResponseSet, 'ridley/host_connector/response_set'
+    autoload :SSH, 'ridley/host_connector/ssh'
+    autoload :WinRM, 'ridley/host_connector/winrm'
 
     DEFAULT_SSH_PORT   = 22.freeze
     DEFAULT_WINRM_PORT = 5985.freeze
@@ -15,11 +15,11 @@ module Ridley
     class << self
       def best_connector_for(host)
         if connector_port_open?(host, DEFAULT_SSH_PORT)
-          Ridley::Connector::SSH
+          Ridley::HostConnector::SSH
         elsif connector_port_open?(host, DEFAULT_WINRM_PORT)
-          Ridley::Connector::WinRM
+          Ridley::HostConnector::WinRM
         else
-          raise Ridley::Errors::UnknownConnector, "No connection method available on #{host}"
+          raise Ridley::Errors::UnknownHostConnector, "No connection method available on #{host}"
         end
       end
 
@@ -33,6 +33,8 @@ module Ridley
             false
           end
         end
+      rescue Timeout::Error
+        false
       end
     end
   end

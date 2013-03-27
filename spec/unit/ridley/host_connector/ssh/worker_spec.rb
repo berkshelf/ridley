@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Ridley::Connector::SSH::Worker do
+describe Ridley::HostConnector::SSH::Worker do
   describe "ClassMethods" do
     let(:host) { 'reset.riotgames.com' }
     

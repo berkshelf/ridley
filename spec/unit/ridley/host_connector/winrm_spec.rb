@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Ridley::Connector::WinRM do
+describe Ridley::HostConnector::WinRM do
   let(:connection) { double('conn', ssh: { user: "vagrant", password: "vagrant" }) }
 
   let(:node_one) do
@@ -12,7 +12,7 @@ describe Ridley::Connector::WinRM do
   end
 
   describe "ClassMethods" do
-    subject { Ridley::Connector::WinRM }
+    subject { Ridley::HostConnector::WinRM }
     
     describe "::start" do
       let(:options) do
@@ -26,7 +26,7 @@ describe Ridley::Connector::WinRM do
         result = subject.start([node_one, node_two], options) do |winrm|
           winrm.run("dir")
         end
-        result.should be_a(Ridley::Connector::ResponseSet)
+        result.should be_a(Ridley::HostConnector::ResponseSet)
       end
 
       it "raises a LocalJumpError if a block is not provided" do
@@ -37,11 +37,11 @@ describe Ridley::Connector::WinRM do
     end
   end
 
-  subject { Ridley::Connector::WinRM.new([node_one, node_two], user: 'Administrator', password: 'password1') }
+  subject { Ridley::HostConnector::WinRM.new([node_one, node_two], user: 'Administrator', password: 'password1') }
 
   describe "#run" do
     it "returns a ResponseSet" do
-      subject.run("dir").should be_a(Ridley::Connector::ResponseSet)
+      subject.run("dir").should be_a(Ridley::HostConnector::ResponseSet)
     end
   end
 end

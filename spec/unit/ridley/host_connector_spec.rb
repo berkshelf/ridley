@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Ridley::Connector do
+describe Ridley::HostConnector do
   
   subject do
     described_class
@@ -38,16 +38,16 @@ describe Ridley::Connector do
     let(:host) {"127.0.0.1"}
     
     context "when an SSH port is open" do
-      it "returns Ridley::Connector::SSH" do
+      it "returns Ridley::HostConnector::SSH" do
         subject.stub(:connector_port_open?).and_return(true)
-        subject.best_connector_for(host).should eq(Ridley::Connector::SSH)
+        subject.best_connector_for(host).should eq(Ridley::HostConnector::SSH)
       end
     end
 
     context "when an SSH port isnt open and a WinRM port is open" do
-      it "returns Ridley::Connector::WinRM" do
+      it "returns Ridley::HostConnector::WinRM" do
         subject.stub(:connector_port_open?).and_return(false, true)
-        subject.best_connector_for(host).should eq(Ridley::Connector::WinRM)
+        subject.best_connector_for(host).should eq(Ridley::HostConnector::WinRM)
       end
     end
 
@@ -56,7 +56,7 @@ describe Ridley::Connector do
         subject.stub(:connector_port_open?).and_return(false, false)
         expect {
           subject.best_connector_for(host)
-        }.to raise_error(Ridley::Errors::UnknownConnector)
+        }.to raise_error(Ridley::Errors::UnknownHostConnector)
       end
     end
   end

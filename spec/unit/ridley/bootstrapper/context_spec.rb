@@ -19,7 +19,7 @@ describe Ridley::Bootstrapper::Context do
       
       context "when the best connection is SSH" do
         it "sets template_binding to a Ridley::UnixTemplateBinding" do
-          Ridley::Connector.stub(:best_connector_for).and_return(Ridley::Connector::SSH)
+          Ridley::HostConnector.stub(:best_connector_for).and_return(Ridley::HostConnector::SSH)
           context = subject.create(host, options)
           context.template_binding.should be_a(Ridley::UnixTemplateBinding)
         end
@@ -27,7 +27,7 @@ describe Ridley::Bootstrapper::Context do
 
       context "when the best connection is WinRM" do
         it "sets template_binding to a Ridley::WindowsTemplateBinding" do
-          Ridley::Connector.stub(:best_connector_for).and_return(Ridley::Connector::WinRM)
+          Ridley::HostConnector.stub(:best_connector_for).and_return(Ridley::HostConnector::WinRM)
           context = subject.create(host, options)
           context.template_binding.should be_a(Ridley::WindowsTemplateBinding)          
         end

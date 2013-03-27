@@ -1,10 +1,10 @@
 require 'spec_helper'
 
-describe Ridley::Binding do
+describe Ridley::BootstrapBinding do
   let(:host) { "reset.riotgames.com" }
 
   describe "ClassMethods" do
-    subject { Ridley::Binding }
+    subject { Ridley::BootstrapBinding }
 
     context "when server_url is not specified" do
       let(:options) { Hash.new }
@@ -31,7 +31,7 @@ describe Ridley::Binding do
     end
   end
 
-  subject { Ridley::Binding.new }
+  subject { Ridley::BootstrapBinding.new }
 
   describe "#templates_path" do
     it "returns a pathname" do

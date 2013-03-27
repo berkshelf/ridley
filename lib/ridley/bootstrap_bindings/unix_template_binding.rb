@@ -1,12 +1,12 @@
 module Ridley
   # @author Kyle Allan <kallan@riotgames.com>
-  class UnixTemplateBinding < Ridley::Binding
+  class UnixTemplateBinding < Ridley::BootstrapBinding
 
     attr_reader :sudo
     attr_reader :hints
 
     def initialize(options = {})
-      options = Ridley::Binding.default_options.merge(options)
+      options = Ridley::BootstrapBinding.default_options.merge(options)
       options[:template] ||= default_template
       self.class.validate_options(options)
 

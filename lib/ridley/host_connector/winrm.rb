@@ -1,14 +1,12 @@
-require 'net/ssh'
+require 'winrm'
 
 module Ridley
-  module Connector
-    # @author Jamie Winsor <reset@riotgames.com>
-    class SSH
-      autoload :Worker, 'ridley/connector/ssh/worker'
+  module HostConnector
+    # @author Kyle Allan <kallan@riotgames.com>
+    class WinRM
+      autoload :Worker, 'ridley/host_connector/winrm/worker'
 
       class << self
-        # @param [Ridley::NodeResource, Array<Ridley::NodeResource>] nodes
-        # @param [Hash] options
         def start(nodes, options = {}, &block)
           runner = new(nodes, options)
           result = yield runner
@@ -24,25 +22,19 @@ module Ridley
       attr_reader :nodes
       attr_reader :options
 
-      # @param [Ridley::NodeResource, Array<Ridley::NodeResource>] nodes
-      # @param [Hash] options
-      #   @see Net::SSH
       def initialize(nodes, options = {})
-        @nodes   = Array(nodes)
+        @nodes = Array(nodes)
         @options = options
       end
 
-      # @param [String] command
-      #
-      # @return [Array]
       def run(command)
         workers = Array.new
         futures = self.nodes.collect do |node|
-          workers << worker = Worker.new_link(self.options.freeze)
-          worker.future.run(node.public_hostname, command)
+          workers << worker = Worker.new_link(node.public_hostname, self.options.freeze)
+          worker.future.run(command)
         end
 
-        ResponseSet.new.tap do |response_set|
+        Ridley::HostConnector::ResponseSet.new.tap do |response_set|
           futures.each do |future|
             status, response = future.value
             response_set.add_response(response)

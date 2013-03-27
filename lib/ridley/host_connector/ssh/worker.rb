@@ -1,5 +1,5 @@
 module Ridley
-  module Connector
+  module HostConnector
     class SSH
       # @author Jamie Winsor <reset@riotgames.com>
       # @api private
@@ -27,7 +27,7 @@ module Ridley
         #
         # @return [Array]
         def run(command)
-          response = Ridley::Connector::Response.new(host)
+          response = Ridley::HostConnector::Response.new(host)
           debug "Running SSH command: '#{command}' on: '#{host}' as: '#{user}'"
 
           Net::SSH.start(host, user, options.slice(*Net::SSH::VALID_OPTIONS)) do |ssh|

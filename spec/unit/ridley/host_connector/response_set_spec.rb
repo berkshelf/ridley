@@ -1,15 +1,15 @@
 require 'spec_helper'
 
-describe Ridley::Connector::ResponseSet do
+describe Ridley::HostConnector::ResponseSet do
   describe "ClassMethods" do
     subject { described_class }
 
     describe "::merge!" do
-      let(:target) { Ridley::Connector::ResponseSet.new }
-      let(:other) { Ridley::Connector::ResponseSet.new }
+      let(:target) { Ridley::HostConnector::ResponseSet.new }
+      let(:other) { Ridley::HostConnector::ResponseSet.new }
 
       before(:each) do
-        other.add_response(Ridley::Connector::Response.new('host.local'))
+        other.add_response(Ridley::HostConnector::Response.new('host.local'))
       end
 
       it "returns the mutated target" do
@@ -26,8 +26,8 @@ describe Ridley::Connector::ResponseSet do
   describe "#add_response" do
     it "accepts an array of responses" do
       responses = [
-        Ridley::Connector::Response.new("one.riotgames.com"),
-        Ridley::Connector::Response.new("two.riotgames.com")
+        Ridley::HostConnector::Response.new("one.riotgames.com"),
+        Ridley::HostConnector::Response.new("two.riotgames.com")
       ]
       subject.add_response(responses)
 
@@ -35,7 +35,7 @@ describe Ridley::Connector::ResponseSet do
     end
 
     it "accepts a single response" do
-      response = Ridley::Connector::Response.new("one.riotgames.com")
+      response = Ridley::HostConnector::Response.new("one.riotgames.com")
       subject.add_response(response)
 
       subject.responses.should have(1).item
@@ -43,7 +43,7 @@ describe Ridley::Connector::ResponseSet do
   end
 
   describe "#responses" do
-    it "returns an array of Ridley::Connector::Response objects including both failures and successes" do
+    it "returns an array of Ridley::HostConnector::Response objects including both failures and successes" do
       responses = [
         double('success', error?: false),
         double('failure', error?: true)
@@ -55,7 +55,7 @@ describe Ridley::Connector::ResponseSet do
   end
 
   describe "#successes" do
-    it "returns an array of Ridley::Connector::Response objects only including the successes" do
+    it "returns an array of Ridley::HostConnector::Response objects only including the successes" do
       responses = [
         double('success', error?: false),
         double('failure', error?: true)
@@ -67,7 +67,7 @@ describe Ridley::Connector::ResponseSet do
   end
 
   describe "#failures" do
-    it "returns an array of Ridley::Connector::Response objects only including the failures" do
+    it "returns an array of Ridley::HostConnector::Response objects only including the failures" do
       responses = [
         double('success', error?: false),
         double('failure', error?: true)
@@ -79,14 +79,14 @@ describe Ridley::Connector::ResponseSet do
   end
 
   describe "#merge" do
-    let(:target) { Ridley::Connector::ResponseSet.new }
-    let(:other) { Ridley::Connector::ResponseSet.new }
+    let(:target) { Ridley::HostConnector::ResponseSet.new }
+    let(:other) { Ridley::HostConnector::ResponseSet.new }
 
     before(:each) do
-      other.add_response(Ridley::Connector::Response.new('host.local'))
+      other.add_response(Ridley::HostConnector::Response.new('host.local'))
     end
 
-    it "returns a new Ridley::Connector::ResponseSet object" do
+    it "returns a new Ridley::HostConnector::ResponseSet object" do
       result = target.merge(other)
 
       result.should have(1).item
@@ -95,11 +95,11 @@ describe Ridley::Connector::ResponseSet do
   end
 
   describe "#merge!" do
-    let(:target) { Ridley::Connector::ResponseSet.new }
-    let(:other) { Ridley::Connector::ResponseSet.new }
+    let(:target) { Ridley::HostConnector::ResponseSet.new }
+    let(:other) { Ridley::HostConnector::ResponseSet.new }
 
     before(:each) do
-      other.add_response(Ridley::Connector::Response.new('host.local'))
+      other.add_response(Ridley::HostConnector::Response.new('host.local'))
     end
 
     it "returns the mutated target" do

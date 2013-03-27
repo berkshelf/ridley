@@ -2,7 +2,7 @@ require 'erubis'
 
 module Ridley
   # @author Kyle Allan <kallan@riotgames.com>
-  class Binding
+  class BootstrapBinding
     class << self
       def validate_options(options = {})
         if options[:server_url].nil?

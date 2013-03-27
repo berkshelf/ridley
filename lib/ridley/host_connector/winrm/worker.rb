@@ -1,5 +1,5 @@
 module Ridley
-  module Connector
+  module HostConnector
     class WinRM
       # @author Kyle Allan <kallan@riotgames.com>
       # @api private
@@ -24,7 +24,7 @@ module Ridley
         end
 
         def run(command)
-          response = Ridley::Connector::Response.new(host)
+          response = Ridley::HostConnector::Response.new(host)
           debug "Running WinRM Command: '#{command}' on: '#{host}' as: '#{user}'"
 
           output = winrm.run_cmd(command) do |stdout, stderr|
@@ -55,7 +55,7 @@ module Ridley
         end
 
         def winrm_port
-          options[:winrm_port] || Ridley::Connector::DEFAULT_WINRM_PORT
+          options[:winrm_port] || Ridley::HostConnector::DEFAULT_WINRM_PORT
         end
       end
     end

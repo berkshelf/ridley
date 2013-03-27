@@ -1,12 +1,12 @@
 # Windows Specific code written by Seth Chisamore (<schisamo@opscode.com>)
 module Ridley
   # @author Kyle Allan <kallan@riotgames.com>
-  class WindowsTemplateBinding < Ridley::Binding
+  class WindowsTemplateBinding < Ridley::BootstrapBinding
     
     attr_reader :template_file
 
     def initialize(options)
-      options = Ridley::Binding.default_options.merge(options)
+      options = Ridley::BootstrapBinding.default_options.merge(options)
       options[:template] ||= default_template
       self.class.validate_options(options)
 
