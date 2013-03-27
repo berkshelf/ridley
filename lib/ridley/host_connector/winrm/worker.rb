@@ -10,6 +10,8 @@ module Ridley
         # @return [String]
         attr_reader :user
         # @return [String]
+        attr_reader :password
+        # @return [String]
         attr_reader :host
         # @return [Hash]
         attr_reader :options
@@ -17,9 +19,11 @@ module Ridley
         attr_reader :winrm_endpoint
 
         def initialize(host, options = {})
-          @host           = host
           @options        = options.deep_symbolize_keys
+          @options        = options[:winrm] if options[:winrm]
+          @host           = host
           @user           = @options[:user]
+          @password       = @options[:password]
           @winrm_endpoint = "http://#{host}:#{winrm_port}/wsman"
         end
 
@@ -51,11 +55,11 @@ module Ridley
         end
 
         def winrm
-          ::WinRM::WinRMWebService.new(winrm_endpoint, :plaintext, user: user, pass: options[:pass], basic_auth_only: true)
+          ::WinRM::WinRMWebService.new(winrm_endpoint, :plaintext, user: user, pass: password, basic_auth_only: true)
         end
 
         def winrm_port
-          options[:winrm_port] || Ridley::HostConnector::DEFAULT_WINRM_PORT
+          options[:port] || Ridley::HostConnector::DEFAULT_WINRM_PORT
         end
       end
     end

@@ -16,6 +16,7 @@ module Ridley
         # @param [Hash] options
         def initialize(host, options = {})
           @options = options.deep_symbolize_keys
+          @options = options[:ssh] if options[:ssh]
           @host    = host
           @sudo    = @options[:sudo]
           @user    = @options[:user]

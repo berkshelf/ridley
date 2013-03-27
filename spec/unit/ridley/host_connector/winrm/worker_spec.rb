@@ -5,7 +5,9 @@ describe Ridley::HostConnector::WinRM::Worker do
   
   let(:options) do
     {
-      winrm_port: 1234
+      winrm: {
+        port: 1234
+      }
     }
   end
 
@@ -17,7 +19,7 @@ describe Ridley::HostConnector::WinRM::Worker do
     end
 
     it "defaults to Ridley::HostConnector::DEFAULT_WINRM_PORT when not overridden" do
-      options.delete(:winrm_port)
+      options.delete(:winrm)
       subject.winrm_port.should eq(Ridley::HostConnector::DEFAULT_WINRM_PORT)
     end
   end

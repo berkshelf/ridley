@@ -10,6 +10,10 @@ module Ridley
       #     * :password (String) the password for the shell user that will perform the bootstrap
       #     * :keys (Array, String) an array of keys (or a single key) to authenticate the ssh user with instead of a password
       #     * :timeout (Float) [5.0] timeout value for SSH bootstrap
+      #   @option options [Hash] :winrm
+      #     * :user (String) a user that will login to each node and perform the bootstrap command on (required)
+      #     * :password (String) the password for the user that will perform the bootstrap
+      #     * :port (Fixnum) the winrm port to connect on the node the bootstrap will be performed on (5985)
       #   @option options [String] :validator_client
       #   @option options [String] :validator_path
       #     filepath to the validator used to bootstrap the node (required)
@@ -41,7 +45,8 @@ module Ridley
           validator_path: client.validator_path,
           validator_client: client.validator_client,
           encrypted_data_bag_secret_path: client.encrypted_data_bag_secret_path,
-          ssh: client.ssh
+          ssh: client.ssh,
+          winrm: client.winrm
         }
 
         options = default_options.merge(options)

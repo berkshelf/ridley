@@ -60,4 +60,43 @@ describe Ridley::HostConnector do
       end
     end
   end
+
+  describe "#parse_options" do
+    let(:options) do
+      {
+        ssh: {
+          port: 1234
+        },
+        winrm: {
+          port: 5678
+        }
+      }
+    end
+    
+    context "when :ssh has a key for :port" do
+      it "returns the value of port instead of the default" do
+        subject.parse_options(options).should include(1234)
+      end
+    end
+
+    context "when there is no :ssh key" do
+      it "returns the default value for port" do
+        options.delete(:ssh)
+        subject.parse_options(options).should include(22)
+      end
+    end
+
+    context "when :winrm has a key for :port" do
+      it "returns the value of port instead of the default" do
+        subject.parse_options(options).should include(5678)
+      end
+    end
+
+    context "when there is no :ssh key" do
+      it "returns the default value for port" do
+        options.delete(:winrm)
+        subject.parse_options(options).should include(5985)
+      end
+    end
+  end
 end

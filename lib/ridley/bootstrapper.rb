@@ -21,6 +21,10 @@ module Ridley
     #   * :password (String) the password for the shell user that will perform the bootstrap
     #   * :keys (Array, String) an array of keys (or a single key) to authenticate the ssh user with instead of a password
     #   * :timeout (Float) [5.0] timeout value for SSH bootstrap
+    # @option options [Hash] :winrm
+    #   * :user (String) a user that will login to each node and perform the bootstrap command on (required)
+    #   * :password (String) the password for the user that will perform the bootstrap
+    #   * :port (Fixnum) the winrm port to connect on the node the bootstrap will be performed on (5985)
     # @option options [String] :validator_client
     # @option options [String] :validator_path
     #   filepath to the validator used to bootstrap the node (required)
@@ -40,7 +44,7 @@ module Ridley
     #   environment to join the node to
     # @option options [Boolean] :sudo (true)
     #   bootstrap with sudo (default: true)
-    # @option options [String] :template ('omnibus')
+    # @option options [String] :template
     #   bootstrap template to use
     def initialize(hosts, options = {})
       @hosts         = Array(hosts).collect(&:to_s).uniq
@@ -64,8 +68,8 @@ module Ridley
       futures = contexts.collect do |context|
         info "Running bootstrap command on #{context.host}"
 
-        workers << worker = context.connector::Worker.new_link(context.host, self.options[:ssh].freeze)
-
+        workers << worker = context.host_connector::Worker.new_link(context.host, self.options.freeze)
+        
         worker.future.run(context.boot_command)
       end
 
