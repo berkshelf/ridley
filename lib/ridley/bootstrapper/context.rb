@@ -52,7 +52,7 @@ module Ridley
 
       # @return [String]
       attr_reader :host
-      # @return [Ridley::Connector]
+      # @return [Ridley::HostConnector]
       attr_reader :host_connector
       # @return [Ridley::Binding]
       attr_reader :template_binding

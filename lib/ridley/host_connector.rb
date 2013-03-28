@@ -25,9 +25,9 @@ module Ridley
       # @return [Ridley::HostConnector] a class under Ridley::HostConnector
       def best_connector_for(host, options = {})
         ssh_port, winrm_port = parse_options(options)
-        if connector_port_open?(host, DEFAULT_SSH_PORT)
+        if connector_port_open?(host, ssh_port)
           Ridley::HostConnector::SSH
-        elsif connector_port_open?(host, DEFAULT_WINRM_PORT)
+        elsif connector_port_open?(host, winrm_port)
           Ridley::HostConnector::WinRM
         else
           raise Ridley::Errors::UnknownHostConnector, "No connection method available on #{host}"

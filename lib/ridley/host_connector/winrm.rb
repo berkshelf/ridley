@@ -1,5 +1,3 @@
-require 'winrm'
-
 module Ridley
   module HostConnector
     # @author Kyle Allan <kallan@riotgames.com>

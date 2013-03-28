@@ -5,8 +5,8 @@ module Ridley
 
     include Celluloid
     include Celluloid::Logger
-
-    # @return [Array<String>]
+    
+    # @return  [Array<String>]
     attr_reader :hosts
 
     # @return [Array<Bootstrapper::Context>]
@@ -56,24 +56,23 @@ module Ridley
       }.merge(@options[:ssh])
 
       @options[:sudo] = @options[:ssh][:sudo]
-
       @contexts = @hosts.collect do |host|
         Context.create(host, options)
       end
     end
 
-    # @return [SSH::ResponseSet]
+    # @return [HostConnector::ResponseSet]
     def run
       workers = Array.new
       futures = contexts.collect do |context|
         info "Running bootstrap command on #{context.host}"
 
         workers << worker = context.host_connector::Worker.new_link(context.host, self.options.freeze)
-        
-        worker.future.run(context.boot_command)
+
+        worker.future.run(context.template_binding.boot_command)
       end
 
-      Connector::ResponseSet.new.tap do |response_set|
+      HostConnector::ResponseSet.new.tap do |response_set|
         futures.each do |future|
           status, response = future.value
           response_set.add_response(response)
