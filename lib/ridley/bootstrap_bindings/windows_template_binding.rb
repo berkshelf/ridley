@@ -1,5 +1,5 @@
 # 
-# Ridley::UnixTemplateBinding
+# Ridley::WindowsTemplateBinding
 #   Represents a binding that will be evaluated as an ERB template. When bootstrapping
 #   nodes, an instance of this class represents the customizable and necessary configurations
 #   need by the Host in order to install and connect to Chef. By default, this class will be used
@@ -7,7 +7,9 @@
 # 
 # @author Kyle Allan <kallan@riotgames.com>
 # 
-# Windows Specific code written by Seth Chisamore (<schisamo@opscode.com>)
+# Windows Specific code written by Seth Chisamore (<schisamo@opscode.com>) in knife-windows
+# https://github.com/opscode/knife-windows/blob/3b8886ddcfb928ca0958cd05b22f8c3d78bee86e/lib/chef/knife/bootstrap/windows-chef-client-msi.erb
+# https://github.com/opscode/knife-windows/blob/78d38bbed358ac20107fc2b5b427f4b5e52e5cb2/lib/chef/knife/core/windows_bootstrap_context.rb
 module Ridley
   class WindowsTemplateBinding < Ridley::BootstrapBinding
     
@@ -115,8 +117,11 @@ CONFIG
       raise Errors::EncryptedDataBagSecretNotFound, "Error bootstrapping: Encrypted data bag secret provided but not found at '#{encrypted_data_bag_secret_path}'"      
     end
 
+    # Implements a Visual Basic script that attempts a simple
+    # 'wget' to download the Chef msi
+    # 
     # @return [String]
-    def win_wget
+    def windows_wget_vb
       win_wget = <<-WGET
 url = WScript.Arguments.Named("url")
 path = WScript.Arguments.Named("path")
@@ -165,8 +170,11 @@ WGET
       escape_and_echo(win_wget)
     end
 
+    # Implements a Powershell script that attempts a simple
+    # 'wget' to download the Chef msi
+    # 
     # @return [String]
-    def win_wget_ps
+    def windows_wget_powershell
       win_wget_ps = <<-WGET_PS
 param(
  [String] $remoteUrl,

@@ -26,11 +26,11 @@ setlocal
 mkdir <%= bootstrap_directory %>
 
 > <%= bootstrap_directory %>\wget.vbs (
- <%= win_wget %>
+ <%= windows_wget_vb %>
 )
 
 > <%= bootstrap_directory %>\wget.ps1 (
- <%= win_wget_ps %>
+ <%= windows_wget_powershell %>
 )
 
 rem Determine the version and the architecture

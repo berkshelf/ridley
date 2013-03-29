@@ -63,15 +63,15 @@ describe Ridley::WindowsTemplateBinding do
     end
   end
 
-  describe "#win_wget" do
+  describe "#windows_wget_vb" do
     it "returns a string" do
-      subject.win_wget.should be_a(String)
+      subject.windows_wget_vb.should be_a(String)
     end
   end
 
-  describe "#win_wget_ps" do
+  describe "#windows_wget_powershell" do
     it "returns a string" do
-      subject.win_wget_ps.should be_a(String)
+      subject.windows_wget_powershell.should be_a(String)
     end
   end
 

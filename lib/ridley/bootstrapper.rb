@@ -67,7 +67,7 @@ module Ridley
       futures = contexts.collect do |context|
         info "Running bootstrap command on #{context.host}"
 
-        workers << worker = context.host_connector::Worker.new_link(context.host, self.options.freeze)
+        workers << worker = context.host_connector::Worker.new(context.host, self.options.freeze)
 
         worker.future.run(context.template_binding.boot_command)
       end
