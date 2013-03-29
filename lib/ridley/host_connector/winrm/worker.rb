@@ -60,7 +60,7 @@ module Ridley
 
         # @return [::WinRM::WinRMWebService]
         def winrm
-          ::WinRM::WinRMWebService.new(winrm_endpoint, :plaintext, user: user, pass: password, disable_sspi: true)
+          ::WinRM::WinRMWebService.new(winrm_endpoint, :plaintext, user: user, pass: password, disable_sspi: true, basic_auth_only: true)
         end
 
         # @return [Fixnum]
