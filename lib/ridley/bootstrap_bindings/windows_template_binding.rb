@@ -41,7 +41,7 @@ module Ridley
 
       @template_file                  = options[:template]
       @bootstrap_proxy                = options[:bootstrap_proxy]
-      @chef_version                   = options[:chef_version]
+      @chef_version                   = options[:chef_version] ? options[:chef_version] : "latest"
       @validator_path                 = options[:validator_path]
       @encrypted_data_bag_secret_path = options[:encrypted_data_bag_secret_path]
       @server_url                     = options[:server_url]
@@ -56,7 +56,7 @@ module Ridley
     def boot_command
       template.evaluate(self)
     end
-
+    
     # @return [String]
     def chef_config
       body = <<-CONFIG
@@ -198,7 +198,7 @@ WGET_PS
 
     # @return [String]
     def local_download_path
-      "%TEMP%\\chef-client-latest.msi"
+      "%TEMP%\\chef-client-#{chef_version}.msi"
     end
 
     # escape WIN BATCH special chars

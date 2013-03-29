@@ -78,6 +78,7 @@ module Ridley
     attr_accessor :encrypted_data_bag_secret_path
     attr_accessor :ssh
     attr_accessor :winrm
+    attr_accessor :chef_version
 
     # @option options [String] :server_url
     #   URL to the Chef API
@@ -98,6 +99,8 @@ module Ridley
     #   * :user (String) a user that will login to each node and perform the bootstrap command on (required)
     #   * :password (String) the password for the user that will perform the bootstrap
     #   * :port (Fixnum) the winrm port to connect on the node the bootstrap will be performed on (5985)
+    # @option  options [String] :chef_version
+    #   the version of Chef to use when bootstrapping
     # @option options [Hash] :params
     #   URI query unencoded key/value pairs
     # @option options [Hash] :headers
@@ -123,6 +126,7 @@ module Ridley
 
       @ssh              = @options[:ssh]
       @winrm            = @options[:winrm]
+      @chef_version     = @options[:chef_version]
       @validator_client = @options[:validator_client]
 
       @options[:client_key] = File.expand_path(@options[:client_key])

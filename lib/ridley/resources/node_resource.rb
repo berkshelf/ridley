@@ -46,12 +46,12 @@ module Ridley
           validator_client: client.validator_client,
           encrypted_data_bag_secret_path: client.encrypted_data_bag_secret_path,
           ssh: client.ssh,
-          winrm: client.winrm
+          winrm: client.winrm,
+          chef_version: client.chef_version
         }
 
         options = default_options.merge(options)
-
-        Bootstrapper.new(*args, options).run
+        Bootstrapper.new(args, options).run
       end
 
       # Merges the given data with the the data of the target node on the remote
