@@ -1,3 +1,5 @@
+# Requiring winrm here because of https://github.com/WinRb/WinRM/issues/39
+require 'winrm'
 require 'chozo'
 require 'celluloid'
 require 'faraday'

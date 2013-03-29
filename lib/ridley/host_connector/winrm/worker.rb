@@ -1,5 +1,3 @@
-require 'winrm'
-
 module Ridley
   module HostConnector
     class WinRM
