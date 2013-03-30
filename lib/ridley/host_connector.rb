@@ -24,13 +24,13 @@ module Ridley
       # 
       # @return [Ridley::HostConnector] a class under Ridley::HostConnector
       def best_connector_for(host, options = {})
-        ssh_port, winrm_port = parse_options(options)
+        ssh_port, winrm_port = parse_port_options(options)
         if connector_port_open?(host, ssh_port)
           Ridley::HostConnector::SSH
         elsif connector_port_open?(host, winrm_port)
           Ridley::HostConnector::WinRM
         else
-          raise Ridley::Errors::UnknownHostConnector, "No connection method available on #{host}"
+          raise Ridley::Errors::HostConnectionError, "No available connection method available on #{host}."
         end
       end
 
@@ -66,7 +66,7 @@ module Ridley
       #   * :port (Fixnum) the winrm port to connect on the node the bootstrap will be performed on (5985)
       # 
       # @return [Array]
-      def parse_options(options)
+      def parse_port_options(options)
         ssh_port = options[:ssh][:port] if options[:ssh]
         winrm_port = options[:winrm][:port] if options[:winrm]
         [ssh_port || DEFAULT_SSH_PORT, winrm_port || DEFAULT_WINRM_PORT]

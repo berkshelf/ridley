@@ -18,7 +18,7 @@ describe Ridley::Bootstrapper do
     }
   end
 
-  before(:each) { Ridley::HostConnector.stub(:best_connector_for) }
+  before(:each) { Ridley::HostConnector.stub(:best_connector_for).and_return(Ridley::HostConnector::SSH) }
 
   describe "ClassMethods" do
     subject { Ridley::Bootstrapper }

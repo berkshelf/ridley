@@ -11,6 +11,8 @@ module Ridley
           runner.terminate
 
           result
+        ensure
+          runner.terminate if runner && runner.alive?
         end
       end
 

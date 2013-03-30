@@ -32,6 +32,15 @@ describe Ridley::Bootstrapper::Context do
           context.template_binding.should be_a(Ridley::WindowsTemplateBinding)          
         end
       end
+
+      context "when there is no good connection option" do
+        it "raises an error" do
+          Ridley::HostConnector.stub(:best_connector_for).and_return(nil)
+          expect {
+            context = subject.create(host, options)
+          }.to raise_error(Ridley::Errors::HostConnectionError)
+        end
+      end
     end
   end
 end

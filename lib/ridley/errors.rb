@@ -38,7 +38,7 @@ module Ridley
     class BootstrapError < RidleyError; end
     class ClientKeyFileNotFound < BootstrapError; end
     class EncryptedDataBagSecretNotFound < BootstrapError; end
-    class UnknownHostConnector < BootstrapError; end
+    class HostConnectionError < BootstrapError; end
 
     # Exception thrown when the maximum amount of requests is exceeded.
     class RedirectLimitReached < RidleyError

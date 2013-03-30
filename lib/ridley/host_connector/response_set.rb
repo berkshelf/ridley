@@ -6,10 +6,10 @@ module Ridley
         # Merges the responses of the other ResponseSet with the target ResponseSet
         # and returns the mutated target
         #
-        # @param [Connector::ResponseSet] target
-        # @param [Connector::ResponseSet] other
+        # @param [HostConnector::ResponseSet] target
+        # @param [HostConnector::ResponseSet] other
         #
-        # @return [Connector::ResponseSet]
+        # @return [HostConnector::ResponseSet]
         def merge!(target, other)
           if other.is_a?(self)
             target.add_response(other.responses)
@@ -34,9 +34,9 @@ module Ridley
         add_response Array(responses)
       end
 
-      # @param [Connector::Response, Array<Connector::Response>] response
+      # @param [HostConnector::Response, Array<HostConnector::Response>] response
       #
-      # @return [Array<Connector::Response>]
+      # @return [Array<HostConnector::Response>]
       def add_response(response)
         if response.is_a?(Array)
           until response.empty?
@@ -64,9 +64,9 @@ module Ridley
       # Merges the responses of another ResponseSet with self and returns
       # a new instance of ResponseSet
       #
-      # @param [Ridley::Connector::ResponseSet] other
+      # @param [Ridley::HostConnector::ResponseSet] other
       #
-      # @return [Ridley::Connector::ResponseSet]
+      # @return [Ridley::HostConnector::ResponseSet]
       def merge(other)
         target = self.class.new(self.responses) # Why the fuck can't I use #dup here?
         self.class.merge!(target, other)
@@ -75,7 +75,7 @@ module Ridley
       # Merges the respones of another ResponseSet with self and returns
       # mutated self
       #
-      # @param [Ridley::Connector::ResponseSet] other
+      # @param [Ridley::HostConnector::ResponseSet] other
       #
       # @return [self]
       def merge!(other)
@@ -84,12 +84,12 @@ module Ridley
 
       private
 
-        # @param [Connector::Response] response
+        # @param [HostConnector::Response] response
         def add_failure(response)
           self.failures << response
         end
 
-        # @param [Connector::Response] response
+        # @param [HostConnector::Response] response
         def add_success(response)
           self.successes << response
         end

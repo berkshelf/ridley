@@ -45,7 +45,7 @@ describe Ridley::HostConnector do
     end
 
     context "when an SSH port isnt open and a WinRM port is open" do
-      it "returns Ridley::HostConnector::WinRM" do
+      it "retrns Ridley::HostConnector::WinRM" do
         subject.stub(:connector_port_open?).and_return(false, true)
         subject.best_connector_for(host).should eq(Ridley::HostConnector::WinRM)
       end
@@ -56,12 +56,12 @@ describe Ridley::HostConnector do
         subject.stub(:connector_port_open?).and_return(false, false)
         expect {
           subject.best_connector_for(host)
-        }.to raise_error(Ridley::Errors::UnknownHostConnector)
+        }.to raise_error(Ridley::Errors::HostConnectionError)
       end
     end
   end
 
-  describe "#parse_options" do
+  describe "#parse_port_options" do
     let(:options) do
       {
         ssh: {
@@ -75,27 +75,27 @@ describe Ridley::HostConnector do
     
     context "when :ssh has a key for :port" do
       it "returns the value of port instead of the default" do
-        subject.parse_options(options).should include(1234)
+        subject.parse_port_options(options).should include(1234)
       end
     end
 
     context "when there is no :ssh key" do
       it "returns the default value for port" do
         options.delete(:ssh)
-        subject.parse_options(options).should include(22)
+        subject.parse_port_options(options).should include(22)
       end
     end
 
     context "when :winrm has a key for :port" do
       it "returns the value of port instead of the default" do
-        subject.parse_options(options).should include(5678)
+        subject.parse_port_options(options).should include(5678)
       end
     end
 
     context "when there is no :ssh key" do
       it "returns the default value for port" do
         options.delete(:winrm)
-        subject.parse_options(options).should include(5985)
+        subject.parse_port_options(options).should include(5985)
       end
     end
   end

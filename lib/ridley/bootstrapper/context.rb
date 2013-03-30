@@ -40,11 +40,13 @@ module Ridley
         #   bootstrap template to use
         def create(host, options = {})
           host_connector = HostConnector.best_connector_for(host, options)
-          case host_connector.to_s
+          template_binding = case host_connector.to_s
           when Ridley::HostConnector::SSH.to_s
-            template_binding = Ridley::UnixTemplateBinding.new(options)
+            Ridley::UnixTemplateBinding.new(options)
           when Ridley::HostConnector::WinRM.to_s
-            template_binding = Ridley::WindowsTemplateBinding.new(options)
+            Ridley::WindowsTemplateBinding.new(options)
+          else
+            raise Ridley::Errors::HostConnectionError, "Cannot find an appropriate Template Binding for an unknown connector."
           end
           new(host, host_connector, template_binding)
         end

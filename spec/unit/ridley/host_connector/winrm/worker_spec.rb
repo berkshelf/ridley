@@ -30,11 +30,11 @@ describe Ridley::HostConnector::WinRM::Worker do
     end
   end
 
-  describe "#_upload_command" do
+  describe "#get_command" do
     let(:command) { "echo %TEMP%" }
     context "when a command is less than 2047 characters" do
       it "returns the command" do
-        subject._upload_command(command).should eq(command)
+        subject.get_command(command).should eq(command)
       end
     end
   end
