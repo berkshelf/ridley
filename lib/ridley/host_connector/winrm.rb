@@ -5,6 +5,8 @@ module Ridley
       autoload :Worker, 'ridley/host_connector/winrm/worker'
 
       class << self
+        # @param [Ridley::NodeResource, Array<Ridley::NodeResource>] nodes
+        # @param [Hash] options
         def start(nodes, options = {}, &block)
           runner = new(nodes, options)
           result = yield runner
@@ -22,11 +24,16 @@ module Ridley
       attr_reader :nodes
       attr_reader :options
 
+      # @param [Ridley::NodeResource, Array<Ridley::NodeResource>] nodes
+      # @param [Hash] options
       def initialize(nodes, options = {})
         @nodes = Array(nodes)
         @options = options
       end
 
+      # @param [String] command
+      #
+      # @return [Array]
       def run(command)
         workers = Array.new
         futures = self.nodes.collect do |node|
