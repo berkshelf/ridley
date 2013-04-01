@@ -2,7 +2,7 @@ require 'erubis'
 
 module Ridley
   module BootstrapBinding
-    class << self
+    module ClassMethods
       def validate_options(options = {})
         if options[:server_url].nil?
           raise Errors::ArgumentError, "A server_url is required for bootstrapping"
@@ -25,6 +25,12 @@ module Ridley
           sudo: true,
           hints: Hash.new
         }
+      end
+    end
+
+    class << self
+      def included(base)
+        base.extend(ClassMethods)
       end
     end
 

@@ -13,7 +13,19 @@ describe Ridley::BootstrapBinding do
   end
 
   describe "ClassMethods" do
-    subject { Ridley::BootstrapBinding }
+    subject do
+      Class.new do
+        include Ridley::BootstrapBinding
+      end
+    end
+
+    describe ":included" do
+      context "when a class includes Ridley::BootstrapBinding" do
+        it "should have a validate_options class method`" do
+          subject.methods.should include(:validate_options)
+        end
+      end
+    end
 
     describe ":validate_options" do
       context "when server_url is not specified" do
