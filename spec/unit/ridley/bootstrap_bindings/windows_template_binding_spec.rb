@@ -6,7 +6,8 @@ describe Ridley::WindowsTemplateBinding do
       server_url: "https://api.opscode.com/organizations/vialstudios",
       validator_client: "chef-validator",
       validator_path: fixtures_path.join("reset.pem").to_s,
-      encrypted_data_bag_secret_path: fixtures_path.join("reset.pem").to_s
+      encrypted_data_bag_secret_path: fixtures_path.join("reset.pem").to_s,
+      chef_version: "11.4.0"
     }
   end
   
@@ -14,10 +15,56 @@ describe Ridley::WindowsTemplateBinding do
     subject { described_class }
     
     describe "::new" do
+      context "when a chef_version is passed through" do
+        it "sets the chef_version attribute to the same value" do
+          subject.new(options).chef_version.should eq("11.4.0")
+        end
+      end
+
+      context "when the chef_version is not passed through" do
+        it "sets the chef_version to 'latest'" do
+          options.delete(:chef_version)
+          subject.new(options).chef_version.should eq("latest")
+        end
+      end
     end
   end
 
   subject { Ridley::WindowsTemplateBinding.new(options) }
+
+  describe "MixinMethods" do
+
+    describe "#templates_path" do
+      it "returns a pathname" do
+        subject.templates_path.should be_a(Pathname)
+      end
+    end
+
+    describe "#first_boot" do
+      it "returns a string" do
+        subject.first_boot.should be_a(String)
+      end
+    end
+
+    describe "#encrypted_data_bag_secret" do
+      it "returns a string" do
+        subject.encrypted_data_bag_secret.should be_a(String)
+      end
+    end
+
+    describe "#validation_key" do
+      it "returns a string" do
+        subject.validation_key.should be_a(String)
+      end
+    end
+
+    describe "template" do
+      it "returns a string" do
+        subject.template.should be_a(Erubis::Eruby)
+      end
+    end
+  end
+
 
   describe "#boot_command" do
     it "returns a string" do
@@ -34,12 +81,6 @@ describe Ridley::WindowsTemplateBinding do
   describe "#chef_config" do
     it "returns a string" do
       subject.chef_config.should be_a(String)
-    end
-  end
-
-  describe "#first_boot" do
-    it "returns a string" do
-      subject.first_boot.should be_a(String)
     end
   end
 
@@ -74,5 +115,4 @@ describe Ridley::WindowsTemplateBinding do
       subject.windows_wget_powershell.should be_a(String)
     end
   end
-
 end

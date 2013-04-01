@@ -11,7 +11,9 @@
 # https://github.com/opscode/knife-windows/blob/3b8886ddcfb928ca0958cd05b22f8c3d78bee86e/lib/chef/knife/bootstrap/windows-chef-client-msi.erb
 # https://github.com/opscode/knife-windows/blob/78d38bbed358ac20107fc2b5b427f4b5e52e5cb2/lib/chef/knife/core/windows_bootstrap_context.rb
 module Ridley
-  class WindowsTemplateBinding < Ridley::BootstrapBinding
+  class WindowsTemplateBinding
+
+    include Ridley::BootstrapBinding
     
     attr_reader :template_file
 
@@ -39,7 +41,7 @@ module Ridley
     def initialize(options)
       options = Ridley::BootstrapBinding.default_options.merge(options)
       options[:template] ||= default_template
-      self.class.validate_options(options)
+      Ridley::BootstrapBinding.validate_options(options)
 
       @template_file                  = options[:template]
       @bootstrap_proxy                = options[:bootstrap_proxy]

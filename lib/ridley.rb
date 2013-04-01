@@ -37,7 +37,6 @@ module Ridley
   autoload :Resource, 'ridley/resource'
   autoload :SandboxUploader, 'ridley/sandbox_uploader'
   autoload :HostConnector, 'ridley/host_connector'
-  autoload :BootstrapBinding, 'ridley/bootstrap_binding'
 
   class << self
     extend Forwardable
@@ -65,6 +64,6 @@ end
 
 Celluloid.logger = Ridley.logger
 
+require 'ridley/bootstrap_bindings'
 require 'ridley/middleware'
 require 'ridley/resources'
-require 'ridley/bootstrap_bindings'

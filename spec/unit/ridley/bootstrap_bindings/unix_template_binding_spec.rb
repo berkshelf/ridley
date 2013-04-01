@@ -37,6 +37,39 @@ describe Ridley::UnixTemplateBinding do
 
   subject { Ridley::UnixTemplateBinding.new(options) }
 
+  describe "MixinMethods" do
+
+    describe "#templates_path" do
+      it "returns a pathname" do
+        subject.templates_path.should be_a(Pathname)
+      end
+    end
+
+    describe "#first_boot" do
+      it "returns a string" do
+        subject.first_boot.should be_a(String)
+      end
+    end
+
+    describe "#encrypted_data_bag_secret" do
+      it "returns a string" do
+        subject.encrypted_data_bag_secret.should be_a(String)
+      end
+    end
+
+    describe "#validation_key" do
+      it "returns a string" do
+        subject.validation_key.should be_a(String)
+      end
+    end
+
+    describe "template" do
+      it "returns a string" do
+        subject.template.should be_a(Erubis::Eruby)
+      end
+    end
+  end
+
   describe "#boot_command" do
     it "returns a string" do
       subject.boot_command.should be_a(String)
@@ -52,12 +85,6 @@ describe Ridley::UnixTemplateBinding do
   describe "#chef_config" do
     it "returns a string" do
       subject.chef_config.should be_a(String)
-    end
-  end
-
-  describe "#first_boot" do
-    it "returns a string" do
-      subject.first_boot.should be_a(String)
     end
   end
 

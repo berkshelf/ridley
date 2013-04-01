@@ -1,8 +1,7 @@
 require 'erubis'
 
 module Ridley
-  # @author Kyle Allan <kallan@riotgames.com>
-  class BootstrapBinding
+  module BootstrapBinding
     class << self
       def validate_options(options = {})
         if options[:server_url].nil?
@@ -20,11 +19,11 @@ module Ridley
       def default_options
         @default_options ||= {
           validator_client: "chef-validator",
-          hints: Hash.new,
           attributes: Hash.new,
           run_list: Array.new,
           environment: "_default",
-          sudo: true
+          sudo: true,
+          hints: Hash.new
         }
       end
     end
@@ -78,5 +77,6 @@ module Ridley
     def template
       Erubis::Eruby.new(IO.read(template_file).chomp)
     end
+
   end
 end

@@ -8,7 +8,9 @@
 # @author Kyle Allan <kallan@riotgames.com>
 # 
 module Ridley
-  class UnixTemplateBinding < Ridley::BootstrapBinding
+  class UnixTemplateBinding
+
+    include Ridley::BootstrapBinding
 
     attr_reader :sudo
     attr_reader :hints
@@ -37,7 +39,7 @@ module Ridley
     def initialize(options = {})
       options = Ridley::BootstrapBinding.default_options.merge(options)
       options[:template] ||= default_template
-      self.class.validate_options(options)
+      Ridley::BootstrapBinding.validate_options(options)
 
       @template_file                  = options[:template]
       @bootstrap_proxy                = options[:bootstrap_proxy]
