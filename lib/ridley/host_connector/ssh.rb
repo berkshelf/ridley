@@ -40,7 +40,7 @@ module Ridley
       def run(command)
         workers = Array.new
         futures = self.nodes.collect do |node|
-          workers << worker = Worker.new_link(node.public_hostname, self.options.freeze)
+          workers << worker = Worker.new(node.public_hostname, self.options.freeze)
           worker.future.run(command)
         end
 
