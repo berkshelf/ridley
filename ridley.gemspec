@@ -33,4 +33,5 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'erubis'
   s.add_runtime_dependency 'net-http-persistent', '>= 2.8'
   s.add_runtime_dependency 'retryable'
+  s.add_runtime_dependency 'winrm', '~> 1.1.0'
 end

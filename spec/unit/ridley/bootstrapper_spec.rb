@@ -18,6 +18,8 @@ describe Ridley::Bootstrapper do
     }
   end
 
+  before(:each) { Ridley::HostConnector.stub(:best_connector_for).and_return(Ridley::HostConnector::SSH) }
+
   describe "ClassMethods" do
     subject { Ridley::Bootstrapper }
 
@@ -48,18 +50,6 @@ describe Ridley::Bootstrapper do
         it "has a context for each item given" do
           @obj.contexts.should have(2).items
         end
-      end
-    end
-
-    describe "::templates_path" do
-      it "returns a pathname" do
-        subject.templates_path.should be_a(Pathname)
-      end
-    end
-
-    describe "::default_template" do
-      it "returns a string" do
-        subject.default_template.should be_a(String)
       end
     end
   end
