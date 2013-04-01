@@ -3,22 +3,10 @@ module Ridley
   class Bootstrapper
     autoload :Context, 'ridley/bootstrapper/context'
 
-    class << self
-      # @return [Pathname]
-      def templates_path
-        Ridley.root.join('bootstrappers')
-      end
-
-      # @return [String]
-      def default_template
-        templates_path.join('omnibus.erb').to_s
-      end
-    end
-
     include Celluloid
     include Celluloid::Logger
-
-    # @return [Array<String>]
+    
+    # @return  [Array<String>]
     attr_reader :hosts
 
     # @return [Array<Bootstrapper::Context>]
@@ -33,6 +21,10 @@ module Ridley
     #   * :password (String) the password for the shell user that will perform the bootstrap
     #   * :keys (Array, String) an array of keys (or a single key) to authenticate the ssh user with instead of a password
     #   * :timeout (Float) [5.0] timeout value for SSH bootstrap
+    # @option options [Hash] :winrm
+    #   * :user (String) a user that will login to each node and perform the bootstrap command on (required)
+    #   * :password (String) the password for the user that will perform the bootstrap
+    #   * :port (Fixnum) the winrm port to connect on the node the bootstrap will be performed on (5985)
     # @option options [String] :validator_client
     # @option options [String] :validator_path
     #   filepath to the validator used to bootstrap the node (required)
@@ -52,7 +44,7 @@ module Ridley
     #   environment to join the node to
     # @option options [Boolean] :sudo (true)
     #   bootstrap with sudo (default: true)
-    # @option options [String] :template ('omnibus')
+    # @option options [String] :template
     #   bootstrap template to use
     def initialize(hosts, options = {})
       @hosts         = Array(hosts).collect(&:to_s).uniq
@@ -64,23 +56,23 @@ module Ridley
       }.merge(@options[:ssh])
 
       @options[:sudo] = @options[:ssh][:sudo]
-
       @contexts = @hosts.collect do |host|
-        Context.new(host, options)
+        Context.create(host, options)
       end
     end
 
-    # @return [SSH::ResponseSet]
+    # @return [HostConnector::ResponseSet]
     def run
       workers = Array.new
       futures = contexts.collect do |context|
         info "Running bootstrap command on #{context.host}"
 
-        workers << worker = SSH::Worker.new_link(self.options[:ssh].freeze)
-        worker.future.run(context.host, context.boot_command)
+        workers << worker = context.host_connector::Worker.new(context.host, self.options.freeze)
+
+        worker.future.run(context.template_binding.boot_command)
       end
 
-      SSH::ResponseSet.new.tap do |response_set|
+      HostConnector::ResponseSet.new.tap do |response_set|
         futures.each do |future|
           status, response = future.value
           response_set.add_response(response)

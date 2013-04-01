@@ -1,3 +1,5 @@
+# Requiring winrm here because of https://github.com/WinRb/WinRM/issues/39
+require 'winrm'
 require 'chozo'
 require 'celluloid'
 require 'faraday'
@@ -34,7 +36,7 @@ module Ridley
   autoload :Mixin, 'ridley/mixin'
   autoload :Resource, 'ridley/resource'
   autoload :SandboxUploader, 'ridley/sandbox_uploader'
-  autoload :SSH, 'ridley/ssh'
+  autoload :HostConnector, 'ridley/host_connector'
 
   class << self
     extend Forwardable
@@ -62,5 +64,6 @@ end
 
 Celluloid.logger = Ridley.logger
 
+require 'ridley/bootstrap_bindings'
 require 'ridley/middleware'
 require 'ridley/resources'
