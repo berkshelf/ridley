@@ -53,6 +53,14 @@ module Ridley
       ensure
         workers.map(&:terminate)
       end
+
+      def chef_client
+        command = "chef-client"
+        if self.options[:ssh] && self.options[:ssh][:sudo]
+          command = "sudo #{command}"
+        end
+        run(command)
+      end
     end
   end
 end

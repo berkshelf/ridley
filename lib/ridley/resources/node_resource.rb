@@ -196,18 +196,23 @@ module Ridley
       self.cloud_provider == "rackspace"
     end
 
-    # Run Chef-Client on the instantiated node
+    # Run Chef-Client on the instantiated node.
     #
     # @param [Hash] options
-    #   a hash of options to pass to {Ridley::SSH.start}
+    #   a hash of options to pass to the best {Ridley::HostConnector}
     #
-    # @return [SSH::Response]
+    # @return [HostConnector::Response]
     def chef_client(options = {})
-      options = client.ssh.merge(options)
+      connector_options = Hash.new
+      connector_options[:ssh] = client.ssh
+      connector_options[:winrm] = client.winrm
+      connector_options.merge(options)
 
       Ridley.log.debug "Running Chef Client on: #{self.public_hostname}"
-      Ridley::SSH.start(self, options) do |ssh|
-        ssh.run("sudo chef-client").first
+
+      host_connector = HostConnector.best_connector_for(host, connector_options)
+      host_connector.start(self, connector_options) do |connector|
+        connector.chef_client.first
       end
     end
 

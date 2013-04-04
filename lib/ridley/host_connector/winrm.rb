@@ -50,6 +50,10 @@ module Ridley
       ensure
         workers.map(&:terminate)
       end
+
+      def chef_client
+        run("chef-client")
+      end
     end
   end
 end
