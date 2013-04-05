@@ -70,4 +70,13 @@ describe Ridley::HostConnector::SSH do
       end
     end
   end
+
+  describe "#put_secret" do
+    let(:encrypted_data_bag_secret_path) { fixtures_path.join("encrypted_data_bag_secret").to_s }
+    
+    it "receives a run command with 'echo'" do
+      subject.should_receive(:run).with(/echo/)
+      subject.put_secret(encrypted_data_bag_secret_path)
+    end
+  end
 end

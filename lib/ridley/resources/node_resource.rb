@@ -210,9 +210,10 @@ module Ridley
 
       Ridley.log.debug "Running Chef Client on: #{self.public_hostname}"
 
-      host_connector = HostConnector.best_connector_for(host, connector_options)
-      host_connector.start(self, connector_options) do |connector|
-        connector.chef_client.first
+      HostConnector.best_connector_for(host, connector_options) do |host_connector|
+        host_connector.start(self, connector_options) do |connector|
+          connector.chef_client.first
+        end
       end
     end
 
@@ -221,9 +222,9 @@ module Ridley
     # returned
     #
     # @param [Hash] options
-    #   a hash of options to pass to {Ridley::SSH.start}
+    #   a hash of options to pass to the best {Ridley::HostConnector}
     #
-    # @return [SSH::Response, nil]
+    # @return [HostConnector::Response, nil]
     def put_secret(options = {})
       if client.encrypted_data_bag_secret_path.nil? ||
         !File.exists?(client.encrypted_data_bag_secret_path)
@@ -231,13 +232,16 @@ module Ridley
         return nil
       end
 
-      options = client.ssh.merge(options)
-      secret  = File.read(client.encrypted_data_bag_secret_path).chomp
-      command = "echo '#{secret}' > /etc/chef/encrypted_data_bag_secret; chmod 0600 /etc/chef/encrypted_data_bag_secret"
+      connector_options = Hash.new
+      connector_options[:ssh] = client.ssh
+      connector_options[:winrm] = client.winrm
 
       Ridley.log.debug "Writing Encrypted Data Bag Secret to: #{self.public_hostname}"
-      Ridley::SSH.start(self, options) do |ssh|
-        ssh.run(command).first
+
+      HostConnector.best_connector_for(host, connector_options) do |host_connector|
+        host_connector.start(self, connector_options) do |connector|
+          connector.put_secret(client.encrypted_data_bag_secret_path).first
+        end
       end
     end
 
