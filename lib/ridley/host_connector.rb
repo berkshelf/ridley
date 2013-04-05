@@ -32,8 +32,12 @@ module Ridley
         else
           raise Ridley::Errors::HostConnectionError, "No available connection method available on #{host}."
         end
-        yield host_connector if block
-        host_connector
+
+        if block
+          yield host_connector
+        else
+          host_connector
+        end
       end
 
       # Checks to see if the given port is open for TCP connections

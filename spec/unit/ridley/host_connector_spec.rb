@@ -79,6 +79,15 @@ describe Ridley::HostConnector do
         }.to raise_error(Ridley::Errors::HostConnectionError)
       end
     end
+
+    context "when a block is provided" do
+      it "yields the best HostConnector to the block" do
+        subject.stub(:connector_port_open?).and_return(true)
+        subject.best_connector_for(host) do |yielded|
+          yielded.should eq(Ridley::HostConnector::SSH)
+        end
+      end
+    end
   end
 
   describe "#parse_port_options" do
