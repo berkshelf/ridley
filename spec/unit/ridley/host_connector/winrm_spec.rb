@@ -44,4 +44,21 @@ describe Ridley::HostConnector::WinRM do
       subject.run("dir").should be_a(Ridley::HostConnector::ResponseSet)
     end
   end
+
+  describe "#chef_client" do
+    it "receives a command to run 'chef-client'" do
+      subject.should_receive(:run).with("chef-client")
+      subject.chef_client
+    end
+  end
+
+  describe "#put_secret" do
+    let(:encrypted_data_bag_secret_path) { fixtures_path.join("encrypted_data_bag_secret").to_s }
+
+    it "receives a command to copy the secret" do
+      secret  = File.read(encrypted_data_bag_secret_path).chomp
+      subject.should_receive(:run).with("echo #{secret} > C:\\chef\\encrypted_data_bag_secret")
+      subject.put_secret(encrypted_data_bag_secret_path)
+    end
+  end
 end

@@ -75,7 +75,8 @@ describe Ridley::HostConnector::SSH do
     let(:encrypted_data_bag_secret_path) { fixtures_path.join("encrypted_data_bag_secret").to_s }
     
     it "receives a run command with 'echo'" do
-      subject.should_receive(:run).with(/echo/)
+      secret  = File.read(encrypted_data_bag_secret_path).chomp
+      subject.should_receive(:run).with("echo '#{secret}' > /etc/chef/encrypted_data_bag_secret; chmod 0600 /etc/chef/encrypted_data_bag_secret")
       subject.put_secret(encrypted_data_bag_secret_path)
     end
   end

@@ -210,7 +210,7 @@ module Ridley
 
       Ridley.log.debug "Running Chef Client on: #{self.public_hostname}"
 
-      HostConnector.best_connector_for(host, connector_options) do |host_connector|
+      HostConnector.best_connector_for(self.public_hostname, connector_options) do |host_connector|
         host_connector.start(self, connector_options) do |connector|
           connector.chef_client.first
         end
@@ -238,7 +238,7 @@ module Ridley
 
       Ridley.log.debug "Writing Encrypted Data Bag Secret to: #{self.public_hostname}"
 
-      HostConnector.best_connector_for(host, connector_options) do |host_connector|
+      HostConnector.best_connector_for(self.public_hostname, connector_options) do |host_connector|
         host_connector.start(self, connector_options) do |connector|
           connector.put_secret(client.encrypted_data_bag_secret_path).first
         end

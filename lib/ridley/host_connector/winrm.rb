@@ -54,6 +54,12 @@ module Ridley
       def chef_client
         run("chef-client")
       end
+
+      def put_secret(encrypted_data_bag_secret_path)
+        secret  = File.read(encrypted_data_bag_secret_path).chomp
+        command = "echo #{secret} > C:\\chef\\encrypted_data_bag_secret"
+        run(command)
+      end
     end
   end
 end
