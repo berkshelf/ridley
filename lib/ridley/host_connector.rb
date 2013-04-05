@@ -21,6 +21,9 @@ module Ridley
       #   * :port (Fixnum) the ssh port to connect on the node the bootstrap will be performed on (22)
       # @option options [Hash] :winrm
       #   * :port (Fixnum) the winrm port to connect on the node the bootstrap will be performed on (5985)
+      # @param block [Proc]
+      #   an optional block that is yielded the best HostConnector
+      #
       #
       # @return [Ridley::HostConnector] a class under Ridley::HostConnector
       def best_connector_for(host, options = {}, &block)

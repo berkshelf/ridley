@@ -54,6 +54,9 @@ module Ridley
         workers.map(&:terminate)
       end
 
+      # Executes a chef-client command on the nodes
+      # 
+      # @return [#run]
       def chef_client
         command = "chef-client"
         if self.options[:ssh] && self.options[:ssh][:sudo]
@@ -63,6 +66,12 @@ module Ridley
         run(command)
       end
 
+      # Executes a copy of the encrypted_data_bag_secret to the nodes
+      # 
+      # @param [String] encrypted_data_bag_secret_path
+      #   the path to the encrypted_data_bag_secret
+      # 
+      # @return [#run]
       def put_secret(encrypted_data_bag_secret_path)
         secret  = File.read(encrypted_data_bag_secret_path).chomp
         command = "echo '#{secret}' > /etc/chef/encrypted_data_bag_secret; chmod 0600 /etc/chef/encrypted_data_bag_secret"
