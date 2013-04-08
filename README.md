@@ -2,7 +2,7 @@
 [![Gem Version](https://badge.fury.io/rb/ridley.png)](http://badge.fury.io/rb/ridley)
 [![Build Status](https://secure.travis-ci.org/RiotGames/ridley.png?branch=master)](http://travis-ci.org/RiotGames/ridley)
 [![Dependency Status](https://gemnasium.com/RiotGames/ridley.png?travis)](https://gemnasium.com/RiotGames/ridley)
-[![Code Climate](https://codeclimate.com/badge.png)](https://codeclimate.com/github/RiotGames/ridley)
+[![Code Climate](https://codeclimate.com/github/RiotGames/ridley.png)](https://codeclimate.com/github/RiotGames/ridley)
 
 A reliable Chef API client with a clean syntax
 
