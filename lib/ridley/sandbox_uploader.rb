@@ -75,14 +75,13 @@ module Ridley
       end
 
       if path_or_io.respond_to? :read
-        io = path_or_io
+        contents = path_or_io.read
       elsif path_or_io.kind_of? String
-        io = File.open(path_or_io, 'rb')
+        contents = File.read(path_or_io)
       else
         raise Ridley::Errors::ArgumentError, "Expected a String or an IO, but got #{path_or_io.inspect}"
       end
 
-      contents = io.read
       calculated_checksum = self.class.checksum64_string(contents)
       expected_checksum = Base64.encode64([chk_id].pack('H*')).strip
       unless expected_checksum == calculated_checksum
