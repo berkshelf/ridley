@@ -26,6 +26,8 @@ module Ridley
       attr_reader :nodes
       attr_reader :options
 
+      EMBEDDED_RUBY_PATH = "/opt/chef/embedded/bin/ruby".freeze
+
       # @param [Ridley::NodeResource, Array<Ridley::NodeResource>] nodes
       # @param [Hash] options
       #   @see Net::SSH
@@ -76,6 +78,17 @@ module Ridley
         secret  = File.read(encrypted_data_bag_secret_path).chomp
         command = "echo '#{secret}' > /etc/chef/encrypted_data_bag_secret; chmod 0600 /etc/chef/encrypted_data_bag_secret"
 
+        run(command)
+      end
+
+      # Executes a provided Ruby script in the embedded Ruby installation
+      # 
+      # @param [Array<String>] command_lines
+      #   An Array of lines of the command to be executed
+      # 
+      # @return [#run]
+      def ruby_script(command_lines)
+        command = "#{EMBEDDED_RUBY_PATH} -e \"#{command_lines.join(';')}\""
         run(command)
       end
     end

@@ -80,4 +80,13 @@ describe Ridley::HostConnector::SSH do
       subject.put_secret(encrypted_data_bag_secret_path)
     end
   end
+
+  describe "#ruby_script" do
+    let(:command_lines) { ["puts 'hello'", "puts 'there'"] }
+
+    it "receives a ruby call with the command" do
+      subject.should_receive(:run).with("#{described_class::EMBEDDED_RUBY_PATH} -e \"puts 'hello';puts 'there'\"")
+      subject.ruby_script(command_lines)
+    end
+  end
 end
