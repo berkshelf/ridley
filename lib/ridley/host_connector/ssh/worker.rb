@@ -31,34 +31,42 @@ module Ridley
           response = Ridley::HostConnector::Response.new(host)
           debug "Running SSH command: '#{command}' on: '#{host}' as: '#{user}'"
 
+          channel_exec = ->(channel, command) do
+            channel.exec(command) do |ch, success|
+              unless success
+                raise "Channel execution failed while executing command #{command}"
+              end
+
+              channel.on_data do |ch, data|
+                response.stdout += data
+                info "NODE[#{host}] #{data}" if data.present? and data != "\r\n"
+              end
+
+              channel.on_extended_data do |ch, type, data|
+                response.stderr += data
+                info "NODE[#{host}] #{data}" if data.present? and data != "\r\n"
+              end
+
+              channel.on_request("exit-status") do |ch, data|
+                response.exit_code = data.read_long
+              end
+
+              channel.on_request("exit-signal") do |ch, data|
+                response.exit_signal = data.read_string
+              end
+            end
+          end
+
           Net::SSH.start(host, user, options.slice(*Net::SSH::VALID_OPTIONS)) do |ssh|
             ssh.open_channel do |channel|
               if self.sudo
-                channel.request_pty
-              end
+                channel.request_pty do |channel, success|
+                  raise "Could not aquire pty: A pty is required for running sudo commands." unless success
 
-              channel.exec(command) do |ch, success|
-                unless success
-                  raise "FAILURE: could not execute command"
+                  channel_exec.call(channel, command)
                 end
-
-                channel.on_data do |ch, data|
-                  response.stdout += data
-                  info "NODE[#{host}] #{data}" if data.present? and data != "\r\n"
-                end
-
-                channel.on_extended_data do |ch, type, data|
-                  response.stderr += data
-                  info "NODE[#{host}] #{data}" if data.present? and data != "\r\n"
-                end
-
-                channel.on_request("exit-status") do |ch, data|
-                  response.exit_code = data.read_long
-                end
-
-                channel.on_request("exit-signal") do |ch, data|
-                  response.exit_signal = data.read_string
-                end
+              else
+                channel_exec.call(channel, command)
               end
             end
 
