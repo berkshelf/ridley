@@ -36,7 +36,7 @@ module Ridley
           raise Ridley::Errors::HostConnectionError, "No available connection method available on #{host}."
         end
 
-        if block
+        if block_given?
           yield host_connector
         else
           host_connector

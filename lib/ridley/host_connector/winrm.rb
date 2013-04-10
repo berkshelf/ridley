@@ -24,7 +24,7 @@ module Ridley
       attr_reader :nodes
       attr_reader :options
 
-      EMBEDDED_RUBY_PATH = "C:\\opscode\\chef\\embedded\\bin\\ruby".freeze
+      EMBEDDED_RUBY_PATH = 'C:\opscode\chef\embedded\bin\ruby'.freeze
 
       # @param [Ridley::NodeResource, Array<Ridley::NodeResource>] nodes
       # @param [Hash] options

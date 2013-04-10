@@ -46,49 +46,4 @@ describe Ridley::HostConnector::SSH do
       subject.run("ls").should be_a(Ridley::HostConnector::ResponseSet)
     end
   end
-
-  describe "#chef_client" do
-    it "returns a HostConnector::ResponseSet" do
-      subject.chef_client.should be_a(Ridley::HostConnector::ResponseSet)
-    end
-
-    context "when the sudo key exists" do
-      let(:options) do
-        {
-          ssh: {
-            user: "vagrant",
-            password: "vagrant",
-            sudo: true,
-            timeout: 1
-          }
-        }
-      end
-
-      subject { Ridley::HostConnector::SSH.new(node_one, options) }
-
-      it "receives a run command with 'sudo'" do
-        subject.should_receive(:run).with("sudo chef-client")
-        subject.chef_client
-      end
-    end
-  end
-
-  describe "#put_secret" do
-    let(:encrypted_data_bag_secret_path) { fixtures_path.join("encrypted_data_bag_secret").to_s }
-    
-    it "receives a run command with 'echo'" do
-      secret  = File.read(encrypted_data_bag_secret_path).chomp
-      subject.should_receive(:run).with("echo '#{secret}' > /etc/chef/encrypted_data_bag_secret; chmod 0600 /etc/chef/encrypted_data_bag_secret")
-      subject.put_secret(encrypted_data_bag_secret_path)
-    end
-  end
-
-  describe "#ruby_script" do
-    let(:command_lines) { ["puts 'hello'", "puts 'there'"] }
-
-    it "receives a ruby call with the command" do
-      subject.should_receive(:run).with("#{described_class::EMBEDDED_RUBY_PATH} -e \"puts 'hello';puts 'there'\"")
-      subject.ruby_script(command_lines)
-    end
-  end
 end
