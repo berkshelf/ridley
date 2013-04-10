@@ -36,6 +36,7 @@ module Ridley
   autoload :Connection, 'ridley/connection'
   autoload :ChainLink, 'ridley/chain_link'
   autoload :Chef, 'ridley/chef'
+  autoload :ChefObject, 'ridley/chef_object'
   autoload :DSL, 'ridley/dsl'
   autoload :Logging, 'ridley/logging'
   autoload :Mixin, 'ridley/mixin'
@@ -71,4 +72,5 @@ Celluloid.logger = Ridley.logger
 
 require 'ridley/bootstrap_bindings'
 require 'ridley/middleware'
+require 'ridley/chef_objects'
 require 'ridley/resources'

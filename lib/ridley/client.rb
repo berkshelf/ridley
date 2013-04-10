@@ -22,8 +22,38 @@ module Ridley
   #   r.save
   #
   #   connection.role.find("new-role") => <#Ridley::RoleResource: @name="new-role">
-  class Client < Celluloid::SupervisionGroup
+  class Client
+    class ConnectionSupervisor < ::Celluloid::SupervisionGroup
+      def initialize(registry, options)
+        super(registry) do |s|
+          s.pool(Ridley::Connection, size: 4, args: [
+            options[:server_url],
+            options[:client_name],
+            options[:client_key],
+            options.slice(*Ridley::Connection::VALID_OPTIONS)
+          ], as: :connection_pool)
+        end
+      end
+    end
+
+    class ResourcesSupervisor < ::Celluloid::SupervisionGroup
+      def initialize(registry, connection_registry)
+        super(registry) do |s|
+          s.supervise_as :client_resource, Ridley::ClientResource, connection_registry
+          s.supervise_as :cookbook_resource, Ridley::CookbookResource, connection_registry
+        end
+      end
+    end
+
     class << self
+      # @return [Proc]
+      def finalizer
+        proc {
+          @connection_supervisor.terminate if @connection_supervisor && @connection_supervisor.alive?
+          @resources_supervisor.terminate if @resources_supervisor && @resources_supervisor.alive?
+        }
+      end
+
       def open(options = {}, &block)
         cli = new(options)
         cli.evaluate(&block)
@@ -115,9 +145,6 @@ module Ridley
     # @raise [Errors::ClientKeyFileNotFound] if the option for :client_key does not contain
     #   a file path pointing to a readable client key
     def initialize(options = {})
-      log.info { "Ridley starting..." }
-      super()
-
       @options = options.reverse_merge(
         ssh: Hash.new,
         winrm: Hash.new
@@ -143,22 +170,22 @@ module Ridley
         raise Errors::ClientKeyFileNotFound, "client key not found at: '#{@options[:client_key]}'"
       end
 
-      pool(Ridley::Connection, size: 4, args: [
-        @options[:server_url],
-        @options[:client_name],
-        @options[:client_key],
-        @options.slice(*Connection::VALID_OPTIONS)
-      ], as: :connection_pool)
+      @connection_registry   = Celluloid::Registry.new
+      @resources_registry    = Celluloid::Registry.new
+      @connection_supervisor = ConnectionSupervisor.new(@connection_registry, @options)
+      @resources_supervisor  = ResourcesSupervisor.new(@resources_registry, @connection_registry)
+      # Why do we use a class function for defining our finalizer?
+      # http://www.mikeperham.com/2010/02/24/the-trouble-with-ruby-finalizers/
+      ObjectSpace.define_finalizer(self, self.class.finalizer)
     end
 
-    # @return [Ridley::ChainLink]
     def client
-      ChainLink.new(Actor.current, Ridley::ClientResource)
+      @resources_registry[:client_resource]
     end
 
     # @return [Ridley::ChainLink]
     def cookbook
-      ChainLink.new(Actor.current, Ridley::CookbookResource)
+      @resources_registry[:cookbook_resource]
     end
 
     # @return [Ridley::ChainLink]
@@ -241,26 +268,10 @@ module Ridley
     end
     alias_method :sync, :evaluate
 
-    def finalize
-      connection.terminate if connection && connection.alive?
-    end
-
-    def connection
-      @registry[:connection_pool]
-    end
-
     private
 
-      def method_missing(method, *args, &block)
-        if block_given?
-          @self_before_instance_eval ||= eval("self", block.binding)
-        end
-
-        if @self_before_instance_eval.nil?
-          super
-        end
-
-        @self_before_instance_eval.send(method, *args, &block)
+      def connection
+        @registry[:connection_pool]
       end
   end
 end
