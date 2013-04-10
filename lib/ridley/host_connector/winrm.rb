@@ -2,6 +2,7 @@ module Ridley
   module HostConnector
     # @author Kyle Allan <kallan@riotgames.com>
     class WinRM
+      autoload :CommandUploader, 'ridley/host_connector/winrm/command_uploader'
       autoload :Worker, 'ridley/host_connector/winrm/worker'
 
       class << self
@@ -23,8 +24,6 @@ module Ridley
 
       attr_reader :nodes
       attr_reader :options
-
-      EMBEDDED_RUBY_PATH = 'C:\opscode\chef\embedded\bin\ruby'.freeze
 
       # @param [Ridley::NodeResource, Array<Ridley::NodeResource>] nodes
       # @param [Hash] options
@@ -51,36 +50,6 @@ module Ridley
         end
       ensure
         workers.map(&:terminate)
-      end
-
-      # Executes a chef-client run on the nodes
-      # 
-      # @return [#run]
-      def chef_client
-        run("chef-client")
-      end
-
-      # Executes a copy of the encrypted_data_bag_secret to the nodes
-      #
-      # @param [String] encrypted_data_bag_secret_path
-      #   the path to the encrypted_data_bag_secret
-      # 
-      # @return [#run]
-      def put_secret(encrypted_data_bag_secret_path)
-        secret  = File.read(encrypted_data_bag_secret_path).chomp
-        command = "echo #{secret} > C:\\chef\\encrypted_data_bag_secret"
-        run(command)
-      end
-
-      # Executes a provided Ruby script in the embedded Ruby installation
-      # 
-      # @param [Array<String>] command_lines
-      #   An Array of lines of the command to be executed
-      # 
-      # @return [#run]
-      def ruby_script(command_lines)
-        command = "#{EMBEDDED_RUBY_PATH} -e \"#{command_lines.join(';')}\""
-        run(command)
       end
     end
   end
