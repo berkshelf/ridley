@@ -53,11 +53,10 @@ module Ridley
       #
       # @return [Boolean]
       def connector_port_open?(host, port)
-        Timeout::timeout(1) do
+        Timeout::timeout(3) do
           socket = TCPSocket.new(host, port)
           socket.close
         end
-
         true
       rescue Timeout::Error, SocketError, Errno::ECONNREFUSED, Errno::EHOSTUNREACH
         false

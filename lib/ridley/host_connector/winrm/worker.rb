@@ -42,9 +42,17 @@ module Ridley
           debug "Running WinRM Command: '#{command}' on: '#{host}' as: '#{user}'"
 
           output = winrm.run_cmd(command) do |stdout, stderr|
-            response.stdout += stdout unless stdout.nil?
-            response.stderr += stderr unless stderr.nil?
+            if stdout
+              response.stdout += stdout
+              info "NODE[#{host}] #{stdout}"
+            end
+
+            if stderr
+              response.stderr += stderr unless stderr.nil?
+              info "NODE[#{host}] #{stdout}"
+            end
           end
+
           response.exit_code = output[:exitcode]
 
           case response.exit_code
