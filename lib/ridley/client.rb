@@ -41,6 +41,10 @@ module Ridley
         super(registry) do |s|
           s.supervise_as :client_resource, Ridley::ClientResource, connection_registry
           s.supervise_as :cookbook_resource, Ridley::CookbookResource, connection_registry
+          s.supervise_as :environment_resource, Ridley::EnvironmentResource, connection_registry
+          s.supervise_as :node_resource, Ridley::NodeResource, connection_registry
+          s.supervise_as :role_resource, Ridley::RoleResource, connection_registry
+          s.supervise_as :sandbox_resource, Ridley::SandboxResource, connection_registry
         end
       end
     end
@@ -195,22 +199,22 @@ module Ridley
 
     # @return [Ridley::ChainLink]
     def environment
-      ChainLink.new(Actor.current, Ridley::EnvironmentResource)
+      @resources_registry[:environment_resource]
     end
 
     # @return [Ridley::ChainLink]
     def node
-      ChainLink.new(Actor.current, Ridley::NodeResource)
+      @resources_registry[:node_resource]
     end
 
     # @return [Ridley::ChainLink]
     def role
-      ChainLink.new(Actor.current, Ridley::RoleResource)
+      @resources_registry[:role_resource]
     end
 
     # @return [Ridley::ChainLink]
     def sandbox
-      ChainLink.new(Actor.current, Ridley::SandboxResource)
+      @resources_registry[:sandbox_resource]
     end
 
     # Creates an runs a new Ridley::Search
@@ -233,7 +237,7 @@ module Ridley
     #
     # @example
     #   conn = Ridley.new(...)
-    #   conn.search_indexes => 
+    #   conn.search_indexes =>
     #     [:client, :environment, :node, :role, :"ridley-two", :"ridley-one"]
     #
     # @return [Array<Symbol, String>]

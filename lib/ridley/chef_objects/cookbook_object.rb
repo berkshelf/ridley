@@ -1,4 +1,5 @@
 module Ridley
+  # @author Jamie Winsor <reset@riotgames.com>
   class CookbookObject < Ridley::ChefObject
     include Ridley::Logging
 
@@ -149,7 +150,7 @@ module Ridley
     private
 
       # Return a lambda for downloading a file from the cookbook of the given type
-      # 
+      #
       # @param [#to_sym] filetype
       #
       # @return [lambda]

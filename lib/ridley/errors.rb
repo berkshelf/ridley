@@ -54,6 +54,7 @@ module Ridley
     end
 
     class FrozenCookbook < RidleyError; end
+    class SandboxCommitError < RidleyError; end
 
     class HTTPError < RidleyError
       class << self

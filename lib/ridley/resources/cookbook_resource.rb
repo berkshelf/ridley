@@ -24,7 +24,7 @@ module Ridley
     #   an array of strings representing the available versions
     def all
       response = connection.get(self.resource_path).body
-      
+
       {}.tap do |cookbooks|
         response.each do |name, details|
           cookbooks[name] = details["versions"].collect { |version| version["version"] }
@@ -76,7 +76,7 @@ module Ridley
     #   the path to the directory the cookbook was downloaded to
     def download(name, version, destination = Dir.mktmpdir)
       cookbook = find(name, version)
-      
+
       unless cookbook.nil?
         cookbook.download(destination)
       end

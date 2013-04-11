@@ -1,4 +1,5 @@
 module Ridley
+  # @author Jamie Winsor <reset@riotgames.com>
   class ClientObject < Ridley::ChefObject
     attribute :name,
       type: String,
