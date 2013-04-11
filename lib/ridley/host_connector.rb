@@ -24,7 +24,6 @@ module Ridley
       # @param block [Proc]
       #   an optional block that is yielded the best HostConnector
       #
-      #
       # @return [Ridley::HostConnector] a class under Ridley::HostConnector
       def best_connector_for(host, options = {}, &block)
         ssh_port, winrm_port = parse_port_options(options)
@@ -57,6 +56,7 @@ module Ridley
           socket = TCPSocket.new(host, port)
           socket.close
         end
+
         true
       rescue Timeout::Error, SocketError, Errno::ECONNREFUSED, Errno::EHOSTUNREACH
         false
