@@ -54,6 +54,17 @@ module Ridley
         Bootstrapper.new(args, options).run
       end
 
+      # @return [SSH::Worker, WinRM::Worker]
+      def configured_worker_for(client, host)
+        connector_options = Hash.new
+        connector_options[:ssh] = client.ssh
+        connector_options[:winrm] = client.winrm
+
+        HostConnector.best_connector_for(host, connector_options) do |host_connector|
+          host_connector::Worker.new(host, connector_options)
+        end
+      end
+
       # Merges the given data with the the data of the target node on the remote
       #
       # @param [Ridley::Client] client

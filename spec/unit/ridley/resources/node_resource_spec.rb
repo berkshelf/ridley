@@ -10,6 +10,10 @@ describe Ridley::NodeResource do
       ssh: {
         user: "reset",
         password: "lol"
+      },
+      winrm: {
+        user: "Administrator",
+        password: "secret"
       }
     )
   end
@@ -33,6 +37,38 @@ describe Ridley::NodeResource do
       it "bootstraps multiple nodes" do
         pending
         subject.bootstrap(connection, "33.33.33.10", "33.33.33.11", boot_options)
+      end
+    end
+
+    describe "::configured_worker_for" do
+      subject { configured_worker_for }
+
+      let(:configured_worker_for) { described_class.configured_worker_for(connection, host) }
+      let(:host) { "33.33.33.10" }
+
+      context "when the best connector is SSH" do
+        before do
+          Ridley::HostConnector.stub(:best_connector_for).and_yield(Ridley::HostConnector::SSH)
+        end
+
+        it "returns an SSH worker instance" do
+          configured_worker_for.should be_a(Ridley::HostConnector::SSH::Worker)
+        end
+
+        its(:user) { should eq("reset") }
+      end
+
+      context "when the best connector is WinRM" do
+        before do
+          Ridley::HostConnector.stub(:best_connector_for).and_yield(Ridley::HostConnector::WinRM)
+        end
+
+        it "returns a WinRm worker instance" do
+          configured_worker_for.should be_a(Ridley::HostConnector::WinRM::Worker)
+        end
+
+        its(:user) { should eq("Administrator") }
+        its(:password) { should eq("secret") }
       end
     end
 
