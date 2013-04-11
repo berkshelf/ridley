@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe Ridley::HostConnector do
-  
   subject do
     described_class
   end
@@ -14,29 +13,50 @@ describe Ridley::HostConnector do
     described_class::DEFAULT_WINRM_PORT.should eq(5985)
   end
 
-  describe "#connector_port_open" do
-    let(:host) {"127.0.0.1"}
-    let(:port) {22}
-    let(:socket) {double(:new => true, :close => nil)}
+  describe "#connector_port_open?", focus: true do
+    let(:host) { "127.0.0.1" }
+    let(:port) { 22 }
+    let(:socket) { double(:new => true, :close => nil) }
 
     context "when a port is open" do
-      it "returns true" do
+      before do
         TCPSocket.stub(:new).and_return(socket)
-        subject.connector_port_open?(host, port).should eq(true)
+      end
+
+      it "returns true" do
+        subject.connector_port_open?(host, port).should eql(true)
+      end
+
+      it "closes the opened socket" do
+        socket.should_receive(:close)
+        subject.connector_port_open?(host, port)
       end
     end
 
     context "when a port is closed" do
-      it "returns false" do
+      before do
         TCPSocket.stub(:new).and_raise(Errno::ECONNREFUSED)
+      end
+
+      it "returns false" do
         subject.connector_port_open?(host, port).should eq(false)
+      end
+    end
+
+    context "when host is unreachable" do
+      before do
+        TCPSocket.stub(:new).and_raise(SocketError)
+      end
+
+      it "returns false" do
+        subject.connector_port_open?(host, port).should eql(false)
       end
     end
   end
 
   describe "#best_connector_for" do
     let(:host) {"127.0.0.1"}
-    
+
     context "when an SSH port is open" do
       it "returns Ridley::HostConnector::SSH" do
         subject.stub(:connector_port_open?).and_return(true)
@@ -72,7 +92,7 @@ describe Ridley::HostConnector do
         }
       }
     end
-    
+
     context "when :ssh has a key for :port" do
       it "returns the value of port instead of the default" do
         subject.parse_port_options(options).should include(1234)
