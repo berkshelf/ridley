@@ -19,15 +19,26 @@ describe Ridley::HostConnector do
     let(:socket) { double(:new => true, :close => nil) }
 
     context "when a port is open" do
-      it "returns true" do
+      before do
         TCPSocket.stub(:new).and_return(socket)
-        subject.connector_port_open?(host, port).should eq(true)
+      end
+
+      it "returns true" do
+        subject.connector_port_open?(host, port).should eql(true)
+      end
+
+      it "closes the opened socket" do
+        socket.should_receive(:close)
+        subject.connector_port_open?(host, port)
       end
     end
 
     context "when a port is closed" do
-      it "returns false" do
+      before do
         TCPSocket.stub(:new).and_raise(Errno::ECONNREFUSED)
+      end
+
+      it "returns false" do
         subject.connector_port_open?(host, port).should eq(false)
       end
     end
