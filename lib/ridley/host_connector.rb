@@ -14,14 +14,14 @@ module Ridley
 
     class << self
       # Finds and returns the best HostConnector for a given host
-      # 
+      #
       # @param  host [String]
       #   the host to attempt to connect to
       # @option options [Hash] :ssh
       #   * :port (Fixnum) the ssh port to connect on the node the bootstrap will be performed on (22)
       # @option options [Hash] :winrm
       #   * :port (Fixnum) the winrm port to connect on the node the bootstrap will be performed on (5985)
-      # 
+      #
       # @return [Ridley::HostConnector] a class under Ridley::HostConnector
       def best_connector_for(host, options = {})
         ssh_port, winrm_port = parse_port_options(options)
@@ -41,7 +41,7 @@ module Ridley
       #   the host to attempt to connect to
       # @param  port [Fixnum]
       #   the port to attempt to connect on
-      # 
+      #
       # @return [Boolean]
       def connector_port_open?(host, port)
         Timeout::timeout(1) do
@@ -53,7 +53,7 @@ module Ridley
             false
           end
         end
-      rescue Timeout::Error
+      rescue Timeout::Error, SocketError
         false
       end
 
@@ -64,7 +64,7 @@ module Ridley
       #   * :port (Fixnum) the ssh port to connect on the node the bootstrap will be performed on (22)
       # @option options [Hash] :winrm
       #   * :port (Fixnum) the winrm port to connect on the node the bootstrap will be performed on (5985)
-      # 
+      #
       # @return [Array]
       def parse_port_options(options)
         ssh_port = options[:ssh][:port] if options[:ssh]
