@@ -2,18 +2,6 @@ module Ridley
   # @author Jamie Winsor <reset@riotgames.com>
   class Resource
     class << self
-      # @return [String, nil]
-      def chef_id
-        @chef_id
-      end
-
-      # @param [String, Symbol] identifier
-      #
-      # @return [String]
-      def set_chef_id(identifier)
-        @chef_id = identifier.to_sym
-      end
-
       # @return [String]
       def resource_path
         @resource_path ||= self.chef_type.pluralize
@@ -83,7 +71,7 @@ module Ridley
     # @return [Array<Object>]
     def all
       connection.get(self.class.resource_path).body.collect do |identity, location|
-        new(self.class.chef_id => identity)
+        new(self.class.representation.chef_id => identity)
       end
     end
 

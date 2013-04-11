@@ -1,5 +1,20 @@
 module Ridley
+  # @author Jamie Winsor <reset@riotgames.com>
   class ChefObject
+    class << self
+      # @return [String, nil]
+      def chef_id
+        @chef_id
+      end
+
+      # @param [String, Symbol] identifier
+      #
+      # @return [String]
+      def set_chef_id(identifier)
+        @chef_id = identifier.to_sym
+      end
+    end
+
     include Chozo::VariaModel
     include Comparable
 
@@ -51,7 +66,7 @@ module Ridley
 
     # @return [String]
     def chef_id
-      get_attribute(resource.class.chef_id)
+      get_attribute(self.class.chef_id)
     end
 
     def inspect
