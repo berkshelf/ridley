@@ -13,7 +13,7 @@ describe Ridley::HostConnector do
     described_class::DEFAULT_WINRM_PORT.should eq(5985)
   end
 
-  describe "#connector_port_open?", focus: true do
+  describe "#connector_port_open?" do
     let(:host) { "127.0.0.1" }
     let(:port) { 22 }
     let(:socket) { double(:new => true, :close => nil) }
