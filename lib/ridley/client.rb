@@ -71,13 +71,13 @@ module Ridley
       def validate_options(options)
         missing = (REQUIRED_OPTIONS - options.keys)
 
-        unless missing.empty?
+        if missing.any?
           missing.collect! { |opt| "'#{opt}'" }
           raise ArgumentError, "Missing required option(s): #{missing.join(', ')}"
         end
 
         missing_values = options.slice(*REQUIRED_OPTIONS).select { |key, value| !value.present? }
-        unless missing_values.empty?
+        if missing_values.any?
           values = missing_values.keys.collect { |opt| "'#{opt}'" }
           raise ArgumentError, "Missing value for required option(s): '#{values.join(', ')}'"
         end
