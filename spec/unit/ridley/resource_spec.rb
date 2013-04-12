@@ -2,10 +2,22 @@ require 'spec_helper'
 
 describe Ridley::Resource do
   let(:connection) { double('connection') }
-  
+
   describe "ClassMethods" do
+    let(:representation) do
+      Class.new(Ridley::ChefObject) do
+        set_chef_id "id"
+        set_chef_type "thing"
+        set_chef_json_class "Chef::Thing"
+      end
+    end
+
     subject do
       Class.new(Ridley::Resource)
+    end
+
+    before do
+      subject.stub(representation: representation)
     end
 
     it_behaves_like "a Ridley Resource", Class.new(Ridley::Resource)
@@ -54,8 +66,21 @@ describe Ridley::Resource do
     end
 
     describe "::resource_path" do
-      it "returns the underscored and plural name of the including class if nothing is set" do
-        subject.resource_path.should eql(subject.class.name.underscore.pluralize)
+      context "when not explicitly set" do
+        before { subject.set_resource_path(nil) }
+
+        it "returns the representation's chef type, pluralized" do
+          subject.resource_path.should eql(representation.chef_type.pluralize)
+        end
+      end
+
+      context "when explicitly set" do
+        let(:set_path) { "hello" }
+        before { subject.set_resource_path(set_path) }
+
+        it "returns the set value" do
+          subject.resource_path.should eql(set_path)
+        end
       end
     end
 

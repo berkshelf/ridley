@@ -4,7 +4,7 @@ module Ridley
     class << self
       # @return [String]
       def resource_path
-        @resource_path ||= self.chef_type.pluralize
+        @resource_path ||= representation.chef_type.pluralize
       end
 
       # @param [String] path
