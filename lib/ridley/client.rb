@@ -62,8 +62,6 @@ module Ridley
       def open(options = {}, &block)
         cli = new(options)
         cli.evaluate(&block)
-      ensure
-        cli.terminate if cli && cli.alive?
       end
 
       # @raise [ArgumentError]
