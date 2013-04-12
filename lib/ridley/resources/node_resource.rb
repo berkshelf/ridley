@@ -54,15 +54,75 @@ module Ridley
         Bootstrapper.new(args, options).run
       end
 
-      # @return [SSH::Worker, WinRM::Worker]
-      def configured_worker_for(client, host)
-        connector_options = Hash.new
-        connector_options[:ssh] = client.ssh
-        connector_options[:winrm] = client.winrm
+      # Executes a Chef run using the best worker available for the given
+      # host.
+      #
+      # @param [Ridley::Client] client
+      # @param [String] host
+      #
+      # @return [HostConnector::Response]
+      def chef_run(client, host)
+        worker = configured_worker_for(client, host)
+        status, response = worker.chef_client
 
-        HostConnector.best_connector_for(host, connector_options) do |host_connector|
-          host_connector::Worker.new(host, connector_options)
+        case status
+        when :ok
+          Ridley.log.info { "Completed Chef client run on: #{host}" }
+          response
+        when :error
+          Ridley.log.info { "Failed Chef client run on: #{host}" }
+          raise Errors::RemoteCommandError.new(response.stderr.chomp)
         end
+      ensure
+        worker.terminate if worker && worker.alive?
+      end
+
+      # Puts a secret on the host using the best worker available for
+      # the given host.
+      #
+      # @param [Ridley::Client] client
+      # @param [String] host
+      # @param [String] encrypted_data_bag_secret_path
+      # 
+      # @return [HostConnector::Response]
+      def put_secret(client, host, encrypted_data_bag_secret_path)
+        worker = configured_worker_for(client, host)
+        status, response = worker.put_secret(encrypted_data_bag_secret_path)
+
+        case status
+        when :ok
+          Ridley.log.info { "Successfully put secret file on: #{host}" }
+          response
+        when :error
+          Ridley.log.info { "Failed to put secret file on: #{host}" }
+          nil
+        end
+      ensure
+        worker.terminate if worker && worker.alive?
+      end
+
+      # Executes an arbitrary ruby script using the best worker available
+      # for the given host.
+      #
+      # @param [Ridley::Client] client
+      # @param [String] host
+      # @param [Array<String>] command_lines
+      #
+      # @return [HostConnector::Response]
+      def ruby_script(client, host, command_lines)
+        worker = configured_worker_for(client, host)
+        status, response = worker.ruby_script(command_lines)
+
+        case status
+        when :ok
+          response.stdout.chomp
+        when :error
+          raise Errors::RemoteScriptError.new(response.stderr.chomp)
+        else
+          raise ArgumentError, "unknown status returned from #ruby_script: #{status}"
+        end
+      ensure
+        worker.terminate if worker && worker.alive?
       end
 
       # Merges the given data with the the data of the target node on the remote
@@ -83,6 +143,21 @@ module Ridley
       def merge_data(client, target, options = {})
         find!(client, target).merge_data(options)
       end
+
+      private
+        # @param [Ridley::Client] client
+        # @param [String] host
+        #
+        # @return [SSH::Worker, WinRM::Worker]
+        def configured_worker_for(client, host)
+          connector_options = Hash.new
+          connector_options[:ssh] = client.ssh
+          connector_options[:winrm] = client.winrm
+
+          HostConnector.best_connector_for(host, connector_options) do |host_connector|
+            host_connector::Worker.new(host, connector_options)
+          end
+        end
     end
 
     set_chef_id "name"
@@ -223,7 +298,8 @@ module Ridley
 
       HostConnector.best_connector_for(self.public_hostname, connector_options) do |host_connector|
         host_connector.start(self, connector_options) do |connector|
-          connector.chef_client.first
+          _, response = connector.chef_client
+          response
         end
       end
     end
@@ -251,7 +327,8 @@ module Ridley
 
       HostConnector.best_connector_for(self.public_hostname, connector_options) do |host_connector|
         host_connector.start(self, connector_options) do |connector|
-          connector.put_secret(client.encrypted_data_bag_secret_path).first
+          _, response = connector.put_secret(client.encrypted_data_bag_secret_path)
+          response
         end
       end
     end

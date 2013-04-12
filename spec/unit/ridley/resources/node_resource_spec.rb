@@ -21,6 +21,8 @@ describe Ridley::NodeResource do
   describe "ClassMethods" do
     subject { Ridley::NodeResource }
 
+    let(:worker) { double('worker', alive?: true, terminate: nil) }
+
     describe "::bootstrap" do
       let(:boot_options) do
         {
@@ -40,10 +42,119 @@ describe Ridley::NodeResource do
       end
     end
 
+    describe "::chef_run" do
+      subject { chef_run }
+      let(:chef_run) { described_class.chef_run(connection, host) }
+      let(:response) { [:ok, double('response', stdout: 'success_message')] }
+      let(:host) { "33.33.33.10" }
+
+      before do
+        Ridley::NodeResource.stub(:configured_worker_for).and_return(worker)
+        worker.stub(:chef_client).and_return(response)
+      end
+
+      context "when it executes successfully" do
+        it "returns a successful response" do
+          chef_run.stdout.should eq('success_message')
+        end
+      end
+
+      context "when it executes unsuccessfully" do
+        let(:response) { [:error, double('response', stderr: 'failure_message')] }
+
+        it "raises a RemoteCommandError" do
+          expect {
+            chef_run
+            }.to raise_error(Ridley::Errors::RemoteCommandError)
+        end
+      end
+
+      it "terminates the worker" do
+        worker.should_receive(:terminate)
+        chef_run
+      end
+    end
+
+    describe "::put_secret" do
+      subject { put_secret }
+      let(:put_secret) { described_class.put_secret(connection, host, secret_path)}
+      let(:response) { [:ok, double('response', stdout: 'success_message')] }
+      let(:host) { "33.33.33.10" }
+      let(:secret_path) { fixtures_path.join("reset.pem").to_s }
+
+      before do
+        Ridley::NodeResource.stub(:configured_worker_for).and_return(worker)
+        worker.stub(:put_secret).and_return(response)
+      end
+
+      context "when it executes successfully" do
+        it "returns a successful response" do
+          put_secret.stdout.should eq('success_message')
+        end
+      end
+
+      context "when it executes unsuccessfully" do
+        let(:response) { [:error, double('response', stderr: 'failure_message')] }
+
+        it "returns nil" do
+          put_secret.should be_nil
+        end
+      end
+
+      it "terminates the worker" do
+        worker.should_receive(:terminate)
+        put_secret
+      end
+    end
+
+    describe "::ruby_script" do
+      subject { ruby_script }
+      let(:ruby_script) { described_class.ruby_script(connection, host, command_lines) }
+      let(:response) { [:ok, double('response', stdout: 'success_message')] }
+      let(:host) { "33.33.33.10" }
+      let(:command_lines) { ["puts 'hello'", "puts 'there'"] }
+
+      before do
+        Ridley::NodeResource.stub(:configured_worker_for).and_return(worker)
+        worker.stub(:ruby_script).and_return(response)
+      end
+
+      context "when it executes successfully" do
+        it "returns a successful response" do
+          ruby_script.should eq('success_message')
+        end
+      end
+
+      context "when it executes unsuccessfully" do
+        let(:response) { [:error, double('response', stderr: 'failure_message')] }
+
+        it "raises a RemoteScriptError" do
+          expect {
+            ruby_script
+            }.to raise_error(Ridley::Errors::RemoteScriptError)
+        end
+      end
+
+      context "when it executes with an unknown error" do
+        let(:response) { [:unknown, double('response', stderr: 'failure_message')] }
+
+        it "raises an ArgumentError" do
+          expect {
+            ruby_script
+          }.to raise_error(ArgumentError)
+        end
+      end
+
+      it "terminates the worker" do
+        worker.should_receive(:terminate)
+        ruby_script
+      end
+    end
+
     describe "::configured_worker_for" do
       subject { configured_worker_for }
 
-      let(:configured_worker_for) { described_class.configured_worker_for(connection, host) }
+      let(:configured_worker_for) { described_class.send(:configured_worker_for, connection, host) }
       let(:host) { "33.33.33.10" }
 
       context "when the best connector is SSH" do

@@ -3,6 +3,19 @@ module Ridley
     class WinRM
       # @author Kyle Allan <kallan@riotgames.com>
       # @author Justin Campbell <justin.campbell@riotgames.com>
+      #
+      # @example
+      #   command_uploader = CommandUploader.new(long_command, winrm)
+      #   command_uploader.upload
+      #   command_uploader.command
+      #
+      #   This class is used by WinRM Workers when the worker is told to execute a command that 
+      #   might be too long for WinRM to handle.
+      #
+      #   After an instance of this class is created, the upload method will upload the long command
+      #   to the node being worked on in chunks. Once on the node, some Powershell code will decode
+      #   the long_command into a batch file. The command method will return a String representing the
+      #   command the worker will use to execute the uploaded batch script.
       class CommandUploader
         
         CHUNK_LIMIT = 1024
