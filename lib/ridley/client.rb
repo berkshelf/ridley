@@ -41,6 +41,7 @@ module Ridley
         super(registry) do |s|
           s.supervise_as :client_resource, Ridley::ClientResource, connection_registry
           s.supervise_as :cookbook_resource, Ridley::CookbookResource, connection_registry
+          s.supervise_as :data_bag_resource, Ridley::DataBagResource, connection_registry
           s.supervise_as :environment_resource, Ridley::EnvironmentResource, connection_registry
           s.supervise_as :node_resource, Ridley::NodeResource, connection_registry
           s.supervise_as :role_resource, Ridley::RoleResource, connection_registry
@@ -194,7 +195,7 @@ module Ridley
 
     # @return [Ridley::ChainLink]
     def data_bag
-      ChainLink.new(Actor.current, Ridley::DataBagResource)
+      @resources_registry[:data_bag_resource]
     end
 
     # @return [Ridley::ChainLink]
@@ -275,7 +276,19 @@ module Ridley
     private
 
       def connection
-        @registry[:connection_pool]
+        @connection_registry[:connection_pool]
+      end
+
+      def method_missing(method, *args, &block)
+        if block_given?
+          @self_before_instance_eval ||= eval("self", block.binding)
+        end
+
+        if @self_before_instance_eval.nil?
+          super
+        end
+
+        @self_before_instance_eval.send(method, *args, &block)
       end
   end
 end
