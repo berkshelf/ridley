@@ -23,9 +23,9 @@ module Ridley
     #
     # @return [Ridley::ClientResource]
     def regenerate_key(chef_client)
-      obj = find!(chef_client)
-      obj.regenerate_key
-      obj
+      chef_client = find!(chef_client)
+      chef_client.private_key = true
+      update(chef_client)
     end
   end
 end
