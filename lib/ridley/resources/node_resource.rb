@@ -1,4 +1,4 @@
-module Ridley 
+module Ridley
   # @author Jamie Winsor <reset@riotgames.com>
   class NodeResource < Ridley::Resource
     class << self
@@ -114,8 +114,8 @@ module Ridley
     # attribute and value.
     #
     # @note It is not possible to set any other attribute level on a node and have it persist after
-    #   a Chef Run. This is because all other attribute levels are truncated at the start of a Chef Run. 
-    # 
+    #   a Chef Run. This is because all other attribute levels are truncated at the start of a Chef Run.
+    #
     # @example setting and saving a node level normal attribute
     #
     #   obj = node.find("jwinsor-1")
@@ -165,7 +165,7 @@ module Ridley
     #
     # @return [nil, String]
     def cloud_provider
-      self.cloud? ? self.automatic[:cloud][:provider] : nil      
+      self.cloud? ? self.automatic[:cloud][:provider] : nil
     end
 
     # Returns true if the node is identified as a cloud node.

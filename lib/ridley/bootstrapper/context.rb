@@ -5,7 +5,6 @@ module Ridley
     # @author Jamie Winsor <reset@riotgames.com>
     class Context
       class << self
-
         # @param [String] host
         # @option options [Hash] :ssh
         #   * :user (String) a shell user that will login to each node and perform the bootstrap command on (required)
@@ -38,6 +37,8 @@ module Ridley
         #   bootstrap with sudo (default: true)
         # @option options [String] :template ('omnibus')
         #   bootstrap template to use
+        #
+        # @raise [Errors::HostConnectionError] if a node is unreachable
         def create(host, options = {})
           host_connector = HostConnector.best_connector_for(host, options)
           template_binding = case host_connector.to_s

@@ -64,9 +64,29 @@ describe Ridley::Bootstrapper do
   end
 
   describe "#contexts" do
-    it "returns an array of Bootstrapper::Contexts" do
-      subject.contexts.should be_a(Array)
-      subject.contexts.should each be_a(Ridley::Bootstrapper::Context)
+    before do
+      Ridley::Bootstrapper::Context.stub(:create).and_return(double)
+    end
+
+    it "creates a new context for each host" do
+      Ridley::Bootstrapper::Context.should_receive(:create).exactly(nodes.length).times
+      subject.contexts
+    end
+
+    it "contains a item for each host" do
+      subject.contexts.should have(nodes.length).items
+    end
+
+    context "when a host is unreachable" do
+      before do
+        Ridley::Bootstrapper::Context.stub(:create).and_raise(Ridley::Errors::HostConnectionError)
+      end
+
+      it "raises a HostConnectionError" do
+        expect {
+          subject.contexts
+        }.to raise_error(Ridley::Errors::HostConnectionError)
+      end
     end
   end
 
