@@ -15,6 +15,8 @@ module Ridley
       :root_files
     ].freeze
 
+    set_chef_id "name"
+
     attribute :name,
       required: true
 

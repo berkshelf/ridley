@@ -1,7 +1,6 @@
 module Ridley
   # @author Jamie Winsor <reset@riotgames.com>
   class EnvironmentResource < Ridley::Resource
-    set_chef_id "name"
     set_chef_type "environment"
     set_chef_json_class "Chef::Environment"
     set_resource_path "environments"

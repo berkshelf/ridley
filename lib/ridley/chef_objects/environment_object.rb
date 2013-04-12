@@ -1,6 +1,8 @@
 module Ridley
   # @author Jamie Winsor <reset@riotgames.com>
   class EnvironmentObject < Ridley::ChefObject
+    set_chef_id "name"
+
     attribute :name,
       required: true
 

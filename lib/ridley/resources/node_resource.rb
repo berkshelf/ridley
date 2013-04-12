@@ -3,7 +3,6 @@ module Ridley
   class NodeResource < Ridley::Resource
     include Ridley::Logging
 
-    set_chef_id "name"
     set_chef_type "node"
     set_chef_json_class "Chef::Node"
     set_resource_path "nodes"
