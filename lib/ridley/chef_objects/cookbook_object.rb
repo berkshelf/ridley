@@ -16,6 +16,8 @@ module Ridley
     ].freeze
 
     set_chef_id "name"
+    set_chef_type "cookbook"
+    set_chef_json_class "Chef::Cookbook"
 
     attribute :name,
       required: true

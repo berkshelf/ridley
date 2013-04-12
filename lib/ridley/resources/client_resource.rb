@@ -8,8 +8,6 @@ module Ridley
   #     #<Ridley::ClientResource chef_id:'reset-validator'>
   #   ]
   class ClientResource < Ridley::Resource
-    set_chef_type "client"
-    set_chef_json_class "Chef::ApiClient"
     set_resource_path "clients"
     represented_by Ridley::ClientObject
 

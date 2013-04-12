@@ -2,6 +2,8 @@ module Ridley
   # @author Jamie Winsor <reset@riotgames.com>
   class NodeObject < Ridley::ChefObject
     set_chef_id "name"
+    set_chef_type "node"
+    set_chef_json_class "Chef::Node"
 
     attribute :name,
       required: true

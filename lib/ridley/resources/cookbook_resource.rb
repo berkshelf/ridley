@@ -1,8 +1,6 @@
 module Ridley
   # @author Jamie Winsor <reset@riotgames.com>
   class CookbookResource < Ridley::Resource
-    set_chef_type "cookbook"
-    set_chef_json_class "Chef::Cookbook"
     set_resource_path "cookbooks"
     represented_by Ridley::CookbookObject
 

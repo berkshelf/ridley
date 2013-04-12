@@ -13,6 +13,32 @@ module Ridley
       def set_chef_id(identifier)
         @chef_id = identifier.to_sym
       end
+
+      # @return [String]
+      def chef_type
+        @chef_type ||= self.class.name.underscore
+      end
+
+      # @param [String, Symbol] type
+      #
+      # @return [String]
+      def set_chef_type(type)
+        @chef_type = type.to_s
+        attribute(:chef_type, default: type)
+      end
+
+      # @return [String, nil]
+      def chef_json_class
+        @chef_json_class
+      end
+
+      # @param [String, Symbol] klass
+      #
+      # @return [String]
+      def set_chef_json_class(klass)
+        @chef_json_class = klass
+        attribute(:json_class, default: klass)
+      end
     end
 
     include Chozo::VariaModel

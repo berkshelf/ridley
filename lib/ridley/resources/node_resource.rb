@@ -3,8 +3,6 @@ module Ridley
   class NodeResource < Ridley::Resource
     include Ridley::Logging
 
-    set_chef_type "node"
-    set_chef_json_class "Chef::Node"
     set_resource_path "nodes"
     represented_by Ridley::NodeObject
 
@@ -137,6 +135,7 @@ module Ridley
     end
 
     private
+
       # @param [Ridley::Client] client
       # @param [String] host
       #
