@@ -23,7 +23,7 @@ describe "Bootstrapping a node", type: "acceptance" do
 
   it "returns an array of response objects" do
     pending
-    
+
     connection.node.bootstrap("33.33.33.10").should_not have_errors
   end
 end

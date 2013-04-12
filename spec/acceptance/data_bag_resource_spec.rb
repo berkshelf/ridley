@@ -34,7 +34,7 @@ describe "DataBag API operations", type: "acceptance" do
       end
 
       it "returns an array of data bags" do
-        connection.data_bag.all.should each be_a(Ridley::DataBagResource)
+        connection.data_bag.all.should each be_a(Ridley::DataBagObject)
       end
 
       it "returns all of the data bags on the server" do

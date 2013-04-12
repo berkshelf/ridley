@@ -4,6 +4,7 @@ describe "Role API operations", type: "acceptance" do
   let(:server_url) { "https://api.opscode.com/organizations/ridley" }
   let(:client_name) { "reset" }
   let(:client_key) { "/Users/reset/.chef/reset.pem" }
+  let(:resource) { double('role-resource') }
 
   let(:connection) do
     Ridley.new(
@@ -20,8 +21,8 @@ describe "Role API operations", type: "acceptance" do
 
   describe "finding a role" do
     let(:target) do
-      Ridley::RoleResource.new(
-        connection,
+      Ridley::RoleObject.new(
+        resource,
         name: "ridley-test",
         description: "a testing role for ridley" 
       )
@@ -31,21 +32,21 @@ describe "Role API operations", type: "acceptance" do
       connection.role.create(target)
     end
 
-    it "returns the target Ridley::RoleResource from the server" do
+    it "returns the target Ridley::RoleObject from the server" do
       connection.role.find(target.name).should eql(target)
     end
   end
 
   describe "creating a role" do
     let(:target) do
-      Ridley::RoleResource.new(
-        connection,
+      Ridley::RoleObject.new(
+        resource,
         name: "ridley-test",
         description: "a testing role for ridley" 
       )
     end
 
-    it "returns a new Ridley::RoleResource" do
+    it "returns a new Ridley::RoleObject" do
       connection.role.create(target).should eql(target)
     end
 
@@ -60,8 +61,8 @@ describe "Role API operations", type: "acceptance" do
 
   describe "deleting a role" do
     let(:target) do
-      Ridley::RoleResource.new(
-        connection,
+      Ridley::RoleObject.new(
+        resource,
         name: "ridley-role-one"
       )
     end
@@ -70,7 +71,7 @@ describe "Role API operations", type: "acceptance" do
       connection.role.create(target)
     end
 
-    it "returns the deleted Ridley::RoleResource resource" do
+    it "returns the deleted Ridley::RoleObject resource" do
       connection.role.delete(target).should eql(target)
     end
 
@@ -106,15 +107,15 @@ describe "Role API operations", type: "acceptance" do
         obj = role.all
 
         obj.should have(2).roles
-        obj.should each be_a(Ridley::RoleResource)
+        obj.should each be_a(Ridley::RoleObject)
       end
     end
   end
 
   describe "updating a role" do
     let(:target) do
-      Ridley::RoleResource.new(
-        connection,
+      Ridley::RoleObject.new(
+        resource,
         name: "ridley-role-one"
       )
     end
@@ -123,7 +124,7 @@ describe "Role API operations", type: "acceptance" do
       connection.role.create(target)
     end
 
-    it "returns an updated Ridley::RoleResource object" do
+    it "returns an updated Ridley::RoleObject object" do
       connection.role.update(target).should eql(target)
     end
 
