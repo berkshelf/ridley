@@ -65,8 +65,8 @@ describe Ridley::Client do
           @conn.scheme.should eql("https")
         end
 
-        it "assigns the value of the 'organization' option to an 'organization' attribute" do
-          @conn.connection.organization.should eql(organization)
+        it "takes the organization out of the server_url and assigns it to the organization reader" do
+          @conn.organization.should eql(organization)
         end
 
         it "sets the 'path_prefix' of the connection the organization sub URI" do

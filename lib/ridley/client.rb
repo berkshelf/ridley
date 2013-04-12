@@ -101,6 +101,7 @@ module Ridley
     def_delegator :connection, :path_prefix
     def_delegator :connection, :url_prefix
 
+    def_delegator :connection, :organization
     def_delegator :connection, :client_key
     def_delegator :connection, :client_key=
     def_delegator :connection, :client_name
