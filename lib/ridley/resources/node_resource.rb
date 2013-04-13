@@ -63,16 +63,7 @@ module Ridley
       # @return [HostConnector::Response]
       def chef_run(client, host)
         worker = configured_worker_for(client, host)
-        status, response = worker.chef_client
-
-        case status
-        when :ok
-          Ridley.log.info { "Completed Chef client run on: #{host}" }
-          response
-        when :error
-          Ridley.log.info { "Failed Chef client run on: #{host}" }
-          raise Errors::RemoteCommandError.new(response.stderr.chomp)
-        end
+        worker.chef_client
       ensure
         worker.terminate if worker && worker.alive?
       end
@@ -87,16 +78,7 @@ module Ridley
       # @return [HostConnector::Response]
       def put_secret(client, host, encrypted_data_bag_secret_path)
         worker = configured_worker_for(client, host)
-        status, response = worker.put_secret(encrypted_data_bag_secret_path)
-
-        case status
-        when :ok
-          Ridley.log.info { "Successfully put secret file on: #{host}" }
-          response
-        when :error
-          Ridley.log.info { "Failed to put secret file on: #{host}" }
-          nil
-        end
+        worker.put_secret(encrypted_data_bag_secret_path)
       ensure
         worker.terminate if worker && worker.alive?
       end
@@ -111,16 +93,22 @@ module Ridley
       # @return [HostConnector::Response]
       def ruby_script(client, host, command_lines)
         worker = configured_worker_for(client, host)
-        status, response = worker.ruby_script(command_lines)
+        worker.ruby_script(command_lines)
+      ensure
+        worker.terminate if worker && worker.alive?
+      end
 
-        case status
-        when :ok
-          response.stdout.chomp
-        when :error
-          raise Errors::RemoteScriptError.new(response.stderr.chomp)
-        else
-          raise ArgumentError, "unknown status returned from #ruby_script: #{status}"
-        end
+      # Executes the given command on a node using the best worker
+      # available for the given host.
+      #
+      # @param [Ridley::Client] client
+      # @param [String] host
+      # @param [String] command
+      #
+      # @return [Array<Symbol, HostConnector::Response>]
+      def execute_command(client, host, command)
+        worker = configured_worker_for(client, host)
+        worker.run(command)
       ensure
         worker.terminate if worker && worker.alive?
       end
