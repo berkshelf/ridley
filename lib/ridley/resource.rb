@@ -53,22 +53,10 @@ module Ridley
     #
     # @return [nil, Object]
     def find(object)
-      find!(object)
-    rescue Errors::ResourceNotFound
-      nil
-    end
-
-    # @param [String, #chef_id] object
-    #
-    # @raise [Errors::HTTPNotFound]
-    #   if a resource with the given chef_id is not found
-    #
-    # @return [Object]
-    def find!(object)
       chef_id = object.respond_to?(:chef_id) ? object.chef_id : object
       new(connection.get("#{self.class.resource_path}/#{chef_id}").body)
     rescue Errors::HTTPNotFound => ex
-      raise Errors::ResourceNotFound, ex
+      nil
     end
 
     # @param [#to_hash] object
