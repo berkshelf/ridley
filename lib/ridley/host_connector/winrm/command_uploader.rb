@@ -20,6 +20,8 @@ module Ridley
         class << self
           # Runs a delete command on files in %TEMP% that are named
           # winrm-upload*.
+          #
+          # @param [WinRM::WinRMWebService] winrm
           def cleanup(winrm)
             winrm.run_cmd( "del %TEMP%\\winrm-upload* /F /Q" )
           end
