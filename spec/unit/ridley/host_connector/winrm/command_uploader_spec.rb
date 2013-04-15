@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 describe Ridley::HostConnector::WinRM::CommandUploader do
+
   subject { command_uploader }
 
   let(:command_uploader) { described_class.new(command_string, winrm_stub) }
@@ -28,6 +29,17 @@ describe Ridley::HostConnector::WinRM::CommandUploader do
       winrm_stub.should_receive(:powershell)
 
       upload
+    end
+  end
+
+  describe "#cleanup" do
+    subject { cleanup }
+
+    let(:cleanup) { command_uploader.cleanup }
+
+    it "cleans up the windows temp dir" do
+      winrm_stub.should_receive(:run_cmd).with("del %TEMP%\\winrm-upload* /F /Q")
+      cleanup
     end
   end
 

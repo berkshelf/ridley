@@ -43,6 +43,12 @@ module Ridley
           "cmd.exe /C #{command_file_name}"
         end
 
+        # Runs a delete command on files in %TEMP% that are named
+        # winrm-upload*.
+        def cleanup
+          winrm.run_cmd( "del %TEMP%\\winrm-upload* /F /Q" )
+        end
+
         private
 
           def upload_command

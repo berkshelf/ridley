@@ -148,6 +148,8 @@ module Ridley
         end
     end
 
+    include Ridley::Logging
+
     set_chef_id "name"
     set_chef_type "node"
     set_chef_json_class "Chef::Node"
@@ -282,7 +284,7 @@ module Ridley
       connector_options[:winrm] = client.winrm
       connector_options.merge(options)
 
-      Ridley.log.debug "Running Chef Client on: #{self.public_hostname}"
+      log.debug "Running Chef Client on: #{self.public_hostname}"
 
       HostConnector.best_connector_for(self.public_hostname, connector_options) do |host_connector|
         host_connector.start(self, connector_options) do |connector|
@@ -311,7 +313,7 @@ module Ridley
       connector_options[:ssh] = client.ssh
       connector_options[:winrm] = client.winrm
 
-      Ridley.log.debug "Writing Encrypted Data Bag Secret to: #{self.public_hostname}"
+      log.debug "Writing Encrypted Data Bag Secret to: #{self.public_hostname}"
 
       HostConnector.best_connector_for(self.public_hostname, connector_options) do |host_connector|
         host_connector.start(self, connector_options) do |connector|

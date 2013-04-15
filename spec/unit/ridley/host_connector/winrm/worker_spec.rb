@@ -40,6 +40,7 @@ describe Ridley::HostConnector::WinRM::Worker do
 
         command_uploader_stub.should_receive :upload
         command_uploader_stub.stub command: "my command"
+        command_uploader_stub.stub(:cleanup)
 
         get_command.should eq("my command")
       end

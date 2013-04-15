@@ -95,6 +95,7 @@ module Ridley
             debug "Detected a command that was longer than #{CommandUploader::CHUNK_LIMIT} characters, \
               uploading command as a file to the host."
             command_uploader = CommandUploader.new(command, winrm)
+            command_uploader.cleanup
             command_uploader.upload
             command_uploader.command
           end
