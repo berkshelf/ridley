@@ -1,18 +1,29 @@
 require 'spec_helper'
 
 describe Ridley::HostConnector::WinRM::CommandUploader do
-
-  subject { command_uploader }
-
-  let(:command_uploader) { described_class.new(command_string, winrm_stub) }
-  let(:command_string) { "a" * 2048 }
-  let(:run_cmd_data) { { data: [{ stdout: "abc123" }] } }
   let(:winrm_stub) {
     double('WinRM',
       run_cmd: run_cmd_data,
       powershell: nil
     )
   }
+
+  describe "::cleanup" do
+    subject { cleanup }
+
+    let(:cleanup) { described_class.cleanup(winrm_stub) }
+
+    it "cleans up the windows temp dir" do
+      winrm_stub.should_receive(:run_cmd).with("del %TEMP%\\winrm-upload* /F /Q")
+      cleanup
+    end
+  end
+
+  subject { command_uploader }
+
+  let(:command_uploader) { described_class.new(command_string, winrm_stub) }
+  let(:command_string) { "a" * 2048 }
+  let(:run_cmd_data) { { data: [{ stdout: "abc123" }] } }
 
   its(:command_string) { should eq(command_string) }
   its(:winrm) { should eq(winrm_stub) }
@@ -29,17 +40,6 @@ describe Ridley::HostConnector::WinRM::CommandUploader do
       winrm_stub.should_receive(:powershell)
 
       upload
-    end
-  end
-
-  describe "#cleanup" do
-    subject { cleanup }
-
-    let(:cleanup) { command_uploader.cleanup }
-
-    it "cleans up the windows temp dir" do
-      winrm_stub.should_receive(:run_cmd).with("del %TEMP%\\winrm-upload* /F /Q")
-      cleanup
     end
   end
 

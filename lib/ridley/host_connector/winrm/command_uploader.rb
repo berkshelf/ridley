@@ -17,6 +17,13 @@ module Ridley
       #   the long_command into a batch file. The command method will return a String representing the
       #   command the worker will use to execute the uploaded batch script.
       class CommandUploader
+        class << self
+          # Runs a delete command on files in %TEMP% that are named
+          # winrm-upload*.
+          def cleanup(winrm)
+            winrm.run_cmd( "del %TEMP%\\winrm-upload* /F /Q" )
+          end
+        end
         
         CHUNK_LIMIT = 1024
 
@@ -41,12 +48,6 @@ module Ridley
         # @return [String] the command to execute the uploaded file
         def command
           "cmd.exe /C #{command_file_name}"
-        end
-
-        # Runs a delete command on files in %TEMP% that are named
-        # winrm-upload*.
-        def cleanup
-          winrm.run_cmd( "del %TEMP%\\winrm-upload* /F /Q" )
         end
 
         private
