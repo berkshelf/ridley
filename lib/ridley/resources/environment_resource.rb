@@ -40,7 +40,7 @@ module Ridley
     # @example setting and saving an environment level default attribute
     #
     #   obj = environment.find("production")
-    #   obj.set_defualt_attribute("my_app.billing.enabled", false)
+    #   obj.set_default_attribute("my_app.billing.enabled", false)
     #   obj.save
     #
     # @param [String] key
