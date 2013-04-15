@@ -119,59 +119,6 @@ CONFIG
       raise Errors::EncryptedDataBagSecretNotFound, "Error bootstrapping: Encrypted data bag secret provided but not found at '#{encrypted_data_bag_secret_path}'"      
     end
 
-    # Implements a Visual Basic script that attempts a simple
-    # 'wget' to download the Chef msi
-    # 
-    # @return [String]
-    def windows_wget_vb
-      win_wget = <<-WGET
-url = WScript.Arguments.Named("url")
-path = WScript.Arguments.Named("path")
-proxy = null
-Set objXMLHTTP = CreateObject("MSXML2.ServerXMLHTTP")
-Set wshShell = CreateObject( "WScript.Shell" )
-Set objUserVariables = wshShell.Environment("USER")
-
-'http proxy is optional
-'attempt to read from HTTP_PROXY env var first
-On Error Resume Next
-
-If NOT (objUserVariables("HTTP_PROXY") = "") Then
-proxy = objUserVariables("HTTP_PROXY")
-
-'fall back to named arg
-ElseIf NOT (WScript.Arguments.Named("proxy") = "") Then
-proxy = WScript.Arguments.Named("proxy")
-End If
-
-If NOT isNull(proxy) Then
-'setProxy method is only available on ServerXMLHTTP 6.0+
-Set objXMLHTTP = CreateObject("MSXML2.ServerXMLHTTP.6.0")
-objXMLHTTP.setProxy 2, proxy
-End If
-
-On Error Goto 0
-
-objXMLHTTP.open "GET", url, false
-objXMLHTTP.send()
-If objXMLHTTP.Status = 200 Then
-Set objADOStream = CreateObject("ADODB.Stream")
-objADOStream.Open
-objADOStream.Type = 1
-objADOStream.Write objXMLHTTP.ResponseBody
-objADOStream.Position = 0
-Set objFSO = Createobject("Scripting.FileSystemObject")
-If objFSO.Fileexists(path) Then objFSO.DeleteFile path
-Set objFSO = Nothing
-objADOStream.SaveToFile path
-objADOStream.Close
-Set objADOStream = Nothing
-End if
-Set objXMLHTTP = Nothing
-WGET
-      escape_and_echo(win_wget)
-    end
-
     # Implements a Powershell script that attempts a simple
     # 'wget' to download the Chef msi
     # 
