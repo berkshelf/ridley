@@ -4,13 +4,10 @@ module Ridley
     autoload :Context, 'ridley/bootstrapper/context'
 
     include Celluloid
-    include Celluloid::Logger
-    
+    include Ridley::Logging
+
     # @return  [Array<String>]
     attr_reader :hosts
-
-    # @return [Array<Bootstrapper::Context>]
-    attr_reader :contexts
 
     # @return [Hash]
     attr_reader :options
@@ -56,16 +53,22 @@ module Ridley
       }.merge(@options[:ssh])
 
       @options[:sudo] = @options[:ssh][:sudo]
-      @contexts = @hosts.collect do |host|
-        Context.create(host, options)
-      end
     end
 
+    # @raise [Errors::HostConnectionError] if a node is unreachable
+    #
+    # @return [Array<Bootstrapper::Context>]
+    def contexts
+      @contexts ||= @hosts.collect { |host| Context.create(host, options) }
+    end
+
+    # @raise [Errors::HostConnectionError] if a node is unreachable
+    #
     # @return [HostConnector::ResponseSet]
     def run
       workers = Array.new
       futures = contexts.collect do |context|
-        info "Running bootstrap command on #{context.host}"
+        log.info { "Running bootstrap command on #{context.host}" }
 
         workers << worker = context.host_connector::Worker.new(context.host, self.options.freeze)
 
