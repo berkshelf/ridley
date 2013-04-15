@@ -4,8 +4,8 @@ module Ridley
   # @example listing all clients
   #   conn = Ridley.new(...)
   #   conn.client.all #=> [
-  #     #<Ridley::ClientResource chef_id:'reset'>,
-  #     #<Ridley::ClientResource chef_id:'reset-validator'>
+  #     #<Ridley::ClientObject chef_id:'reset'>,
+  #     #<Ridley::ClientObject chef_id:'reset-validator'>
   #   ]
   class ClientResource < Ridley::Resource
     set_resource_path "clients"
@@ -17,13 +17,15 @@ module Ridley
     #
     # @param [String, #chef_id] chef_client
     #
-    # @raise [Errors::HTTPNotFound]
+    # @raise [Errors::ResourceNotFound]
     #   if a client with the given chef_id is not found
-    # @raise [Errors::HTTPError]
     #
-    # @return [Ridley::ClientResource]
+    # @return [Ridley::ClientObject]
     def regenerate_key(chef_client)
-      chef_client = find!(chef_client)
+      unless chef_client = find(chef_client)
+        abort Errors::ResourceNotFound.new("client '#{chef_client}' not found")
+      end
+
       chef_client.private_key = true
       update(chef_client)
     end
