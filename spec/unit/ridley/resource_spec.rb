@@ -1,67 +1,28 @@
 require 'spec_helper'
 
 describe Ridley::Resource do
-  let(:connection) { double('connection') }
+  let(:representation) do
+    Class.new(Ridley::ChefObject) do
+      set_chef_id "id"
+      set_chef_type "thing"
+      set_chef_json_class "Chef::Thing"
+    end
+  end
+
+  let(:resource_class) do
+    Class.new(Ridley::Resource) do
+      set_resource_path "rspecs"
+    end
+  end
 
   describe "ClassMethods" do
-    let(:representation) do
-      Class.new(Ridley::ChefObject) do
-        set_chef_id "id"
-        set_chef_type "thing"
-        set_chef_json_class "Chef::Thing"
-      end
-    end
-
-    subject do
-      Class.new(Ridley::Resource)
-    end
-
-    before do
-      subject.stub(representation: representation)
-    end
-
-    it_behaves_like "a Ridley Resource", Class.new(Ridley::Resource)
-
-    describe "::initialize" do
-      it "mass assigns the given attributes" do
-        new_attrs = {
-          name: "a name"
-        }
-
-        subject.any_instance.should_receive(:mass_assign).with(new_attrs)
-        subject.new(connection, new_attrs)
-      end
-    end
-
-    describe "::set_chef_type" do
-      it "sets the chef_type attr on the class" do
-        subject.set_chef_type("environment")
-
-        subject.chef_type.should eql("environment")
-      end
-    end
+    subject { resource_class }
 
     describe "::set_resource_path" do
       it "sets the resource_path attr on the class" do
         subject.set_resource_path("environments")
 
         subject.resource_path.should eql("environments")
-      end
-    end
-
-    describe "::set_chef_json_class" do
-      it "sets the chef_json_class attr on the class" do
-        subject.set_chef_json_class("Chef::Environment")
-
-        subject.chef_json_class.should eql("Chef::Environment")
-      end
-    end
-
-    describe "::set_chef_id" do
-      it "sets the chef_id attribute on the class" do
-        subject.set_chef_id(:environment)
-
-        subject.chef_id.should eql(:environment)
       end
     end
 
@@ -83,105 +44,91 @@ describe Ridley::Resource do
         end
       end
     end
+  end
 
-    describe "::chef_type" do
-      it "returns the underscored name of the including class if nothing is set" do
-        subject.chef_type.should eql(subject.class.name.underscore)
-      end
+  let(:connection) { double('chef-connection') }
+  let(:response) { double('chef-response', body: Hash.new) }
+
+  subject { resource_class.new(double('registry')) }
+
+  before do
+    resource_class.stub(representation: representation)
+    subject.stub(connection: connection)
+  end
+
+  describe "::all" do
+    it "sends GET to /{resource_path}" do
+      connection.should_receive(:get).with(subject.class.resource_path).and_return(response)
+
+      subject.all
+    end
+  end
+
+  describe "::find" do
+    let(:id) { "some_id" }
+
+    it "sends GET to /{resource_path}/{id} where {id} is the given ID" do
+      connection.should_receive(:get).with("#{subject.class.resource_path}/#{id}").and_return(response)
+
+      subject.find(id)
     end
 
-    describe "::chef_json_class" do
-      it "returns the chef_json if nothing has been set" do
-        subject.chef_json_class.should be_nil
+    context "when the resource is not found" do
+      before do
+        connection.should_receive(:get).with("#{subject.class.resource_path}/#{id}").
+          and_raise(Ridley::Errors::HTTPNotFound.new({}))
       end
-    end
 
-    describe "::chef_id" do
-      it "returns nil if nothing is set" do
-        subject.chef_id.should be_nil
+      it "returns nil" do
+        subject.find(id).should be_nil
       end
     end
   end
 
-  subject do
-    Class.new(Ridley::Resource).new(connection)
-  end
-
-  describe "comparable" do
-    subject do
-      Class.new(Ridley::Resource) do
-        set_chef_id "name"
-
-        attribute "name"
-        attribute "other_extra"
-        attribute "extra"
-      end
+  describe "::create" do
+    let(:attrs) do
+      {
+        first_name: "jamie",
+        last_name: "winsor"
+      }
     end
 
-    let(:one) { subject.new(connection) }
-    let(:two) { subject.new(connection) }
+    it "sends a post request to the given client using the includer's resource_path" do
+      connection.should_receive(:post).with(subject.class.resource_path, duck_type(:to_json)).and_return(response)
 
-    context "given two objects with the same value for their 'chef_id'" do
-      before(:each) do
-        one.mass_assign(name: "reset", other_extra: "stuff")
-        two.mass_assign(name: "reset", extra: "stuff")
-      end
-
-      it "is equal" do
-        one.should be_eql(two)
-      end
-    end
-
-    context "given two objects with different values for their 'chef_id'" do
-      before(:each) do
-        one.mass_assign(name: "jamie", other_extra: "stuff")
-        two.mass_assign(name: "winsor", extra: "stuff")
-      end
-
-      it "is not equal" do
-        one.should_not be_eql(two)
-      end
+      subject.create(attrs)
     end
   end
 
-  describe "uniqueness" do
-    subject do
-      Class.new(Ridley::Resource) do
-        set_chef_id "name"
+  describe "::delete" do
+    it "sends a delete request to the given client using the includer's resource_path for the given string" do
+      connection.should_receive(:delete).with("#{subject.class.resource_path}/ridley-test").and_return(response)
 
-        attribute "name"
-        attribute "other_extra"
-        attribute "extra"
-      end
+      subject.delete("ridley-test")
     end
 
-    let(:one) { subject.new(connection) }
-    let(:two) { subject.new(connection) }
+    it "accepts an object that responds to 'chef_id'" do
+      object = double("obj")
+      object.stub(:chef_id) { "hello" }
+      connection.should_receive(:delete).with("#{subject.class.resource_path}/#{object.chef_id}").and_return(response)
 
-    context "given an array of objects with the same value for their 'chef_id'" do
-      let(:nodes) do
-        one.mass_assign(name: "reset", other_extra: "stuff")
-        two.mass_assign(name: "reset", extra: "stuff")
-
-        [ one, two ]
-      end
-
-      it "returns only one unique element" do
-        nodes.uniq.should have(1).item
-      end
+      subject.delete( object)
     end
+  end
 
-    context "given an array of objects with different values for their 'chef_id'" do
-      let(:nodes) do
-        one.mass_assign(name: "jamie", other_extra: "stuff")
-        two.mass_assign(name: "winsor", extra: "stuff")
+  describe "::delete_all" do
+    it "sends a delete request for every object in the collection" do
+      pending
+    end
+  end
 
-        [ one, two ]
-      end
+  describe "::update" do
+    it "sends a put request to the given client using the includer's resource_path with the given object" do
+      object = subject.new(name: "hello")
+      connection.should_receive(:put).
+        with("#{subject.class.resource_path}/#{object.chef_id}", duck_type(:to_json)).and_return(response)
 
-      it "returns all of the elements" do
-        nodes.uniq.should have(2).item
-      end
+      subject.update(object)
     end
   end
 end
