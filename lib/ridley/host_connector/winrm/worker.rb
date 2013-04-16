@@ -32,8 +32,8 @@ module Ridley
         #   * :password (String) the password for the user that will perform the bootstrap
         #   * :port (Fixnum) the winrm port to connect on the node the bootstrap will be performed on (5985)
         def initialize(host, options = {})
-          @options          = options.deep_symbolize_keys
-          @options          = options[:winrm] if options[:winrm]
+          options          = options.deep_symbolize_keys
+          @options          = options[:winrm] || Hash.new
           @host             = host
           @user             = @options[:user]
           @password         = @options[:password]
