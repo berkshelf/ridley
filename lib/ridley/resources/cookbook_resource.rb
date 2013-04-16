@@ -20,7 +20,7 @@ module Ridley
     #   a hash containing keys which represent cookbook names and values which contain
     #   an array of strings representing the available versions
     def all
-      response = connection.get(self.resource_path).body
+      response = connection.get(self.class.resource_path).body
 
       {}.tap do |cookbooks|
         response.each do |name, details|
@@ -83,21 +83,10 @@ module Ridley
     #
     # @return [nil, CookbookResource]
     def find(object, version)
-      find!(object, version)
+      chef_id = object.respond_to?(:chef_id) ? object.chef_id : object
+      new(connection.get("#{self.class.resource_path}/#{chef_id}/#{version}").body)
     rescue Errors::HTTPNotFound
       nil
-    end
-
-    # @param [String, #chef_id] object
-    # @param [String] version
-    #
-    # @raise [Errors::HTTPNotFound]
-    #   if a resource with the given chef_id is not found
-    #
-    # @return [CookbookResource]
-    def find!(object, version)
-      chef_id = object.respond_to?(:chef_id) ? object.chef_id : object
-      new(connection.get("#{self.resource_path}/#{chef_id}/#{version}").body)
     end
 
     # Return the latest version of the given cookbook found on the remote Chef server
