@@ -31,7 +31,6 @@ module Ridley
 
     # Delete a cookbook of the given name and version on the remote Chef server
     #
-    # @param [Ridley::Client] client
     # @param [String] name
     # @param [String] version
     #
@@ -56,7 +55,7 @@ module Ridley
     #
     # @option options [Boolean] purge (false)
     def delete_all(name, options = {})
-      versions(client, name).each do |version|
+      versions(name).each do |version|
         future(:delete, name, version, options)
       end.map(&:value)
     end
@@ -98,7 +97,7 @@ module Ridley
     # @return [CookbookResource]
     def find!(object, version)
       chef_id = object.respond_to?(:chef_id) ? object.chef_id : object
-      new(client.connection.get("#{self.resource_path}/#{chef_id}/#{version}").body)
+      new(connection.get("#{self.resource_path}/#{chef_id}/#{version}").body)
     end
 
     # Return the latest version of the given cookbook found on the remote Chef server
@@ -211,7 +210,7 @@ module Ridley
     # @param [String] name
     #
     # @example
-    #   versions(client, "nginx") => [ "1.0.0", "1.2.0" ]
+    #   versions("nginx") => [ "1.0.0", "1.2.0" ]
     #
     # @return [Array<String>]
     def versions(name)

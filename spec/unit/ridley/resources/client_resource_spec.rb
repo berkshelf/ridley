@@ -1,9 +1,7 @@
 require 'spec_helper'
 
 describe Ridley::ClientResource do
-  subject do
-    Ridley::ClientResource.new(double('registry'))
-  end
+  subject { described_class.new(double('registry')) }
 
   describe "#regenerate_key" do
     let(:client_id) { "rspec-client" }
