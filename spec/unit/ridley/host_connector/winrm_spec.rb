@@ -10,6 +10,12 @@ describe Ridley::HostConnector::WinRM do
   let(:node_two) do
     Ridley::NodeResource.new(connection, automatic: { cloud: { public_hostname: "33.33.33.11" } })
   end
+  let(:command_uploader) { double('command_uploader') }
+
+  before do
+    Ridley::HostConnector::WinRM::CommandUploader.stub(:new).and_return(command_uploader)
+    command_uploader.stub(:cleanup)
+  end
 
   describe "ClassMethods" do
     subject { Ridley::HostConnector::WinRM }

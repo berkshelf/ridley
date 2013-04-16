@@ -74,7 +74,7 @@ module Ridley
           response.stderr = e.message
           [ :error, response ]
         ensure
-          command_uploader.cleanup if command.length > CommandUploader::CHUNK_LIMIT
+          command_uploader.cleanup
         end
 
         # @return [WinRM::WinRMWebService]
