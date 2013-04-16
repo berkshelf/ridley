@@ -1,5 +1,10 @@
-# Requiring winrm here because of https://github.com/WinRb/WinRM/issues/39
-require 'winrm'
+require 'active_support/core_ext/kernel/reporting'
+# Silencing warnings because not all versions of GSSAPI support all of the GSSAPI methods
+# the gssapi gem attempts to attach to and these warnings are dumped to STDERR.
+silence_warnings do
+  # Requiring winrm before all other gems because of https://github.com/WinRb/WinRM/issues/39
+  require 'winrm'
+end
 require 'chozo'
 require 'celluloid'
 require 'faraday'
