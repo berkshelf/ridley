@@ -159,6 +159,7 @@ describe Ridley::NodeResource do
       context "when the best connector is WinRM" do
         before do
           Ridley::HostConnector.stub(:best_connector_for).and_yield(Ridley::HostConnector::WinRM)
+          Ridley::HostConnector::WinRM::CommandUploader.stub(:new)
         end
 
         it "returns a WinRm worker instance" do

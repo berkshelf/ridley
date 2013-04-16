@@ -20,23 +20,27 @@ module Ridley
         
         CHUNK_LIMIT = 1024
 
-        # @return [String]
-        attr_reader :command_string
         # @return [WinRM::WinRMWebService]
         attr_reader :winrm
+        # @return [String]
+        attr_reader :base64_file_name
+        # @return [String]
+        attr_reader :command_file_name
 
-        # @param [String] command_string
         # @param [WinRM::WinRMWebService] winrm
-        def initialize(command_string, winrm)
-          @command_string = command_string
-          @winrm          = winrm
+        def initialize(winrm)
+          @winrm = winrm
+          @base64_file_name = get_file_path("winrm-upload-base64-#{unique_string}")
+          @command_file_name = get_file_path("winrm-upload-#{unique_string}.bat")
         end
 
         # Uploads the command encoded as base64 to a file on the host
         # and then uses Powershell to transform the base64 file into the
         # command that was originally passed through.
-        def upload
-          upload_command
+        #
+        # @param [String] command_string
+        def upload(command_string)
+          upload_command(command_string)
           convert_command
         end
 
@@ -54,13 +58,13 @@ module Ridley
 
         private
 
-          def upload_command
-            command_string_chars.each_slice(CHUNK_LIMIT) do |chunk|
+          def upload_command(command_string)
+            command_string_chars(command_string).each_slice(CHUNK_LIMIT) do |chunk|
               winrm.run_cmd( "echo #{chunk.join} >> \"#{base64_file_name}\"" )
             end
           end
 
-          def command_string_chars
+          def command_string_chars(command_string)
             Base64.encode64(command_string).gsub("\n", '').chars.to_a
           end
 
@@ -71,14 +75,6 @@ module Ridley
               $new_file = [System.IO.Path]::GetFullPath(\"#{command_file_name}\")
               [System.IO.File]::WriteAllBytes($new_file,$bytes)
             POWERSHELL
-          end
-
-          def base64_file_name
-            @base64_file_name ||= get_file_path("winrm-upload-base64-#{unique_string}")
-          end
-
-          def command_file_name
-            @command_file_name ||= get_file_path("winrm-upload-#{unique_string}.bat")
           end
 
           def unique_string

@@ -19,6 +19,9 @@ module Ridley
         attr_reader :winrm_endpoint
         # @return [CommandUploader]
         attr_reader :command_uploader
+        # @return [Array]
+        attr_reader :command_uploaders
+        finalizer :finalizer
 
         EMBEDDED_RUBY_PATH = 'C:\opscode\chef\embedded\bin\ruby'.freeze
 
@@ -29,17 +32,23 @@ module Ridley
         #   * :password (String) the password for the user that will perform the bootstrap
         #   * :port (Fixnum) the winrm port to connect on the node the bootstrap will be performed on (5985)
         def initialize(host, options = {})
-          @options        = options.deep_symbolize_keys
-          @options        = options[:winrm] if options[:winrm]
-          @host           = host
-          @user           = @options[:user]
-          @password       = @options[:password]
-          @winrm_endpoint = "http://#{host}:#{winrm_port}/wsman"
+          @options          = options.deep_symbolize_keys
+          @options          = options[:winrm] if options[:winrm]
+          @host             = host
+          @user             = @options[:user]
+          @password         = @options[:password]
+          @winrm_endpoint   = "http://#{host}:#{winrm_port}/wsman"
+          @command_uploaders = Array.new
+        end
+
+        def finalizer
+          command_uploaders.map(&:cleanup)
         end
 
         def run(command)
-          @command_uploader = CommandUploader.new(command, winrm)
-          command = get_command(command)
+          command_uploader = CommandUploader.new(winrm)
+          command_uploaders << command_uploader
+          command = get_command(command, command_uploader)
 
           response = Ridley::HostConnector::Response.new(host)
           debug "Running WinRM Command: '#{command}' on: '#{host}' as: '#{user}'"
@@ -73,8 +82,6 @@ module Ridley
           response.exit_code = -1
           response.stderr = e.message
           [ :error, response ]
-        ensure
-          command_uploader.cleanup
         end
 
         # @return [WinRM::WinRMWebService]
@@ -93,13 +100,13 @@ module Ridley
         # @param  command [String]
         # 
         # @return [String]
-        def get_command(command)
+        def get_command(command, command_uploader)
           if command.length < CommandUploader::CHUNK_LIMIT
             command
           else
             debug "Detected a command that was longer than #{CommandUploader::CHUNK_LIMIT} characters, \
               uploading command as a file to the host."
-            command_uploader.upload
+            command_uploader.upload(command)
             command_uploader.command
           end
         end

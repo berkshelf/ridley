@@ -6,6 +6,10 @@ describe Ridley::HostConnector::WinRM::Worker do
   let(:host) { 'reset.riotgames.com' }  
   let(:options) { {} }
 
+  before do
+    Ridley::HostConnector::WinRM::CommandUploader.stub(:new).and_return(double('command_uploader'))
+  end
+
   describe "#winrm_port" do
     subject(:winrm_port) { winrm_worker.winrm_port }
 
@@ -25,19 +29,15 @@ describe Ridley::HostConnector::WinRM::Worker do
   end
 
   describe "#get_command" do
-    subject(:get_command) { winrm_worker.get_command(command) }
+    subject(:get_command) { winrm_worker.get_command(command, command_uploader_stub) }
 
     let(:command) { "echo %TEMP%" }
+    let(:command_uploader_stub) { double('CommandUploader') }
 
     it { should eq(command) }
     
     context "when a command is more than 2047 characters" do
       let(:command) { "a" * 2048 }
-      let(:command_uploader_stub) { double('CommandUploader') }
-
-      before do
-        winrm_worker.stub(:command_uploader).and_return(command_uploader_stub)
-      end
 
       it "uploads and returns a command" do
         Ridley::HostConnector::WinRM::CommandUploader.stub new: command_uploader_stub

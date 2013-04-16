@@ -10,16 +10,19 @@ describe Ridley::HostConnector::WinRM::CommandUploader do
 
   subject { command_uploader }
 
-  let(:command_uploader) { described_class.new(command_string, winrm_stub) }
+  let(:command_uploader) { described_class.new(winrm_stub) }
   let(:command_string) { "a" * 2048 }
   let(:run_cmd_data) { { data: [{ stdout: "abc123" }] } }
   let(:command_file_name) { "my_command.bat" }
 
-  its(:command_string) { should eq(command_string) }
   its(:winrm) { should eq(winrm_stub) }
 
+  before do
+    command_uploader.stub(:get_file_path).and_return("")
+  end
+
   describe "#upload" do
-    let(:upload) { command_uploader.upload }
+    let(:upload) { command_uploader.upload(command_string) }
 
     it "calls winrm to upload and convert the command" do
       winrm_stub.should_receive(:run_cmd).and_return(
