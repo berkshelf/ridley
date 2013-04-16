@@ -9,7 +9,7 @@ module Ridley
       #   command_uploader.upload
       #   command_uploader.command
       #
-      #   This class is used by WinRM Workers when the worker is told to execute a command that 
+      #   This class is used by WinRM Workers when the worker is told to execute a command that
       #   might be too long for WinRM to handle.
       #
       #   After an instance of this class is created, the upload method will upload the long command
@@ -17,7 +17,6 @@ module Ridley
       #   the long_command into a batch file. The command method will return a String representing the
       #   command the worker will use to execute the uploaded batch script.
       class CommandUploader
-        
         CHUNK_LIMIT = 1024
 
         # @return [WinRM::WinRMWebService]
@@ -29,8 +28,8 @@ module Ridley
 
         # @param [WinRM::WinRMWebService] winrm
         def initialize(winrm)
-          @winrm = winrm
-          @base64_file_name = get_file_path("winrm-upload-base64-#{unique_string}")
+          @winrm             = winrm
+          @base64_file_name  = get_file_path("winrm-upload-base64-#{unique_string}")
           @command_file_name = get_file_path("winrm-upload-#{unique_string}.bat")
         end
 
@@ -71,7 +70,7 @@ module Ridley
           def convert_command
             winrm.powershell <<-POWERSHELL
               $base64_string = Get-Content \"#{base64_file_name}\"
-              $bytes  = [System.Convert]::FromBase64String($base64_string) 
+              $bytes  = [System.Convert]::FromBase64String($base64_string)
               $new_file = [System.IO.Path]::GetFullPath(\"#{command_file_name}\")
               [System.IO.File]::WriteAllBytes($new_file,$bytes)
             POWERSHELL

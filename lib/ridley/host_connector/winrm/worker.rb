@@ -21,6 +21,7 @@ module Ridley
         attr_reader :command_uploader
         # @return [Array]
         attr_reader :command_uploaders
+
         finalizer :finalizer
 
         EMBEDDED_RUBY_PATH = 'C:\opscode\chef\embedded\bin\ruby'.freeze
@@ -32,12 +33,12 @@ module Ridley
         #   * :password (String) the password for the user that will perform the bootstrap
         #   * :port (Fixnum) the winrm port to connect on the node the bootstrap will be performed on (5985)
         def initialize(host, options = {})
-          options          = options.deep_symbolize_keys
-          @options          = options[:winrm] || Hash.new
-          @host             = host
-          @user             = @options[:user]
-          @password         = @options[:password]
-          @winrm_endpoint   = "http://#{host}:#{winrm_port}/wsman"
+          options            = options.deep_symbolize_keys
+          @options           = options[:winrm] || Hash.new
+          @host              = host
+          @user              = @options[:user]
+          @password          = @options[:password]
+          @winrm_endpoint    = "http://#{host}:#{winrm_port}/wsman"
           @command_uploaders = Array.new
         end
 
@@ -46,8 +47,7 @@ module Ridley
         end
 
         def run(command)
-          command_uploader = CommandUploader.new(winrm)
-          command_uploaders << command_uploader
+          command_uploaders << command_uploader = CommandUploader.new(winrm)
           command = get_command(command, command_uploader)
 
           response = Ridley::HostConnector::Response.new(host)
@@ -95,10 +95,10 @@ module Ridley
         end
 
         # Returns the command if it does not break the WinRM command length
-        # limit. Otherwise, we return an execution of the command as a batch file. 
+        # limit. Otherwise, we return an execution of the command as a batch file.
         #
         # @param  command [String]
-        # 
+        #
         # @return [String]
         def get_command(command, command_uploader)
           if command.length < CommandUploader::CHUNK_LIMIT
@@ -112,7 +112,7 @@ module Ridley
         end
 
         # Executes a chef-client run on the nodes
-        # 
+        #
         # @return [#run]
         def chef_client
           run("chef-client")
@@ -122,7 +122,7 @@ module Ridley
         #
         # @param [String] encrypted_data_bag_secret_path
         #   the path to the encrypted_data_bag_secret
-        # 
+        #
         # @return [#run]
         def put_secret(encrypted_data_bag_secret_path)
           secret  = File.read(encrypted_data_bag_secret_path).chomp
@@ -131,10 +131,10 @@ module Ridley
         end
 
         # Executes a provided Ruby script in the embedded Ruby installation
-        # 
+        #
         # @param [Array<String>] command_lines
         #   An Array of lines of the command to be executed
-        # 
+        #
         # @return [#run]
         def ruby_script(command_lines)
           command = "#{EMBEDDED_RUBY_PATH} -e \"#{command_lines.join(';')}\""
