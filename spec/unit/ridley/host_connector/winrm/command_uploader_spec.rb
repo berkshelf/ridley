@@ -8,22 +8,12 @@ describe Ridley::HostConnector::WinRM::CommandUploader do
     )
   }
 
-  describe "::cleanup" do
-    subject { cleanup }
-
-    let(:cleanup) { described_class.cleanup(winrm_stub) }
-
-    it "cleans up the windows temp dir" do
-      winrm_stub.should_receive(:run_cmd).with("del %TEMP%\\winrm-upload* /F /Q")
-      cleanup
-    end
-  end
-
   subject { command_uploader }
 
   let(:command_uploader) { described_class.new(command_string, winrm_stub) }
   let(:command_string) { "a" * 2048 }
   let(:run_cmd_data) { { data: [{ stdout: "abc123" }] } }
+  let(:command_file_name) { "my_command.bat" }
 
   its(:command_string) { should eq(command_string) }
   its(:winrm) { should eq(winrm_stub) }
@@ -46,12 +36,29 @@ describe Ridley::HostConnector::WinRM::CommandUploader do
   describe "#command" do
     subject { command }
     let(:command) { command_uploader.command }
-    let(:command_file_name) { "my_command.bat" }
 
     before do
       command_uploader.stub command_file_name: command_file_name
     end
 
     it { should eq("cmd.exe /C #{command_file_name}") }
+  end
+
+  describe "#cleanup" do
+    subject { cleanup }
+
+    let(:cleanup) { command_uploader.cleanup }
+    let(:base64_file_name) { "my_base64_file" }
+
+    before do
+      command_uploader.stub command_file_name: command_file_name
+      command_uploader.stub base64_file_name: base64_file_name
+    end
+
+    it "cleans up the windows temp dir" do
+      winrm_stub.should_receive(:run_cmd).with("del #{base64_file_name} /F /Q")
+      winrm_stub.should_receive(:run_cmd).with("del #{command_file_name} /F /Q")
+      cleanup
+    end
   end
 end

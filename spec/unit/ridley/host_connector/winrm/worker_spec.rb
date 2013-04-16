@@ -33,9 +33,13 @@ describe Ridley::HostConnector::WinRM::Worker do
     
     context "when a command is more than 2047 characters" do
       let(:command) { "a" * 2048 }
+      let(:command_uploader_stub) { double('CommandUploader') }
+
+      before do
+        winrm_worker.stub(:command_uploader).and_return(command_uploader_stub)
+      end
 
       it "uploads and returns a command" do
-        command_uploader_stub = double('CommandUploader')
         Ridley::HostConnector::WinRM::CommandUploader.stub new: command_uploader_stub
 
         command_uploader_stub.should_receive :upload

@@ -17,6 +17,8 @@ module Ridley
         attr_reader :options
         # @return [String]
         attr_reader :winrm_endpoint
+        # @return [CommandUploader]
+        attr_reader :command_uploader
 
         EMBEDDED_RUBY_PATH = 'C:\opscode\chef\embedded\bin\ruby'.freeze
 
@@ -36,6 +38,7 @@ module Ridley
         end
 
         def run(command)
+          @command_uploader = CommandUploader.new(command, winrm)
           command = get_command(command)
 
           response = Ridley::HostConnector::Response.new(host)
@@ -71,7 +74,7 @@ module Ridley
           response.stderr = e.message
           [ :error, response ]
         ensure
-          CommandUploader.cleanup(winrm)
+          command_uploader.cleanup if command.length > CommandUploader::CHUNK_LIMIT
         end
 
         # @return [WinRM::WinRMWebService]
@@ -96,7 +99,6 @@ module Ridley
           else
             debug "Detected a command that was longer than #{CommandUploader::CHUNK_LIMIT} characters, \
               uploading command as a file to the host."
-            command_uploader = CommandUploader.new(command, winrm)
             command_uploader.upload
             command_uploader.command
           end
