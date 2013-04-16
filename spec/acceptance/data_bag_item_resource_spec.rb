@@ -5,7 +5,7 @@ describe "DataBag API operations", type: "acceptance" do
   let(:client_name) { "reset" }
   let(:client_key) { "/Users/reset/.chef/reset.pem" }
 
-  let(:connection) do
+  let(:client) do
     Ridley.new(
       server_url: server_url,
       client_name: client_name,
@@ -17,20 +17,14 @@ describe "DataBag API operations", type: "acceptance" do
   after(:all) { WebMock.disable_net_connect! }
 
   before(:all) do
-    connection.data_bag.delete_all
-    @databag = connection.data_bag.create(name: "ridley-test")
+    client.data_bag.delete_all
+    @databag = client.data_bag.create(name: "ridley-test")
   end
 
-  before(:each) do
-    @databag.item.delete_all
-  end
+  before { @databag.item.delete_all }
 
   describe "listing data bag items" do
     context "when the data bag has no items" do
-      before(:each) do
-        @databag.item.delete_all
-      end
-
       it "returns an empty array" do
         @databag.item.all.should have(0).items
       end
@@ -57,9 +51,9 @@ describe "DataBag API operations", type: "acceptance" do
 
     context "when an 'id' field is missing" do
       it "raises an Ridley::Errors::InvalidResource error" do
-        lambda {
+        expect {
           @databag.item.create(name: "jamie")
-        }.should raise_error(Ridley::Errors::InvalidResource)
+        }.to raise_error(Ridley::Errors::InvalidResource)
       end
     end
   end
@@ -96,7 +90,7 @@ describe "DataBag API operations", type: "acceptance" do
     it "returns the deleted data bag item" do
       dbi = @databag.item.delete(attributes["id"])
 
-      dbi.should be_a(Ridley::DataBagItemResource)
+      dbi.should be_a(Ridley::DataBagItemObject)
       dbi.attributes.should eql(attributes)
     end
 
@@ -114,7 +108,7 @@ describe "DataBag API operations", type: "acceptance" do
     end
 
     it "returns the array of deleted data bag items" do
-      @databag.item.delete_all.should each be_a(Ridley::DataBagItemResource)
+      @databag.item.delete_all.should each be_a(Ridley::DataBagItemObject)
     end
 
     it "removes all data bag items from the data bag" do

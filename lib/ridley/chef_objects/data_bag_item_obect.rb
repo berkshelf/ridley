@@ -14,11 +14,11 @@ module Ridley
     alias_method :attributes=, :mass_assign
     alias_method :attributes, :_attributes_
 
-    # @param [Ridley::Client] client
+    # @param [Ridley::Resource] resource
     # @param [Ridley::DataBagObject] data_bag
     # @param [#to_hash] new_attrs
-    def initialize(client, data_bag, new_attrs = {})
-      super(client, new_attrs)
+    def initialize(resource, data_bag, new_attrs = {})
+      super(resource, new_attrs)
       @data_bag = data_bag
     end
 
@@ -33,7 +33,7 @@ module Ridley
     def save
       raise Errors::InvalidResource.new(self.errors) unless valid?
 
-      mass_assign(self.class.create(client, data_bag, self)._attributes_)
+      mass_assign(resource.create(data_bag, self)._attributes_)
       true
     rescue Errors::HTTPConflict
       self.update
@@ -53,7 +53,7 @@ module Ridley
 
       cipher = OpenSSL::Cipher::Cipher.new('aes-256-cbc')
       cipher.decrypt
-      cipher.pkcs5_keyivgen(client.encrypted_data_bag_secret)
+      cipher.pkcs5_keyivgen(encrypted_data_bag_secret)
       decrypted_value = cipher.update(decoded_value) + cipher.final
 
       YAML.load(decrypted_value)
@@ -63,7 +63,7 @@ module Ridley
     #
     # @return [Object]
     def reload
-      mass_assign(self.class.find(client, data_bag, self)._attributes_)
+      mass_assign(resource.find(data_bag, self)._attributes_)
       self
     end
 
@@ -77,7 +77,7 @@ module Ridley
     def update
       raise Errors::InvalidResource.new(self.errors) unless valid?
 
-      mass_assign(self.class.update(client, data_bag, self)._attributes_)
+      mass_assign(resource.update(data_bag, self)._attributes_)
       true
     end
 
@@ -90,5 +90,11 @@ module Ridley
       mass_assign(hash.has_key?(:raw_data) ? hash[:raw_data] : hash)
       self
     end
+
+    private
+
+      def encrypted_data_bag_secret
+        resource.connection.encrypted_data_bag_secret
+      end
   end
 end
