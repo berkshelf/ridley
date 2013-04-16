@@ -1,14 +1,14 @@
 require 'spec_helper'
 
 describe Ridley::HostConnector::WinRM do
-  let(:connection) { double('conn', ssh: { user: "vagrant", password: "vagrant" }) }
+  let(:resource) { double('resource') }
 
   let(:node_one) do
-    Ridley::NodeResource.new(connection, automatic: { cloud: { public_hostname: "33.33.33.10" } })
+    Ridley::NodeObject.new(resource, automatic: { cloud: { public_hostname: "33.33.33.10" } })
   end
 
   let(:node_two) do
-    Ridley::NodeResource.new(connection, automatic: { cloud: { public_hostname: "33.33.33.11" } })
+    Ridley::NodeObject.new(resource, automatic: { cloud: { public_hostname: "33.33.33.11" } })
   end
   let(:command_uploader) { double('command_uploader', cleanup: nil) }
 
@@ -18,7 +18,7 @@ describe Ridley::HostConnector::WinRM do
 
   describe "ClassMethods" do
     subject { Ridley::HostConnector::WinRM }
-    
+
     describe "::start" do
       let(:options) do
         {
