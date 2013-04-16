@@ -56,9 +56,9 @@ describe Ridley::SandboxObject do
   end
 
   describe "#upload" do
-    it "delegates self to SandboxUploader.upload" do
+    it "delegates to resource#upload" do
       checksums = double('checksums')
-      Ridley::SandboxUploader.should_receive(:upload).with(subject, checksums)
+      resource.should_receive(:upload).with(subject, checksums)
 
       subject.upload(checksums)
     end

@@ -1,14 +1,16 @@
 require 'spec_helper'
 
 describe Ridley::SandboxUploader do
-  let(:client) do
-    double('client',
-      client_name: 'reset',
-      client_key: fixtures_path.join('reset.pem'),
+  let(:client_name) { "reset" }
+  let(:client_key) { fixtures_path.join('reset.pem') }
+  let(:connection) do
+    double('connection',
+      client_name: client_name,
+      client_key: client_key,
       options: {}
     )
   end
-
+  let(:resource) { double('resource', connection: connection) }
   let(:checksums) do
     {
       "oGCPHrQ+5MylEL+V+NIJ9w==" => {
@@ -18,22 +20,10 @@ describe Ridley::SandboxUploader do
     }
   end
 
-  let(:sandbox) do
-    Ridley::SandboxResource.new(client, checksums: checksums)
-  end
+  let(:sandbox) { Ridley::SandboxObject.new(resource, checksums: checksums) }
 
   describe "ClassMethods" do
     subject { described_class }
-    describe "::upload" do
-      it "terminates the uploader after upload" do
-        uploader = double('uploader', alive?: true)
-        Ridley::SandboxUploader.should_receive(:pool).with(size: 12, args: [sandbox]).and_return(uploader)
-        uploader.should_receive(:multi_upload).with(checksums)
-        uploader.should_receive(:terminate)
-
-        subject.upload(sandbox, checksums)
-      end
-    end
 
     describe "::checksum" do
       subject { described_class.checksum(path) }
@@ -52,15 +42,7 @@ describe Ridley::SandboxUploader do
     end
   end
 
-  subject { described_class.new(sandbox) }
-
-  describe "#multi_upload" do
-    it "sends an upload command for each pair of checksum/path" do
-      subject.should_receive(:upload).with(checksums.first[0], checksums.first[1])
-
-      subject.multi_upload(checksums)
-    end
-  end
+  subject { described_class.new(client_name, client_key, {}) }
 
   describe "#upload" do
     let(:chk_id) { "oGCPHrQ+5MylEL+V+NIJ9w==" }
@@ -79,7 +61,7 @@ describe Ridley::SandboxUploader do
       it "uploads each checksum to their target URL" do
         stub_request(:put, checksums[chk_id][:url])
 
-        subject.upload(chk_id, path)
+        subject.upload(sandbox, chk_id, path)
       end
     end
 
@@ -93,11 +75,11 @@ describe Ridley::SandboxUploader do
       end
 
       let(:sandbox) do
-        Ridley::SandboxResource.new(client, checksums: checksums)
+        Ridley::SandboxObject.new(double, checksums: checksums)
       end
 
       it "returns nil" do
-        subject.upload(chk_id, path).should be_nil
+        subject.upload(sandbox, chk_id, path).should be_nil
       end
     end
   end

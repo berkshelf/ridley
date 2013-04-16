@@ -37,7 +37,7 @@ module Ridley
     end
 
     class ResourcesSupervisor < ::Celluloid::SupervisionGroup
-      def initialize(registry, connection_registry)
+      def initialize(registry, connection_registry, options)
         super(registry) do |s|
           s.supervise_as :client_resource, Ridley::ClientResource, connection_registry
           s.supervise_as :cookbook_resource, Ridley::CookbookResource, connection_registry
@@ -45,7 +45,8 @@ module Ridley
           s.supervise_as :environment_resource, Ridley::EnvironmentResource, connection_registry
           s.supervise_as :node_resource, Ridley::NodeResource, connection_registry
           s.supervise_as :role_resource, Ridley::RoleResource, connection_registry
-          s.supervise_as :sandbox_resource, Ridley::SandboxResource, connection_registry
+          s.supervise_as :sandbox_resource, Ridley::SandboxResource, connection_registry,
+            options[:client_name], options[:client_key], options.slice(*Ridley::Connection::VALID_OPTIONS)
           s.supervise_as :search_resource, Ridley::SearchResource, connection_registry
         end
       end
@@ -178,7 +179,7 @@ module Ridley
       @connection_registry   = Celluloid::Registry.new
       @resources_registry    = Celluloid::Registry.new
       @connection_supervisor = ConnectionSupervisor.new(@connection_registry, @options)
-      @resources_supervisor  = ResourcesSupervisor.new(@resources_registry, @connection_registry)
+      @resources_supervisor  = ResourcesSupervisor.new(@resources_registry, @connection_registry, @options)
       # Why do we use a class function for defining our finalizer?
       # http://www.mikeperham.com/2010/02/24/the-trouble-with-ruby-finalizers/
       ObjectSpace.define_finalizer(self, self.class.finalizer)

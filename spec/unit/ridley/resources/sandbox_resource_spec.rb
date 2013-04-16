@@ -1,8 +1,10 @@
 require 'spec_helper'
 
 describe Ridley::SandboxResource do
+  let(:client_name) { "reset" }
+  let(:client_key) { fixtures_path.join('reset.pem') }
   let(:connection) { double('chef-connection') }
-  subject { described_class.new(double) }
+  subject { described_class.new(double, client_name, client_key) }
   before  { subject.stub(connection: connection) }
 
   describe "#create" do

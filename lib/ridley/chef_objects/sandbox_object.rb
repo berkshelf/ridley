@@ -34,8 +34,17 @@ module Ridley
     end
 
     # Concurrently upload all of this sandboxes files into the checksum containers of the sandbox
+    #
+    # @param [Hash] checksums
+    #   a hash of file checksums and file paths
+    #
+    # @example
+    #   sandbox.upload(
+    #     "e5a0f6b48d0712382295ff30bec1f9cc" => "/Users/reset/code/rbenv-cookbook/recipes/default.rb",
+    #     "de6532a7fbe717d52020dc9f3ae47dbe" => "/Users/reset/code/rbenv-cookbook/recipes/ohai_plugin.rb"
+    #   )
     def upload(checksums)
-      SandboxUploader.upload(self, checksums)
+      resource.upload(self, checksums)
     end
 
     # Notify the Chef Server that uploading to this sandbox has completed
