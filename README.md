@@ -348,6 +348,41 @@ And the same goes for setting an environment level override attribute
 
     conn.node.bootstrap("33.33.33.10", "33.33.33.11")
 
+## Bootstrapping Windows Nodes
+
+Windows Nodes are bootstrapped using a combination of WinRM, Batch, and PowerShell. You will probably need to tweak some settings on your Windows servers to ensure the commands are successful.
+
+## WinRM Settings
+
+1. Enable WinRM: `winrm quickconfig` and say Yes.
+2. Set some WinRM settings to ensure that you don't get 401 Unauthorized responses and 500 Responses because of timeouts.
+
+```
+winrm set winrm/config/service/auth @{Basic="true"}
+winrm set winrm/config/service @{AllowUnencrypted="true"}
+winrm set winrm/config/service @{EnumerationTimeoutms="600000"}
+winrm set winrm/config @{MaxTimeoutms="600000"}
+winrm set winrm/config/client @{TrustedHosts="*"}
+```
+
+## PowerShell Settings
+
+1. You should also configure your PowerShell profile, so that PowerShell commands have a more lenient timeout period.
+
+```
+mkdir C:\Users\my_user\Documents\WindowsPowerShell
+echo "$PSSessionOption = New-PSSessionOption -OpenTimeout 0 -CancelTimeout 0 -IdleTimeout 0 -OperationTimeout 0" > C:\Users\my_user\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
+```
+
+Verify the PowerShell settings by opening up the PowerShell Console and entering `$PSSessionOption` and ensure those values are set, and that there are no errors output.
+
+The following links offer some information about configuring a machine's PowerShell settings:
+* [PowerShell Profiles](http://technet.microsoft.com/en-us/library/ee692764.aspx)
+* [The $PSSessionOptions Preference Variable](http://technet.microsoft.com/library/hh847796.aspx)
+* [Creating a new PSSessionOption](http://technet.microsoft.com/en-us/library/hh849703.aspx)
+
+You may also want to tweak your Windows boxes a bit more ex: turning UAC off, turning off the Windows Firewall.
+
 # Authors and Contributors
 
 * Jamie Winsor (<reset@riotgames.com>)
