@@ -1,37 +1,29 @@
 require 'spec_helper'
 
 describe Ridley::HostConnector::SSH do
-  let(:connection) { double('conn', ssh: { user: "vagrant", password: "vagrant" }) }
+  let(:resource) { double('resource') }
 
   let(:node_one) do
-    Ridley::NodeResource.new(connection, automatic: { cloud: { public_hostname: "33.33.33.10" } })
+    Ridley::NodeObject.new(resource, automatic: { cloud: { public_hostname: "33.33.33.10" } })
   end
 
   let(:node_two) do
-    Ridley::NodeResource.new(connection, automatic: { cloud: { public_hostname: "33.33.33.11" } })
+    Ridley::NodeObject.new(resource, automatic: { cloud: { public_hostname: "33.33.33.11" } })
+  end
+
+  let(:options) do
+    {
+      user: "vagrant",
+      password: "vagrant",
+      timeout: 1
+    }
   end
 
   describe "ClassMethods" do
-    subject { Ridley::HostConnector::SSH }
-    
+    subject { described_class }
+
     describe "::start" do
-      let(:options) do
-        {
-          user: "vagrant",
-          password: "vagrant",
-          timeout: 1
-        }
-      end
-
-      it "evaluates within the context of a new SSH and returns the last item in the block" do
-        result = subject.start([node_one, node_two], options) do |ssh|
-          ssh.run("ls")
-        end
-
-        result.should be_a(Ridley::HostConnector::ResponseSet)
-      end
-
-      it "raises a LocalJumpError if a block is not provided" do        
+      it "raises a LocalJumpError if a block is not provided" do
         expect {
           subject.start([node_one, node_two], options)
         }.to raise_error(LocalJumpError)
@@ -39,10 +31,20 @@ describe Ridley::HostConnector::SSH do
     end
   end
 
-  subject { Ridley::HostConnector::SSH.new([node_one, node_two], ssh: {user: "vagrant", password: "vagrant", timeout: 1}) }
+  subject do
+    Ridley::HostConnector::SSH.new([node_one, node_two], ssh: { user: "vagrant", password: "vagrant", timeout: 1 })
+  end
 
   describe "#run" do
-    it "returns an HostConnector::ResponseSet" do
+    let(:worker) { double('worker', terminate: nil) }
+    let(:response) { Ridley::HostConnector::Response.new("host") }
+    before { Ridley::HostConnector::SSH::Worker.stub(:new).and_return(worker) }
+
+    before do
+      worker.stub_chain(:future, :run).and_return(double(value: [:ok, response]))
+    end
+
+    it "returns an SSH::ResponseSet" do
       subject.run("ls").should be_a(Ridley::HostConnector::ResponseSet)
     end
   end
