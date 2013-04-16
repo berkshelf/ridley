@@ -40,6 +40,9 @@ module Ridley
     class EncryptedDataBagSecretNotFound < BootstrapError; end
     class HostConnectionError < BootstrapError; end
 
+    class RemoteCommandError < RidleyError; end
+    class RemoteScriptError < RemoteCommandError; end
+
     # Exception thrown when the maximum amount of requests is exceeded.
     class RedirectLimitReached < RidleyError
       attr_reader :response

@@ -54,6 +54,65 @@ module Ridley
         Bootstrapper.new(args, options).run
       end
 
+      # Executes a Chef run using the best worker available for the given
+      # host.
+      #
+      # @param [Ridley::Client] client
+      # @param [String] host
+      #
+      # @return [HostConnector::Response]
+      def chef_run(client, host)
+        worker = configured_worker_for(client, host)
+        worker.chef_client
+      ensure
+        worker.terminate if worker && worker.alive?
+      end
+
+      # Puts a secret on the host using the best worker available for
+      # the given host.
+      #
+      # @param [Ridley::Client] client
+      # @param [String] host
+      # @param [String] encrypted_data_bag_secret_path
+      # 
+      # @return [HostConnector::Response]
+      def put_secret(client, host, encrypted_data_bag_secret_path)
+        worker = configured_worker_for(client, host)
+        worker.put_secret(encrypted_data_bag_secret_path)
+      ensure
+        worker.terminate if worker && worker.alive?
+      end
+
+      # Executes an arbitrary ruby script using the best worker available
+      # for the given host.
+      #
+      # @param [Ridley::Client] client
+      # @param [String] host
+      # @param [Array<String>] command_lines
+      #
+      # @return [HostConnector::Response]
+      def ruby_script(client, host, command_lines)
+        worker = configured_worker_for(client, host)
+        worker.ruby_script(command_lines)
+      ensure
+        worker.terminate if worker && worker.alive?
+      end
+
+      # Executes the given command on a node using the best worker
+      # available for the given host.
+      #
+      # @param [Ridley::Client] client
+      # @param [String] host
+      # @param [String] command
+      #
+      # @return [Array<Symbol, HostConnector::Response>]
+      def execute_command(client, host, command)
+        worker = configured_worker_for(client, host)
+        worker.run(command)
+      ensure
+        worker.terminate if worker && worker.alive?
+      end
+
       # Merges the given data with the the data of the target node on the remote
       #
       # @param [Ridley::Client] client
@@ -72,7 +131,24 @@ module Ridley
       def merge_data(client, target, options = {})
         find!(client, target).merge_data(options)
       end
+
+      private
+        # @param [Ridley::Client] client
+        # @param [String] host
+        #
+        # @return [SSH::Worker, WinRM::Worker]
+        def configured_worker_for(client, host)
+          connector_options = Hash.new
+          connector_options[:ssh] = client.ssh
+          connector_options[:winrm] = client.winrm
+
+          HostConnector.best_connector_for(host, connector_options) do |host_connector|
+            host_connector::Worker.new(host, connector_options)
+          end
+        end
     end
+
+    include Ridley::Logging
 
     set_chef_id "name"
     set_chef_type "node"
@@ -196,18 +272,25 @@ module Ridley
       self.cloud_provider == "rackspace"
     end
 
-    # Run Chef-Client on the instantiated node
+    # Run Chef-Client on the instantiated node.
     #
     # @param [Hash] options
-    #   a hash of options to pass to {Ridley::SSH.start}
+    #   a hash of options to pass to the best {Ridley::HostConnector}
     #
-    # @return [SSH::Response]
+    # @return [HostConnector::Response]
     def chef_client(options = {})
-      options = client.ssh.merge(options)
+      connector_options = Hash.new
+      connector_options[:ssh] = client.ssh
+      connector_options[:winrm] = client.winrm
+      connector_options.merge(options)
 
-      Ridley.log.debug "Running Chef Client on: #{self.public_hostname}"
-      Ridley::SSH.start(self, options) do |ssh|
-        ssh.run("sudo chef-client").first
+      log.debug "Running Chef Client on: #{self.public_hostname}"
+
+      HostConnector.best_connector_for(self.public_hostname, connector_options) do |host_connector|
+        host_connector.start(self, connector_options) do |connector|
+          _, response = connector.chef_client
+          response
+        end
       end
     end
 
@@ -216,9 +299,9 @@ module Ridley
     # returned
     #
     # @param [Hash] options
-    #   a hash of options to pass to {Ridley::SSH.start}
+    #   a hash of options to pass to the best {Ridley::HostConnector}
     #
-    # @return [SSH::Response, nil]
+    # @return [HostConnector::Response, nil]
     def put_secret(options = {})
       if client.encrypted_data_bag_secret_path.nil? ||
         !File.exists?(client.encrypted_data_bag_secret_path)
@@ -226,13 +309,17 @@ module Ridley
         return nil
       end
 
-      options = client.ssh.merge(options)
-      secret  = File.read(client.encrypted_data_bag_secret_path).chomp
-      command = "echo '#{secret}' > /etc/chef/encrypted_data_bag_secret; chmod 0600 /etc/chef/encrypted_data_bag_secret"
+      connector_options = Hash.new
+      connector_options[:ssh] = client.ssh
+      connector_options[:winrm] = client.winrm
 
-      Ridley.log.debug "Writing Encrypted Data Bag Secret to: #{self.public_hostname}"
-      Ridley::SSH.start(self, options) do |ssh|
-        ssh.run(command).first
+      log.debug "Writing Encrypted Data Bag Secret to: #{self.public_hostname}"
+
+      HostConnector.best_connector_for(self.public_hostname, connector_options) do |host_connector|
+        host_connector.start(self, connector_options) do |connector|
+          _, response = connector.put_secret(client.encrypted_data_bag_secret_path)
+          response
+        end
       end
     end
 

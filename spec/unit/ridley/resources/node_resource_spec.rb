@@ -10,12 +10,20 @@ describe Ridley::NodeResource do
       ssh: {
         user: "reset",
         password: "lol"
-      }
+      },
+      winrm: {
+        user: "Administrator",
+        password: "secret"
+      },
+      encrypted_data_bag_secret_path: nil
     )
   end
+  let(:host) { "33.33.33.10" }
 
   describe "ClassMethods" do
     subject { Ridley::NodeResource }
+
+    let(:worker) { double('worker', alive?: true, terminate: nil) }
 
     describe "::bootstrap" do
       let(:boot_options) do
@@ -36,6 +44,133 @@ describe Ridley::NodeResource do
       end
     end
 
+    describe "::chef_run" do
+      subject { chef_run }
+      let(:chef_run) { described_class.chef_run(connection, host) }
+      let(:response) { [:ok, double('response', stdout: 'success_message')] }
+
+      before do
+        Ridley::NodeResource.stub(:configured_worker_for).and_return(worker)
+        worker.stub(:chef_client).and_return(response)
+      end
+
+      it { should eq(response) }
+
+      context "when it executes unsuccessfully" do
+        let(:response) { [:error, double('response', stderr: 'failure_message')] }
+
+        it {should eq(response)}
+      end
+
+      it "terminates the worker" do
+        worker.should_receive(:terminate)
+        chef_run
+      end
+    end
+
+    describe "::put_secret" do
+      subject { put_secret }
+      let(:put_secret) { described_class.put_secret(connection, host, secret_path)}
+      let(:response) { [:ok, double('response', stdout: 'success_message')] }
+      let(:secret_path) { fixtures_path.join("reset.pem").to_s }
+
+      before do
+        Ridley::NodeResource.stub(:configured_worker_for).and_return(worker)
+        worker.stub(:put_secret).and_return(response)
+      end
+
+      it { should eq(response) }
+
+      context "when it executes unsuccessfully" do
+        let(:response) { [:error, double('response', stderr: 'failure_message')] }
+
+        it { should eq(response) }
+      end
+
+      it "terminates the worker" do
+        worker.should_receive(:terminate)
+        put_secret
+      end
+    end
+
+    describe "::ruby_script" do
+      subject { ruby_script }
+      let(:ruby_script) { described_class.ruby_script(connection, host, command_lines) }
+      let(:response) { [:ok, double('response', stdout: 'success_message')] }
+      let(:command_lines) { ["puts 'hello'", "puts 'there'"] }
+
+      before do
+        Ridley::NodeResource.stub(:configured_worker_for).and_return(worker)
+        worker.stub(:ruby_script).and_return(response)
+      end
+
+      it { should eq(response) }
+
+      context "when it executes unsuccessfully" do
+        let(:response) { [:error, double('response', stderr: 'failure_message')] }
+
+        it { should eq(response) }
+      end
+
+      it "terminates the worker" do
+        worker.should_receive(:terminate)
+        ruby_script
+      end
+    end
+
+    describe "::execute_command" do
+      subject { execute_command }
+
+      let(:execute_command) { described_class.execute_command(connection, host, command) }
+      let(:response) { [:ok, double('response', stdout: 'success_message')] }
+      let(:command) { "echo 'hello world'" }
+
+      before do
+        Ridley::NodeResource.stub(:configured_worker_for).and_return(worker)
+        worker.stub(:run).and_return(response)
+      end
+
+      it { should eq(response) }
+
+      context "when it executes unsuccessfully" do
+        let(:response) { [:error, double('response', stderr: 'failure_message')] }
+
+        it { should eq(response) }
+      end
+    end
+
+    describe "::configured_worker_for" do
+      subject { configured_worker_for }
+
+      let(:configured_worker_for) { described_class.send(:configured_worker_for, connection, host) }
+
+      context "when the best connector is SSH" do
+        before do
+          Ridley::HostConnector.stub(:best_connector_for).and_yield(Ridley::HostConnector::SSH)
+        end
+
+        it "returns an SSH worker instance" do
+          configured_worker_for.should be_a(Ridley::HostConnector::SSH::Worker)
+        end
+
+        its(:user) { should eq("reset") }
+      end
+
+      context "when the best connector is WinRM" do
+        before do
+          Ridley::HostConnector.stub(:best_connector_for).and_yield(Ridley::HostConnector::WinRM)
+          Ridley::HostConnector::WinRM::CommandUploader.stub(:new)
+        end
+
+        it "returns a WinRm worker instance" do
+          configured_worker_for.should be_a(Ridley::HostConnector::WinRM::Worker)
+        end
+
+        its(:user) { should eq("Administrator") }
+        its(:password) { should eq("secret") }
+      end
+    end
+
     describe "::merge_data" do
       it "finds the target node and sends it the merge_data message" do
         data = double('data')
@@ -48,7 +183,8 @@ describe Ridley::NodeResource do
     end
   end
 
-  subject { Ridley::NodeResource.new(connection) }
+  subject { node_resource }
+  let(:node_resource) { Ridley::NodeResource.new(connection) }
 
   describe "#set_chef_attribute" do
     it "sets an normal node attribute at the nested path" do
@@ -242,11 +378,42 @@ describe Ridley::NodeResource do
   end
 
   describe "#chef_client" do
-    pending
+    subject { chef_client }
+    let(:chef_client) { node_resource.chef_client }
+    let(:worker) { double('worker', chef_client: response) }
+    let(:response) { [:ok, Ridley::HostConnector::Response.new(host)] }
+
+    before do
+      Ridley::HostConnector.stub(:best_connector_for).and_yield(Ridley::HostConnector::SSH)
+      Ridley::HostConnector::SSH.stub(:start).and_yield(worker)
+    end
+
+    it "returns a HostConnector::Response" do
+
+      chef_client.should be_a(Ridley::HostConnector::Response)
+    end
   end
 
   describe "#put_secret" do
-    pending
+    subject { put_secret }
+    let(:put_secret) { node_resource.put_secret }
+    let(:worker) { double('worker', put_secret: response) }
+    let(:response) { [:ok, Ridley::HostConnector::Response.new(host)] }
+
+    before do
+      Ridley::HostConnector.stub(:best_connector_for).and_yield(Ridley::HostConnector::SSH)
+      Ridley::HostConnector::SSH.stub(:start).and_yield(worker)
+    end
+
+    context "when the client does not have an encrypted file" do
+      it "returns nil" do
+        put_secret.should be_nil
+      end
+    end
+
+    it "returns a HostConnector::Response" do
+      pending
+    end
   end
 
   describe "#merge_data" do

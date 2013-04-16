@@ -2,6 +2,7 @@ module Ridley
   module HostConnector
     # @author Kyle Allan <kallan@riotgames.com>
     class WinRM
+      autoload :CommandUploader, 'ridley/host_connector/winrm/command_uploader'
       autoload :Worker, 'ridley/host_connector/winrm/worker'
 
       class << self

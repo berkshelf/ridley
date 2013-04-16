@@ -18,7 +18,8 @@ describe Ridley::HostConnector::SSH do
       let(:options) do
         {
           user: "vagrant",
-          password: "vagrant"
+          password: "vagrant",
+          timeout: 1
         }
       end
 
@@ -38,10 +39,10 @@ describe Ridley::HostConnector::SSH do
     end
   end
 
-  subject { Ridley::HostConnector::SSH.new([node_one, node_two], user: "vagrant", password: "vagrant") }
+  subject { Ridley::HostConnector::SSH.new([node_one, node_two], ssh: {user: "vagrant", password: "vagrant", timeout: 1}) }
 
   describe "#run" do
-    it "returns an SSH::ResponseSet" do
+    it "returns an HostConnector::ResponseSet" do
       subject.run("ls").should be_a(Ridley::HostConnector::ResponseSet)
     end
   end

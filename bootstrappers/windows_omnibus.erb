@@ -25,10 +25,6 @@ setlocal
 <%= "SETX HTTP_PROXY \"#{bootstrap_proxy}\"" if bootstrap_proxy %>
 mkdir <%= bootstrap_directory %>
 
-> <%= bootstrap_directory %>\wget.vbs (
- <%= windows_wget_vb %>
-)
-
 > <%= bootstrap_directory %>\wget.ps1 (
  <%= windows_wget_powershell %>
 )
@@ -87,24 +83,7 @@ set "REMOTE_SOURCE_MSI_URL=https://www.opscode.com/chef/download?p=windows&pv=%M
 set "LOCAL_DESTINATION_MSI_PATH=<%= local_download_path %>"
 set "FALLBACK_QUERY_STRING=&DownloadContext=PowerShell"
 
-cscript /nologo <%= bootstrap_directory %>\wget.vbs /url:"%REMOTE_SOURCE_MSI_URL%" /path:"%LOCAL_DESTINATION_MSI_PATH%"
-
-rem Work around issues found in Windows Server 2012 around job objects not respecting WSMAN memory quotas
-rem that cause the MSI download process to exceed the quota even when it is increased by administrators.
-rem Retry the download using a more memory-efficient mechanism that only works if PowerShell is available.
-if ERRORLEVEL 1 (      
-    echo Warning: Failed to download "%REMOTE_SOURCE_MSI_URL%" to "%LOCAL_DESTINATION_MSI_PATH%"
-    echo Warning: Retrying download with PowerShell if available
-    if EXIST "%LOCAL_DESTINATION_MSI_PATH%" del /f /q "%LOCAL_DESTINATION_MSI_PATH%"
-    powershell -ExecutionPolicy Unrestricted -NoProfile -NonInteractive "& '<%= bootstrap_directory %>\wget.ps1' '%REMOTE_SOURCE_MSI_URL%%FALLBACK_QUERY_STRING%' '%LOCAL_DESTINATION_MSI_PATH%'"
-
-    if NOT ERRORLEVEL 1 (
-        echo Download succeeded
-    ) else (
-        echo Failed to download "%REMOTE_SOURCE_MSI_URL%"
-        echo Subsequent attempt to install the downloaded MSI is likely to fail
-    )
-)
+powershell -ExecutionPolicy Unrestricted -NoProfile -NonInteractive "& '<%= bootstrap_directory %>\wget.ps1' '%REMOTE_SOURCE_MSI_URL%%FALLBACK_QUERY_STRING%' '%LOCAL_DESTINATION_MSI_PATH%'"
 
 <%= install_chef %>
 

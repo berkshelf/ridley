@@ -44,7 +44,7 @@ module Ridley
     # @option options [String] :template
     #   bootstrap template to use
     def initialize(hosts, options = {})
-      @hosts         = Array(hosts).collect(&:to_s).uniq
+      @hosts         = Array(hosts).flatten.collect(&:to_s).uniq
       @options       = options.dup
       @options[:ssh] ||= Hash.new
       @options[:ssh] = {

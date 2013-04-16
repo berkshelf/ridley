@@ -21,16 +21,24 @@ module Ridley
       #   * :port (Fixnum) the ssh port to connect on the node the bootstrap will be performed on (22)
       # @option options [Hash] :winrm
       #   * :port (Fixnum) the winrm port to connect on the node the bootstrap will be performed on (5985)
+      # @param block [Proc]
+      #   an optional block that is yielded the best HostConnector
       #
       # @return [Ridley::HostConnector] a class under Ridley::HostConnector
-      def best_connector_for(host, options = {})
+      def best_connector_for(host, options = {}, &block)
         ssh_port, winrm_port = parse_port_options(options)
         if connector_port_open?(host, ssh_port)
-          Ridley::HostConnector::SSH
+          host_connector = Ridley::HostConnector::SSH
         elsif connector_port_open?(host, winrm_port)
-          Ridley::HostConnector::WinRM
+          host_connector = Ridley::HostConnector::WinRM
         else
           raise Ridley::Errors::HostConnectionError, "No available connection method available on #{host}."
+        end
+
+        if block_given?
+          yield host_connector
+        else
+          host_connector
         end
       end
 
@@ -44,7 +52,7 @@ module Ridley
       #
       # @return [Boolean]
       def connector_port_open?(host, port)
-        Timeout::timeout(1) do
+        Timeout::timeout(3) do
           socket = TCPSocket.new(host, port)
           socket.close
         end
