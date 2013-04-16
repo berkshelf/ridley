@@ -13,7 +13,7 @@ describe Ridley::HostConnector do
     described_class::DEFAULT_WINRM_PORT.should eq(5985)
   end
 
-  describe "#connector_port_open?", focus: true do
+  describe "#connector_port_open?" do
     let(:host) { "127.0.0.1" }
     let(:port) { 22 }
     let(:socket) { double(:new => true, :close => nil) }
@@ -77,6 +77,15 @@ describe Ridley::HostConnector do
         expect {
           subject.best_connector_for(host)
         }.to raise_error(Ridley::Errors::HostConnectionError)
+      end
+    end
+
+    context "when a block is provided" do
+      it "yields the best HostConnector to the block" do
+        subject.stub(:connector_port_open?).and_return(true)
+        subject.best_connector_for(host) do |yielded|
+          yielded.should eq(Ridley::HostConnector::SSH)
+        end
       end
     end
   end
