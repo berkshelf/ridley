@@ -46,6 +46,7 @@ module Ridley
           s.supervise_as :node_resource, Ridley::NodeResource, connection_registry
           s.supervise_as :role_resource, Ridley::RoleResource, connection_registry
           s.supervise_as :sandbox_resource, Ridley::SandboxResource, connection_registry
+          s.supervise_as :search_resource, Ridley::SearchResource, connection_registry
         end
       end
     end
@@ -217,20 +218,21 @@ module Ridley
       @resources_registry[:sandbox_resource]
     end
 
-    # Creates an runs a new Ridley::Search
+    # Perform a search the Chef Server
     #
-    # @see Ridley::Search#run
-    #
-    # @param [String, Symbol] index
-    # @param [String, nil] query
+    # @param [#to_sym, #to_s] index
+    # @param [#to_s] query_string
     #
     # @option options [String] :sort
+    #   a sort string such as 'name DESC'
     # @option options [Integer] :rows
+    #   how many rows to return
     # @option options [Integer] :start
+    #   the result number to start from
     #
     # @return [Hash]
     def search(index, query = nil, options = {})
-      Ridley::Search.new(Actor.current, index, query, options).run
+      @resources_registry[:search_resource].run(index, query, options)
     end
 
     # Return the array of all possible search indexes for the including connection
@@ -242,7 +244,7 @@ module Ridley
     #
     # @return [Array<Symbol, String>]
     def search_indexes
-      Ridley::Search.indexes(Actor.current)
+      @resources_registry[:search_resource].indexes
     end
 
     # The encrypted data bag secret for this connection.
