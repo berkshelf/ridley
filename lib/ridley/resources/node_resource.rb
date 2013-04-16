@@ -41,19 +41,19 @@ module Ridley
     #
     # @return [SSH::ResponseSet]
     def bootstrap(*args)
-      options = args.extract_options!
+      args = args.dup
+      opts = args.extract_options!
 
-      default_options = {
-        server_url: client.server_url,
-        validator_path: client.validator_path,
-        validator_client: client.validator_client,
-        encrypted_data_bag_secret_path: client.encrypted_data_bag_secret_path,
-        ssh: client.ssh,
-        winrm: client.winrm,
-        chef_version: client.chef_version
-      }
+      options = opts.reverse_merge(
+        server_url: connection.server_url,
+        validator_path: connection.validator_path,
+        validator_client: connection.validator_client,
+        encrypted_data_bag_secret_path: connection.encrypted_data_bag_secret_path,
+        ssh: connection.ssh,
+        winrm: connection.winrm,
+        chef_version: connection.chef_version
+      )
 
-      options = default_options.merge(options)
       Bootstrapper.new(args, options).run
     end
 
@@ -131,7 +131,7 @@ module Ridley
     #
     # @return [Ridley::NodeResource]
     def merge_data(target, options = {})
-      find!(target).merge_data(options)
+      find(target).merge_data(options)
     end
 
     private

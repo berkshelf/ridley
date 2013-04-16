@@ -1,12 +1,12 @@
 require 'spec_helper'
 
 describe Ridley::NodeResource do
-  it_behaves_like "a Ridley Resource", Ridley::NodeResource
-
   let(:connection) do
-    double('conn',
+    double('chef-connection',
       server_url: "https://api.opscode.com/organizations/vialstudios",
+      validator_path: nil,
       validator_client: "chef-validator",
+      encrypted_data_bag_secret_path: nil,
       ssh: {
         user: "reset",
         password: "lol"
@@ -15,446 +15,170 @@ describe Ridley::NodeResource do
         user: "Administrator",
         password: "secret"
       },
-      encrypted_data_bag_secret_path: nil
+      chef_version: nil
     )
   end
   let(:host) { "33.33.33.10" }
 
-  describe "ClassMethods" do
-    subject { Ridley::NodeResource }
+  let(:worker) { double('worker', alive?: true, terminate: nil) }
 
-    let(:worker) { double('worker', alive?: true, terminate: nil) }
+  let(:instance) { described_class.new(double) }
+  before { instance.stub(connection: connection) }
 
-    describe "::bootstrap" do
-      let(:boot_options) do
-        {
-          validator_path: fixtures_path.join("reset.pem").to_s,
-          encrypted_data_bag_secret_path: fixtures_path.join("reset.pem").to_s
-        }
-      end
-
-      it "bootstraps a single node" do
-        pending
-        subject.bootstrap(connection, "33.33.33.10", boot_options)
-      end
-
-      it "bootstraps multiple nodes" do
-        pending
-        subject.bootstrap(connection, "33.33.33.10", "33.33.33.11", boot_options)
-      end
+  describe "#bootstrap" do
+    let(:hosts) { [ "192.168.1.2" ] }
+    let(:options) do
+      {
+        validator_path: fixtures_path.join("reset.pem").to_s,
+        encrypted_data_bag_secret_path: fixtures_path.join("reset.pem").to_s
+      }
     end
+    let(:bootstrapper) { double('bootstrapper', run: nil) }
+    subject { instance }
+    before { Ridley::Bootstrapper.should_receive(:new).with(hosts, anything).and_return(bootstrapper) }
 
-    describe "::chef_run" do
-      subject { chef_run }
-      let(:chef_run) { described_class.chef_run(connection, host) }
-      let(:response) { [:ok, double('response', stdout: 'success_message')] }
+    it "runs the Bootstrapper" do
+      bootstrapper.should_receive(:run)
 
-      before do
-        Ridley::NodeResource.stub(:configured_worker_for).and_return(worker)
-        worker.stub(:chef_client).and_return(response)
-      end
-
-      it { should eq(response) }
-
-      context "when it executes unsuccessfully" do
-        let(:response) { [:error, double('response', stderr: 'failure_message')] }
-
-        it {should eq(response)}
-      end
-
-      it "terminates the worker" do
-        worker.should_receive(:terminate)
-        chef_run
-      end
-    end
-
-    describe "::put_secret" do
-      subject { put_secret }
-      let(:put_secret) { described_class.put_secret(connection, host, secret_path)}
-      let(:response) { [:ok, double('response', stdout: 'success_message')] }
-      let(:secret_path) { fixtures_path.join("reset.pem").to_s }
-
-      before do
-        Ridley::NodeResource.stub(:configured_worker_for).and_return(worker)
-        worker.stub(:put_secret).and_return(response)
-      end
-
-      it { should eq(response) }
-
-      context "when it executes unsuccessfully" do
-        let(:response) { [:error, double('response', stderr: 'failure_message')] }
-
-        it { should eq(response) }
-      end
-
-      it "terminates the worker" do
-        worker.should_receive(:terminate)
-        put_secret
-      end
-    end
-
-    describe "::ruby_script" do
-      subject { ruby_script }
-      let(:ruby_script) { described_class.ruby_script(connection, host, command_lines) }
-      let(:response) { [:ok, double('response', stdout: 'success_message')] }
-      let(:command_lines) { ["puts 'hello'", "puts 'there'"] }
-
-      before do
-        Ridley::NodeResource.stub(:configured_worker_for).and_return(worker)
-        worker.stub(:ruby_script).and_return(response)
-      end
-
-      it { should eq(response) }
-
-      context "when it executes unsuccessfully" do
-        let(:response) { [:error, double('response', stderr: 'failure_message')] }
-
-        it { should eq(response) }
-      end
-
-      it "terminates the worker" do
-        worker.should_receive(:terminate)
-        ruby_script
-      end
-    end
-
-    describe "::execute_command" do
-      subject { execute_command }
-
-      let(:execute_command) { described_class.execute_command(connection, host, command) }
-      let(:response) { [:ok, double('response', stdout: 'success_message')] }
-      let(:command) { "echo 'hello world'" }
-
-      before do
-        Ridley::NodeResource.stub(:configured_worker_for).and_return(worker)
-        worker.stub(:run).and_return(response)
-      end
-
-      it { should eq(response) }
-
-      context "when it executes unsuccessfully" do
-        let(:response) { [:error, double('response', stderr: 'failure_message')] }
-
-        it { should eq(response) }
-      end
-    end
-
-    describe "::configured_worker_for" do
-      subject { configured_worker_for }
-
-      let(:configured_worker_for) { described_class.send(:configured_worker_for, connection, host) }
-
-      context "when the best connector is SSH" do
-        before do
-          Ridley::HostConnector.stub(:best_connector_for).and_yield(Ridley::HostConnector::SSH)
-        end
-
-        it "returns an SSH worker instance" do
-          configured_worker_for.should be_a(Ridley::HostConnector::SSH::Worker)
-        end
-
-        its(:user) { should eq("reset") }
-      end
-
-      context "when the best connector is WinRM" do
-        before do
-          Ridley::HostConnector.stub(:best_connector_for).and_yield(Ridley::HostConnector::WinRM)
-          Ridley::HostConnector::WinRM::CommandUploader.stub(:new)
-        end
-
-        it "returns a WinRm worker instance" do
-          configured_worker_for.should be_a(Ridley::HostConnector::WinRM::Worker)
-        end
-
-        its(:user) { should eq("Administrator") }
-        its(:password) { should eq("secret") }
-      end
-    end
-
-    describe "::merge_data" do
-      it "finds the target node and sends it the merge_data message" do
-        data = double('data')
-        node = double('node')
-        node.should_receive(:merge_data).with(data)
-        subject.should_receive(:find!).and_return(node)
-
-        subject.merge_data(connection, node, data)
-      end
+      subject.bootstrap("192.168.1.2", options)
     end
   end
 
-  subject { node_resource }
-  let(:node_resource) { Ridley::NodeResource.new(connection) }
-
-  describe "#set_chef_attribute" do
-    it "sets an normal node attribute at the nested path" do
-       subject.set_chef_attribute('deep.nested.item', true)
-
-       subject.normal.should have_key("deep")
-       subject.normal["deep"].should have_key("nested")
-       subject.normal["deep"]["nested"].should have_key("item")
-       subject.normal["deep"]["nested"]["item"].should be_true
-    end
-
-    context "when the normal attribute is already set" do
-      it "test" do
-        subject.normal = {
-          deep: {
-            nested: {
-              item: false
-            }
-          }
-        }
-        subject.set_chef_attribute('deep.nested.item', true)
-        
-        subject.normal["deep"]["nested"]["item"].should be_true
-      end
-    end
-  end
-
-  describe "#cloud?" do
-    it "returns true if the cloud automatic attribute is set" do
-      subject.automatic = {
-        "cloud" => Hash.new
-      }
-
-      subject.cloud?.should be_true
-    end
-
-    it "returns false if the cloud automatic attribute is not set" do
-      subject.automatic.delete(:cloud)
-
-      subject.cloud?.should be_false
-    end
-  end
-
-  describe "#eucalyptus?" do
-    it "returns true if the node is a cloud node using the eucalyptus provider" do
-      subject.automatic = {
-        "cloud" => {
-          "provider" => "eucalyptus"
-        }
-      }
-
-      subject.eucalyptus?.should be_true
-    end
-
-    it "returns false if the node is not a cloud node" do
-      subject.automatic.delete(:cloud)
-
-      subject.eucalyptus?.should be_false
-    end
-
-    it "returns false if the node is a cloud node but not using the eucalyptus provider" do
-      subject.automatic = {
-        "cloud" => {
-          "provider" => "ec2"
-        }
-      }
-
-      subject.eucalyptus?.should be_false
-    end
-  end
-
-  describe "#ec2?" do
-    it "returns true if the node is a cloud node using the ec2 provider" do
-      subject.automatic = {
-        "cloud" => {
-          "provider" => "ec2"
-        }
-      }
-
-      subject.ec2?.should be_true
-    end
-
-    it "returns false if the node is not a cloud node" do
-      subject.automatic.delete(:cloud)
-
-      subject.ec2?.should be_false
-    end
-
-    it "returns false if the node is a cloud node but not using the ec2 provider" do
-      subject.automatic = {
-        "cloud" => {
-          "provider" => "rackspace"
-        }
-      }
-
-      subject.ec2?.should be_false
-    end
-  end
-
-  describe "#rackspace?" do
-    it "returns true if the node is a cloud node using the rackspace provider" do
-      subject.automatic = {
-        "cloud" => {
-          "provider" => "rackspace"
-        }
-      }
-
-      subject.rackspace?.should be_true
-    end
-
-    it "returns false if the node is not a cloud node" do
-      subject.automatic.delete(:cloud)
-
-      subject.rackspace?.should be_false
-    end
-
-    it "returns false if the node is a cloud node but not using the rackspace provider" do
-      subject.automatic = {
-        "cloud" => {
-          "provider" => "ec2"
-        }
-      }
-
-      subject.rackspace?.should be_false
-    end
-  end
-
-  describe "#cloud_provider" do
-    it "returns the cloud provider if the node is a cloud node" do
-      subject.automatic = {
-        "cloud" => {
-          "provider" => "ec2"
-        }
-      }
-
-      subject.cloud_provider.should eql("ec2")
-    end
-
-    it "returns nil if the node is not a cloud node" do
-      subject.automatic.delete(:cloud)
-
-      subject.cloud_provider.should be_nil
-    end
-  end
-
-  describe "#public_ipv4" do
-    it "returns the public ipv4 address if the node is a cloud node" do
-      subject.automatic = {
-        "cloud" => {
-          "provider" => "ec2",
-          "public_ipv4" => "10.0.0.1"
-        }
-      }
-
-      subject.public_ipv4.should eql("10.0.0.1")
-    end
-
-    it "returns the ipaddress if the node is not a cloud node" do
-      subject.automatic = {
-        "ipaddress" => "192.168.1.1"
-      }
-      subject.automatic.delete(:cloud)
-
-      subject.public_ipv4.should eql("192.168.1.1")
-    end
-  end
-
-  describe "#public_hostname" do
-    it "returns the public hostname if the node is a cloud node" do
-      subject.automatic = {
-        "cloud" => {
-          "public_hostname" => "reset.cloud.riotgames.com"
-        }
-      }
-
-      subject.public_hostname.should eql("reset.cloud.riotgames.com")
-    end
-
-    it "returns the FQDN if the node is not a cloud node" do
-      subject.automatic = {
-        "fqdn" => "reset.internal.riotgames.com"
-      }
-      subject.automatic.delete(:cloud)
-
-      subject.public_hostname.should eql("reset.internal.riotgames.com")
-    end
-  end
-
-  describe "#chef_solo" do
-    pending
-  end
-
-  describe "#chef_client" do
-    subject { chef_client }
-    let(:chef_client) { node_resource.chef_client }
-    let(:worker) { double('worker', chef_client: response) }
-    let(:response) { [:ok, Ridley::HostConnector::Response.new(host)] }
+  describe "#chef_run" do
+    let(:chef_run) { instance.chef_run(connection, host) }
+    let(:response) { [:ok, double('response', stdout: 'success_message')] }
+    subject { chef_run }
 
     before do
-      Ridley::HostConnector.stub(:best_connector_for).and_yield(Ridley::HostConnector::SSH)
-      Ridley::HostConnector::SSH.stub(:start).and_yield(worker)
+      instance.stub(:configured_worker_for).and_return(worker)
+      worker.stub(:chef_client).and_return(response)
     end
 
-    it "returns a HostConnector::Response" do
+    it { should eql(response) }
 
-      chef_client.should be_a(Ridley::HostConnector::Response)
+    context "when it executes unsuccessfully" do
+      let(:response) { [ :error, double('response', stderr: 'failure_message') ] }
+
+      it { should eql(response) }
+    end
+
+    it "terminates the worker" do
+      worker.should_receive(:terminate)
+      chef_run
     end
   end
 
   describe "#put_secret" do
+    let(:put_secret) { instance.put_secret(connection, host, secret_path)}
+    let(:response) { [ :ok, double('response', stdout: 'success_message') ] }
+    let(:secret_path) { fixtures_path.join("reset.pem").to_s }
     subject { put_secret }
-    let(:put_secret) { node_resource.put_secret }
-    let(:worker) { double('worker', put_secret: response) }
-    let(:response) { [:ok, Ridley::HostConnector::Response.new(host)] }
 
     before do
-      Ridley::HostConnector.stub(:best_connector_for).and_yield(Ridley::HostConnector::SSH)
-      Ridley::HostConnector::SSH.stub(:start).and_yield(worker)
+      instance.stub(:configured_worker_for).and_return(worker)
+      worker.stub(:put_secret).and_return(response)
     end
 
-    context "when the client does not have an encrypted file" do
-      it "returns nil" do
-        put_secret.should be_nil
+    it { should eql(response) }
+
+    context "when it executes unsuccessfully" do
+      let(:response) { [ :error, double('response', stderr: 'failure_message') ] }
+
+      it { should eql(response) }
+    end
+
+    it "terminates the worker" do
+      worker.should_receive(:terminate)
+      put_secret
+    end
+  end
+
+  describe "#ruby_script" do
+    let(:ruby_script) { instance.ruby_script(connection, host, command_lines) }
+    let(:response) { [:ok, double('response', stdout: 'success_message')] }
+    let(:command_lines) { ["puts 'hello'", "puts 'there'"] }
+    subject { ruby_script }
+
+    before do
+      instance.stub(:configured_worker_for).and_return(worker)
+      worker.stub(:ruby_script).and_return(response)
+    end
+
+    it { should eq(response) }
+
+    context "when it executes unsuccessfully" do
+      let(:response) { [:error, double('response', stderr: 'failure_message')] }
+
+      it { should eq(response) }
+    end
+
+    it "terminates the worker" do
+      worker.should_receive(:terminate)
+      ruby_script
+    end
+  end
+
+  describe "#execute_command" do
+    let(:execute_command) { instance.execute_command(connection, host, command) }
+    let(:response) { [:ok, double('response', stdout: 'success_message')] }
+    let(:command) { "echo 'hello world'" }
+    subject { execute_command }
+
+    before do
+      instance.stub(:configured_worker_for).and_return(worker)
+      worker.stub(:run).and_return(response)
+    end
+
+    it { should eq(response) }
+
+    context "when it executes unsuccessfully" do
+      let(:response) { [:error, double('response', stderr: 'failure_message')] }
+
+      it { should eq(response) }
+    end
+  end
+
+  describe "#configured_worker_for" do
+    let(:configured_worker_for) { instance.send(:configured_worker_for, connection, host) }
+    subject { configured_worker_for }
+
+    context "when the best connector is SSH" do
+      before do
+        Ridley::HostConnector.stub(:best_connector_for).and_yield(Ridley::HostConnector::SSH)
       end
+
+      it "returns an SSH worker instance" do
+        configured_worker_for.should be_a(Ridley::HostConnector::SSH::Worker)
+      end
+
+      its(:user) { should eq("reset") }
     end
 
-    it "returns a HostConnector::Response" do
-      pending
+    context "when the best connector is WinRM" do
+      before do
+        Ridley::HostConnector.stub(:best_connector_for).and_yield(Ridley::HostConnector::WinRM)
+        Ridley::HostConnector::WinRM::CommandUploader.stub(:new)
+      end
+
+      it "returns a WinRm worker instance" do
+        configured_worker_for.should be_a(Ridley::HostConnector::WinRM::Worker)
+      end
+
+      its(:user) { should eq("Administrator") }
+      its(:password) { should eq("secret") }
     end
   end
 
   describe "#merge_data" do
-    before(:each) do
-      subject.name = "reset.riotgames.com"
-      subject.should_receive(:update)
-    end
+    subject { instance }
 
-    it "appends items to the run_list" do
-      subject.merge_data(run_list: ["cook::one", "cook::two"])
+    it "finds the target node and sends it the merge_data message" do
+      data = double('data')
+      node = double('node')
+      node.should_receive(:merge_data).with(data)
+      subject.should_receive(:find).and_return(node)
 
-      subject.run_list.should =~ ["cook::one", "cook::two"]
-    end
-
-    it "ensures the run_list is unique if identical items are given" do
-      subject.run_list = [ "cook::one" ]
-      subject.merge_data(run_list: ["cook::one", "cook::two"])
-
-      subject.run_list.should =~ ["cook::one", "cook::two"]
-    end
-
-    it "deep merges attributes into the normal attributes" do
-      subject.normal = {
-        one: {
-          two: {
-            four: :deep
-          }
-        }
-      }
-      subject.merge_data(attributes: {
-        one: {
-          two: {
-            three: :deep
-          }
-        }
-      })
-
-      subject.normal[:one][:two].should have_key(:four)
-      subject.normal[:one][:two][:four].should eql(:deep)
-      subject.normal[:one][:two].should have_key(:three)
-      subject.normal[:one][:two][:three].should eql(:deep)
+      subject.merge_data(node, data)
     end
   end
 end
