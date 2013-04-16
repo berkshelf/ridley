@@ -24,21 +24,28 @@ module Ridley
       sumhash = { checksums: Hash.new }.tap do |chks|
         Array(checksums).each { |chk| chks[:checksums][chk] = nil }
       end
-      super(sumhash)
+      new(connection.post(self.class.resource_path, MultiJson.encode(sumhash)).body)
     end
 
     # @param [#chef_id] object
     #
     # @raise [Ridley::Errors::SandboxCommitError]
+    # @raise [Ridley::Errors::ResourceNotFound]
+    # @raise [Ridley::Errors::PermissionDenied]
     #
     # @return [Hash]
     def commit(object)
-      connection.put("#{self.class.resource_path}/#{object.chef_id}", MultiJson.encode(is_completed: true)).body
+      chef_id = object.respond_to?(:chef_id) ? object.chef_id : object
+      connection.put("#{self.class.resource_path}/#{chef_id}", MultiJson.encode(is_completed: true)).body
     rescue Ridley::Errors::HTTPBadRequest => ex
-      abort(Ridley::Errors::SandboxCommitError.new(ex.message))
+      abort Ridley::Errors::SandboxCommitError.new(ex.message)
+    rescue Ridley::Errors::HTTPNotFound => ex
+      abort Ridley::Errors::ResourceNotFound.new(ex.message)
+    rescue Ridley::Errors::HTTPUnauthorized, Ridley::Errors::HTTPForbidden => ex
+      abort Ridley::Errors::PermissionDenied.new(ex.message)
     end
 
-    def update(object)
+    def update(*args)
       raise RuntimeError, "action not supported"
     end
 
@@ -54,7 +61,7 @@ module Ridley
       raise RuntimeError, "action not supported"
     end
 
-    def delete_all
+    def delete_all(*args)
       raise RuntimeError, "action not supported"
     end
   end

@@ -55,6 +55,7 @@ module Ridley
 
     class FrozenCookbook < RidleyError; end
     class SandboxCommitError < RidleyError; end
+    class PermissionDenied < RidleyError; end
 
     class HTTPError < RidleyError
       class << self
@@ -75,7 +76,7 @@ module Ridley
 
         def error_map
           @@error_map ||= Hash.new
-        end        
+        end
       end
 
       attr_reader :env
