@@ -11,39 +11,18 @@ shared_examples_for "a Ridley Resource" do |resource_klass|
       it "sends a get request for the class' resource_path using the given client" do
         response.stub(:body) { Hash.new }
         client.connection.should_receive(:get).with(subject.resource_path).and_return(response)
-        
+
         subject.all(client)
       end
     end
 
     describe "::find" do
-      it "delegates to find!" do
-        id = double('id')
-        subject.should_receive(:find!).with(client, id)
-
-        subject.find(client, id)
-      end
-
-      context "when the resource is not found" do
-        it "returns nil" do
-          pending
-        end
-      end
-    end
-
-    describe "::find!" do
       it "sends a get request to the given client to the resource_path of the class for the given chef_id" do
         chef_id = "ridley_test"
         response.stub(:body) { Hash.new }
         client.connection.should_receive(:get).with("#{subject.resource_path}/#{chef_id}").and_return(response)
 
         subject.find(client, chef_id)
-      end
-
-      context "when the resource is not found" do
-        it "raises a Ridley::Errors::HTTPNotFound error" do
-          pending
-        end
       end
     end
 
@@ -137,7 +116,7 @@ shared_examples_for "a Ridley Resource" do |resource_klass|
   end
 
   describe "#update" do
-    context "when the object is valid" do   
+    context "when the object is valid" do
       let(:updated) do
         updated = double('updated')
         updated.stub(:[]).and_return(Hash.new)
