@@ -70,7 +70,7 @@ module Ridley
     # @return [Array<Hash>]
     def upload(object, checksums)
       checksums.collect do |chk_id, path|
-        uploader.future(:upload, chk_id, path)
+        uploader.future(:upload, object, chk_id, path)
       end.map(&:value)
     end
 

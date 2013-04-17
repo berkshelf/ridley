@@ -4,6 +4,11 @@ module Ridley
     set_resource_path "cookbooks"
     represented_by Ridley::CookbookObject
 
+    def initialize(connection_registry, client_name, client_key, options = {})
+      super(connection_registry)
+      @sandbox_resource = SandboxResource.new_link(connection_registry, client_name, client_key, options)
+    end
+
     # List all of the cookbooks and their versions present on the remote
     #
     # @example return value
@@ -147,7 +152,7 @@ module Ridley
 
       connection.put(url, cookbook.to_json)
     rescue Ridley::Errors::HTTPConflict => ex
-      raise Ridley::Errors::FrozenCookbook, ex
+      abort Ridley::Errors::FrozenCookbook.new(ex)
     end
     alias_method :create, :update
 
@@ -178,7 +183,7 @@ module Ridley
         if existing.frozen? && options[:force] == false
           msg = "The cookbook #{cookbook.cookbook_name} (#{cookbook.version}) already exists and is"
           msg << " frozen on the Chef server. Use the 'force' option to override."
-          raise Ridley::Errors::FrozenCookbook, msg
+          abort Ridley::Errors::FrozenCookbook.new(msg)
         end
       end
 
@@ -187,7 +192,7 @@ module Ridley
       end
 
       checksums = cookbook.checksums.dup
-      sandbox   = sandbox.create(checksums.keys)
+      sandbox   = sandbox_resource.create(checksums.keys)
 
       sandbox.upload(checksums)
       sandbox.commit
@@ -209,5 +214,9 @@ module Ridley
         cb_ver["version"]
       end
     end
+
+    private
+
+      attr_reader :sandbox_resource
   end
 end
