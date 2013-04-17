@@ -54,14 +54,6 @@ module Ridley
     end
 
     class << self
-      # @return [Proc]
-      def finalizer
-        proc {
-          @connection_supervisor.terminate if @connection_supervisor && @connection_supervisor.alive?
-          @resources_supervisor.terminate if @resources_supervisor && @resources_supervisor.alive?
-        }
-      end
-
       def open(options = {}, &block)
         cli = new(options)
         cli.evaluate(&block)
@@ -93,7 +85,13 @@ module Ridley
     ].freeze
 
     extend Forwardable
+    include Celluloid
     include Ridley::Logging
+
+    finalizer do
+      @connection_supervisor.terminate if @connection_supervisor && @connection_supervisor.alive?
+      @resources_supervisor.terminate if @resources_supervisor && @resources_supervisor.alive?
+    end
 
     def_delegator :connection, :build_url
     def_delegator :connection, :scheme
@@ -181,9 +179,6 @@ module Ridley
       @resources_registry    = Celluloid::Registry.new
       @connection_supervisor = ConnectionSupervisor.new(@connection_registry, @options)
       @resources_supervisor  = ResourcesSupervisor.new(@resources_registry, @connection_registry, @options)
-      # Why do we use a class function for defining our finalizer?
-      # http://www.mikeperham.com/2010/02/24/the-trouble-with-ruby-finalizers/
-      ObjectSpace.define_finalizer(self, self.class.finalizer)
     end
 
     def client
