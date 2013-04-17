@@ -42,7 +42,8 @@ module Ridley
         supervise_as :client_resource, Ridley::ClientResource, connection_registry
         supervise_as :cookbook_resource, Ridley::CookbookResource, connection_registry,
           options[:client_name], options[:client_key], options.slice(*Ridley::Connection::VALID_OPTIONS)
-        supervise_as :data_bag_resource, Ridley::DataBagResource, connection_registry
+        supervise_as :data_bag_resource, Ridley::DataBagResource, connection_registry,
+          options[:encrypted_data_bag_secret]
         supervise_as :environment_resource, Ridley::EnvironmentResource, connection_registry
         supervise_as :node_resource, Ridley::NodeResource, connection_registry
         supervise_as :role_resource, Ridley::RoleResource, connection_registry
@@ -169,6 +170,8 @@ module Ridley
       if @options[:encrypted_data_bag_secret_path]
         @encrypted_data_bag_secret_path = File.expand_path(@options[:encrypted_data_bag_secret_path])
       end
+
+      @options[:encrypted_data_bag_secret] = encrypted_data_bag_secret
 
       unless @options[:client_key].present? && File.exist?(@options[:client_key])
         raise Errors::ClientKeyFileNotFound, "client key not found at: '#{@options[:client_key]}'"

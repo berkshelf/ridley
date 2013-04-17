@@ -14,7 +14,7 @@ module Ridley
     alias_method :attributes=, :mass_assign
     alias_method :attributes, :_attributes_
 
-    # @param [Ridley::Resource] resource
+    # @param [Ridley::DataBagItemResource] resource
     # @param [Ridley::DataBagObject] data_bag
     # @param [#to_hash] new_attrs
     def initialize(resource, data_bag, new_attrs = {})
@@ -94,7 +94,7 @@ module Ridley
     private
 
       def encrypted_data_bag_secret
-        resource.connection.encrypted_data_bag_secret
+        resource.encrypted_data_bag_secret
       end
   end
 end

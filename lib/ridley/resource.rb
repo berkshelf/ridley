@@ -28,6 +28,7 @@ module Ridley
     include Chozo::VariaModel
     include Comparable
 
+    # @param [Celluloid::Registry] connection_registry
     def initialize(connection_registry)
       @connection_registry = connection_registry
     end
