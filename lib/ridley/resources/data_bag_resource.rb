@@ -1,5 +1,4 @@
 require 'ridley/resources/data_bag_item_resource'
-require 'ridley/resources/encrypted_data_bag_item_resource'
 
 module Ridley
   # @author Jamie Winsor <reset@riotgames.com>
