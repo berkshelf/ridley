@@ -1,12 +1,14 @@
 require 'spec_helper'
 
 describe Ridley::NodeResource do
-  let(:connection) do
-    double('chef-connection',
+  let(:host) { "33.33.33.10" }
+  let(:worker) { double('worker', alive?: true, terminate: nil) }
+  let(:options) do
+    {
       server_url: "https://api.opscode.com/organizations/vialstudios",
-      validator_path: nil,
+      validator_path: "/some/path",
       validator_client: "chef-validator",
-      encrypted_data_bag_secret_path: nil,
+      encrypted_data_bag_secret: "hellokitty",
       ssh: {
         user: "reset",
         password: "lol"
@@ -15,15 +17,10 @@ describe Ridley::NodeResource do
         user: "Administrator",
         password: "secret"
       },
-      chef_version: nil
-    )
+      chef_version: "11.4.0"
+    }
   end
-  let(:host) { "33.33.33.10" }
-
-  let(:worker) { double('worker', alive?: true, terminate: nil) }
-
-  let(:instance) { described_class.new(double) }
-  before { instance.stub(connection: connection) }
+  let(:instance) { described_class.new(double, options) }
 
   describe "#bootstrap" do
     let(:hosts) { [ "192.168.1.2" ] }

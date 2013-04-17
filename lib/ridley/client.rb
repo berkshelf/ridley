@@ -45,7 +45,7 @@ module Ridley
         supervise_as :data_bag_resource, Ridley::DataBagResource, connection_registry,
           options[:encrypted_data_bag_secret]
         supervise_as :environment_resource, Ridley::EnvironmentResource, connection_registry
-        supervise_as :node_resource, Ridley::NodeResource, connection_registry
+        supervise_as :node_resource, Ridley::NodeResource, connection_registry, options
         supervise_as :role_resource, Ridley::RoleResource, connection_registry
         supervise_as :sandbox_resource, Ridley::SandboxResource, connection_registry,
           options[:client_name], options[:client_key], options.slice(*Ridley::Connection::VALID_OPTIONS)

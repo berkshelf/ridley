@@ -6,9 +6,49 @@ module Ridley
     set_resource_path "nodes"
     represented_by Ridley::NodeObject
 
+    attr_reader :server_url
+    attr_reader :validator_path
+    attr_reader :validator_client
+    attr_reader :encrypted_data_bag_secret
+    attr_reader :ssh
+    attr_reader :winrm
+    attr_reader :chef_version
+
+    # @param [Celluloid::Registry] connection_registry
+    #
+    # @option options [String] :server_url
+    #   URL to the Chef API
+    # @option options [Hash] ssh
+    #   * :user (String) a shell user that will login to each node and perform the bootstrap command on
+    #   * :password (String) the password for the shell user that will perform the bootstrap
+    #   * :keys (Array, String) an array of keys (or a single key) to authenticate the ssh user with instead of a password
+    #   * :timeout (Float) [5.0] timeout value for SSH bootstrap
+    # @option options [Hash] :winrm
+    #   * :user (String) a user that will login to each node and perform the bootstrap command on
+    #   * :password (String) the password for the user that will perform the bootstrap
+    #   * :port (Fixnum) the winrm port to connect on the node the bootstrap will be performed on
+    # @option options [String] :validator_client
+    # @option options [String] :validator_path
+    #   filepath to the validator used to bootstrap the node
+    # @option options [String] :encrypted_data_bag_secret
+    #   your organizations encrypted data bag secret
+    # @option options [String] :chef_version
+    #   version of Chef to install on the node (default: nil)
+    def initialize(connection_registry, options = {})
+      super(connection_registry)
+      @server_url                = options[:server_url]
+      @validator_path            = options[:validator_path]
+      @validator_client          = options[:validator_client]
+      @encrypted_data_bag_secret = options[:encrypted_data_bag_secret]
+      @ssh                       = options[:ssh]
+      @winrm                     = options[:winrm]
+      @chef_version              = options[:chef_version]
+    end
+
     # @overload bootstrap(nodes, options = {})
     #   @param [Array<String>, String] nodes
-    #   @param [Hash] ssh
+    #
+    #   @option options [Hash] ssh
     #     * :user (String) a shell user that will login to each node and perform the bootstrap command on (required)
     #     * :password (String) the password for the shell user that will perform the bootstrap
     #     * :keys (Array, String) an array of keys (or a single key) to authenticate the ssh user with instead of a password
@@ -45,13 +85,13 @@ module Ridley
       opts = args.extract_options!
 
       options = opts.reverse_merge(
-        server_url: connection.server_url,
-        validator_path: connection.validator_path,
-        validator_client: connection.validator_client,
-        encrypted_data_bag_secret_path: connection.encrypted_data_bag_secret_path,
-        ssh: connection.ssh,
-        winrm: connection.winrm,
-        chef_version: connection.chef_version
+        server_url: server_url,
+        validator_path: validator_path,
+        validator_client: validator_client,
+        encrypted_data_bag_secret: encrypted_data_bag_secret,
+        ssh: ssh,
+        winrm: winrm,
+        chef_version: chef_version
       )
 
       Bootstrapper.new(args, options).run
@@ -141,9 +181,7 @@ module Ridley
       #
       # @return [SSH::Worker, WinRM::Worker]
       def configured_worker_for(client, host)
-        connector_options = Hash.new
-        connector_options[:ssh] = client.ssh
-        connector_options[:winrm] = client.winrm
+        connector_options = { ssh: ssh, winrm: winrm }
 
         HostConnector.best_connector_for(host, connector_options) do |host_connector|
           host_connector::Worker.new(host, connector_options)

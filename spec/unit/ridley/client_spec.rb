@@ -123,11 +123,25 @@ describe Ridley::Client do
     end
   end
 
-  subject do
-    described_class.new(config)
+  let(:instance) { described_class.new(config) }
+
+  describe "#node" do
+    subject { instance.node }
+
+    it { should be_a(Ridley::NodeResource) }
+
+    its(:server_url) { should eql(config[:server_url]) }
+    its(:validator_path) { should eql(config[:validator_path]) }
+    its(:validator_client) { should eql(config[:validator_client]) }
+    its(:encrypted_data_bag_secret) { should eql(instance.encrypted_data_bag_secret) }
+    its(:ssh) { should eql(config[:ssh]) }
+    its(:winrm) { should eql(config[:winrm]) }
+    its(:chef_version) { should eql(config[:chef_version]) }
   end
 
   describe "#encrypted_data_bag_secret" do
+    subject { instance }
+
     it "returns a string" do
       subject.encrypted_data_bag_secret.should be_a(String)
     end
