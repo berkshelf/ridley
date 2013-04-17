@@ -42,12 +42,12 @@ describe Ridley::NodeResource do
   end
 
   describe "#chef_run" do
-    let(:chef_run) { instance.chef_run(connection, host) }
+    let(:chef_run) { instance.chef_run(host) }
     let(:response) { [:ok, double('response', stdout: 'success_message')] }
     subject { chef_run }
 
     before do
-      instance.stub(:configured_worker_for).and_return(worker)
+      instance.stub(:new_worker_for).and_return(worker)
       worker.stub(:chef_client).and_return(response)
     end
 
@@ -66,13 +66,13 @@ describe Ridley::NodeResource do
   end
 
   describe "#put_secret" do
-    let(:put_secret) { instance.put_secret(connection, host, secret_path)}
+    let(:put_secret) { instance.put_secret(host, secret_path)}
     let(:response) { [ :ok, double('response', stdout: 'success_message') ] }
     let(:secret_path) { fixtures_path.join("reset.pem").to_s }
     subject { put_secret }
 
     before do
-      instance.stub(:configured_worker_for).and_return(worker)
+      instance.stub(:new_worker_for).and_return(worker)
       worker.stub(:put_secret).and_return(response)
     end
 
@@ -91,13 +91,13 @@ describe Ridley::NodeResource do
   end
 
   describe "#ruby_script" do
-    let(:ruby_script) { instance.ruby_script(connection, host, command_lines) }
+    let(:ruby_script) { instance.ruby_script(host, command_lines) }
     let(:response) { [:ok, double('response', stdout: 'success_message')] }
     let(:command_lines) { ["puts 'hello'", "puts 'there'"] }
     subject { ruby_script }
 
     before do
-      instance.stub(:configured_worker_for).and_return(worker)
+      instance.stub(:new_worker_for).and_return(worker)
       worker.stub(:ruby_script).and_return(response)
     end
 
@@ -116,13 +116,13 @@ describe Ridley::NodeResource do
   end
 
   describe "#execute_command" do
-    let(:execute_command) { instance.execute_command(connection, host, command) }
+    let(:execute_command) { instance.execute_command(host, command) }
     let(:response) { [:ok, double('response', stdout: 'success_message')] }
     let(:command) { "echo 'hello world'" }
     subject { execute_command }
 
     before do
-      instance.stub(:configured_worker_for).and_return(worker)
+      instance.stub(:new_worker_for).and_return(worker)
       worker.stub(:run).and_return(response)
     end
 
@@ -135,9 +135,9 @@ describe Ridley::NodeResource do
     end
   end
 
-  describe "#configured_worker_for" do
-    let(:configured_worker_for) { instance.send(:configured_worker_for, connection, host) }
-    subject { configured_worker_for }
+  describe "#new_worker_for" do
+    let(:new_worker_for) { instance.send(:new_worker_for, host) }
+    subject { new_worker_for }
 
     context "when the best connector is SSH" do
       before do
@@ -145,7 +145,7 @@ describe Ridley::NodeResource do
       end
 
       it "returns an SSH worker instance" do
-        configured_worker_for.should be_a(Ridley::HostConnector::SSH::Worker)
+        new_worker_for.should be_a(Ridley::HostConnector::SSH::Worker)
       end
 
       its(:user) { should eq("reset") }
@@ -158,7 +158,7 @@ describe Ridley::NodeResource do
       end
 
       it "returns a WinRm worker instance" do
-        configured_worker_for.should be_a(Ridley::HostConnector::WinRM::Worker)
+        new_worker_for.should be_a(Ridley::HostConnector::WinRM::Worker)
       end
 
       its(:user) { should eq("Administrator") }

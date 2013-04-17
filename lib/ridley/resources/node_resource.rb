@@ -100,12 +100,11 @@ module Ridley
     # Executes a Chef run using the best worker available for the given
     # host.
     #
-    # @param [Ridley::Client] client
     # @param [String] host
     #
     # @return [HostConnector::Response]
-    def chef_run(client, host)
-      worker = configured_worker_for(client, host)
+    def chef_run(host)
+      worker = new_worker_for(host)
       worker.chef_client
     ensure
       worker.terminate if worker && worker.alive?
@@ -114,13 +113,12 @@ module Ridley
     # Puts a secret on the host using the best worker available for
     # the given host.
     #
-    # @param [Ridley::Client] client
     # @param [String] host
     # @param [String] encrypted_data_bag_secret_path
     #
     # @return [HostConnector::Response]
-    def put_secret(client, host, encrypted_data_bag_secret_path)
-      worker = configured_worker_for(client, host)
+    def put_secret(host, encrypted_data_bag_secret_path)
+      worker = new_worker_for(host)
       worker.put_secret(encrypted_data_bag_secret_path)
     ensure
       worker.terminate if worker && worker.alive?
@@ -129,13 +127,12 @@ module Ridley
     # Executes an arbitrary ruby script using the best worker available
     # for the given host.
     #
-    # @param [Ridley::Client] client
     # @param [String] host
     # @param [Array<String>] command_lines
     #
     # @return [HostConnector::Response]
-    def ruby_script(client, host, command_lines)
-      worker = configured_worker_for(client, host)
+    def ruby_script(host, command_lines)
+      worker = new_worker_for(host)
       worker.ruby_script(command_lines)
     ensure
       worker.terminate if worker && worker.alive?
@@ -144,13 +141,12 @@ module Ridley
     # Executes the given command on a node using the best worker
     # available for the given host.
     #
-    # @param [Ridley::Client] client
     # @param [String] host
     # @param [String] command
     #
     # @return [Array<Symbol, HostConnector::Response>]
-    def execute_command(client, host, command)
-      worker = configured_worker_for(client, host)
+    def execute_command(host, command)
+      worker = new_worker_for(host)
       worker.run(command)
     ensure
       worker.terminate if worker && worker.alive?
@@ -180,11 +176,10 @@ module Ridley
       # @param [String] host
       #
       # @return [SSH::Worker, WinRM::Worker]
-      def configured_worker_for(client, host)
-        connector_options = { ssh: ssh, winrm: winrm }
-
-        HostConnector.best_connector_for(host, connector_options) do |host_connector|
-          host_connector::Worker.new(host, connector_options)
+      def new_worker_for(host)
+        options = { ssh: ssh, winrm: winrm }
+        HostConnector.best_connector_for(host, options) do |host_connector|
+          host_connector::Worker.new(host, options)
         end
       end
   end
