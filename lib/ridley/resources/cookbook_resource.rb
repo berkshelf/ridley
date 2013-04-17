@@ -6,7 +6,7 @@ module Ridley
 
     def initialize(connection_registry, client_name, client_key, options = {})
       super(connection_registry)
-      @sandbox_resource = SandboxResource.new_link(connection_registry, client_name, client_key, options)
+      # @sandbox_resource = SandboxResource.new_link(connection_registry, client_name, client_key, options)
     end
 
     # List all of the cookbooks and their versions present on the remote

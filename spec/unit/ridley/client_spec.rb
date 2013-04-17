@@ -24,114 +24,100 @@ describe Ridley::Client do
   end
 
   describe "ClassMethods" do
-    subject { described_class }
+    let(:options) do
+      {
+        server_url: "https://api.opscode.com/some_path",
+        client_name: client_name,
+        client_key: client_key
+      }
+    end
 
     describe "::initialize" do
-      let(:server_url) { "https://api.opscode.com/some_path" }
+      subject { described_class.new(options) }
 
       describe "parsing the 'server_url' option" do
-        before(:each) do
-          @conn = subject.new(
-            server_url: server_url,
-            client_name: client_name,
-            client_key: client_key,
-          )
-        end
-
-        it "assigns a 'host' attribute from the given 'server_url' option" do
-          @conn.host.should eql("api.opscode.com")
-        end
-
-        it "assigns a 'scheme' attribute from the given 'server_url' option" do
-          @conn.scheme.should eql("https")
-        end
-
-        it "sets a 'path_prefix' to the root of the given 'server_url' option" do
-          @conn.path_prefix.should eql("/")
-        end
+        its(:host) { should eql("api.opscode.com") }
+        its(:scheme) { should eql("https") }
+        its(:path_prefix) { should eql("/") }
       end
 
       describe "with a server_url containing an organization" do
-        before(:each) do
-          @conn = subject.new(
-            server_url: "#{server_url}/organizations/#{organization}",
-            client_name: client_name,
-            client_key: client_key
-          )
+        before do
+         options[:server_url] = "#{server_url}/organizations/#{organization}"
         end
 
         it "gets the host data from the server_url" do
-          @conn.host.should eql("api.opscode.com")
-          @conn.scheme.should eql("https")
+          subject.host.should eql("api.opscode.com")
+          subject.scheme.should eql("https")
         end
 
         it "takes the organization out of the server_url and assigns it to the organization reader" do
-          @conn.organization.should eql(organization)
+          subject.organization.should eql(organization)
         end
 
         it "sets the 'path_prefix' of the connection the organization sub URI" do
-          @conn.path_prefix.should eql("/organizations/#{organization}")
+          subject.path_prefix.should eql("/organizations/#{organization}")
         end
       end
 
       it "raises 'ArgumentError' if a value for server_url is not given" do
-        lambda {
-          subject.new(
+        expect {
+          described_class.new(
             client_name: client_name,
             client_key: client_key
           )
-        }.should raise_error(ArgumentError, "Missing required option(s): 'server_url'")
+        }.to raise_error(ArgumentError, "Missing required option(s): 'server_url'")
       end
 
       it "raises if a value for client_name is not given" do
-        lambda {
-          subject.new(
+        expect {
+          described_class.new(
             server_url: server_url,
             client_key: client_key
           )
-        }.should raise_error(ArgumentError, "Missing required option(s): 'client_name'")
+        }.to raise_error(ArgumentError, "Missing required option(s): 'client_name'")
       end
 
       it "raises if a value for client_key is not given" do
-        lambda {
-          subject.new(
+        expect {
+          described_class.new(
             server_url: server_url,
             client_name: client_name
           )
-        }.should raise_error(ArgumentError, "Missing required option(s): 'client_key'")
+        }.to raise_error(ArgumentError, "Missing required option(s): 'client_key'")
       end
 
       it "raises a ClientKeyFileNotFound if the filepath for client_key is not found" do
         config[:client_key] = "/tmp/nofile.xxsa"
 
-        lambda {
-          subject.new(config)
-        }.should raise_error(Ridley::Errors::ClientKeyFileNotFound)
+        expect {
+          described_class.new(config)
+        }.to raise_error(Ridley::Errors::ClientKeyFileNotFound)
       end
 
       it "expands the path of the client_key" do
         config[:client_key] = "~/"
 
-        subject.new(config).client_key.should_not == "~/"
+        described_class.new(config).client_key.should_not == "~/"
       end
 
       it "assigns a 'ssh' attribute from the given 'ssh' option" do
-        subject.new(config).ssh.should eql({user: "reset", password: "password1", port: "222"})
+        described_class.new(config).ssh.should eql({user: "reset", password: "password1", port: "222"})
       end
 
       it "assigns a 'winrm' attribute from the given 'winrm' option" do
-        subject.new(config).winrm.should eql({user: "reset", password: "password2", port: "5986"})
+        described_class.new(config).winrm.should eql({user: "reset", password: "password2", port: "5986"})
       end
 
       it "assigns a 'chef_version' attribute from the given 'chef_version' option" do
-        subject.new(config).chef_version.should eql("10.24.0-01")
+        described_class.new(config).chef_version.should eql("10.24.0-01")
       end
     end
 
     describe "::open" do
       it "raises a LocalJumpError if no block is given" do
         lambda {
-          subject.open(config)
+          described_class.open(config)
         }.should raise_error(LocalJumpError)
       end
     end
