@@ -26,7 +26,7 @@ module Ridley
     class ConnectionSupervisor < ::Celluloid::SupervisionGroup
       def initialize(registry, options)
         super(registry)
-        pool(Ridley::Connection, size: 4, args: [
+        pool(Ridley::Connection, size: options[:pool_size], args: [
           options[:server_url],
           options[:client_name],
           options[:client_key],
@@ -146,13 +146,16 @@ module Ridley
     #   * :verify (Boolean) [true] set to false to disable SSL verification
     # @option options [URI, String, Hash] :proxy
     #   URI, String, or Hash of HTTP proxy options
+    # @option options [Integer] :pool_size (4)
+    #   size of the connection pool
     #
     # @raise [Errors::ClientKeyFileNotFound] if the option for :client_key does not contain
     #   a file path pointing to a readable client key
     def initialize(options = {})
       @options = options.reverse_merge(
         ssh: Hash.new,
-        winrm: Hash.new
+        winrm: Hash.new,
+        pool_size: 4
       ).deep_symbolize_keys
       self.class.validate_options(@options)
 
