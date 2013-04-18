@@ -1,20 +1,17 @@
-# 
-# Ridley::WindowsTemplateBinding
-#   Represents a binding that will be evaluated as an ERB template. When bootstrapping
-#   nodes, an instance of this class represents the customizable and necessary configurations
-#   need by the Host in order to install and connect to Chef. By default, this class will be used
-#   when WinRM is the best way to connect to the node.
-# 
+# Represents a binding that will be evaluated as an ERB template. When bootstrapping
+# nodes, an instance of this class represents the customizable and necessary configurations
+# need by the Host in order to install and connect to Chef. By default, this class will be used
+# when WinRM is the best way to connect to the node.
+#
 # @author Kyle Allan <kallan@riotgames.com>
-# 
+#
 # Windows Specific code written by Seth Chisamore (<schisamo@opscode.com>) in knife-windows
 # https://github.com/opscode/knife-windows/blob/3b8886ddcfb928ca0958cd05b22f8c3d78bee86e/lib/chef/knife/bootstrap/windows-chef-client-msi.erb
 # https://github.com/opscode/knife-windows/blob/78d38bbed358ac20107fc2b5b427f4b5e52e5cb2/lib/chef/knife/core/windows_bootstrap_context.rb
 module Ridley
   class WindowsTemplateBinding
-
     include Ridley::BootstrapBinding
-    
+
     attr_reader :template_file
 
     # @option options [String] :validator_client
@@ -22,8 +19,8 @@ module Ridley
     #   filepath to the validator used to bootstrap the node (required)
     # @option options [String] :bootstrap_proxy (nil)
     #   URL to a proxy server to bootstrap through
-    # @option options [String] :encrypted_data_bag_secret_path (nil)
-    #   filepath on your host machine to your organizations encrypted data bag secret
+    # @option options [String] :encrypted_data_bag_secret
+    #   your organizations encrypted data bag secret
     # @option options [Hash] :hints (Hash.new)
     #   a hash of Ohai hints to place on the bootstrapped node
     # @option options [Hash] :attributes (Hash.new)
@@ -43,24 +40,24 @@ module Ridley
       options[:template] ||= default_template
       self.class.validate_options(options)
 
-      @template_file                  = options[:template]
-      @bootstrap_proxy                = options[:bootstrap_proxy]
-      @chef_version                   = options[:chef_version] ? options[:chef_version] : "latest"
-      @validator_path                 = options[:validator_path]
-      @encrypted_data_bag_secret_path = options[:encrypted_data_bag_secret_path]
-      @server_url                     = options[:server_url]
-      @validator_client               = options[:validator_client]
-      @node_name                      = options[:node_name]
-      @attributes                     = options[:attributes]
-      @run_list                       = options[:run_list]
-      @environment                    = options[:environment]
+      @template_file             = options[:template]
+      @bootstrap_proxy           = options[:bootstrap_proxy]
+      @chef_version              = options[:chef_version] ? options[:chef_version] : "latest"
+      @validator_path            = options[:validator_path]
+      @encrypted_data_bag_secret = options[:encrypted_data_bag_secret]
+      @server_url                = options[:server_url]
+      @validator_client          = options[:validator_client]
+      @node_name                 = options[:node_name]
+      @attributes                = options[:attributes]
+      @run_list                  = options[:run_list]
+      @environment               = options[:environment]
     end
 
     # @return [String]
     def boot_command
       template.evaluate(self)
     end
-    
+
     # @return [String]
     def chef_config
       body = <<-CONFIG
@@ -112,16 +109,14 @@ CONFIG
 
     # @return [String]
     def encrypted_data_bag_secret
-      return unless encrypted_data_bag_secret_path
+      return unless @encrypted_data_bag_secret
 
-      escape_and_echo(IO.read(encrypted_data_bag_secret_path).chomp)
-    rescue Errno::ENOENT
-      raise Errors::EncryptedDataBagSecretNotFound, "Error bootstrapping: Encrypted data bag secret provided but not found at '#{encrypted_data_bag_secret_path}'"      
+      escape_and_echo(@encrypted_data_bag_secret)
     end
 
     # Implements a Powershell script that attempts a simple
     # 'wget' to download the Chef msi
-    # 
+    #
     # @return [String]
     def windows_wget_powershell
       win_wget_ps = <<-WGET_PS
@@ -130,7 +125,7 @@ param(
  [String] $localPath
 )
 
-$webClient = new-object System.Net.WebClient; 
+$webClient = new-object System.Net.WebClient;
 
 $webClient.DownloadFile($remoteUrl, $localPath);
 WGET_PS

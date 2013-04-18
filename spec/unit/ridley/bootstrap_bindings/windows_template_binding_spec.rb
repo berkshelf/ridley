@@ -6,14 +6,14 @@ describe Ridley::WindowsTemplateBinding do
       server_url: "https://api.opscode.com/organizations/vialstudios",
       validator_client: "chef-validator",
       validator_path: fixtures_path.join("reset.pem").to_s,
-      encrypted_data_bag_secret_path: fixtures_path.join("reset.pem").to_s,
+      encrypted_data_bag_secret: File.read(fixtures_path.join("reset.pem")),
       chef_version: "11.4.0"
     }
   end
-  
+
   describe "ClassMethods" do
     subject { described_class }
-    
+
     describe "::new" do
       context "when a chef_version is passed through" do
         it "sets the chef_version attribute to the same value" do
@@ -33,7 +33,6 @@ describe Ridley::WindowsTemplateBinding do
   subject { Ridley::WindowsTemplateBinding.new(options) }
 
   describe "MixinMethods" do
-
     describe "#templates_path" do
       it "returns a pathname" do
         subject.templates_path.should be_a(Pathname)
@@ -64,7 +63,6 @@ describe Ridley::WindowsTemplateBinding do
       end
     end
   end
-
 
   describe "#boot_command" do
     it "returns a string" do

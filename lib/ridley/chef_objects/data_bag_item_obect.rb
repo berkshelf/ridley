@@ -50,7 +50,7 @@ module Ridley
 
     def decrypt_value(value)
       if encrypted_data_bag_secret.nil?
-        raise Errors::EncryptedDataBagSecretNotSet, "no encrypted data bag secret was set for this Ridley connection"
+        raise Errors::EncryptedDataBagSecretNotSet
       end
 
       decoded_value = Base64.decode64(value)

@@ -27,7 +27,7 @@ describe Ridley::NodeResource do
     let(:options) do
       {
         validator_path: fixtures_path.join("reset.pem").to_s,
-        encrypted_data_bag_secret_path: fixtures_path.join("reset.pem").to_s
+        encrypted_data_bag_secret: File.read(fixtures_path.join("reset.pem"))
       }
     end
     let(:bootstrapper) { double('bootstrapper', run: nil) }

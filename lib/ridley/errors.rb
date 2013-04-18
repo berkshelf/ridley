@@ -34,7 +34,11 @@ module Ridley
     end
 
     class CookbookSyntaxError < RidleyError; end
-    class EncryptedDataBagSecretNotSet < RidleyError; end
+    class EncryptedDataBagSecretNotSet < RidleyError
+      def message
+        "no encrypted data bag secret was set for this Ridley connection"
+      end
+    end
 
     class BootstrapError < RidleyError; end
     class ClientKeyFileNotFound < BootstrapError; end

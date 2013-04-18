@@ -6,7 +6,7 @@ describe Ridley::HostConnector::SSH::Worker do
 
   let(:host) { 'reset.riotgames.com' }
   let(:options) { {} }
-  
+
   describe "#sudo" do
     subject { ssh_worker.sudo }
 
@@ -14,7 +14,7 @@ describe Ridley::HostConnector::SSH::Worker do
 
     context "with sudo" do
       let(:options) { { ssh: { sudo: true } } }
-      
+
       it { should be_true }
     end
   end
@@ -38,7 +38,7 @@ describe Ridley::HostConnector::SSH::Worker do
     subject(:put_secret) { ssh_worker.put_secret(encrypted_data_bag_secret_path) }
     let(:encrypted_data_bag_secret_path) { fixtures_path.join("encrypted_data_bag_secret").to_s }
     let(:secret) { File.read(encrypted_data_bag_secret_path).chomp }
-    
+
     it "receives a run command with echo" do
       ssh_worker.should_receive(:run).with("echo '#{secret}' > /etc/chef/encrypted_data_bag_secret; chmod 0600 /etc/chef/encrypted_data_bag_secret")
       put_secret

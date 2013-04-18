@@ -14,7 +14,7 @@ describe Ridley::Bootstrapper do
       server_url: "https://api.opscode.com/organizations/vialstudios",
       validator_client: "vialstudios-validator",
       validator_path: fixtures_path.join("reset.pem").to_s,
-      encrypted_data_bag_secret_path: fixtures_path.join("reset.pem").to_s
+      encrypted_data_bag_secret: File.read(fixtures_path.join("reset.pem"))
     }
   end
 

@@ -27,8 +27,8 @@ module Ridley
     #   filepath to the validator used to bootstrap the node (required)
     # @option options [String] :bootstrap_proxy (nil)
     #   URL to a proxy server to bootstrap through
-    # @option options [String] :encrypted_data_bag_secret_path (nil)
-    #   filepath on your host machine to your organizations encrypted data bag secret
+    # @option options [String] :encrypted_data_bag_secret
+    #   your organizations encrypted data bag secret
     # @option options [Hash] :hints (Hash.new)
     #   a hash of Ohai hints to place on the bootstrapped node
     # @option options [Hash] :attributes (Hash.new)
