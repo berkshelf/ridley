@@ -5,5 +5,5 @@ describe Ridley::DataBagObject do
   let(:resource) { double('db-resource', item_resource: item_resource) }
   subject { described_class.new(resource) }
 
-  its(:item) { should be_a(Ridley::DataBagObject::DBIChainLink) }
+  its(:item) { should be_a(Ridley::DataBagObject::DataBagItemProxy) }
 end
