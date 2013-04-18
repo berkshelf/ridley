@@ -104,7 +104,7 @@ module Ridley
     #
     # @return [HostConnector::Response]
     def chef_run(host)
-      worker = new_worker_for(host)
+      worker = HostConnector.new(host, ssh: ssh, winrm: winrm)
       worker.chef_client
     ensure
       worker.terminate if worker && worker.alive?
@@ -118,7 +118,7 @@ module Ridley
     #
     # @return [HostConnector::Response]
     def put_secret(host, encrypted_data_bag_secret_path)
-      worker = new_worker_for(host)
+      worker = HostConnector.new(host, ssh: ssh, winrm: winrm)
       worker.put_secret(encrypted_data_bag_secret_path)
     ensure
       worker.terminate if worker && worker.alive?
@@ -132,7 +132,7 @@ module Ridley
     #
     # @return [HostConnector::Response]
     def ruby_script(host, command_lines)
-      worker = new_worker_for(host)
+      worker = HostConnector.new(host, ssh: ssh, winrm: winrm)
       worker.ruby_script(command_lines)
     ensure
       worker.terminate if worker && worker.alive?
@@ -146,7 +146,7 @@ module Ridley
     #
     # @return [Array<Symbol, HostConnector::Response>]
     def execute_command(host, command)
-      worker = new_worker_for(host)
+      worker = HostConnector.new(host, ssh: ssh, winrm: winrm)
       worker.run(command)
     ensure
       worker.terminate if worker && worker.alive?
@@ -169,18 +169,5 @@ module Ridley
     def merge_data(target, options = {})
       find(target).merge_data(options)
     end
-
-    private
-
-      # @param [Ridley::Client] client
-      # @param [String] host
-      #
-      # @return [SSH::Worker, WinRM::Worker]
-      def new_worker_for(host)
-        options = { ssh: ssh, winrm: winrm }
-        HostConnector.best_connector_for(host, options) do |host_connector|
-          host_connector::Worker.new(host, options)
-        end
-      end
   end
 end

@@ -47,7 +47,7 @@ describe Ridley::NodeResource do
     subject { chef_run }
 
     before do
-      instance.stub(:new_worker_for).and_return(worker)
+      Ridley::HostConnector.stub(:new).and_return(worker)
       worker.stub(:chef_client).and_return(response)
     end
 
@@ -72,7 +72,7 @@ describe Ridley::NodeResource do
     subject { put_secret }
 
     before do
-      instance.stub(:new_worker_for).and_return(worker)
+      Ridley::HostConnector.stub(:new).and_return(worker)
       worker.stub(:put_secret).and_return(response)
     end
 
@@ -97,7 +97,7 @@ describe Ridley::NodeResource do
     subject { ruby_script }
 
     before do
-      instance.stub(:new_worker_for).and_return(worker)
+      Ridley::HostConnector.stub(:new).and_return(worker)
       worker.stub(:ruby_script).and_return(response)
     end
 
@@ -122,7 +122,7 @@ describe Ridley::NodeResource do
     subject { execute_command }
 
     before do
-      instance.stub(:new_worker_for).and_return(worker)
+      Ridley::HostConnector.stub(:new).and_return(worker)
       worker.stub(:run).and_return(response)
     end
 
@@ -132,37 +132,6 @@ describe Ridley::NodeResource do
       let(:response) { [:error, double('response', stderr: 'failure_message')] }
 
       it { should eq(response) }
-    end
-  end
-
-  describe "#new_worker_for" do
-    let(:new_worker_for) { instance.send(:new_worker_for, host) }
-    subject { new_worker_for }
-
-    context "when the best connector is SSH" do
-      before do
-        Ridley::HostConnector.stub(:best_connector_for).and_yield(Ridley::HostConnector::SSH)
-      end
-
-      it "returns an SSH worker instance" do
-        new_worker_for.should be_a(Ridley::HostConnector::SSH::Worker)
-      end
-
-      its(:user) { should eq("reset") }
-    end
-
-    context "when the best connector is WinRM" do
-      before do
-        Ridley::HostConnector.stub(:best_connector_for).and_yield(Ridley::HostConnector::WinRM)
-        Ridley::HostConnector::WinRM::CommandUploader.stub(:new)
-      end
-
-      it "returns a WinRm worker instance" do
-        new_worker_for.should be_a(Ridley::HostConnector::WinRM::Worker)
-      end
-
-      its(:user) { should eq("Administrator") }
-      its(:password) { should eq("secret") }
     end
   end
 
