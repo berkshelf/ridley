@@ -49,6 +49,10 @@ module Ridley
     end
 
     def decrypt_value(value)
+      if encrypted_data_bag_secret.nil?
+        raise Errors::EncryptedDataBagSecretNotSet, "no encrypted data bag secret was set for this Ridley connection"
+      end
+
       decoded_value = Base64.decode64(value)
 
       cipher = OpenSSL::Cipher::Cipher.new('aes-256-cbc')

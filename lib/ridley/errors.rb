@@ -34,6 +34,7 @@ module Ridley
     end
 
     class CookbookSyntaxError < RidleyError; end
+    class EncryptedDataBagSecretNotSet < RidleyError; end
 
     class BootstrapError < RidleyError; end
     class ClientKeyFileNotFound < BootstrapError; end

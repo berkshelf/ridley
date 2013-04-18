@@ -1,8 +1,7 @@
 require 'spec_helper'
 
 describe Ridley::DataBagItemObject do
-  let(:connection) { double('chef-connection') }
-  let(:resource) { double('chef-resource', connection: connection) }
+  let(:resource) { double('chef-resource') }
   let(:data_bag) { double('data-bag') }
   subject { described_class.new(resource, data_bag) }
 
@@ -42,7 +41,7 @@ describe Ridley::DataBagItemObject do
 
   describe "#decrypt" do
     before(:each) do
-      connection.stub(encrypted_data_bag_secret: File.read(fixtures_path.join("encrypted_data_bag_secret").to_s))
+      resource.stub(encrypted_data_bag_secret: File.read(fixtures_path.join("encrypted_data_bag_secret").to_s))
     end
 
     it "decrypts an encrypted value" do
@@ -56,6 +55,20 @@ describe Ridley::DataBagItemObject do
       subject.attributes[:id] = id
       subject.decrypt
       subject.attributes[:id].should == id
+    end
+  end
+
+  describe "#decrypt_value" do
+    context "when no encrypted_data_bag_secret has been configured" do
+      before do
+        resource.stub(encrypted_data_bag_secret: nil)
+      end
+
+      it "raises an EncryptedDataBagSecretNotSet error" do
+        expect {
+          subject.decrypt_value("Xk0E8lV9r4BhZzcg4wal0X4w9ZexN3azxMjZ9r1MCZc=")
+        }.to raise_error(Ridley::Errors::EncryptedDataBagSecretNotSet)
+      end
     end
   end
 end
