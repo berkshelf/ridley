@@ -114,12 +114,11 @@ module Ridley
     # the given host.
     #
     # @param [String] host
-    # @param [String] encrypted_data_bag_secret_path
     #
     # @return [HostConnector::Response]
-    def put_secret(host, encrypted_data_bag_secret_path)
+    def put_secret(host)
       worker = HostConnector.new(host, ssh: ssh, winrm: winrm)
-      worker.put_secret(encrypted_data_bag_secret_path)
+      worker.put_secret(encrypted_data_bag_secret)
     ensure
       worker.terminate if worker && worker.alive?
     end

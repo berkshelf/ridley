@@ -14,7 +14,7 @@ module Ridley
         attr_reader :options
 
         EMBEDDED_RUBY_PATH = '/opt/chef/embedded/bin/ruby'.freeze
-        
+
         # @param [Hash] options
         def initialize(host, options = {})
           options = options.deep_symbolize_keys
@@ -104,16 +104,14 @@ module Ridley
           run(command)
         end
 
-        # Executes a copy of the encrypted_data_bag_secret to the nodes
+        # Writes the given encrypted data bag secret to the node
         #
-        # @param [String] encrypted_data_bag_secret_path
-        #   the path to the encrypted_data_bag_secret
-        # 
+        # @param [String] secret
+        #   your organization's encrypted data bag secret
+        #
         # @return [#run]
-        def put_secret(encrypted_data_bag_secret_path)
-          secret  = File.read(encrypted_data_bag_secret_path).chomp
+        def put_secret(secret)
           command = "echo '#{secret}' > /etc/chef/encrypted_data_bag_secret; chmod 0600 /etc/chef/encrypted_data_bag_secret"
-
           run(command)
         end
 
@@ -121,7 +119,7 @@ module Ridley
         #
         # @param [Array<String>] command_lines
         #   An Array of lines of the command to be executed
-        # 
+        #
         # @return [#run]
         def ruby_script(command_lines)
           command = "#{EMBEDDED_RUBY_PATH} -e \"#{command_lines.join(';')}\""

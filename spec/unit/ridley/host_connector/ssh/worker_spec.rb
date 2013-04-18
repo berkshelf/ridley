@@ -35,7 +35,7 @@ describe Ridley::HostConnector::SSH::Worker do
   end
 
   describe "#put_secret" do
-    subject(:put_secret) { ssh_worker.put_secret(encrypted_data_bag_secret_path) }
+    subject(:put_secret) { ssh_worker.put_secret(secret) }
     let(:encrypted_data_bag_secret_path) { fixtures_path.join("encrypted_data_bag_secret").to_s }
     let(:secret) { File.read(encrypted_data_bag_secret_path).chomp }
 

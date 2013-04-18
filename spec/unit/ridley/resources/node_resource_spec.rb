@@ -66,9 +66,8 @@ describe Ridley::NodeResource do
   end
 
   describe "#put_secret" do
-    let(:put_secret) { instance.put_secret(host, secret_path)}
+    let(:put_secret) { instance.put_secret(host) }
     let(:response) { [ :ok, double('response', stdout: 'success_message') ] }
-    let(:secret_path) { fixtures_path.join("reset.pem").to_s }
     subject { put_secret }
 
     before do
