@@ -4,6 +4,7 @@ describe "Node API operations", type: "acceptance" do
   let(:server_url) { "https://api.opscode.com/organizations/ridley" }
   let(:client_name) { "reset" }
   let(:client_key) { "/Users/reset/.chef/reset.pem" }
+  let(:resource) { double('node-resource') }
 
   let(:connection) do
     Ridley.new(
@@ -21,12 +22,7 @@ describe "Node API operations", type: "acceptance" do
   end
 
   describe "finding a node" do
-    let(:target) do
-      Ridley::NodeResource.new(
-        connection,
-        name: "ridley-one"
-      )
-    end
+    let(:target) { Ridley::NodeObject.new(resource, name: "ridley-one") }
 
     before(:each) do
       connection.node.create(target)
@@ -38,14 +34,9 @@ describe "Node API operations", type: "acceptance" do
   end
 
   describe "creating a node" do
-    let(:target) do
-      Ridley::NodeResource.new(
-        connection,
-        name: "ridley-one"
-      )
-    end
-    
-    it "returns a new Ridley::NodeResource object" do
+    let(:target) { Ridley::NodeObject.new(resource, name: "ridley-one") }
+
+    it "returns a new Ridley::NodeObject object" do
       connection.node.create(target).should eql(target)
     end
 
@@ -59,12 +50,7 @@ describe "Node API operations", type: "acceptance" do
   end
 
   describe "deleting a node" do
-    let(:target) do
-      Ridley::NodeResource.new(
-        connection,
-        name: "ridley-one"
-      )
-    end
+    let(:target) { Ridley::NodeObject.new(resource, name: "ridley-one") }
 
     before(:each) do
       connection.node.create(target)
@@ -101,23 +87,18 @@ describe "Node API operations", type: "acceptance" do
       end
     end
 
-    it "returns an array of Ridley::NodeResource objects" do
+    it "returns an array of Ridley::NodeObject" do
       connection.sync do
         obj = node.all
-        
-        obj.should each be_a(Ridley::NodeResource)
+
+        obj.should each be_a(Ridley::NodeObject)
         obj.should have(2).nodes
       end
     end
   end
 
   describe "updating a node" do
-    let(:target) do
-      Ridley::NodeResource.new(
-        connection,
-        name: "ridley-one"
-      )
-    end
+    let(:target) { Ridley::NodeObject.new(resource, name: "ridley-one") }
 
     before(:each) do
       connection.node.create(target)

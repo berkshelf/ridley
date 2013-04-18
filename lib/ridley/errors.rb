@@ -34,6 +34,11 @@ module Ridley
     end
 
     class CookbookSyntaxError < RidleyError; end
+    class EncryptedDataBagSecretNotSet < RidleyError
+      def message
+        "no encrypted data bag secret was set for this Ridley connection"
+      end
+    end
 
     class BootstrapError < RidleyError; end
     class ClientKeyFileNotFound < BootstrapError; end
@@ -54,6 +59,8 @@ module Ridley
     end
 
     class FrozenCookbook < RidleyError; end
+    class SandboxCommitError < RidleyError; end
+    class PermissionDenied < RidleyError; end
 
     class HTTPError < RidleyError
       class << self
@@ -74,7 +81,7 @@ module Ridley
 
         def error_map
           @@error_map ||= Hash.new
-        end        
+        end
       end
 
       attr_reader :env

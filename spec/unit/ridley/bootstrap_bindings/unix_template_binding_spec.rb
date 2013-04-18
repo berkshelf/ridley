@@ -1,19 +1,18 @@
 require 'spec_helper'
 
 describe Ridley::UnixTemplateBinding do
-
   let(:options) do
     {
       server_url: "https://api.opscode.com/organizations/vialstudios",
       validator_client: "chef-validator",
       validator_path: fixtures_path.join("reset.pem").to_s,
-      encrypted_data_bag_secret_path: fixtures_path.join("reset.pem").to_s
+      encrypted_data_bag_secret: File.read(fixtures_path.join("reset.pem"))
     }
   end
-  
+
   describe "ClassMethods" do
     subject { described_class }
-    
+
     describe "::new" do
       context "when no sudo option is passed through" do
         it "sets a default value of 'true' to 'sudo'" do

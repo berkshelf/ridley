@@ -39,7 +39,7 @@ module Ridley
     attr_reader :chef_version
     attr_reader :default_options
     attr_reader :validator_path
-    attr_reader :encrypted_data_bag_secret_path
+    attr_reader :encrypted_data_bag_secret
     attr_reader :server_url
     attr_reader :validator_client
     attr_reader :node_name
@@ -55,17 +55,6 @@ module Ridley
     # @return [String]
     def first_boot
       MultiJson.encode attributes.merge(run_list: run_list)
-    end
-
-    # @raise [Ridley::Errors::EncryptedDataBagSecretNotFound]
-    #
-    # @return [String, nil]
-    def encrypted_data_bag_secret
-      return unless encrypted_data_bag_secret_path
-
-      IO.read(encrypted_data_bag_secret_path).chomp
-    rescue Errno::ENOENT
-      raise Errors::EncryptedDataBagSecretNotFound, "Error bootstrapping: Encrypted data bag secret provided but not found at '#{encrypted_data_bag_secret_path}'"
     end
 
     # The validation key to create a new client for the node

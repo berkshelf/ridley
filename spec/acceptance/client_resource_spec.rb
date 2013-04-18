@@ -4,6 +4,7 @@ describe "Client API operations", type: "acceptance" do
   let(:server_url) { "https://api.opscode.com/organizations/ridley" }
   let(:client_name) { "reset" }
   let(:client_key) { "/Users/reset/.chef/reset.pem" }
+  let(:resource) { double('client-resource') }
 
   let(:connection) do
     Ridley.new(
@@ -21,39 +22,28 @@ describe "Client API operations", type: "acceptance" do
   end
 
   describe "finding a client" do
-    let(:target) do
-      Ridley::ClientResource.new(
-        connection,
-        name: "motherbrain-test",
-        admin: false
-      )
-    end
+    let(:target) { Ridley::ClientObject.new(resource, name: "motherbrain-test", admin: false) }
 
     before(:each) do
       connection.client.create(target)
     end
 
-    it "returns a valid Ridley::ClientResource" do
+    it "returns a valid Ridley::ClientObject" do
       connection.sync do
         obj = client.find(target)
 
-        obj.should be_a(Ridley::ClientResource)
+        obj.should be_a(Ridley::ClientObject)
         obj.should be_valid
       end
     end
   end
 
   describe "creating a client" do
-    let(:target) do
-      Ridley::ClientResource.new(
-        connection,
-        name: "motherbrain_test"
-      )
-    end
+    let(:target) { Ridley::ClientObject.new(resource, name: "motherbrain-test", admin: false) }
 
-    it "returns a Ridley::ClientResource object" do
+    it "returns a Ridley::ClientObject object" do
       connection.sync do
-        client.create(target).should be_a(Ridley::ClientResource)
+        client.create(target).should be_a(Ridley::ClientObject)
       end
     end
 
@@ -65,20 +55,14 @@ describe "Client API operations", type: "acceptance" do
   end
 
   describe "deleting a client" do
-    let(:target) do
-      Ridley::ClientResource.new(
-        connection,
-        name: "motherbrain-test",
-        admin: false
-      )
-    end
+    let(:target) { Ridley::ClientObject.new(resource, name: "motherbrain-test", admin: false) }
 
     before(:each) do
       connection.client.create(target)
     end
 
-    it "returns a Ridley::ClientResource object" do
-      connection.client.delete(target).should be_a(Ridley::ClientResource)
+    it "returns a Ridley::ClientObject object" do
+      connection.client.delete(target).should be_a(Ridley::ClientObject)
     end
   end
 
@@ -91,7 +75,7 @@ describe "Client API operations", type: "acceptance" do
     end
 
     it "returns an array of Ridley::ClientResource objects" do
-      connection.client.delete_all.should each be_a(Ridley::ClientResource)
+      connection.client.delete_all.should each be_a(Ridley::ClientObject)
     end
 
     it "deletes all clients from the remote" do
@@ -104,25 +88,19 @@ describe "Client API operations", type: "acceptance" do
   end
 
   describe "listing all clients" do
-    it "returns an array of Ridley::ClientResource objects" do
-      connection.client.all.should each be_a(Ridley::ClientResource)
+    it "returns an array of Ridley::ClientObject objects" do
+      connection.client.all.should each be_a(Ridley::ClientObject)
     end
   end
 
   describe "regenerating a client's private key" do
-    let(:target) do
-      Ridley::ClientResource.new(
-        connection,
-        name: "motherbrain-test",
-        admin: false
-      )
-    end
+    let(:target) { Ridley::ClientObject.new(resource, name: "motherbrain-test", admin: false) }
 
     before(:each) do
       connection.client.create(target)
     end
 
-    it "returns a Ridley::ClientResource object with a value for 'private_key'" do
+    it "returns a Ridley::ClientObject object with a value for 'private_key'" do
       connection.sync do
         obj = client.regenerate_key(target)
 

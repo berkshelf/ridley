@@ -8,7 +8,7 @@ describe Ridley::Bootstrapper::Context do
       server_url: "https://api.opscode.com/organizations/vialstudios",
       validator_client: "chef-validator",
       validator_path: fixtures_path.join("reset.pem").to_s,
-      encrypted_data_bag_secret_path: fixtures_path.join("reset.pem").to_s
+      encrypted_data_bag_secret: File.read(fixtures_path.join("reset.pem"))
     }
   end
 
@@ -16,7 +16,6 @@ describe Ridley::Bootstrapper::Context do
     subject { Ridley::Bootstrapper::Context }
 
     describe "::create" do
-      
       context "when the best connection is SSH" do
         it "sets template_binding to a Ridley::UnixTemplateBinding" do
           Ridley::HostConnector.stub(:best_connector_for).and_return(Ridley::HostConnector::SSH)
@@ -29,7 +28,7 @@ describe Ridley::Bootstrapper::Context do
         it "sets template_binding to a Ridley::WindowsTemplateBinding" do
           Ridley::HostConnector.stub(:best_connector_for).and_return(Ridley::HostConnector::WinRM)
           context = subject.create(host, options)
-          context.template_binding.should be_a(Ridley::WindowsTemplateBinding)          
+          context.template_binding.should be_a(Ridley::WindowsTemplateBinding)
         end
       end
 

@@ -24,8 +24,8 @@ describe "Sandbox API operations", type: "acceptance" do
   end
 
   describe "creating a new sandbox" do
-    it "returns an instance of Ridley::SandboxResource" do
-      connection.sandbox.create(checksums).should be_a(Ridley::SandboxResource)
+    it "returns an instance of Ridley::SandboxObject" do
+      connection.sandbox.create(checksums).should be_a(Ridley::SandboxObject)
     end
 
     it "contains a value for sandbox_id" do

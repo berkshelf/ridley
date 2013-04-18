@@ -13,7 +13,44 @@ describe Ridley::HostConnector do
     described_class::DEFAULT_WINRM_PORT.should eq(5985)
   end
 
-  describe "#connector_port_open?" do
+  describe "::new" do
+    let(:host) { "192.168.1.1" }
+    let(:options) do
+      {
+        ssh: {
+          user: "reset",
+          password: "lol"
+        },
+        winrm: {
+          user: "Administrator",
+          password: "secret"
+        }
+      }
+    end
+
+    subject { described_class.new(host, options) }
+
+    context "when the best connector is SSH" do
+      before do
+        described_class.stub(:best_connector_for).and_yield(Ridley::HostConnector::SSH)
+      end
+
+      it { should be_a(Ridley::HostConnector::SSH::Worker) }
+      its(:user) { should eq("reset") }
+    end
+
+    context "when the best connector is WinRM" do
+      before do
+        described_class.stub(:best_connector_for).and_yield(Ridley::HostConnector::WinRM)
+      end
+
+      it { should be_a(Ridley::HostConnector::WinRM::Worker) }
+      its(:user) { should eq("Administrator") }
+      its(:password) { should eq("secret") }
+    end
+  end
+
+  describe "::connector_port_open?" do
     let(:host) { "127.0.0.1" }
     let(:port) { 22 }
     let(:socket) { double(:new => true, :close => nil) }
@@ -54,7 +91,7 @@ describe Ridley::HostConnector do
     end
   end
 
-  describe "#best_connector_for" do
+  describe "::best_connector_for" do
     let(:host) {"127.0.0.1"}
 
     context "when an SSH port is open" do
@@ -90,7 +127,7 @@ describe Ridley::HostConnector do
     end
   end
 
-  describe "#parse_port_options" do
+  describe "::parse_port_options" do
     let(:options) do
       {
         ssh: {
