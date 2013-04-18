@@ -53,7 +53,7 @@ module Ridley
     #
     # @return [Hashie::Mash]
     def set_chef_attribute(key, value)
-      attr_hash = Hashie::Mash.from_dotted_path(key, value)
+      attr_hash   = Hashie::Mash.from_dotted_path(key, value)
       self.normal = self.normal.deep_merge(attr_hash)
     end
 
@@ -122,44 +122,18 @@ module Ridley
       self.cloud_provider == "rackspace"
     end
 
-    # Run Chef-Client on the instantiated node
+    # Executes a Chef run on the node
     #
-    # @param [Hash] options
-    #   a hash of options to pass to {Ridley::SSH.start}
-    #
-    # @return [SSH::Response]
-    def chef_client(options = {})
-      options = client.ssh.merge(options)
-
-      Ridley.log.debug "Running Chef Client on: #{self.public_hostname}"
-      Ridley::SSH.start(self, options) do |ssh|
-        ssh.run("sudo chef-client").first
-      end
+    # @return [HostConnector::Response]
+    def chef_run
+      resource.chef_run(self.public_hostname)
     end
 
-    # Put the client's encrypted data bag secret onto the instantiated node. If no
-    # encrypted data bag key path is set on the resource's client then nil will be
-    # returned
+    # Puts the configured encrypted data bag secret on the node
     #
-    # @param [Hash] options
-    #   a hash of options to pass to {Ridley::SSH.start}
-    #
-    # @return [SSH::Response, nil]
-    def put_secret(options = {})
-      if client.encrypted_data_bag_secret_path.nil? ||
-        !File.exists?(client.encrypted_data_bag_secret_path)
-
-        return nil
-      end
-
-      options = client.ssh.merge(options)
-      secret  = File.read(client.encrypted_data_bag_secret_path).chomp
-      command = "echo '#{secret}' > /etc/chef/encrypted_data_bag_secret; chmod 0600 /etc/chef/encrypted_data_bag_secret"
-
-      Ridley.log.debug "Writing Encrypted Data Bag Secret to: #{self.public_hostname}"
-      Ridley::SSH.start(self, options) do |ssh|
-        ssh.run(command).first
-      end
+    # @return [HostConnector::Response]
+    def put_secret
+      resource.put_secret(self.public_hostname)
     end
 
     # Merges the instaniated nodes data with the given data and updates
