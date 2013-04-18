@@ -1,14 +1,14 @@
-# Represents a binding that will be evaluated as an ERB template. When bootstrapping
-# nodes, an instance of this class represents the customizable and necessary configurations
-# need by the Host in order to install and connect to Chef. By default, this class will be used
-# when WinRM is the best way to connect to the node.
-#
-# @author Kyle Allan <kallan@riotgames.com>
-#
-# Windows Specific code written by Seth Chisamore (<schisamo@opscode.com>) in knife-windows
-# https://github.com/opscode/knife-windows/blob/3b8886ddcfb928ca0958cd05b22f8c3d78bee86e/lib/chef/knife/bootstrap/windows-chef-client-msi.erb
-# https://github.com/opscode/knife-windows/blob/78d38bbed358ac20107fc2b5b427f4b5e52e5cb2/lib/chef/knife/core/windows_bootstrap_context.rb
 module Ridley
+  # Represents a binding that will be evaluated as an ERB template. When bootstrapping
+  # nodes, an instance of this class represents the customizable and necessary configurations
+  # needed by the Host in order to install and connect to Chef. By default, this class will be used
+  # when WinRM is the best way to connect to the node.
+  #
+  # @author Kyle Allan <kallan@riotgames.com>
+  #
+  # Windows Specific code written by Seth Chisamore (<schisamo@opscode.com>) in knife-windows
+  # https://github.com/opscode/knife-windows/blob/3b8886ddcfb928ca0958cd05b22f8c3d78bee86e/lib/chef/knife/bootstrap/windows-chef-client-msi.erb
+  # https://github.com/opscode/knife-windows/blob/78d38bbed358ac20107fc2b5b427f4b5e52e5cb2/lib/chef/knife/core/windows_bootstrap_context.rb
   class WindowsTemplateBinding
     include Ridley::BootstrapBinding
 

@@ -1,10 +1,10 @@
-# Represents a binding that will be evaluated as an ERB template. When bootstrapping
-# nodes, an instance of this class represents the customizable and necessary configurations
-# need by the Host in order to install and connect to Chef. By default, this class will be used
-# when SSH is the best way to connect to the node.
-#
-# @author Kyle Allan <kallan@riotgames.com>
 module Ridley
+  # Represents a binding that will be evaluated as an ERB template. When bootstrapping
+  # nodes, an instance of this class represents the customizable and necessary configurations
+  # needed by the Host in order to install and connect to Chef. By default, this class will be used
+  # when SSH is the best way to connect to the node.
+  #
+  # @author Kyle Allan <kallan@riotgames.com>
   class UnixTemplateBinding
     include Ridley::BootstrapBinding
 
