@@ -10,12 +10,6 @@ A reliable Chef API client with a clean syntax
 
     $ gem install ridley
 
-## Known Issues
-
-* Sandboxes has not been implemented
-* Full support for Cookbooks is not included
-* Acceptance test suite needs to be refactored
-
 ## Usage
 
 Require Ridley into your application
@@ -24,42 +18,25 @@ Require Ridley into your application
 
 ## Creating a new Ridley client
 
-    conn = Ridley.new(
-      server_url: "https://api.opscode.com",
+    ridley = Ridley.new(
+      server_url: "https://api.opscode.com/organizations/ridley",
       client_name: "reset",
-      client_key: "/Users/reset/.chef/reset.pem",
-      organization: "ridley"
+      client_key: "/Users/reset/.chef/reset.pem"
     )
 
-Creating a new connection requires you to specify at minimum:
+Creating a new instance of Ridley requires the following options:
 
 * server_url
 * client_name
 * client_key
 
-An optional organization option can be specified if you are working with Hosted or Private Chef (OHC/OPC). For a full list of available options see the [yard documentation](http://rubydoc.info/gems/ridley).
+Ridley exposes a number of functions that return resources which you can use to retrieve or create objects on your Chef server. Here is a simple example of getting a list of all the roles on your Chef server.
 
-Connections can also be instantiated by a helper function: `Ridley.new`
-
-    Ridley.new(
-      server_url: "https://api.opscode.com",
-      client_name: "reset",
-      client_key: "/Users/reset/.chef/reset.pem"
-    )
-
-Using a connection object you can interact with collections of resources on a Chef server. Resources are:
-
-* Nodes
-* Roles
-* Environments
-* Clients
-* Cookbooks
-* Data Bags
-
-Here is a simple example of instantiating a new connection and listing all of the roles on a Chef server.
-
-    conn = Ridley.new(...)
-    conn.role.all => []
+    ridley = Ridley.new(...)
+    ridley.role.all #=> [
+      #<Ridley::RoleObject chef_id:motherbrain_srv ...>,
+      #<Ridley::RoleObject chef_id:motherbrain_proxy ...>
+    ]
 
 For more information scroll down to the Manipulating Chef Resources section of this README.
 
@@ -67,9 +44,8 @@ For more information scroll down to the Manipulating Chef Resources section of t
 
 An alternative syntax is provided if you want to perform multiple requests, in order, on a connection.
 
-    conn = Ridley.new(...)
-
-    conn.sync do
+    ridley = Ridley.new(...)
+    ridley.sync do
       role.all
       role.find("reset")
       role.create(name: "ridley-test")
@@ -78,170 +54,157 @@ An alternative syntax is provided if you want to perform multiple requests, in o
 
 The `sync` function on the connection object takes a block with no arguments and allows you to access the DSL within the block. You can address any one of the resources within the sync block:
 
-    conn.sync do
+    ridley.sync do
       environment.all
       node.all
       ...
     end
 
-A helper function exists to allow you to express yourself in a one-liner: `Ridley.sync`
+For one-liner requests you can create a new instance of Ridley and dispose of it with `Ridley.open`
 
-    Ridley.sync(server_url: "https://api.opscode.com", ...) do
-      role.all => []
+    Ridley.open(server_url: "https://api.opscode.com", ...) do
+      role.all
     end
-
-### Asynchronous execution
-
-__COMING SOON__
 
 ## Manipulating Chef Resources
 
-All resource can be listed, created, retrieved, updated, or destroyed. Some resources have additional functionality described in [their documentation](http://rubydoc.info/gems/ridley).
+Resources are access by instance functions on a new instance of Ridley::Client.
 
-### Listing all resources
+    ridley = Ridley.new(...)
+    ridley.client      #=> Ridley::ClientResource
+    ridley.cookbook    #=> Ridley::CookbookResource
+    ridley.data_bag    #=> Ridley::DataBagResource
+    ridley.environment #=> Ridley::EnvironmentResource
+    ridley.node        #=> Ridley::NodeResource
+    ridley.role        #=> Ridley::RoleResource
+    ridley.sandbox     #=> Ridley::SandboxResource
+    ridley.search      #=> Ridley::SearchResource
 
-You use a connection to interact with the resources on the remote Chef server it is pointing to. For example, if you wanted to get a list of all of the roles on your Chef server:
+DataBagItems are the only exception to this rule. The DataBagItem resource is accessed from a DataBagObject
 
-    conn = Ridley.new(...)
-    conn.role.all           => []
+    data_bag = ridley.data_bag.find("my_data")
+    data_bag.item                 #=> Ridley::DataBagItemResource
+    data_bag.item.find("my_item") #=> Ridley::DataBagItemObject
 
-Calling `role.all` on the connection object will return an array of Ridley::RoleResource objects. All of the resources can be listed, not just Roles:
+### CRUD
 
-    conn = Ridley.new(...)
-    conn.node.all           => [<#Ridley::NodeResource>]
-    conn.role.all           => [<#Ridley::RoleResource>]
-    conn.environment.all    => [<#Ridley::EnvironmentResource>]
-    conn.client.all         => [<#Ridley::ClientResource>]
-    conn.cookbook.all       => [<#Ridley::CookbookResource>]
-    conn.data_bag.all       => [<#Ridley::DataBagResource>]
+Most resources can be listed, retrieved, created, updated, and destroyed. These are commonly referred to as CRUD (Create Read Update Delete) operations.
 
-### Creating a resource
+#### Create
 
-A new resource can be created in a few ways
+A new Chef Object can be created in a three ways
 
-_Create by instantiate and save_
+_With the `#create` function and an attribute hash_
 
-    conn = Ridley.new(...)
-    obj = conn.role.new
+    ridley = Ridley.new(...)
+    ridley.role.create(name: "reset") #=> #<Ridley::RoleObject: chef_id:reset>
 
+_With the `#create` function and an instance of a Chef Object_
+
+    obj = ridley.role.new
     obj.name = "reset"
-    obj.save => <#Ridley::RoleResource: @name="reset">
+    ridley.role.create(obj) #=> #<Ridley::RoleObject: chef_id:reset>
 
-_Create by the `create` function with attribute hash_
+_With the `#save` function on an instance of a Chef Object_
 
-    conn = Ridley.new(...)
-    conn.role.create(name: "reset") => <#Ridley::RoleResource: @name="reset">
-
-_Create by the `create` function with a resource object_
-
-    conn = Ridley.new(...)
-    obj = conn.role.new
-
+    obj = ridley.role.new
     obj.name = "reset"
-    conn.role.create(obj) => <#Ridley::RoleResource: @name="reset">
+    obj.save #=> #<Ridley::RoleObject: chef_id:reset>
 
-Each of these methods is identical, it is up to you on how you'd like to create new resources.
+Each of these methods produce an identical object on the Chef server. It is up to you on how you'd like to create new resources.
 
-### Retrieving a resource
+### Read
 
-There are two functions for retrieving a resource. `find` and `find!`. If you are familiar with ActiveRecord; these are the functions used to pull records out of the database.
+Most resources have two read functions
 
-Both `find` and `find!` will return a resource but if the resource is not found on the Chef server `find!` will raise an exception while `find` will return `nil`.
+- `#all` for listing all the Chef Objects
+- `#find` for retrieving a specific Chef Object
 
-If you were following allong in the previous section we created a role named `reset`. We'll assume that role has been created in this next example.
+#### Listing
 
-    conn = Ridley.new(...)
+If you wanted to get a list of all of the roles on your Chef server
 
-    conn.role.find("reset") => <#Ridley::RoleResource: @name="reset">
-    conn.role.find!("reset") => <#Ridley::RoleResource: @name="reset">
+    ridley = Ridley.new(...)
+    ridley.role.all #=> [
+      #<Ridley::RoleObject chef_id:motherbrain_srv ...>,
+      #<Ridley::RoleObject chef_id:motherbrain_proxy ...>
+    ]
 
-Now if we attempt to find a role that does not exist on the Chef server
 
-    conn = Ridley.new(...)
+#### Finding
 
-    conn.role.find("not_there") => nil
-    conn.role.find!("not_there") =>
-    Ridley::Errors::HTTPNotFound: errors: 'Cannot load role reset'
-      from /Users/reset/code/ridley/lib/ridley/middleware/chef_response.rb:11:in `on_complete'
-      from /Users/reset/.rbenv/versions/1.9.3-p194/lib/ruby/gems/1.9.1/gems/faraday-0.8.1/lib/faraday/response.rb:9:in `block in call'
-      from /Users/reset/.rbenv/versions/1.9.3-p194/lib/ruby/gems/1.9.1/gems/faraday-0.8.1/lib/faraday/response.rb:63:in `on_complete'
-      from /Users/reset/.rbenv/versions/1.9.3-p194/lib/ruby/gems/1.9.1/gems/faraday-0.8.1/lib/faraday/response.rb:8:in `call'
-      from /Users/reset/code/ridley/lib/ridley/middleware/chef_auth.rb:31:in `call'
-      from /Users/reset/.rbenv/versions/1.9.3-p194/lib/ruby/gems/1.9.1/gems/faraday-0.8.1/lib/faraday/connection.rb:226:in `run_request'
-      from /Users/reset/.rbenv/versions/1.9.3-p194/lib/ruby/gems/1.9.1/gems/faraday-0.8.1/lib/faraday/connection.rb:87:in `get'
-      from /Users/reset/code/ridley/lib/ridley/resource.rb:115:in `find!'
-      from /Users/reset/code/ridley/lib/ridley/context.rb:22:in `method_missing'
-      from (irb):6
-      from /Users/reset/.rbenv/versions/1.9.3-p194/bin/irb:12:in `<main>'
+If you want to retrieve a single role from the Chef server
 
-### Updating a resource
+    ridley = Ridley.new(...)
+    ridley.role.find("motherbrain_srv") #=> #<Ridley::RoleObject: chef_id:motherbrain_srv ...>
 
-Like creating a resource, updating a resource can also be expressed a few different ways
+If the role does not exist on the Chef server then `nil` is returned
 
-_Update by the `update` function with an id and attribute hash_
+    ridley = Ridley.new(...)
+    ridley.role.find("not_there") #=> nil
 
-    conn = Ridley.new(...)
-    conn.role.update("reset", description: "testing updates!") => <#Ridley::RoleResource: @name="reset", @description="testing updates!">
+### Update
 
-_Update by the `update` function with a resource object_
+Updating a resource can be expressed in three ways
 
-    conn = Ridley.new(...)
-    obj = conn.role.find("reset")
-    obj.description = "resource object!"
+_With the `#update` function, the ID of the Object to update, and an attributes hash_
 
-    conn.role.update(obj) => <#Ridley::RoleResource: @name="reset", @description="resource object!">
+    ridley = Ridley.new(...)
+    ridley.role.update("motherbrain_srv", description: "testing updates") #=>
+      #<Ridley::RoleObject chef_id:motherbrain_srv, description="testing updates" ...>
 
-_Update by saving a resource object_
+_With the `#update` function and an instance of a Chef Object_
 
-    conn = Ridley.new(...)
-    obj = conn.role.find("reset")
+    obj = ridley.role.find("motherbrain_srv")
+    obj.description = "chef object"
 
-    obj.description = "saving an object!"
-    obj.save => <#Ridley::RoleResource: @name="reset", @description="saving an object!">
+    ridley.role.update(obj) #=> #<Ridley::RoleObject: chef_id:motherbrain_srv, description="chef object" ...
 
-### Deleting a resource
+_With the `#save` function on an instance of a Chef Object_
 
-Like creating or updating a resource, there are a few ways deleting a resource can be expressed
+    obj = ridley.role.find("reset")
+    obj.description = "saving an object"
+    obj.save #=> #<Ridley::RoleObject: chef_id:motherbrain_srv, description="saving an object" ...>
 
-_Delete by the `delete` function with an id_
+### Destroy
 
-    conn = Ridley.new(...)
-    conn.role.delete("reset") => <#Ridley::RoleResource: @name="reset">
+Destroying a resource can be express in three ways
 
-_Delete by the `delete` function with a resource object_
+_With the `#delete` function and the ID of the Object to destroy_
 
-    conn = Ridley.new(...)
-    obj = conn.role.find("reset")
+    ridley = Ridley.new(...)
+    ridley.role.delete("motherbrain_srv") => #<Ridley::RoleObject: chef_id:motherbrain_srv ...>
 
-    conn.role.delete(obj) => <#Ridley::RoleResource: @name="reset">
+_With the `#delete` function and a Chef Object_
 
-_Delete by the `destroy` function on a resource object_
+    obj = ridley.role.find("motherbrain_srv")
+    ridley.role.delete(obj) => #<Ridley::RoleObject: chef_id:motherbrain_srv ...>
 
-    conn = Ridley.new(...)
-    obj = conn.role.find("reset")
+_With the `#destroy` function on an instance of a Chef Object_
 
-    obj.destroy => true
+    obj = conn.role.find("motherbrain_srv")
+    obj.destroy #=> true
 
+## Client Resource
 ### Regenerating a client's private key
 
-_Regenerate function on a context with an id_
+_With the `#regnerate_key` function and the ID of the Client to regenerate_
 
-    conn = Ridley.new(...)
-    conn.client.regenerate_key("jwinsor") => <#Ridley::ClientResource: @name="jwinsor", @private_key="HIDDEN">
+    ridley = Ridley.new(...)
+    ridley.client.regenerate_key("jamie") #=> #<Ridley::ClientObject: chef_id:"jamie", private_key="**HIDDEN***" ...>
 
-_Regenerate function on an instantiated resource object_
+_With the `#regenerate_key` function on an instance of a Client Object_
 
-    conn = Ridley.new(...)
-    obj = conn.client.find("jwinsor")
+    obj = ridley.client.find("jamie")
+    obj.regenerate_key #=> #<Ridley::ClientObject: chef_id:"jamie", private_key="**HIDDEN***" ...>
 
-    obj.regenerate_key => <#Ridley::ClientResource: @name="jwinsor", @private_key="HIDDEN">
-
-## Manipulating Data Bags and Data Bag Items
+## Cookbook Resource
+## Data Bag Resource
 
 A data bag is managed exactly the same as any other Chef resource
 
-    conn = Ridley.new(...)
-    conn.data_bag.create("ridley-test")
+    ridley = Ridley.new(...)
+    ridley.data_bag.create("ridley-test")
 
 You can create, delete, update, or retrieve a data bag exactly how you would expect if you read through the
 Manipulating Chef Resources portion of this document.
@@ -250,92 +213,31 @@ Unlike a role, node, client, or environment, a data bag is a container for other
 
 ### Creating a Data Bag Item
 
-    conn = Ridley.new(...)
-    data_bag = conn.data_bag.create("ridley-test")
+    ridley   = Ridley.new(...)
+    data_bag = ridley.data_bag.create("ridley-test")
 
-    data_bag.item.create(id: "appconfig", host: "reset.local", user: "jwinsor") => 
-      <#Ridley::DataBagItemResource: @id="appconfig", @host="reset.local", @user="jwinsor">
+    data_bag.item.create(id: "appconfig", host: "reset.local", user: "jamie") #=>
+      #<Ridley::DataBagItemObject: chef_id:appconfig, host="reset.local", user="jamie">
 
-### Saving a Data Bag Item
-
-    conn = Ridley.new(...)
-    data_bag = conn.data_bag.create("ridley-test")
-
-    dbi = data_bag.item.new
-    dbi[:id] = "appconfig"
-    dbi[:host] = "reset.local"
-    dbi.save => true
-
-## Searching
-
-    conn = Ridley.new(...)
-    conn.search(:node)
-    conn.search(:node, "name:ridley-test.local")
-
-Search will return an array of Ridley resource objects if one of the default indices is specified. Chef's default indices are
-
-* node
-* role
-* client
-* environment
-
-## Manipulating Attributes
-
-Using Ridley you can quickly manipulate node or environment attributes. Attributes are identified by a dotted path notation.
-
-    default[:my_app][:billing][:enabled] => "my_app.billing.enabled"
-
-Given the previous example you could set the default node attribute with the `set_default_attribute` function on a Node object
-
-### Node Attributes
-
-Setting the `node[:my_app][:billing][:enabled]` node level attribute on the node "jwinsor-1"
-
-    conn = Ridley.new
-    conn.sync do
-      obj = node.find("jwinsor-1")
-      obj.set_attribute("my_app.billing.enabled", false)
-      obj.save
-    end
-
-### Environment Attributes
+## Environment Resource
+## Node Resource
+### Setting Attributes
 
 Setting a default environment attribute is just like setting a node level default attribute
 
-    conn = Ridley.new
-    conn.sync do
-      obj = environment.find("production")
-      obj.set_default_attribute("my_app.proxy.enabled", false)
-      obj.save
-    end
+    ridley = Ridley.new(...)
+    production_env = ridley.environment.find("production")
+    production_env.set_default_attribute("my_app.proxy.enabled", false)
+    production_env.save #=> true
 
 And the same goes for setting an environment level override attribute
 
-    conn = Ridley.new
-    conn.sync do
-      obj = environment.find("production")
-      obj.set_override_attribute("my_app.webapp.enabled", false)
-      obj.save
-    end
+    production_env.set_override_attribute("my_app.proxy.enabled", false)
+    production_env.save #=> true
 
-### Role Attributes
+### Bootstrapping Unix nodes
 
-    conn = Ridley.new
-    conn.sync do
-      obj = role.find("why_god_why")
-      obj.set_default_attribute("my_app.proxy.enabled", false)
-      obj.save
-    end
-
-    conn.sync do
-      obj = role.find("why_god_why")
-      obj.set_override_attribute("my_app.webapp.enabled", false)
-      obj.save
-    end
-
-## Bootstrapping nodes
-
-    conn = Ridley.new(
+    ridley = Ridley.new(
       server_url: "https://api.opscode.com",
       organization: "vialstudios",
       validator_client: "vialstudios-validator",
@@ -346,13 +248,13 @@ And the same goes for setting an environment level override attribute
       }
     )
 
-    conn.node.bootstrap("33.33.33.10", "33.33.33.11")
+    ridley.node.bootstrap("33.33.33.10", "33.33.33.11")
 
-## Bootstrapping Windows Nodes
+### Bootstrapping Windows Nodes
 
 Windows Nodes are bootstrapped using a combination of WinRM, Batch, and PowerShell. You will probably need to tweak some settings on your Windows servers to ensure the commands are successful.
 
-## WinRM Settings
+#### WinRM Settings
 
 1. Enable WinRM: `winrm quickconfig` and say Yes.
 2. Set some WinRM settings to ensure that you don't get 401 Unauthorized responses and 500 Responses because of timeouts.
@@ -365,7 +267,7 @@ winrm set winrm/config @{MaxTimeoutms="600000"}
 winrm set winrm/config/client @{TrustedHosts="*"}
 ```
 
-## PowerShell Settings
+#### PowerShell Settings
 
 1. You should also configure your PowerShell profile, so that PowerShell commands have a more lenient timeout period.
 
@@ -382,6 +284,35 @@ The following links offer some information about configuring a machine's PowerSh
 * [Creating a new PSSessionOption](http://technet.microsoft.com/en-us/library/hh849703.aspx)
 
 You may also want to tweak your Windows boxes a bit more ex: turning UAC off, turning off the Windows Firewall.
+
+## Role Resource
+### Role Attributes
+
+Setting role attributes is just like setting node and environment attributes
+
+    ridley = Ridley.new(...)
+    my_app_role = ridley.role.find("my_app")
+    my_app_role.set_default_attribute("my_app.proxy.enabled", false)
+    my_app_role.save #=> true
+
+And the same goes for setting an environment level override attribute
+
+    my_app_role.set_override_attribute("my_app.proxy.enabled", false)
+    my_app_role.save #=> true
+
+## Sandbox Resource
+## Search Resource
+
+    ridley = Ridley.new(...)
+    ridley.search(:node)
+    ridley.search(:node, "name:ridley-test.local")
+
+Search will return an array of the appropriate Chef Objects if one of the default indices is specified. The indices are
+
+* node
+* role
+* client
+* environment
 
 # Authors and Contributors
 
