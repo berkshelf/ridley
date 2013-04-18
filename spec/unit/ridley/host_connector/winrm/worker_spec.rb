@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Ridley::HostConnector::WinRM::Worker do
   subject { winrm_worker }
   let(:winrm_worker) { described_class.new(host, options) }
-  let(:host) { 'reset.riotgames.com' }  
+  let(:host) { 'reset.riotgames.com' }
   let(:options) { {} }
 
   before do
@@ -35,7 +35,7 @@ describe Ridley::HostConnector::WinRM::Worker do
     let(:command_uploader_stub) { double('CommandUploader') }
 
     it { should eq(command) }
-    
+
     context "when a command is more than 2047 characters" do
       let(:command) { "a" * 2048 }
 
@@ -62,8 +62,7 @@ describe Ridley::HostConnector::WinRM::Worker do
   end
 
   describe "#put_secret" do
-    subject(:put_secret) { winrm_worker.put_secret(encrypted_data_bag_secret_path) }
-
+    subject(:put_secret) { winrm_worker.put_secret(secret) }
     let(:encrypted_data_bag_secret_path) { fixtures_path.join("encrypted_data_bag_secret").to_s }
     let(:secret) { File.read(encrypted_data_bag_secret_path).chomp }
 

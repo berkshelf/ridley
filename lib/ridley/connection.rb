@@ -96,7 +96,7 @@ module Ridley
     # we expect. Caught exceptions are re-raised with Celluloid#abort so we don't crash the connection.
     def run_request(*args)
       super
-    rescue Errors::HTTPError => ex
+    rescue Errors::HTTPError, Faraday::Error => ex
       abort(ex)
     end
 

@@ -4,6 +4,7 @@ describe "Environment API operations", type: "acceptance" do
   let(:server_url) { "https://api.opscode.com/organizations/ridley" }
   let(:client_name) { "reset" }
   let(:client_key) { "/Users/reset/.chef/reset.pem" }
+  let(:resource) { double('environment-resource') }
 
   let(:connection) do
     Ridley.new(
@@ -21,22 +22,17 @@ describe "Environment API operations", type: "acceptance" do
   end
 
   describe "finding an environment" do
-    let(:target) do
-      Ridley::EnvironmentResource.new(
-        connection,
-        name: "ridley-test-env"
-      )
-    end
+    let(:target) { Ridley::EnvironmentObject.new(resource, name: "ridley-test-env") }
 
     before(:each) do
       connection.environment.create(target)
     end
 
-    it "returns a valid Ridley::EnvironmentResource object" do
+    it "returns a valid Ridley::EnvironmentObject object" do
       connection.sync do
         obj = environment.find(target)
 
-        obj.should be_a(Ridley::EnvironmentResource)
+        obj.should be_a(Ridley::EnvironmentObject)
         obj.should be_valid
       end
     end
@@ -44,18 +40,18 @@ describe "Environment API operations", type: "acceptance" do
 
   describe "creating an environment" do
     let(:target) do
-      Ridley::EnvironmentResource.new(
-        connection,
+      Ridley::EnvironmentObject.new(
+        resource,
         name: "ridley-test-env",
         description: "a testing environment for ridley"
       )
     end
 
-    it "returns a valid Ridley::EnvironmentResource object" do
+    it "returns a valid Ridley::EnvironmentObject object" do
       connection.sync do
         obj = environment.create(target)
 
-        obj.should be_a(Ridley::EnvironmentResource)
+        obj.should be_a(Ridley::EnvironmentObject)
         obj.should be_valid
       end
     end
@@ -77,8 +73,8 @@ describe "Environment API operations", type: "acceptance" do
       end
     end
 
-    it "returns an array of Ridley::EnvironmentResource objects" do
-      connection.environment.delete_all.should each be_a(Ridley::EnvironmentResource)
+    it "returns an array of Ridley::EnvironmentObject objects" do
+      connection.environment.delete_all.should each be_a(Ridley::EnvironmentObject)
     end
 
     it "deletes all environments but '_default' from the remote" do
@@ -92,18 +88,13 @@ describe "Environment API operations", type: "acceptance" do
   end
 
   describe "listing all environments" do
-    it "should return an array of Ridley::EnvironmentResource objects" do
-      connection.environment.all.should each be_a(Ridley::EnvironmentResource)
+    it "should return an array of Ridley::EnvironmentObject objects" do
+      connection.environment.all.should each be_a(Ridley::EnvironmentObject)
     end
   end
 
   describe "updating an environment" do
-    let(:target) do
-      Ridley::EnvironmentResource.new(
-        connection,
-        name: "ridley-env-test"
-      )
-    end
+    let(:target) { Ridley::EnvironmentObject.new(resource, name: "ridley-test-env") }
 
     before(:each) do
       connection.environment.create(target)

@@ -118,14 +118,13 @@ module Ridley
           run("chef-client")
         end
 
-        # Executes a copy of the encrypted_data_bag_secret to the nodes
+        # Writes the given encrypted data bag secret to the node
         #
-        # @param [String] encrypted_data_bag_secret_path
-        #   the path to the encrypted_data_bag_secret
+        # @param [String] secret
+        #   your organization's encrypted data bag secret
         #
         # @return [#run]
-        def put_secret(encrypted_data_bag_secret_path)
-          secret  = File.read(encrypted_data_bag_secret_path).chomp
+        def put_secret(secret)
           command = "echo #{secret} > C:\\chef\\encrypted_data_bag_secret"
           run(command)
         end

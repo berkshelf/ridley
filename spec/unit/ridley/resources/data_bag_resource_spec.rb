@@ -1,15 +1,20 @@
 require 'spec_helper'
 
 describe Ridley::DataBagResource do
-  it_behaves_like "a Ridley Resource", Ridley::DataBagResource
+  let(:secret) { "supersecretkey" }
+  let(:instance) { described_class.new(double, secret) }
 
-  let(:connection) { double('connection') }
+  describe "#item_resource" do
+    subject { instance.item_resource }
 
-  describe "ClassMethods" do
-    subject { Ridley::DataBagResource }
-
-    describe "::create_item" do
-      pending
+    it "returns a DataBagItemResource" do
+      subject.should be_a(Ridley::DataBagItemResource)
     end
+
+    its(:data_bag_secret) { should eql(secret) }
+  end
+
+  describe "#find" do
+    pending
   end
 end

@@ -13,6 +13,29 @@ module Ridley
     DEFAULT_WINRM_PORT = 5985.freeze
 
     class << self
+      # Create a new connection worker for the given host. An SSH or WinRM connection will be returned
+      # depending on which ports are open on the target host.
+      #
+      # @param [String] host
+      #   host to create a connector for
+      #
+      # @option options [Hash] ssh
+      #   * :user (String) a shell user that will login to each node and perform the bootstrap command on
+      #   * :password (String) the password for the shell user that will perform the bootstrap
+      #   * :keys (Array, String) an array of keys (or a single key) to authenticate the ssh user with instead of a password
+      #   * :timeout (Float) [5.0] timeout value for SSH bootstrap
+      # @option options [Hash] :winrm
+      #   * :user (String) a user that will login to each node and perform the bootstrap command on
+      #   * :password (String) the password for the user that will perform the bootstrap
+      #   * :port (Fixnum) the winrm port to connect on the node the bootstrap will be performed on
+      #
+      # @return [SSH::Worker, WinRM::Worker]
+      def new(host, options = {})
+        HostConnector.best_connector_for(host, options) do |host_connector|
+          host_connector::Worker.new(host, options)
+        end
+      end
+
       # Finds and returns the best HostConnector for a given host
       #
       # @param  host [String]

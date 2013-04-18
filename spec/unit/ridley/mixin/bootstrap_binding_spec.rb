@@ -7,7 +7,7 @@ describe Ridley::BootstrapBinding do
       server_url: "https://api.opscode.com/organizations/vialstudios",
       validator_client: "chef-validator",
       validator_path: fixtures_path.join("reset.pem").to_s,
-      encrypted_data_bag_secret_path: fixtures_path.join("reset.pem").to_s,
+      encrypted_data_bag_secret: File.read(fixtures_path.join("reset.pem")),
       chef_version: "11.4.0"
     }
   end

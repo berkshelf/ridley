@@ -3,24 +3,6 @@ module Ridley
   # @api private
   class SandboxUploader
     class << self
-      # Concurrently upload all of the files in the given sandbox and then clean up
-      # after ourselves
-      #
-      # @param [Ridley::SandboxResource] sandbox
-      # @param [Hash] checksums
-      #
-      # @option options [Integer] :pool_size (12)
-      #   the amount of concurrent uploads to perform
-      def upload(sandbox, checksums, options = {})
-        options = options.reverse_merge(
-          pool_size: 12
-        )
-        uploader = pool(size: options[:pool_size], args: [sandbox])
-        uploader.multi_upload(checksums)
-      ensure
-        uploader.terminate if uploader && uploader.alive?
-      end
-
       # Return the checksum of the contents of the file at the given filepath
       #
       # @param [String] path
@@ -55,46 +37,30 @@ module Ridley
       end
     end
 
-    extend Forwardable
     include Celluloid
 
-    attr_reader :sandbox
+    attr_reader :client_name
+    attr_reader :client_key
+    attr_reader :options
 
-    def_delegator :sandbox, :client
-    def_delegator :sandbox, :checksum
-
-    def initialize(sandbox)
-      @sandbox = sandbox
-    end
-
-    # Concurrently upload multiple files into a sandbox
-    #
-    # @param [Hash] checksums
-    #   a hash of file checksums and file paths
-    #
-    # @example uploading multiple checksums
-    #
-    #   sandbox.multi_upload(
-    #     "e5a0f6b48d0712382295ff30bec1f9cc" => "/Users/reset/code/rbenv-cookbook/recipes/default.rb",
-    #     "de6532a7fbe717d52020dc9f3ae47dbe" => "/Users/reset/code/rbenv-cookbook/recipes/ohai_plugin.rb"
-    #   )
-    def multi_upload(checksums)
-      checksums.collect do |chk_id, path|
-        future.upload(chk_id, path)
-      end.map(&:value)
+    def initialize(client_name, client_key, options = {})
+      @client_name = client_name
+      @client_key  = client_key
+      @options     = options
     end
 
     # Upload one file into the sandbox for the given checksum id
     #
+    # @param [Ridley::SandboxObject] sandbox
     # @param [String] chk_id
     #   checksum of the file being uploaded
     # @param [String] path
     #   path to the file to upload
     #
     # @return [Hash, nil]
-    def upload(chk_id, path)
-      checksum = self.checksum(chk_id)
-      
+    def upload(sandbox, chk_id, path)
+      checksum = sandbox.checksum(chk_id)
+
       unless checksum[:needs_upload]
         return nil
       end
@@ -110,10 +76,10 @@ module Ridley
       url.path    = ""
 
       begin
-        Faraday.new(url, client.options.slice(*Connection::VALID_OPTIONS)) do |c|
+        Faraday.new(url, self.options) do |c|
           c.response :chef_response
           c.response :follow_redirects
-          c.request :chef_auth, client.client_name, client.client_key
+          c.request :chef_auth, self.client_name, self.client_key
           c.adapter :net_http
         end.put(upload_path, contents, headers)
       rescue Ridley::Errors::HTTPError => ex

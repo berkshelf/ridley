@@ -22,13 +22,40 @@ module Ridley
   #   r.save
   #
   #   connection.role.find("new-role") => <#Ridley::RoleResource: @name="new-role">
-  class Client < Celluloid::SupervisionGroup
+  class Client
+    class ConnectionSupervisor < ::Celluloid::SupervisionGroup
+      def initialize(registry, options)
+        super(registry)
+        pool(Ridley::Connection, size: options[:pool_size], args: [
+          options[:server_url],
+          options[:client_name],
+          options[:client_key],
+          options.slice(*Ridley::Connection::VALID_OPTIONS)
+        ], as: :connection_pool)
+      end
+    end
+
+    class ResourcesSupervisor < ::Celluloid::SupervisionGroup
+      def initialize(registry, connection_registry, options)
+        super(registry)
+        supervise_as :client_resource, Ridley::ClientResource, connection_registry
+        supervise_as :cookbook_resource, Ridley::CookbookResource, connection_registry,
+          options[:client_name], options[:client_key], options.slice(*Ridley::Connection::VALID_OPTIONS)
+        supervise_as :data_bag_resource, Ridley::DataBagResource, connection_registry,
+          options[:encrypted_data_bag_secret]
+        supervise_as :environment_resource, Ridley::EnvironmentResource, connection_registry
+        supervise_as :node_resource, Ridley::NodeResource, connection_registry, options
+        supervise_as :role_resource, Ridley::RoleResource, connection_registry
+        supervise_as :sandbox_resource, Ridley::SandboxResource, connection_registry,
+          options[:client_name], options[:client_key], options.slice(*Ridley::Connection::VALID_OPTIONS)
+        supervise_as :search_resource, Ridley::SearchResource, connection_registry
+      end
+    end
+
     class << self
       def open(options = {}, &block)
         cli = new(options)
         cli.evaluate(&block)
-      ensure
-        cli.terminate if cli && cli.alive?
       end
 
       # @raise [ArgumentError]
@@ -37,13 +64,13 @@ module Ridley
       def validate_options(options)
         missing = (REQUIRED_OPTIONS - options.keys)
 
-        unless missing.empty?
+        if missing.any?
           missing.collect! { |opt| "'#{opt}'" }
           raise ArgumentError, "Missing required option(s): #{missing.join(', ')}"
         end
 
         missing_values = options.slice(*REQUIRED_OPTIONS).select { |key, value| !value.present? }
-        unless missing_values.empty?
+        if missing_values.any?
           values = missing_values.keys.collect { |opt| "'#{opt}'" }
           raise ArgumentError, "Missing value for required option(s): '#{values.join(', ')}'"
         end
@@ -57,7 +84,13 @@ module Ridley
     ].freeze
 
     extend Forwardable
+    include Celluloid
     include Ridley::Logging
+
+    finalizer do
+      @connection_supervisor.terminate if @connection_supervisor && @connection_supervisor.alive?
+      @resources_supervisor.terminate if @resources_supervisor && @resources_supervisor.alive?
+    end
 
     def_delegator :connection, :build_url
     def_delegator :connection, :scheme
@@ -66,6 +99,7 @@ module Ridley
     def_delegator :connection, :path_prefix
     def_delegator :connection, :url_prefix
 
+    def_delegator :connection, :organization
     def_delegator :connection, :client_key
     def_delegator :connection, :client_key=
     def_delegator :connection, :client_name
@@ -111,16 +145,16 @@ module Ridley
     #   * :verify (Boolean) [true] set to false to disable SSL verification
     # @option options [URI, String, Hash] :proxy
     #   URI, String, or Hash of HTTP proxy options
+    # @option options [Integer] :pool_size (4)
+    #   size of the connection pool
     #
     # @raise [Errors::ClientKeyFileNotFound] if the option for :client_key does not contain
     #   a file path pointing to a readable client key
     def initialize(options = {})
-      log.info { "Ridley starting..." }
-      super()
-
       @options = options.reverse_merge(
         ssh: Hash.new,
-        winrm: Hash.new
+        winrm: Hash.new,
+        pool_size: 4
       ).deep_symbolize_keys
       self.class.validate_options(@options)
 
@@ -139,79 +173,80 @@ module Ridley
         @encrypted_data_bag_secret_path = File.expand_path(@options[:encrypted_data_bag_secret_path])
       end
 
+      @options[:encrypted_data_bag_secret] = encrypted_data_bag_secret
+
       unless @options[:client_key].present? && File.exist?(@options[:client_key])
         raise Errors::ClientKeyFileNotFound, "client key not found at: '#{@options[:client_key]}'"
       end
 
-      pool(Ridley::Connection, size: 4, args: [
-        @options[:server_url],
-        @options[:client_name],
-        @options[:client_key],
-        @options.slice(*Connection::VALID_OPTIONS)
-      ], as: :connection_pool)
+      @connection_registry   = Celluloid::Registry.new
+      @resources_registry    = Celluloid::Registry.new
+      @connection_supervisor = ConnectionSupervisor.new(@connection_registry, @options)
+      @resources_supervisor  = ResourcesSupervisor.new(@resources_registry, @connection_registry, @options)
     end
 
-    # @return [Ridley::ChainLink]
+    # @return [Ridley::ClientResource]
     def client
-      ChainLink.new(Actor.current, Ridley::ClientResource)
+      @resources_registry[:client_resource]
     end
 
-    # @return [Ridley::ChainLink]
+    # @return [Ridley::CookbookResource]
     def cookbook
-      ChainLink.new(Actor.current, Ridley::CookbookResource)
+      @resources_registry[:cookbook_resource]
     end
 
-    # @return [Ridley::ChainLink]
+    # @return [Ridley::DataBagResource]
     def data_bag
-      ChainLink.new(Actor.current, Ridley::DataBagResource)
+      @resources_registry[:data_bag_resource]
     end
 
-    # @return [Ridley::ChainLink]
+    # @return [Ridley::EnvironmentResource]
     def environment
-      ChainLink.new(Actor.current, Ridley::EnvironmentResource)
+      @resources_registry[:environment_resource]
     end
 
-    # @return [Ridley::ChainLink]
+    # @return [Ridley::NodeResource]
     def node
-      ChainLink.new(Actor.current, Ridley::NodeResource)
+      @resources_registry[:node_resource]
     end
 
-    # @return [Ridley::ChainLink]
+    # @return [Ridley::RoleResource]
     def role
-      ChainLink.new(Actor.current, Ridley::RoleResource)
+      @resources_registry[:role_resource]
     end
 
-    # @return [Ridley::ChainLink]
+    # @return [Ridley::SandboxResource]
     def sandbox
-      ChainLink.new(Actor.current, Ridley::SandboxResource)
+      @resources_registry[:sandbox_resource]
     end
 
-    # Creates an runs a new Ridley::Search
+    # Perform a search the Chef Server
     #
-    # @see Ridley::Search#run
-    #
-    # @param [String, Symbol] index
-    # @param [String, nil] query
+    # @param [#to_sym, #to_s] index
+    # @param [#to_s] query_string
     #
     # @option options [String] :sort
+    #   a sort string such as 'name DESC'
     # @option options [Integer] :rows
+    #   how many rows to return
     # @option options [Integer] :start
+    #   the result number to start from
     #
     # @return [Hash]
     def search(index, query = nil, options = {})
-      Ridley::Search.new(Actor.current, index, query, options).run
+      @resources_registry[:search_resource].run(index, query, options)
     end
 
     # Return the array of all possible search indexes for the including connection
     #
     # @example
     #   conn = Ridley.new(...)
-    #   conn.search_indexes => 
+    #   conn.search_indexes =>
     #     [:client, :environment, :node, :role, :"ridley-two", :"ridley-one"]
     #
     # @return [Array<Symbol, String>]
     def search_indexes
-      Ridley::Search.indexes(Actor.current)
+      @resources_registry[:search_resource].indexes
     end
 
     # The encrypted data bag secret for this connection.
@@ -241,15 +276,11 @@ module Ridley
     end
     alias_method :sync, :evaluate
 
-    def finalize
-      connection.terminate if connection && connection.alive?
-    end
-
-    def connection
-      @registry[:connection_pool]
-    end
-
     private
+
+      def connection
+        @connection_registry[:connection_pool]
+      end
 
       def method_missing(method, *args, &block)
         if block_given?
