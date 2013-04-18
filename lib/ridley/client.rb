@@ -186,36 +186,37 @@ module Ridley
       @resources_supervisor  = ResourcesSupervisor.new(@resources_registry, @connection_registry, @options)
     end
 
+    # @return [Ridley::ClientResource]
     def client
       @resources_registry[:client_resource]
     end
 
-    # @return [Ridley::ChainLink]
+    # @return [Ridley::CookbookResource]
     def cookbook
       @resources_registry[:cookbook_resource]
     end
 
-    # @return [Ridley::ChainLink]
+    # @return [Ridley::DataBagResource]
     def data_bag
       @resources_registry[:data_bag_resource]
     end
 
-    # @return [Ridley::ChainLink]
+    # @return [Ridley::EnvironmentResource]
     def environment
       @resources_registry[:environment_resource]
     end
 
-    # @return [Ridley::ChainLink]
+    # @return [Ridley::NodeResource]
     def node
       @resources_registry[:node_resource]
     end
 
-    # @return [Ridley::ChainLink]
+    # @return [Ridley::RoleResource]
     def role
       @resources_registry[:role_resource]
     end
 
-    # @return [Ridley::ChainLink]
+    # @return [Ridley::SandboxResource]
     def sandbox
       @resources_registry[:sandbox_resource]
     end
