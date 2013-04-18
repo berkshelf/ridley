@@ -39,7 +39,6 @@ module Ridley
       def initialize(registry, connection_registry, options)
         super(registry)
         supervise_as :client_resource, Ridley::ClientResource, connection_registry
-        supervise_as :client_resource, Ridley::ClientResource, connection_registry
         supervise_as :cookbook_resource, Ridley::CookbookResource, connection_registry,
           options[:client_name], options[:client_key], options.slice(*Ridley::Connection::VALID_OPTIONS)
         supervise_as :data_bag_resource, Ridley::DataBagResource, connection_registry,
