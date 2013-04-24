@@ -257,7 +257,7 @@ module Ridley
     def encrypted_data_bag_secret
       return nil if encrypted_data_bag_secret_path.nil?
 
-      IO.read(encrypted_data_bag_secret_path).chomp
+      ::IO.read(encrypted_data_bag_secret_path).chomp
     rescue Errno::ENOENT => e
       raise Errors::EncryptedDataBagSecretNotFound, "Encrypted data bag secret provided but not found at '#{encrypted_data_bag_secret_path}'"
     end
