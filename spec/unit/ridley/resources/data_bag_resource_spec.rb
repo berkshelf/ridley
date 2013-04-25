@@ -11,7 +11,7 @@ describe Ridley::DataBagResource do
       subject.should be_a(Ridley::DataBagItemResource)
     end
 
-    its(:data_bag_secret) { should eql(secret) }
+    its(:encrypted_data_bag_secret) { should eql(secret) }
   end
 
   describe "#find" do
