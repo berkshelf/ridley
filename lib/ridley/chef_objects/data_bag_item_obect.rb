@@ -48,6 +48,15 @@ module Ridley
       mass_assign(decrypted_hash)
     end
 
+    # Decrypts an individual value stored inside the data bag item.
+    #
+    # @example
+    #   data_bag_item.decrypt_value("Xk0E8lV9r4BhZzcg4wal0X4w9ZexN3azxMjZ9r1MCZc=") 
+    #     => {test: {database: {username: "test"}}}
+    #
+    # @param [String] an encrypted String value
+    #
+    # @return [Hash] a decrypted attribute value
     def decrypt_value(value)
       if encrypted_data_bag_secret.nil?
         raise Errors::EncryptedDataBagSecretNotSet
