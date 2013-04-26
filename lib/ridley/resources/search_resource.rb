@@ -77,20 +77,20 @@ module Ridley
     #     }
     #
     # @return [Array<ChefObject>, Hash]
-    def run(index, query_string, options = {})
+    def run(index, query_string, resources_registry, options = {})
       query_uri = self.class.query_uri(index)
       query     = self.class.build_query(query_string, options)
       response  = connection.get(query_uri, query).body
 
       case index.to_sym
       when :node
-        response[:rows].collect { |row| Ridley::NodeObject.new(row) }
+        response[:rows].collect { |row| Ridley::NodeObject.new(resources_registry[:node_resource], row) }
       when :role
-        response[:rows].collect { |row| Ridley::RoleObject.new(row) }
+        response[:rows].collect { |row| Ridley::RoleObject.new(resources_registry[:role_resource], row) }
       when :client
-        response[:rows].collect { |row| Ridley::ClientObject.new(row) }
+        response[:rows].collect { |row| Ridley::ClientObject.new(resources_registry[:client_resource], row) }
       when :environment
-        response[:rows].collect { |row| Ridley::EnvironmentObject.new(row) }
+        response[:rows].collect { |row| Ridley::EnvironmentObject.new(resources_registry[:environment_resource], row) }
       else
         response[:rows]
       end
