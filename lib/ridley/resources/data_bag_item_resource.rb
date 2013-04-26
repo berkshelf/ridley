@@ -3,13 +3,13 @@ module Ridley
   class DataBagItemResource < Ridley::Resource
     represented_by Ridley::DataBagItemObject
 
-    attr_reader :data_bag_secret
+    attr_reader :encrypted_data_bag_secret
 
     # @param [Celluloid::Registry] connection_registry
-    # @param [String] data_bag_secret
-    def initialize(connection_registry, data_bag_secret)
+    # @param [String] encrypted_data_bag_secret
+    def initialize(connection_registry, encrypted_data_bag_secret)
       super(connection_registry)
-      @data_bag_secret = data_bag_secret
+      @encrypted_data_bag_secret = encrypted_data_bag_secret
     end
 
     # @param [Ridley::DataBagObject] data_bag
