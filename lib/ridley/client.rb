@@ -234,7 +234,7 @@ module Ridley
     #
     # @return [Hash]
     def search(index, query = nil, options = {})
-      @resources_registry[:search_resource].run(index, query, options)
+      @resources_registry[:search_resource].run(index, query, @resources_registry, options)
     end
 
     # Return the array of all possible search indexes for the including connection
