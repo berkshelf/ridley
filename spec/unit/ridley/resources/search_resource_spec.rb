@@ -95,8 +95,9 @@ describe Ridley::SearchResource do
         start: 0
       })
     end
+    let(:registry) { double("registry", :[] => nil) }
 
-    let(:run) { subject.run(index, query_string) }
+    let(:run) { subject.run(index, query_string, registry) }
 
     before do
       connection.stub(:get).and_return(response)
@@ -145,7 +146,7 @@ describe Ridley::SearchResource do
       end
 
       context "after the search has executed and results are returned" do
-        let(:search_results) { subject.run(index, query_string) }
+        let(:search_results) { subject.run(index, query_string, registry) }
 
         it "Ridley::NodeObject instances contain the results" do
           first_result = search_results.first
@@ -183,7 +184,7 @@ describe Ridley::SearchResource do
       end
 
       context "after the search has executed and results are returned" do
-        let(:search_results) { subject.run(index, query_string) }
+        let(:search_results) { subject.run(index, query_string, registry) }
 
         it "Ridley::RoleObject instances contain the results" do
           first_result = search_results.first
@@ -220,7 +221,7 @@ describe Ridley::SearchResource do
       end
 
       context "after the search has executed and results are returned" do
-        let(:search_results) { subject.run(index, query_string) }
+        let(:search_results) { subject.run(index, query_string, registry) }
 
         it "Ridley::EnvironmentObject instances contain the results" do
           first_result = search_results.first
@@ -258,7 +259,7 @@ describe Ridley::SearchResource do
       end
 
       context "after the search has executed and results are returned" do
-        let(:search_results) { subject.run(index, query_string) }
+        let(:search_results) { subject.run(index, query_string, registry) }
 
         it "Ridley::ClientObject instances contain the results" do
           first_result = search_results.first
