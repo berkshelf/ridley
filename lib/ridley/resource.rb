@@ -28,6 +28,8 @@ module Ridley
     include Chozo::VariaModel
     include Comparable
 
+    task_class TaskThread
+
     # @param [Celluloid::Registry] connection_registry
     def initialize(connection_registry)
       @connection_registry = connection_registry

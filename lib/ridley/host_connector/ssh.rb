@@ -23,6 +23,8 @@ module Ridley
       include Celluloid
       include Celluloid::Logger
 
+      task_class TaskThread
+
       attr_reader :nodes
       attr_reader :options
 

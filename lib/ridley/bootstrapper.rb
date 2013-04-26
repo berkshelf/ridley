@@ -6,6 +6,8 @@ module Ridley
     include Celluloid
     include Ridley::Logging
 
+    task_class TaskThread
+
     # @return  [Array<String>]
     attr_reader :hosts
 

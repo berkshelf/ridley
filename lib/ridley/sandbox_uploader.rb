@@ -39,6 +39,8 @@ module Ridley
 
     include Celluloid
 
+    task_class TaskThread
+
     attr_reader :client_name
     attr_reader :client_key
     attr_reader :options
