@@ -84,13 +84,13 @@ module Ridley
 
       case index.to_sym
       when :node
-        response[:rows].collect { |row| Ridley::NodeObject.new(row) }
+        response[:rows].collect { |row| Ridley::NodeObject.new(nil, row) }
       when :role
-        response[:rows].collect { |row| Ridley::RoleObject.new(row) }
+        response[:rows].collect { |row| Ridley::RoleObject.new(nil, row) }
       when :client
-        response[:rows].collect { |row| Ridley::ClientObject.new(row) }
+        response[:rows].collect { |row| Ridley::ClientObject.new(nil, row) }
       when :environment
-        response[:rows].collect { |row| Ridley::EnvironmentObject.new(row) }
+        response[:rows].collect { |row| Ridley::EnvironmentObject.new(nil, row) }
       else
         response[:rows]
       end

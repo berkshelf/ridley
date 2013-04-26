@@ -143,6 +143,15 @@ describe Ridley::SearchResource do
         result.should be_a(Array)
         result.should each be_a(Ridley::NodeObject)
       end
+
+      context "after the search has executed and results are returned" do
+        let(:search_results) { subject.run(index, query_string) }
+
+        it "Ridley::NodeObject instances contain the results" do
+          first_result = search_results.first
+          first_result.name.should eq("ridley-one")
+        end
+      end
     end
 
     context "when :role is the given index" do
@@ -172,6 +181,15 @@ describe Ridley::SearchResource do
         result.should be_a(Array)
         result.should each be_a(Ridley::RoleObject)
       end
+
+      context "after the search has executed and results are returned" do
+        let(:search_results) { subject.run(index, query_string) }
+
+        it "Ridley::RoleObject instances contain the results" do
+          first_result = search_results.first
+          first_result.name.should eq("ridley-role-one")
+        end
+      end
     end
 
     context "when :environment is the given index" do
@@ -200,6 +218,15 @@ describe Ridley::SearchResource do
         result.should be_a(Array)
         result.should each be_a(Ridley::EnvironmentObject)
       end
+
+      context "after the search has executed and results are returned" do
+        let(:search_results) { subject.run(index, query_string) }
+
+        it "Ridley::EnvironmentObject instances contain the results" do
+          first_result = search_results.first
+          first_result.name.should eq("ridley-env-test")
+        end
+      end
     end
 
     context "when :client is the given index" do
@@ -209,7 +236,7 @@ describe Ridley::SearchResource do
           rows: [
             {
               chef_type: "client",
-              name: nil,
+              name: "ridley-client-test",
               admin: false,
               validator: false,
               certificate: "-----BEGIN CERTIFICATE-----\nMIIDOjCCAqOgAwIBAgIE47eOmDANBgkqhkiG9w0BAQUFADCBnjELMAkGA1UEBhMC\nVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcMB1NlYXR0bGUxFjAUBgNV\nBAoMDU9wc2NvZGUsIEluYy4xHDAaBgNVBAsME0NlcnRpZmljYXRlIFNlcnZpY2Ux\nMjAwBgNVBAMMKW9wc2NvZGUuY29tL2VtYWlsQWRkcmVzcz1hdXRoQG9wc2NvZGUu\nY29tMCAXDTEyMTAwOTAwMTUxNVoYDzIxMDExMTA0MDAxNTE1WjCBnTEQMA4GA1UE\nBxMHU2VhdHRsZTETMBEGA1UECBMKV2FzaGluZ3RvbjELMAkGA1UEBhMCVVMxHDAa\nBgNVBAsTE0NlcnRpZmljYXRlIFNlcnZpY2UxFjAUBgNVBAoTDU9wc2NvZGUsIElu\nYy4xMTAvBgNVBAMUKFVSSTpodHRwOi8vb3BzY29kZS5jb20vR1VJRFMvY2xpZW50\nX2d1aWQwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCqB9KEGzl7Wcm/\nwz/x8HByZANCn6WQC+R12qQso5I6nLbTNkRP668jXG3j0R5/F5i/KearAB9ePzL/\nQe3iHtwW6u1qLI1hVNFNB+I1fGu1p6fZyIOjnLn3bqsbOkBplHOIqHsp4GVSsHKb\nD32UXZDa9S9ZFXnR4iT6hUGm5895ReZG9TDiHvBpi9NJFDZXz+AQ6JuQY8UgYMMA\nm80KbO8/NJlXbRW+siRuvr+LIsi9Mx4i63pBWAN46my291rQU31PF3IB+btfGtR/\nyDWDgMSB37bTzZeOf1Dg9fpl2vIXyu3PoHER0oYmrMQbrdwAt7qCHZNuNWn51WPb\n1PHxXL1rAgMBAAEwDQYJKoZIhvcNAQEFBQADgYEAGnJUVAv951fUhGyPOrl+LbQG\nqgchMwIn7oDLE863e66BYTDj7koK3jjhx3EBkrT2vt/xS4yW0ZRV1BNqfnNKWbBq\nMNQiKkYdTr+oq2O3plOg/q/M1eG1B5pxGXqvH0O76DVWQcV/svO+HQEi1n8y5UQd\n+pBJCygpuv78wPCM+c4=\n-----END CERTIFICATE-----\n",
@@ -228,6 +255,15 @@ describe Ridley::SearchResource do
 
         result.should be_a(Array)
         result.should each be_a(Ridley::ClientObject)
+      end
+
+      context "after the search has executed and results are returned" do
+        let(:search_results) { subject.run(index, query_string) }
+
+        it "Ridley::ClientObject instances contain the results" do
+          first_result = search_results.first
+          first_result.name.should eq("ridley-client-test")
+        end
       end
     end
   end
