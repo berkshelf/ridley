@@ -42,6 +42,7 @@ module Ridley
       #   the host to attempt to connect to
       # @option options [Hash] :ssh
       #   * :port (Fixnum) the ssh port to connect on the node the bootstrap will be performed on (22)
+      #   * :timeout (Float) [5.0] timeout value for testing SSH connection
       # @option options [Hash] :winrm
       #   * :port (Fixnum) the winrm port to connect on the node the bootstrap will be performed on (5985)
       # @param block [Proc]
@@ -50,7 +51,8 @@ module Ridley
       # @return [Ridley::HostConnector] a class under Ridley::HostConnector
       def best_connector_for(host, options = {}, &block)
         ssh_port, winrm_port = parse_port_options(options)
-        if connector_port_open?(host, ssh_port)
+        timeout = options[:ssh] && options[:ssh][:timeout]
+        if connector_port_open?(host, ssh_port, timeout)
           host_connector = Ridley::HostConnector::SSH
         elsif connector_port_open?(host, winrm_port)
           host_connector = Ridley::HostConnector::WinRM
@@ -72,10 +74,13 @@ module Ridley
       #   the host to attempt to connect to
       # @param  port [Fixnum]
       #   the port to attempt to connect on
+      # @param  timeout [Float]
+      #   the number of seconds to wait (default: 3)
       #
       # @return [Boolean]
-      def connector_port_open?(host, port)
-        Timeout::timeout(3) do
+      def connector_port_open?(host, port, timeout=nil)
+        timeout ||= 3
+        Timeout::timeout(timeout) do
           socket = TCPSocket.new(host, port)
           socket.close
         end
