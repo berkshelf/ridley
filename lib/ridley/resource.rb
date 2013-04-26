@@ -68,6 +68,8 @@ module Ridley
       new_attributes = connection.post(self.class.resource_path, resource.to_json).body
       resource.mass_assign(resource._attributes_.deep_merge(new_attributes))
       resource
+    rescue Errors::HTTPConflict => ex
+      abort(ex)
     end
 
     # @param [String, #chef_id] object
