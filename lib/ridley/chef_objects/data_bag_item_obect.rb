@@ -51,7 +51,7 @@ module Ridley
     # Decrypts an individual value stored inside the data bag item.
     #
     # @example
-    #   data_bag_item.decrypt_value("Xk0E8lV9r4BhZzcg4wal0X4w9ZexN3azxMjZ9r1MCZc=") 
+    #   data_bag_item.decrypt_value("Xk0E8lV9r4BhZzcg4wal0X4w9ZexN3azxMjZ9r1MCZc=")
     #     => {test: {database: {username: "test"}}}
     #
     # @param [String] an encrypted String value

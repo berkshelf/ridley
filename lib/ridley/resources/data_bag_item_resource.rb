@@ -45,6 +45,8 @@ module Ridley
       new_attributes = connection.post("#{DataBagResource.resource_path}/#{data_bag.name}", resource.to_json).body
       resource.mass_assign(new_attributes)
       resource
+    rescue Errors::HTTPConflict => ex
+      abort(ex)
     end
 
     # @param [Ridley::DataBagObject] data_bag
@@ -77,6 +79,8 @@ module Ridley
       new(data_bag).from_hash(
         connection.put("#{DataBagResource.resource_path}/#{data_bag.name}/#{resource.chef_id}", resource.to_json).body
       )
+    rescue Errors::HTTPConflict => ex
+      abort(ex)
     end
   end
 end

@@ -5,12 +5,12 @@ require 'chozo'
 def setup_rspec
   require 'rspec'
   require 'json_spec'
-  require 'webmock/rspec'
 
   Dir[File.join(File.expand_path("../../spec/support/**/*.rb", __FILE__))].each { |f| require f }
 
   RSpec.configure do |config|
     config.include Ridley::SpecHelpers
+    config.include Ridley::RSpec::ChefServer
     config.include JsonSpec::Helpers
 
     config.mock_with :rspec
@@ -19,12 +19,18 @@ def setup_rspec
     config.run_all_when_everything_filtered = true
 
     config.before(:all) do
-      Ridley.logger = nil
       Celluloid.logger = nil
+      Ridley.logger = nil
+      Ridley::RSpec::ChefServer.start unless Ridley::RSpec::ChefServer.running?
     end
 
     config.before(:each) do
       clean_tmp_path
+      Ridley::RSpec::ChefServer.server.clear_data
+    end
+
+    config.after(:each) do
+      Ridley::RSpec::ChefServer.server.clear_data
     end
   end
 end

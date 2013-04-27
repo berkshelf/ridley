@@ -1,48 +1,30 @@
 require 'spec_helper'
 
 describe "Node API operations", type: "acceptance" do
-  let(:server_url) { "https://api.opscode.com/organizations/ridley" }
+  let(:server_url)  { Ridley::RSpec::ChefServer.server_url }
   let(:client_name) { "reset" }
-  let(:client_key) { "/Users/reset/.chef/reset.pem" }
-  let(:resource) { double('node-resource') }
-
-  let(:connection) do
-    Ridley.new(
-      server_url: server_url,
-      client_name: client_name,
-      client_key: client_key
-    )
-  end
-
-  before(:all) { WebMock.allow_net_connect! }
-  after(:all) { WebMock.disable_net_connect! }
-
-  before(:each) do
-    connection.node.delete_all
-  end
+  let(:client_key)  { fixtures_path.join('reset.pem').to_s }
+  let(:connection)  { Ridley.new(server_url: server_url, client_name: client_name, client_key: client_key) }
 
   describe "finding a node" do
-    let(:target) { Ridley::NodeObject.new(resource, name: "ridley-one") }
+    let(:node_name) { "ridley.localhost" }
+    before { chef_node(node_name) }
 
-    before(:each) do
-      connection.node.create(target)
-    end
-
-    it "returns a Ridley::NodeResource object" do
-      connection.node.find(target.name).should eql(target)
+    it "returns a Ridley::NodeObject" do
+      connection.node.find(node_name).should be_a(Ridley::NodeObject)
     end
   end
 
   describe "creating a node" do
-    let(:target) { Ridley::NodeObject.new(resource, name: "ridley-one") }
+    let(:node_name) { "ridley.localhost" }
 
     it "returns a new Ridley::NodeObject object" do
-      connection.node.create(target).should eql(target)
+      connection.node.create(name: node_name).should be_a(Ridley::NodeObject)
     end
 
     it "adds a new node to the server" do
       connection.sync do
-        node.create(target)
+        node.create(name: node_name)
 
         node.all.should have(1).node
       end
@@ -50,26 +32,28 @@ describe "Node API operations", type: "acceptance" do
   end
 
   describe "deleting a node" do
-    let(:target) { Ridley::NodeObject.new(resource, name: "ridley-one") }
+    let(:node_name) { "ridley.localhost" }
+    before { chef_node(node_name) }
 
-    before(:each) do
-      connection.node.create(target)
-    end
-
-    it "returns the deleted object" do
-      connection.node.delete(target).should eql(target)
+    it "returns a Ridley::NodeObject" do
+      connection.node.delete(node_name).should be_a(Ridley::NodeObject)
     end
 
     it "removes the node from the server" do
       connection.sync do
-        node.delete(target)
+        node.delete(node_name)
 
-        node.find(target).should be_nil
+        node.find(node_name).should be_nil
       end
     end
   end
 
   describe "deleting all nodes" do
+    before do
+      chef_node("ridley.localhost")
+      chef_node("motherbrain.localhost")
+    end
+
     it "deletes all nodes from the remote server" do
       connection.sync do
         node.delete_all
@@ -80,11 +64,9 @@ describe "Node API operations", type: "acceptance" do
   end
 
   describe "listing all nodes" do
-    before(:each) do
-      connection.sync do
-        node.create(name: "ridley-one")
-        node.create(name: "ridley-two")
-      end
+    before do
+      chef_node("ridley.localhost")
+      chef_node("motherbrain.localhost")
     end
 
     it "returns an array of Ridley::NodeObject" do
@@ -98,11 +80,9 @@ describe "Node API operations", type: "acceptance" do
   end
 
   describe "updating a node" do
-    let(:target) { Ridley::NodeObject.new(resource, name: "ridley-one") }
-
-    before(:each) do
-      connection.node.create(target)
-    end
+    let(:node_name) { "ridley.localhost" }
+    before { chef_node(node_name) }
+    let(:target) { connection.node.find(node_name) }
 
     it "returns the updated node" do
       connection.node.update(target).should eql(target)

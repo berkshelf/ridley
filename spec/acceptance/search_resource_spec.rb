@@ -1,24 +1,14 @@
 require 'spec_helper'
 
 describe "Search API operations", type: "acceptance" do
-  let(:server_url) { "https://api.opscode.com/organizations/ridley" }
+  let(:server_url)  { Ridley::RSpec::ChefServer.server_url }
   let(:client_name) { "reset" }
-  let(:client_key) { "/Users/reset/.chef/reset.pem" }
-
-  let(:client) do
-    Ridley.new(
-      server_url: server_url,
-      client_name: client_name,
-      client_key: client_key
-    )
-  end
-
-  before(:all) { WebMock.allow_net_connect! }
-  after(:all) { WebMock.disable_net_connect! }
+  let(:client_key)  { fixtures_path.join('reset.pem').to_s }
+  let(:connection)  { Ridley.new(server_url: server_url, client_name: client_name, client_key: client_key) }
 
   describe "listing indexes" do
     it "returns an array of indexes" do
-      indexes = client.search_indexes
+      indexes = connection.search_indexes
 
       indexes.should include("role")
       indexes.should include("node")
@@ -30,7 +20,7 @@ describe "Search API operations", type: "acceptance" do
   describe "searching an index that doesn't exist" do
     it "it raises a Ridley::Errors::HTTPNotFound error" do
       lambda {
-        client.search(:notthere)
+        connection.search(:notthere)
       }.should raise_error(Ridley::Errors::HTTPNotFound)
     end
   end
