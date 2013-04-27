@@ -221,9 +221,14 @@ module Ridley::Chef
         load_root
       end
 
+      def filter_ignored(filename)
+        @ignore = Ridley::Cookbook::Chefignore.new(path)
+        @ignore.ignored?(filename)
+      end
+
       def load_root
         [].tap do |files|
-          Dir.glob(path.join('*'), File::FNM_DOTMATCH).each do |file|
+          Dir.glob(path.join('*'), File::FNM_DOTMATCH).select {|f| filter_ignored(f) }.each do |file|
             next if File.directory?(file)
             @files << file
             @manifest[:root_files] << file_metadata(:root_files, file)
@@ -234,7 +239,7 @@ module Ridley::Chef
       def load_recursively(category, category_dir, glob)
         [].tap do |files|
           file_spec = path.join(category_dir, '**', glob)
-          Dir.glob(file_spec, File::FNM_DOTMATCH).each do |file|
+          Dir.glob(file_spec, File::FNM_DOTMATCH).select {|f| filter_ignored(f) }.each do |file|
             next if File.directory?(file)
             @files << file
             @manifest[category] << file_metadata(category, file)
@@ -244,7 +249,7 @@ module Ridley::Chef
 
       def load_shallow(category, *path_glob)
         [].tap do |files|
-          Dir[path.join(*path_glob)].each do |file|
+          Dir[path.join(*path_glob)].select {|f| filter_ignored(f) }.each do |file|
             @files << file
             @manifest[category] << file_metadata(category, file)
           end
