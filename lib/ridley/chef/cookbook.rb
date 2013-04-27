@@ -3,6 +3,7 @@ module Ridley::Chef
   class Cookbook
     autoload :Metadata, 'ridley/chef/cookbook/metadata'
     autoload :SyntaxCheck, 'ridley/chef/cookbook/syntax_check'
+    require_relative 'chefignore'
 
     class << self
       # @param [String] filepath
@@ -222,7 +223,7 @@ module Ridley::Chef
       end
 
       def filter_ignored(filename)
-        @ignore = Ridley::Cookbook::Chefignore.new(path)
+        @ignore = Ridley::Chef::Cookbook::Chefignore.new(path)
         @ignore.ignored?(filename)
       end
 

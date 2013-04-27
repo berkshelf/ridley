@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-class Ridley
+module Ridley::Chef
   class Cookbook
     class Chefignore
 
@@ -49,7 +49,7 @@ class Ridley
             ignore_globs << line.strip unless line =~ COMMENTS_AND_WHITESPACE
           end
         else
-          Chef::Log.debug("No chefignore file found at #@ignore_file no files will be ignored")
+          # Chef::Log.debug("No chefignore file found at #@ignore_file no files will be ignored")
         end
         ignore_globs
       end
