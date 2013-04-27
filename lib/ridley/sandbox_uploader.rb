@@ -94,7 +94,7 @@ module Ridley
     # @return [Hash, nil]
     def upload(chk_id, path)
       checksum = self.checksum(chk_id)
-      
+
       unless checksum[:needs_upload]
         return nil
       end
@@ -108,6 +108,12 @@ module Ridley
       url         = URI(checksum[:url])
       upload_path = url.path
       url.path    = ""
+
+      # versions prior to OSS Chef 11 will strip the port to upload the file to in the checksum
+      # url returned. This will ensure we are uploading to the proper location.
+      if client.connection.foss?
+        url.port = URI(client.connection.server_url).port
+      end
 
       begin
         Faraday.new(url, client.options.slice(*Connection::VALID_OPTIONS)) do |c|

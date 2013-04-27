@@ -1,11 +1,13 @@
 require 'spec_helper'
 
 describe Ridley::SandboxUploader do
+  let(:connection) { double('chef-conn') }
   let(:client) do
     double('client',
       client_name: 'reset',
       client_key: fixtures_path.join('reset.pem'),
-      options: {}
+      options: {},
+      connection: connection
     )
   end
 
@@ -98,6 +100,27 @@ describe Ridley::SandboxUploader do
 
       it "returns nil" do
         subject.upload(chk_id, path).should be_nil
+      end
+    end
+
+    context "when the connection is an open source server connection with a non-80 port" do
+      before do
+        connection.stub(foss?: true, server_url: "http://localhost:8889")
+      end
+
+      let(:checksums) do
+        {
+          chk_id => {
+            url: "http://localhost/sandboxes/bd091b150b0a4578b97771af6abf3e05",
+            needs_upload: true
+          }
+        }
+      end
+
+      it "does not strip the port from the target to upload to", focus: true do
+        stub_request(:put, "http://localhost:8889/sandboxes/bd091b150b0a4578b97771af6abf3e05")
+
+        subject.upload(chk_id, path)
       end
     end
   end
