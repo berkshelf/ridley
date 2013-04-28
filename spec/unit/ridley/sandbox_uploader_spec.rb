@@ -68,6 +68,10 @@ describe Ridley::SandboxUploader do
     let(:chk_id) { "oGCPHrQ+5MylEL+V+NIJ9w==" }
     let(:path) { fixtures_path.join('reset.pem').to_s }
 
+    before do
+      connection.stub(foss?: false)
+    end
+
     context "when the checksum needs uploading" do
       let(:checksums) do
         {
@@ -117,7 +121,7 @@ describe Ridley::SandboxUploader do
         }
       end
 
-      it "does not strip the port from the target to upload to", focus: true do
+      it "does not strip the port from the target to upload to" do
         stub_request(:put, "http://localhost:8889/sandboxes/bd091b150b0a4578b97771af6abf3e05")
 
         subject.upload(chk_id, path)
