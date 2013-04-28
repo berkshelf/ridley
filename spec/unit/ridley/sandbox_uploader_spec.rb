@@ -48,6 +48,10 @@ describe Ridley::SandboxUploader do
     let(:chk_id) { "oGCPHrQ+5MylEL+V+NIJ9w==" }
     let(:path) { fixtures_path.join('reset.pem').to_s }
 
+    before do
+      connection.stub(foss?: false)
+    end
+
     context "when the checksum needs uploading" do
       let(:checksums) do
         {
@@ -80,6 +84,27 @@ describe Ridley::SandboxUploader do
 
       it "returns nil" do
         subject.upload(sandbox, chk_id, path).should be_nil
+      end
+    end
+
+    context "when the connection is an open source server connection with a non-80 port" do
+      before do
+        connection.stub(foss?: true, server_url: "http://localhost:8889")
+      end
+
+      let(:checksums) do
+        {
+          chk_id => {
+            url: "http://localhost/sandboxes/bd091b150b0a4578b97771af6abf3e05",
+            needs_upload: true
+          }
+        }
+      end
+
+      it "does not strip the port from the target to upload to" do
+        stub_request(:put, "http://localhost:8889/sandboxes/bd091b150b0a4578b97771af6abf3e05")
+
+        subject.upload(sandbox, chk_id, path)
       end
     end
   end

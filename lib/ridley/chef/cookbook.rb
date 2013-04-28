@@ -96,6 +96,7 @@ module Ridley::Chef
         root_files: Array.new
       )
       @frozen        = false
+      @chefignore    = Ridley::Chef::Chefignore.new(@path)
 
       load_files
     end
@@ -207,7 +208,12 @@ module Ridley::Chef
 
     private
 
+      # @return [Array]
       attr_reader :files
+      # @return [Ridley::Chef::Chefignore]
+      attr_reader :chefignore
+
+      def_delegator :chefignore, :ignored?
 
       def load_files
         load_shallow(:recipes, 'recipes', '*.rb')
@@ -225,6 +231,7 @@ module Ridley::Chef
         [].tap do |files|
           Dir.glob(path.join('*'), File::FNM_DOTMATCH).each do |file|
             next if File.directory?(file)
+            next if ignored?(file)
             @files << file
             @manifest[:root_files] << file_metadata(:root_files, file)
           end
@@ -236,6 +243,7 @@ module Ridley::Chef
           file_spec = path.join(category_dir, '**', glob)
           Dir.glob(file_spec, File::FNM_DOTMATCH).each do |file|
             next if File.directory?(file)
+            next if ignored?(file)
             @files << file
             @manifest[category] << file_metadata(category, file)
           end
@@ -245,6 +253,7 @@ module Ridley::Chef
       def load_shallow(category, *path_glob)
         [].tap do |files|
           Dir[path.join(*path_glob)].each do |file|
+            next if ignored?(file)
             @files << file
             @manifest[category] << file_metadata(category, file)
           end
