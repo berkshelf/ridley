@@ -1,39 +1,40 @@
-#--
-# Author:: Daniel DeLeo (<dan@opscode.com>)
-# Copyright:: Copyright (c) 2011 Opscode, Inc.
-# License:: Apache License, Version 2.0
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
 require 'spec_helper'
 
-describe Ridley::Chef::Cookbook::Chefignore do
-  before do
-    @chefignore = Ridley::Chef::Cookbook::Chefignore.new(File.join(fixtures_path))
+describe Ridley::Chef::Chefignore do
+  describe "ClassMethods" do
+    subject { described_class }
+
+    describe "::find_relative_to" do
+      let(:path) { tmp_path.join('chefignore-test') }
+      before(:each) { FileUtils.mkdir_p(path) }
+
+      it "finds a chefignore file in a 'cookbooks' directory relative to the given path" do
+        FileUtils.touch(path.join('chefignore'))
+        subject.find_relative_to(path)
+      end
+
+      it "finds a chefignore file relative to the given path" do
+        FileUtils.mkdir_p(path.join('cookbooks'))
+        FileUtils.touch(path.join('cookbooks', 'chefignore'))
+        subject.find_relative_to(path)
+      end
+    end
   end
 
+  subject { described_class.new(File.join(fixtures_path)) }
+
   it "loads the globs in the chefignore file" do
-    @chefignore.ignores.should =~ %w[recipes/ignoreme.rb ignored]
+    subject.ignores.should =~ %w[recipes/ignoreme.rb ignored]
   end
 
   it "removes items from an array that match the ignores" do
     file_list = %w[ recipes/ignoreme.rb recipes/dontignoreme.rb ]
-    @chefignore.remove_ignores_from(file_list).should == %w[recipes/dontignoreme.rb]
+    subject.remove_ignores_from(file_list).should == %w[recipes/dontignoreme.rb]
   end
 
   it "determines if a file is ignored" do
-    @chefignore.ignored?('ignored').should be_true
-    @chefignore.ignored?('recipes/ignoreme.rb').should be_true
-    @chefignore.ignored?('recipes/dontignoreme.rb').should be_false
+    subject.ignored?('ignored').should be_true
+    subject.ignored?('recipes/ignoreme.rb').should be_true
+    subject.ignored?('recipes/dontignoreme.rb').should be_false
   end
 end
