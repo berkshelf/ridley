@@ -1,4 +1,4 @@
-script: "bundle exec thor spec:unit"
+script: "bundle exec thor spec:all"
 language: ruby
 rvm:
   - 1.9.2
