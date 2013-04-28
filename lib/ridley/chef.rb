@@ -5,6 +5,7 @@ module Ridley
   # site, and Chef Cookbooks
   module Chef
     autoload :Cookbook, 'ridley/chef/cookbook'
+    autoload :Chefignore, 'ridley/chef/chefignore'
     autoload :Digester, 'ridley/chef/digester'
   end
 end
