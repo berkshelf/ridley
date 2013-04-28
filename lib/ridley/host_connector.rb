@@ -52,6 +52,7 @@ module Ridley
       def best_connector_for(host, options = {}, &block)
         ssh_port, winrm_port = parse_port_options(options)
         timeout = options[:ssh] && options[:ssh][:timeout]
+
         if connector_port_open?(host, ssh_port, timeout)
           host_connector = Ridley::HostConnector::SSH
         elsif connector_port_open?(host, winrm_port)
@@ -78,8 +79,9 @@ module Ridley
       #   the number of seconds to wait (default: 3)
       #
       # @return [Boolean]
-      def connector_port_open?(host, port, timeout=nil)
+      def connector_port_open?(host, port, timeout = nil)
         timeout ||= 3
+
         Timeout::timeout(timeout) do
           socket = TCPSocket.new(host, port)
           socket.close
