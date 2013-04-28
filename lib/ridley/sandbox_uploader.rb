@@ -75,6 +75,12 @@ module Ridley
       upload_path = url.path
       url.path    = ""
 
+      # versions prior to OSS Chef 11 will strip the port to upload the file to in the checksum
+      # url returned. This will ensure we are uploading to the proper location.
+      if sandbox.send(:resource).connection.foss?
+        url.port = URI(sandbox.send(:resource).connection.server_url).port
+      end
+
       begin
         Faraday.new(url, self.options) do |c|
           c.response :chef_response
