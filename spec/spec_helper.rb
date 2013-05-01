@@ -5,6 +5,7 @@ require 'chozo'
 def setup_rspec
   require 'rspec'
   require 'json_spec'
+  require 'webmock/rspec'
 
   Dir[File.join(File.expand_path("../../spec/support/**/*.rb", __FILE__))].each { |f| require f }
 
@@ -21,10 +22,17 @@ def setup_rspec
     config.before(:all) do
       Celluloid.logger = nil
       Ridley.logger = nil
-      Ridley::RSpec::ChefServer.start unless Ridley::RSpec::ChefServer.running?
+      WebMock.disable_net_connect!(allow_localhost: true, net_http_connect_on_start: true)
+      Ridley::RSpec::ChefServer.start
+    end
+
+    config.after(:all) do
+      Ridley::RSpec::ChefServer.stop
     end
 
     config.before(:each) do
+      Celluloid.shutdown
+      Celluloid.boot
       clean_tmp_path
       Ridley::RSpec::ChefServer.server.clear_data
     end
