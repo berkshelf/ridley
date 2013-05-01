@@ -1,58 +1,30 @@
 require 'spec_helper'
 
 describe "Role API operations", type: "acceptance" do
-  let(:server_url) { "https://api.opscode.com/organizations/ridley" }
+  let(:server_url)  { Ridley::RSpec::ChefServer.server_url }
   let(:client_name) { "reset" }
-  let(:client_key) { "/Users/reset/.chef/reset.pem" }
-  let(:resource) { double('role-resource') }
-
-  let(:connection) do
-    Ridley.new(
-      server_url: server_url,
-      client_name: client_name,
-      client_key: client_key
-    )
-  end
-
-  before(:all) { WebMock.allow_net_connect! }
-  after(:all) { WebMock.disable_net_connect! }
-
-  before(:each) { connection.role.delete_all }
+  let(:client_key)  { fixtures_path.join('reset.pem').to_s }
+  let(:connection)  { Ridley.new(server_url: server_url, client_name: client_name, client_key: client_key) }
 
   describe "finding a role" do
-    let(:target) do
-      Ridley::RoleObject.new(
-        resource,
-        name: "ridley-test",
-        description: "a testing role for ridley" 
-      )
-    end
+    let(:role_name) { "ridley-role" }
+    before { chef_role(role_name) }
 
-    before(:each) do
-      connection.role.create(target)
-    end
-
-    it "returns the target Ridley::RoleObject from the server" do
-      connection.role.find(target.name).should eql(target)
+    it "returns a Ridley::RoleObject" do
+      connection.role.find(role_name).should be_a(Ridley::RoleObject)
     end
   end
 
   describe "creating a role" do
-    let(:target) do
-      Ridley::RoleObject.new(
-        resource,
-        name: "ridley-test",
-        description: "a testing role for ridley" 
-      )
-    end
+    let(:role_name) { "ridley-role" }
 
     it "returns a new Ridley::RoleObject" do
-      connection.role.create(target).should eql(target)
+      connection.role.create(name: role_name).should be_a(Ridley::RoleObject)
     end
 
     it "adds a new role to the server" do
       connection.sync do
-        role.create(target)
+        role.create(name: role_name)
 
         role.all.should have(1).role
       end
@@ -60,31 +32,28 @@ describe "Role API operations", type: "acceptance" do
   end
 
   describe "deleting a role" do
-    let(:target) do
-      Ridley::RoleObject.new(
-        resource,
-        name: "ridley-role-one"
-      )
-    end
-
-    before(:each) do
-      connection.role.create(target)
-    end
+    let(:role_name) { "ridley-role" }
+    before { chef_role(role_name) }
 
     it "returns the deleted Ridley::RoleObject resource" do
-      connection.role.delete(target).should eql(target)
+      connection.role.delete(role_name).should be_a(Ridley::RoleObject)
     end
 
     it "removes the role from the server" do
       connection.sync do
-        role.delete(target)
+        role.delete(role_name)
 
-        role.find(target).should be_nil
+        role.find(role_name).should be_nil
       end
     end
   end
 
   describe "deleting all roles" do
+    before do
+      chef_role("role_one")
+      chef_role("role_two")
+    end
+
     it "deletes all nodes from the remote server" do
       connection.sync do
         role.delete_all
@@ -95,14 +64,12 @@ describe "Role API operations", type: "acceptance" do
   end
 
   describe "listing all roles" do
-    before(:each) do
-      connection.sync do
-        role.create(name: "jamie")
-        role.create(name: "winsor")
-      end
+    before do
+      chef_role("role_one")
+      chef_role("role_two")
     end
 
-    it "should return an array of Ridley::RoleResource objects" do
+    it "should return an array of Ridley::RoleObject" do
       connection.sync do
         obj = role.all
 
@@ -113,16 +80,9 @@ describe "Role API operations", type: "acceptance" do
   end
 
   describe "updating a role" do
-    let(:target) do
-      Ridley::RoleObject.new(
-        resource,
-        name: "ridley-role-one"
-      )
-    end
-
-    before(:each) do
-      connection.role.create(target)
-    end
+    let(:role_name) { "ridley-role" }
+    before { chef_role(role_name) }
+    let(:target) { connection.role.find(role_name) }
 
     it "returns an updated Ridley::RoleObject object" do
       connection.role.update(target).should eql(target)

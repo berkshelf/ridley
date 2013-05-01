@@ -93,6 +93,8 @@ module Ridley
     def update(object)
       resource = new(object.to_hash)
       new(connection.put("#{self.class.resource_path}/#{resource.chef_id}", resource.to_json).body)
+    rescue Errors::HTTPConflict => ex
+      abort(ex)
     end
   end
 end

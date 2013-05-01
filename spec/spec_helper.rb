@@ -11,6 +11,7 @@ def setup_rspec
 
   RSpec.configure do |config|
     config.include Ridley::SpecHelpers
+    config.include Ridley::RSpec::ChefServer
     config.include JsonSpec::Helpers
 
     config.mock_with :rspec
@@ -19,12 +20,25 @@ def setup_rspec
     config.run_all_when_everything_filtered = true
 
     config.before(:all) do
-      Ridley.logger = nil
       Celluloid.logger = nil
+      Ridley.logger = nil
+      WebMock.disable_net_connect!(allow_localhost: true, net_http_connect_on_start: true)
+      Ridley::RSpec::ChefServer.start
+    end
+
+    config.after(:all) do
+      Ridley::RSpec::ChefServer.stop
     end
 
     config.before(:each) do
+      Celluloid.shutdown
+      Celluloid.boot
       clean_tmp_path
+      Ridley::RSpec::ChefServer.server.clear_data
+    end
+
+    config.after(:each) do
+      Ridley::RSpec::ChefServer.server.clear_data
     end
   end
 end

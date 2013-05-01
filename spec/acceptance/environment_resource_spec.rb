@@ -1,63 +1,46 @@
 require 'spec_helper'
 
 describe "Environment API operations", type: "acceptance" do
-  let(:server_url) { "https://api.opscode.com/organizations/ridley" }
+  let(:server_url)  { Ridley::RSpec::ChefServer.server_url }
   let(:client_name) { "reset" }
-  let(:client_key) { "/Users/reset/.chef/reset.pem" }
-  let(:resource) { double('environment-resource') }
-
-  let(:connection) do
-    Ridley.new(
-      server_url: server_url,
-      client_name: client_name,
-      client_key: client_key
-    )
-  end
-
-  before(:all) { WebMock.allow_net_connect! }
-  after(:all) { WebMock.disable_net_connect! }
-
-  before(:each) do
-    connection.environment.delete_all
-  end
+  let(:client_key)  { fixtures_path.join('reset.pem').to_s }
+  let(:connection)  { Ridley.new(server_url: server_url, client_name: client_name, client_key: client_key) }
 
   describe "finding an environment" do
-    let(:target) { Ridley::EnvironmentObject.new(resource, name: "ridley-test-env") }
-
-    before(:each) do
-      connection.environment.create(target)
-    end
+    before { chef_environment("ridley-test-env") }
 
     it "returns a valid Ridley::EnvironmentObject object" do
-      connection.sync do
-        obj = environment.find(target)
-
-        obj.should be_a(Ridley::EnvironmentObject)
-        obj.should be_valid
-      end
+      connection.environment.find("ridley-test-env").should be_a(Ridley::EnvironmentObject)
     end
   end
 
   describe "creating an environment" do
-    let(:target) do
-      Ridley::EnvironmentObject.new(
-        resource,
-        name: "ridley-test-env",
-        description: "a testing environment for ridley"
-      )
+    it "returns a valid Ridley::EnvironmentObject object" do
+      obj = connection.environment.create(name: "ridley-test-env", description: "a testing env for ridley")
+
+      obj.should be_a(Ridley::EnvironmentObject)
     end
 
-    it "returns a valid Ridley::EnvironmentObject object" do
-      connection.sync do
-        obj = environment.create(target)
-
-        obj.should be_a(Ridley::EnvironmentObject)
-        obj.should be_valid
-      end
+    it "adds an environment to the chef server" do
+      old = connection.environment.all.length
+      connection.environment.create(name: "ridley")
+      connection.environment.all.should have(old + 1).item
     end
   end
 
   describe "deleting an environment" do
+    before { chef_environment("ridley-env") }
+
+    it "returns a Ridley::EnvironmentObject object" do
+      connection.environment.delete("ridley-env").should be_a(Ridley::EnvironmentObject)
+    end
+
+    it "removes the environment from the server" do
+      connection.environment.delete("ridley-env")
+
+      connection.environment.find("ridley-env").should be_nil
+    end
+
     it "raises Ridley::Errors::HTTPMethodNotAllowed when attempting to delete the '_default' environment" do
       lambda {
         connection.environment.delete("_default")
@@ -66,11 +49,9 @@ describe "Environment API operations", type: "acceptance" do
   end
 
   describe "deleting all environments" do
-    before(:each) do
-      connection.sync do
-        environment.create(name: "ridley-one")
-        environment.create(name: "ridley-two")
-      end
+    before do
+      chef_environment("ridley-one")
+      chef_environment("ridley-two")
     end
 
     it "returns an array of Ridley::EnvironmentObject objects" do
@@ -78,12 +59,9 @@ describe "Environment API operations", type: "acceptance" do
     end
 
     it "deletes all environments but '_default' from the remote" do
-      connection.sync do
-        environment.delete_all
+      connection.environment.delete_all
 
-        environment.all.should have(1).clients
-        environment.find("_default").should_not be_nil
-      end
+      connection.environment.all.should have(1).item
     end
   end
 
@@ -94,21 +72,14 @@ describe "Environment API operations", type: "acceptance" do
   end
 
   describe "updating an environment" do
-    let(:target) { Ridley::EnvironmentObject.new(resource, name: "ridley-test-env") }
+    before { chef_environment("ridley-env") }
+    let(:target ) { connection.environment.find("ridley-env") }
 
-    before(:each) do
-      connection.environment.create(target)
-    end
-
-    it "saves a new 'description'" do
+    it "saves a new #description" do
       target.description = description = "ridley testing environment"
 
-      connection.sync do
-        environment.update(target)
-        obj = environment.find(target)
-
-        obj.description.should eql(description)
-      end
+      connection.environment.update(target)
+      target.reload.description.should eql(description)
     end
 
     it "saves a new set of 'default_attributes'" do
