@@ -9,7 +9,7 @@ require 'ridley'
 class Default < Thor
   unless jruby?
     require 'thor/rake_compat'
-    
+
     include Thor::RakeCompat
     Bundler::GemHelper.install_tasks
 
@@ -40,7 +40,7 @@ class Default < Thor
 
     desc "unit", "run only unit tests"
     def unit
-      exec "rspec --color --format=documentation spec --tag ~type:acceptance" 
+      exec "rspec --color --format=documentation spec --tag ~type:acceptance"
     end
 
     desc "acceptance", "run only acceptance tests"
