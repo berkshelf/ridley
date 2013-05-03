@@ -45,7 +45,7 @@ module Ridley
     #
     # @return [Array<Object>]
     def all
-      connection.get(self.class.resource_path).body.collect do |identity, location|
+      request(:get, self.class.resource_path).collect do |identity, location|
         new(self.class.representation.chef_id => identity)
       end
     end
@@ -55,7 +55,7 @@ module Ridley
     # @return [nil, Object]
     def find(object)
       chef_id = object.respond_to?(:chef_id) ? object.chef_id : object
-      new(connection.get("#{self.class.resource_path}/#{chef_id}").body)
+      new(request(:get, "#{self.class.resource_path}/#{chef_id}"))
     rescue Errors::HTTPNotFound => ex
       nil
     end
@@ -65,7 +65,7 @@ module Ridley
     # @return [Object]
     def create(object)
       resource = new(object.to_hash)
-      new_attributes = connection.post(self.class.resource_path, resource.to_json).body
+      new_attributes = request(:post, self.class.resource_path, resource.to_json)
       resource.mass_assign(resource._attributes_.deep_merge(new_attributes))
       resource
     rescue Errors::HTTPConflict => ex
@@ -77,7 +77,7 @@ module Ridley
     # @return [Object]
     def delete(object)
       chef_id = object.respond_to?(:chef_id) ? object.chef_id : object
-      new(connection.delete("#{self.class.resource_path}/#{chef_id}").body)
+      new(request(:delete, "#{self.class.resource_path}/#{chef_id}"))
     end
 
     # @return [Array<Object>]
@@ -92,9 +92,25 @@ module Ridley
     # @return [Object]
     def update(object)
       resource = new(object.to_hash)
-      new(connection.put("#{self.class.resource_path}/#{resource.chef_id}", resource.to_json).body)
+      new(request(:put, "#{self.class.resource_path}/#{resource.chef_id}", resource.to_json))
     rescue Errors::HTTPConflict => ex
       abort(ex)
     end
+
+    private
+
+      # @param [Symbol] method
+      def request(method, *args)
+        raw_request(method, *args).body
+      end
+
+      # @param [Symbol] method
+      def raw_request(method, *args)
+        unless Connection::METHODS.include?(method)
+          raise
+        end
+
+        defer { connection.send(method, *args) }
+      end
   end
 end
