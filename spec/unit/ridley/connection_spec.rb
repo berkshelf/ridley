@@ -56,8 +56,7 @@ describe Ridley::Connection do
     let(:contents) { "SOME STRING STUFF\nHERE.\n" }
 
     before(:each) do
-      stub_request(:get, "http://test.it/file").
-        to_return(status: 200, body: contents)
+      stub_request(:get, "http://test.it/file").to_return(status: 200, body: contents)
     end
 
     it "creates a destination file on disk" do

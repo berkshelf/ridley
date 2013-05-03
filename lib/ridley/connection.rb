@@ -95,7 +95,7 @@ module Ridley
     # Override Faraday::Connection#run_request to catch exceptions from {Ridley::Middleware} that
     # we expect. Caught exceptions are re-raised with Celluloid#abort so we don't crash the connection.
     def run_request(*args)
-      super
+      defer { super }
     rescue Errors::HTTPError, Faraday::Error => ex
       abort(ex)
     end
@@ -129,13 +129,16 @@ module Ridley
       local = Tempfile.new('ridley-stream')
       local.binmode
 
-      retryable(tries: retries, on: OpenURI::HTTPError, sleep: retry_interval) do
-        open(target, 'rb', headers) do |remote|
-          local.write(remote.read)
+      defer {
+        retryable(tries: retries, on: OpenURI::HTTPError, sleep: retry_interval) do
+          open(target, 'rb', headers) do |remote|
+            local.write(remote.read)
+          end
         end
-      end
 
-      local.flush
+        local.flush
+      }
+
       FileUtils.mv(local.path, destination)
     rescue OpenURI::HTTPError => ex
       abort(ex)
