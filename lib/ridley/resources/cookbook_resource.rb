@@ -100,6 +100,8 @@ module Ridley
     #
     # @param [String] name
     #
+    # @raise [Errors::ResourceNotFound] if the target cookbook has no versions
+    #
     # @return [String, nil]
     def latest_version(name)
       ver = versions(name).collect do |version|
@@ -115,6 +117,8 @@ module Ridley
     #   name of the cookbook
     # @param [String, Solve::Constraint] constraint
     #   constraint to solve for
+    #
+    # @raise [Errors::ResourceNotFound] if the target cookbook has no versions
     #
     # @return [CookbookResource, nil]
     #   returns the cookbook resource for the best solution or nil if no solution exists
@@ -208,6 +212,8 @@ module Ridley
     # @example
     #   versions("nginx") => [ "1.0.0", "1.2.0" ]
     #
+    # @raise [Errors::ResourceNotFound] if the target cookbook has no versions
+    #
     # @return [Array<String>]
     def versions(name)
       response = request(:get, "#{self.class.resource_path}/#{name}")
@@ -215,6 +221,8 @@ module Ridley
       response[name]["versions"].collect do |cb_ver|
         cb_ver["version"]
       end
+    rescue Errors::HTTPNotFound => ex
+      abort(Errors::ResourceNotFound.new(ex))
     end
 
     private

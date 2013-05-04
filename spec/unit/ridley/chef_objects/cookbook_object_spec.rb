@@ -44,7 +44,7 @@ describe Ridley::CookbookObject do
     end
   end
 
-  describe "#download_file", focus: true do
+  describe "#download_file" do
     let(:destination) { tmp_path.join('fake.file').to_s }
 
     before(:each) do
