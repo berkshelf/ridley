@@ -1,9 +1,9 @@
 require 'spec_helper'
 
 describe Ridley::CookbookObject do
-  let(:connection) { double('chef-connection') }
-  subject { described_class.new(double('registry')) }
-  before  { subject.stub(connection: connection) }
+  let(:connection) { double('connection') }
+  let(:resource) { double('resource', connection: connection) }
+  subject { described_class.new(resource) }
 
   describe "#download" do
     it "downloads each file" do
@@ -44,7 +44,7 @@ describe Ridley::CookbookObject do
     end
   end
 
-  describe "#download_file" do
+  describe "#download_file", focus: true do
     let(:destination) { tmp_path.join('fake.file').to_s }
 
     before(:each) do
