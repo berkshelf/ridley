@@ -6,7 +6,7 @@ module Ridley
 
     def initialize(connection_registry, client_name, client_key, options = {})
       super(connection_registry)
-      # @sandbox_resource = SandboxResource.new_link(connection_registry, client_name, client_key, options)
+      @sandbox_resource = SandboxResource.new_link(connection_registry, client_name, client_key, options)
     end
 
     # List all of the cookbooks and their versions present on the remote
@@ -25,7 +25,7 @@ module Ridley
     #   a hash containing keys which represent cookbook names and values which contain
     #   an array of strings representing the available versions
     def all
-      response = connection.get(self.class.resource_path).body
+      response = request(:get, self.class.resource_path)
 
       {}.tap do |cookbooks|
         response.each do |name, details|
@@ -47,7 +47,7 @@ module Ridley
       url = "#{self.class.resource_path}/#{name}/#{version}"
       url += "?purge=true" if options[:purge]
 
-      connection.delete(url).body
+      request(:delete, url)
       true
     rescue Errors::HTTPNotFound
       true
@@ -73,13 +73,15 @@ module Ridley
     #   the place to download the cookbook too. If no value is provided the cookbook
     #   will be downloaded to a temporary location
     #
+    # @raise [Errors::ResourceNotFound] if the target cookbook is not found
+    #
     # @return [String]
     #   the path to the directory the cookbook was downloaded to
     def download(name, version, destination = Dir.mktmpdir)
-      cookbook = find(name, version)
-
-      unless cookbook.nil?
+      if cookbook = find(name, version)
         cookbook.download(destination)
+      else
+        abort Errors::ResourceNotFound.new("cookbook #{name} (#{version}) was not found")
       end
     end
 
@@ -89,7 +91,7 @@ module Ridley
     # @return [nil, CookbookResource]
     def find(object, version)
       chef_id = object.respond_to?(:chef_id) ? object.chef_id : object
-      new(connection.get("#{self.class.resource_path}/#{chef_id}/#{version}").body)
+      new(request(:get, "#{self.class.resource_path}/#{chef_id}/#{version}"))
     rescue Errors::HTTPNotFound
       nil
     end
@@ -97,6 +99,8 @@ module Ridley
     # Return the latest version of the given cookbook found on the remote Chef server
     #
     # @param [String] name
+    #
+    # @raise [Errors::ResourceNotFound] if the target cookbook has no versions
     #
     # @return [String, nil]
     def latest_version(name)
@@ -113,6 +117,8 @@ module Ridley
     #   name of the cookbook
     # @param [String, Solve::Constraint] constraint
     #   constraint to solve for
+    #
+    # @raise [Errors::ResourceNotFound] if the target cookbook has no versions
     #
     # @return [CookbookResource, nil]
     #   returns the cookbook resource for the best solution or nil if no solution exists
@@ -150,7 +156,7 @@ module Ridley
       url = "cookbooks/#{cookbook.cookbook_name}/#{cookbook.version}"
       url << "?force=true" if options[:force]
 
-      connection.put(url, cookbook.to_json)
+      request(:put, url, cookbook.to_json)
     rescue Ridley::Errors::HTTPConflict => ex
       abort Ridley::Errors::FrozenCookbook.new(ex)
     end
@@ -206,13 +212,17 @@ module Ridley
     # @example
     #   versions("nginx") => [ "1.0.0", "1.2.0" ]
     #
+    # @raise [Errors::ResourceNotFound] if the target cookbook has no versions
+    #
     # @return [Array<String>]
     def versions(name)
-      response = connection.get("#{self.class.resource_path}/#{name}").body
+      response = request(:get, "#{self.class.resource_path}/#{name}")
 
       response[name]["versions"].collect do |cb_ver|
         cb_ver["version"]
       end
+    rescue Errors::HTTPNotFound => ex
+      abort(Errors::ResourceNotFound.new(ex))
     end
 
     private

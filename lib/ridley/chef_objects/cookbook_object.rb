@@ -118,7 +118,27 @@ module Ridley
     #
     # @return [nil]
     def download_file(filetype, path, destination)
-      download_fun(filetype).call(path, destination)
+      files = case filetype.to_sym
+      when :attribute, :attributes; attributes
+      when :definition, :definitions; definitions
+      when :file, :files; files
+      when :library, :libraries; libraries
+      when :provider, :providers; providers
+      when :recipe, :recipes; recipes
+      when :resource, :resources; resources
+      when :root_file, :root_files; root_files
+      when :template, :templates; templates
+      else
+        raise Errors::UnknownCookbookFileType.new(filetype)
+      end
+
+      file  = files.find { |f| f[:path] == path }
+      return nil if file.nil?
+
+      destination = File.expand_path(destination)
+      log.debug { "downloading '#{filetype}' file: #{file} to: '#{destination}'" }
+
+      resource.connection.stream(file[:url], destination)
     end
 
     # A hash containing keys for all of the different cookbook filetypes with values
@@ -150,41 +170,5 @@ module Ridley
     def to_s
       "#{name}: #{manifest}"
     end
-
-    private
-
-      # Return a lambda for downloading a file from the cookbook of the given type
-      #
-      # @param [#to_sym] filetype
-      #
-      # @return [lambda]
-      #   a lambda which takes to parameters: target and path. Target is the URL to download from
-      #   and path is the location on disk to steam the contents of the remote URL to.
-      def download_fun(filetype)
-        collection = case filetype.to_sym
-        when :attribute, :attributes; method(:attributes)
-        when :definition, :definitions; method(:definitions)
-        when :file, :files; method(:files)
-        when :library, :libraries; method(:libraries)
-        when :provider, :providers; method(:providers)
-        when :recipe, :recipes; method(:recipes)
-        when :resource, :resources; method(:resources)
-        when :root_file, :root_files; method(:root_files)
-        when :template, :templates; method(:templates)
-        else
-          raise Errors::UnknownCookbookFileType.new(filetype)
-        end
-
-        ->(target, destination) {
-          files = collection.call # JW: always chaining .call.find results in a nil value. WHY?
-          file  = files.find { |f| f[:path] == target }
-          return nil if file.nil?
-
-          destination = File.expand_path(destination)
-          log.debug { "downloading '#{filetype}' file: #{file} to: '#{destination}'" }
-
-          connection.stream(file[:url], destination)
-        }
-      end
   end
 end
