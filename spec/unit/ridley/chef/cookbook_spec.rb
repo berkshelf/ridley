@@ -4,7 +4,7 @@ describe Ridley::Chef::Cookbook do
   describe "ClassMethods" do
     subject { described_class }
 
-    describe "#from_path" do
+    describe "::from_path" do
       let(:cookbook_path) { fixtures_path.join("example_cookbook") }
 
       it "returns an instance of Ridley::Chef::Cookbook" do
@@ -26,9 +26,21 @@ describe Ridley::Chef::Cookbook do
           }.should raise_error(IOError)
         end
       end
+
+      context "when the metadata does not contain a value for name and no value for :name option was given" do
+        let(:cookbook_path) { tmp_path.join("directory_name").to_s }
+        before do
+          FileUtils.mkdir_p(cookbook_path)
+          FileUtils.touch(File.join(cookbook_path, 'metadata.rb'))
+        end
+
+        it "sets the name of the cookbook to the name of the directory containing it" do
+          subject.from_path(cookbook_path).cookbook_name.should eql("directory_name")
+        end
+      end
     end
 
-    describe "#checksum" do
+    describe "::checksum" do
       it "delegates to Ridley::Chef::Digester.md5_checksum_for_file" do
         path = fixtures_path.join("example_cookbook", "metadata.rb")
         Ridley::Chef::Digester.should_receive(:md5_checksum_for_file).with(path)

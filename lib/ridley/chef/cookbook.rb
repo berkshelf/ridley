@@ -36,13 +36,8 @@ module Ridley::Chef
         path     = Pathname.new(path)
         metadata = Cookbook::Metadata.from_file(path.join('metadata.rb'))
 
-        name = if options[:name].present?
-          options[:name]
-        else
-          metadata.name.empty? ? File.basename(path) : metadata.name
-        end
-
-        new(name, path, metadata)
+        metadata.name(options[:name].presence || metadata.name.presence || File.basename(path))
+        new(metadata.name, path, metadata)
       end
     end
 
