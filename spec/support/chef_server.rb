@@ -48,6 +48,10 @@ module Ridley::RSpec
       load_data(:clients, name, hash)
     end
 
+    def chef_cookbook(name, version, cookbook = Hash.new)
+      ChefServer.server.load_data("cookbooks" => { "#{name}-#{version}" => cookbook })
+    end
+
     def chef_data_bag(name, hash = Hash.new)
       ChefServer.server.load_data({ 'data' => { name => hash }})
     end
@@ -67,7 +71,7 @@ module Ridley::RSpec
     private
 
       def load_data(key, name, hash)
-        ChefServer.server.load_data({ key.to_s => { name => MultiJson.encode(hash) }})
+        ChefServer.server.load_data(key.to_s => { name => MultiJson.encode(hash) })
       end
   end
 end

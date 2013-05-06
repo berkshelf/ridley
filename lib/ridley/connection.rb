@@ -14,8 +14,11 @@ module Ridley
       :proxy
     ]
 
+    # @return [String]
     attr_reader :organization
+    # @return [String]
     attr_reader :client_key
+    # @return [String]
     attr_reader :client_name
     # @return [Integer]
     #   how many retries to attempt on HTTP requests
