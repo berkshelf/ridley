@@ -26,6 +26,10 @@ module Ridley::Chef
         def from_hash(hash)
           new.from_hash(hash)
         end
+
+        def from_json(json)
+          new.from_json(json)
+        end
       end
 
       NAME              = 'name'.freeze
@@ -456,6 +460,10 @@ module Ridley::Chef
         @recipes          = o[RECIPES] if o.has_key?(RECIPES)
         @version          = o[VERSION] if o.has_key?(VERSION)
         self
+      end
+
+      def from_json(json)
+        from_hash MultiJson.decode(json)
       end
 
       private
