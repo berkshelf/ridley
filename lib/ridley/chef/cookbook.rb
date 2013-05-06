@@ -42,6 +42,10 @@ module Ridley::Chef
           metadata.name.empty? ? File.basename(path) : metadata.name
         end
 
+        if metadata.name.empty?
+            metadata.name(name)
+        end
+
         new(name, path, metadata)
       end
     end
