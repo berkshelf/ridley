@@ -29,6 +29,7 @@ describe Ridley::Chef::Cookbook do
 
       context "when the metadata does not contain a value for name and no value for :name option was given" do
         let(:cookbook_path) { tmp_path.join("directory_name").to_s }
+
         before do
           FileUtils.mkdir_p(cookbook_path)
           FileUtils.touch(File.join(cookbook_path, 'metadata.rb'))
@@ -36,6 +37,21 @@ describe Ridley::Chef::Cookbook do
 
         it "sets the name of the cookbook to the name of the directory containing it" do
           subject.from_path(cookbook_path).cookbook_name.should eql("directory_name")
+        end
+      end
+
+      context "when a metadata.rb is missing but metadata.json is present", focus: true do
+        let(:cookbook_path) { tmp_path.join("temp_cookbook").to_s }
+
+        before do
+          FileUtils.mkdir_p(cookbook_path)
+          File.open(File.join(cookbook_path, 'metadata.json'), 'w+') do |f|
+            f.write MultiJson.encode(name: "rspec_test")
+          end
+        end
+
+        it "sets the name of the cookbook from the metadata.json" do
+          subject.from_path(cookbook_path).cookbook_name.should eql("rspec_test")
         end
       end
     end
