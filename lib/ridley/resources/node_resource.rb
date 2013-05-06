@@ -10,6 +10,7 @@ module Ridley
       #     * :password (String) the password for the shell user that will perform the bootstrap
       #     * :keys (Array, String) an array of keys (or a single key) to authenticate the ssh user with instead of a password
       #     * :timeout (Float) [5.0] timeout value for SSH bootstrap
+      #   @option options [String] :installer_url ('http://opscode.com/chef/install.sh')
       #   @option options [String] :validator_client
       #   @option options [String] :validator_path
       #     filepath to the validator used to bootstrap the node (required)

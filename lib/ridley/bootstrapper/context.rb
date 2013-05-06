@@ -27,6 +27,7 @@ module Ridley
             chef_version: Ridley::CHEF_VERSION,
             environment: "_default",
             sudo: true,
+            installer_url: "http://opscode.com/chef/install.sh",
             template: Bootstrapper.default_template
           }
         end
@@ -38,6 +39,8 @@ module Ridley
       attr_reader :node_name
       # @return [String]
       attr_reader :server_url
+      # @return [String]
+      attr_reader :installer_url
       # @return [String]
       attr_reader :validator_client
       # @return [String]
@@ -57,6 +60,7 @@ module Ridley
       #   filepath to the validator used to bootstrap the node (required)
       # @option options [String] :node_name
       # @option options [String] :server_url
+      # @option options [String] :installer_url ('http://opscode.com/chef/install.sh')
       # @option options [String] :validator_client
       # @option options [String] :bootstrap_proxy
       #   URL to a proxy server to bootstrap through (default: nil)
@@ -82,6 +86,7 @@ module Ridley
 
         @host                           = host
         @server_url                     = options[:server_url]
+        @installer_url                  = options[:installer_url]
         @validator_path                 = options[:validator_path]
         @node_name                      = options[:node_name]
         @validator_client               = options[:validator_client]
