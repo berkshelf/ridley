@@ -115,17 +115,31 @@ module Ridley
     class HTTP5XXError < HTTPError; end
 
     # 3XX
+    class HTTPMultipleChoices < HTTP3XXError; register_error(300); end
     class HTTPMovedPermanently < HTTP3XXError; register_error(301); end
     class HTTPFound < HTTP3XXError; register_error(302); end
+    class HTTPSeeOther < HTTP3XXError; register_error(303); end
+    class HTTPNotModified < HTTP3XXError; register_error(304); end
+    class HTTPUseProxy < HTTP3XXError; register_error(305); end
+    class HTTPTemporaryRedirect < HTTP3XXError; register_error(307); end
 
     # 4XX
     class HTTPBadRequest < HTTP4XXError; register_error(400); end
     class HTTPUnauthorized < HTTP4XXError; register_error(401); end
+    class HTTPPaymentRequired < HTTP4XXError; register_error(402); end
     class HTTPForbidden < HTTP4XXError; register_error(403); end
     class HTTPNotFound < HTTP4XXError; register_error(404); end
     class HTTPMethodNotAllowed < HTTP4XXError; register_error(405); end
+    class HTTPNotAcceptable < HTTP4XXError; register_error(406); end
+    class HTTPProxyAuthenticationRequired < HTTP4XXError; register_error(407); end
     class HTTPRequestTimeout < HTTP4XXError; register_error(408); end
     class HTTPConflict < HTTP4XXError; register_error(409); end
+    class HTTPGone < HTTP4XXError; register_error(410); end
+    class HTTPLengthRequired < HTTP4XXError; register_error(411); end
+    class HTTPPreconditionFailed < HTTP4XXError; register_error(412); end
+    class HTTPRequestEntityTooLarge < HTTP4XXError; register_error(413); end
+    class HTTPRequestURITooLong < HTTP4XXError; register_error(414); end
+    class HTTPUnsupportedMediaType < HTTP4XXError; register_error(415); end
 
     # 5XX
     class HTTPInternalServerError < HTTP5XXError; register_error(500); end
