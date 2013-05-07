@@ -40,7 +40,7 @@ describe Ridley::Chef::Cookbook do
         end
       end
 
-      context "when a metadata.rb is missing but metadata.json is present", focus: true do
+      context "when a metadata.rb is missing but metadata.json is present" do
         let(:cookbook_path) { tmp_path.join("temp_cookbook").to_s }
 
         before do
