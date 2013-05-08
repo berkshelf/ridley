@@ -40,30 +40,10 @@ Ridley exposes a number of functions that return resources which you can use to 
 
 For more information scroll down to the Manipulating Chef Resources section of this README.
 
-### Synchronous execution
+If you don't want to instantiate and manage a connection object you can use `Ridley.open` to open a connection, do some work, and it will be closed for you after the block executes.
 
-An alternative syntax is provided if you want to perform multiple requests, in order, on a connection.
-
-    ridley = Ridley.new(...)
-    ridley.sync do
-      role.all
-      role.find("reset")
-      role.create(name: "ridley-test")
-      role.delete("reset")
-    end
-
-The `sync` function on the connection object takes a block with no arguments and allows you to access the DSL within the block. You can address any one of the resources within the sync block:
-
-    ridley.sync do
-      environment.all
-      node.all
-      ...
-    end
-
-For one-liner requests you can create a new instance of Ridley and dispose of it with `Ridley.open`
-
-    Ridley.open(server_url: "https://api.opscode.com", ...) do
-      role.all
+    Ridley.open(server_url: "https://api.opscode.com", ...) do |r|
+      r.node.all
     end
 
 ## Manipulating Chef Resources
