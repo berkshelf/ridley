@@ -23,11 +23,9 @@ describe "Node API operations", type: "acceptance" do
     end
 
     it "adds a new node to the server" do
-      connection.sync do
-        node.create(name: node_name)
+      connection.node.create(name: node_name)
 
-        node.all.should have(1).node
-      end
+      connection.node.all.should have(1).node
     end
   end
 
@@ -40,11 +38,9 @@ describe "Node API operations", type: "acceptance" do
     end
 
     it "removes the node from the server" do
-      connection.sync do
-        node.delete(node_name)
+      connection.node.delete(node_name)
 
-        node.find(node_name).should be_nil
-      end
+      connection.node.find(node_name).should be_nil
     end
   end
 
@@ -55,11 +51,9 @@ describe "Node API operations", type: "acceptance" do
     end
 
     it "deletes all nodes from the remote server" do
-      connection.sync do
-        node.delete_all
+      connection.node.delete_all
 
-        node.all.should have(0).nodes
-      end
+      connection.node.all.should have(0).nodes
     end
   end
 
@@ -70,12 +64,10 @@ describe "Node API operations", type: "acceptance" do
     end
 
     it "returns an array of Ridley::NodeObject" do
-      connection.sync do
-        obj = node.all
+      obj = connection.node.all
 
-        obj.should each be_a(Ridley::NodeObject)
-        obj.should have(2).nodes
-      end
+      obj.should each be_a(Ridley::NodeObject)
+      obj.should have(2).nodes
     end
   end
 
@@ -96,12 +88,10 @@ describe "Node API operations", type: "acceptance" do
         }
       }
 
-      connection.sync do
-        node.update(target)
-        obj = node.find(target)
+      connection.node.update(target)
+      obj = connection.node.find(target)
 
-        obj.normal.should eql(normal)
-      end
+      obj.normal.should eql(normal)
     end
 
     it "saves a new set of 'default' attributes" do
@@ -112,12 +102,10 @@ describe "Node API operations", type: "acceptance" do
         }
       }
 
-      connection.sync do
-        node.update(target)
-        obj = node.find(target)
+      connection.node.update(target)
+      obj = connection.node.find(target)
 
-        obj.default.should eql(defaults)
-      end
+      obj.default.should eql(defaults)
     end
 
     it "saves a new set of 'automatic' attributes" do
@@ -128,12 +116,10 @@ describe "Node API operations", type: "acceptance" do
         }
       }
 
-      connection.sync do
-        node.update(target)
-        obj = node.find(target)
+      connection.node.update(target)
+      obj = connection.node.find(target)
 
-        obj.automatic.should eql(automatics)
-      end
+      obj.automatic.should eql(automatics)
     end
 
     it "saves a new set of 'override' attributes" do
@@ -144,34 +130,28 @@ describe "Node API operations", type: "acceptance" do
         }
       }
 
-      connection.sync do
-        node.update(target)
-        obj = node.find(target)
+      connection.node.update(target)
+      obj = connection.node.find(target)
 
-        obj.override.should eql(overrides)
-      end
+      obj.override.should eql(overrides)
     end
 
     it "places a node in a new 'chef_environment'" do
       target.chef_environment = environment = "ridley"
 
-      connection.sync do
-        node.update(target)
-        obj = node.find(target)
+      connection.node.update(target)
+      obj = connection.node.find(target)
 
-        obj.chef_environment.should eql(environment)
-      end
+      obj.chef_environment.should eql(environment)
     end
 
     it "saves a new 'run_list' for the node" do
       target.run_list = run_list = ["recipe[one]", "recipe[two]"]
 
-      connection.sync do
-        node.update(target)
-        obj = node.find(target)
+      connection.node.update(target)
+      obj = connection.node.find(target)
 
-        obj.run_list.should eql(run_list)
-      end
+      obj.run_list.should eql(run_list)
     end
   end
 end
