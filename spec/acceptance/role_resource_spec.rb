@@ -23,11 +23,8 @@ describe "Role API operations", type: "acceptance" do
     end
 
     it "adds a new role to the server" do
-      connection.sync do
-        role.create(name: role_name)
-
-        role.all.should have(1).role
-      end
+      connection.role.create(name: role_name)
+      connection.role.all.should have(1).role
     end
   end
 
@@ -40,11 +37,9 @@ describe "Role API operations", type: "acceptance" do
     end
 
     it "removes the role from the server" do
-      connection.sync do
-        role.delete(role_name)
+      connection.role.delete(role_name)
 
-        role.find(role_name).should be_nil
-      end
+      connection.role.find(role_name).should be_nil
     end
   end
 
@@ -55,11 +50,9 @@ describe "Role API operations", type: "acceptance" do
     end
 
     it "deletes all nodes from the remote server" do
-      connection.sync do
-        role.delete_all
+      connection.role.delete_all
 
-        role.all.should have(0).roles
-      end
+      connection.role.all.should have(0).roles
     end
   end
 
@@ -70,12 +63,10 @@ describe "Role API operations", type: "acceptance" do
     end
 
     it "should return an array of Ridley::RoleObject" do
-      connection.sync do
-        obj = role.all
+      obj = connection.role.all
 
-        obj.should have(2).roles
-        obj.should each be_a(Ridley::RoleObject)
-      end
+      obj.should have(2).roles
+      obj.should each be_a(Ridley::RoleObject)
     end
   end
 
@@ -91,12 +82,10 @@ describe "Role API operations", type: "acceptance" do
     it "saves a new run_list" do
       target.run_list = run_list = ["recipe[one]", "recipe[two]"]
 
-      connection.sync do
-        role.update(target)
-        obj = role.find(target)
+      connection.role.update(target)
+      obj = connection.role.find(target)
 
-        obj.run_list.should eql(run_list)
-      end
+      obj.run_list.should eql(run_list)
     end
 
     it "saves a new env_run_lists" do
@@ -105,23 +94,19 @@ describe "Role API operations", type: "acceptance" do
         "development" => ["recipe[two]"]
       }
 
-      connection.sync do
-        role.update(target)
-        obj = role.find(target)
+      connection.role.update(target)
+      obj = connection.role.find(target)
 
-        obj.env_run_lists.should eql(env_run_lists)
-      end
+      obj.env_run_lists.should eql(env_run_lists)
     end
 
     it "saves a new description" do
       target.description = description = "a new description!"
 
-      connection.sync do
-        role.update(target)
-        obj = role.find(target)
+      connection.role.update(target)
+      obj = connection.role.find(target)
 
-        obj.description.should eql(description)
-      end
+      obj.description.should eql(description)
     end
 
     it "saves a new default_attributes" do
@@ -132,12 +117,10 @@ describe "Role API operations", type: "acceptance" do
         }
       }
 
-      connection.sync do
-        role.update(target)
-        obj = role.find(target)
+      connection.role.update(target)
+      obj = connection.role.find(target)
 
-        obj.default_attributes.should eql(defaults)
-      end
+      obj.default_attributes.should eql(defaults)
     end
 
     it "saves a new override_attributes" do
@@ -148,12 +131,10 @@ describe "Role API operations", type: "acceptance" do
         }
       }
 
-      connection.sync do
-        role.update(target)
-        obj = role.find(target)
+      connection.role.update(target)
+      obj = connection.role.find(target)
 
-        obj.override_attributes.should eql(overrides)
-      end
+      obj.override_attributes.should eql(overrides)
     end
   end
 end

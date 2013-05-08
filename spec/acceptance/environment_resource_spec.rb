@@ -90,12 +90,9 @@ describe "Environment API operations", type: "acceptance" do
         }
       }
 
-      connection.sync do
-        environment.update(target)
-        obj = environment.find(target)
-
-        obj.default_attributes.should eql(default_attributes)
-      end
+      connection.environment.update(target)
+      obj = connection.environment.find(target)
+      obj.default_attributes.should eql(default_attributes)
     end
 
     it "saves a new set of 'override_attributes'" do
@@ -106,12 +103,9 @@ describe "Environment API operations", type: "acceptance" do
         }
       }
 
-      connection.sync do
-        environment.update(target)
-        obj = environment.find(target)
-
-        obj.override_attributes.should eql(override_attributes)
-      end
+      connection.environment.update(target)
+      obj = connection.environment.find(target)
+      obj.override_attributes.should eql(override_attributes)
     end
 
     it "saves a new set of 'cookbook_versions'" do
@@ -120,12 +114,9 @@ describe "Environment API operations", type: "acceptance" do
         "tomcat" => "1.3.0"
       }
 
-      connection.sync do
-        environment.update(target)
-        obj = environment.find(target)
-
-        obj.cookbook_versions.should eql(cookbook_versions)
-      end
+      connection.environment.update(target)
+      obj = connection.environment.find(target)
+      obj.cookbook_versions.should eql(cookbook_versions)
     end
   end
 end

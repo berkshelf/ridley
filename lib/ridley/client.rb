@@ -266,32 +266,10 @@ module Ridley
       self.url_prefix.to_s
     end
 
-    def evaluate(&block)
-      unless block_given?
-        raise LocalJumpError, "no block given (yield)"
-      end
-
-      @self_before_instance_eval = eval("self", block.binding)
-      instance_eval(&block)
-    end
-    alias_method :sync, :evaluate
-
     private
 
       def connection
         @connection_registry[:connection_pool]
-      end
-
-      def method_missing(method, *args, &block)
-        if block_given?
-          @self_before_instance_eval ||= eval("self", block.binding)
-        end
-
-        if @self_before_instance_eval.nil?
-          super
-        end
-
-        @self_before_instance_eval.send(method, *args, &block)
       end
   end
 end
