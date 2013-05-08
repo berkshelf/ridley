@@ -79,7 +79,7 @@ CONFIG
       end
 
       if encrypted_data_bag_secret.present?
-        body << %Q{encrypted_data_bag_secret "#{bootstrap_directory}\\encrypted_data_bag_secret"\n}
+        body << %Q{encrypted_data_bag_secret '#{bootstrap_directory}\\encrypted_data_bag_secret'\n}
       end
 
       escape_and_echo(body)
