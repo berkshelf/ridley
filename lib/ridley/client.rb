@@ -54,8 +54,10 @@ module Ridley
 
     class << self
       def open(options = {}, &block)
-        cli = new(options)
-        cli.evaluate(&block)
+        client = new(options)
+        yield client
+      ensure
+        client.terminate if client && client.alive?
       end
 
       # @raise [ArgumentError]

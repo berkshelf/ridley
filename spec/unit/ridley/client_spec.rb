@@ -115,56 +115,53 @@ describe Ridley::Client do
     end
 
     describe "::open" do
-      it "raises a LocalJumpError if no block is given" do
-        lambda {
-          described_class.open(config)
-        }.should raise_error(LocalJumpError)
+      it "instantiates a new connection, yields to it, and terminates it" do
+        new_instance = double(alive?: true)
+        described_class.should_receive(:new).and_return(new_instance)
+        new_instance.should_receive(:hello)
+        new_instance.should_receive(:terminate)
+
+        described_class.open do |f|
+          f.hello
+        end
       end
     end
   end
 
   let(:instance) { described_class.new(config) }
 
-  describe "#node" do
-    subject { instance.node }
+  subject { instance }
 
-    it { should be_a(Ridley::NodeResource) }
-
-    its(:server_url) { should eql(config[:server_url]) }
-    its(:validator_path) { should eql(config[:validator_path]) }
-    its(:validator_client) { should eql(config[:validator_client]) }
-    its(:encrypted_data_bag_secret) { should eql(instance.encrypted_data_bag_secret) }
-    its(:ssh) { should eql(config[:ssh]) }
-    its(:winrm) { should eql(config[:winrm]) }
-    its(:chef_version) { should eql(config[:chef_version]) }
-  end
+  its(:client) { should be_a(Ridley::ClientResource) }
+  its(:cookbook) { should be_a(Ridley::CookbookResource) }
+  its(:data_bag) { should be_a(Ridley::DataBagResource) }
+  its(:environment) { should be_a(Ridley::EnvironmentResource) }
+  its(:node) { should be_a(Ridley::NodeResource) }
+  its(:role) { should be_a(Ridley::RoleResource) }
+  its(:sandbox) { should be_a(Ridley::SandboxResource) }
 
   describe "#encrypted_data_bag_secret" do
-    subject { instance }
+    subject { instance.encrypted_data_bag_secret }
 
-    it "returns a string" do
-      subject.encrypted_data_bag_secret.should be_a(String)
-    end
+    it { should be_a(String) }
 
     context "when a encrypted_data_bag_secret_path is not provided" do
       before(:each) do
-        subject.stub(:encrypted_data_bag_secret_path) { nil }
+        instance.stub(encrypted_data_bag_secret_path: nil)
       end
 
       it "returns nil" do
-        subject.encrypted_data_bag_secret.should be_nil
+        expect(subject).to be_nil
       end
     end
 
     context "when the file is not found at the given encrypted_data_bag_secret_path" do
       before(:each) do
-        subject.stub(:encrypted_data_bag_secret_path) { fixtures_path.join("not.txt").to_s }
+        instance.stub(encrypted_data_bag_secret_path: fixtures_path.join("not.txt").to_s)
       end
 
       it "raises an EncryptedDataBagSecretNotFound erorr" do
-        lambda {
-          subject.encrypted_data_bag_secret
-        }.should raise_error(Ridley::Errors::EncryptedDataBagSecretNotFound)
+        expect { subject }.to raise_error(Ridley::Errors::EncryptedDataBagSecretNotFound)
       end
     end
   end
