@@ -53,10 +53,10 @@ module Ridley
         ssh_port, winrm_port = parse_port_options(options)
         timeout = options[:ssh] && options[:ssh][:timeout]
 
-        if connector_port_open?(host, ssh_port, timeout)
-          host_connector = Ridley::HostConnector::SSH
-        elsif connector_port_open?(host, winrm_port)
+        if connector_port_open?(host, winrm_port)
           host_connector = Ridley::HostConnector::WinRM
+        elsif connector_port_open?(host, ssh_port, timeout)
+          host_connector = Ridley::HostConnector::SSH
         else
           raise Ridley::Errors::HostConnectionError, "No available connection method available on #{host}."
         end
