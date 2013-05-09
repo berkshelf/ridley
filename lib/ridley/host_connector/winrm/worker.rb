@@ -47,10 +47,10 @@ module Ridley
         end
 
         def run(command)
+          response = Ridley::HostConnector::Response.new(host)
           command_uploaders << command_uploader = CommandUploader.new(winrm)
           command = get_command(command, command_uploader)
 
-          response = Ridley::HostConnector::Response.new(host)
           debug "Running WinRM Command: '#{command}' on: '#{host}' as: '#{user}'"
 
           output = winrm.run_cmd(command) do |stdout, stderr|

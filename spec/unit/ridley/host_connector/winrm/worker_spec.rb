@@ -51,6 +51,57 @@ describe Ridley::HostConnector::WinRM::Worker do
     end
   end
 
+  describe "#run" do
+    subject(:run) { winrm_worker.run(command) }
+    let(:command) { "dir" }
+    let(:command_uploader_stub) { double('CommandUploader') }
+    let(:stdout) { "stdout" }
+    let(:stderr) { nil }
+    let(:winrm_stub) { double }
+
+    before do
+      Ridley::HostConnector::WinRM::CommandUploader.stub(:new).and_return(command_uploader_stub)
+      winrm_worker.stub(:winrm).and_return(winrm_stub)
+      winrm_stub.stub(:run_cmd).and_yield(stdout, stderr).and_return({exitcode: 0})
+    end
+
+    context "when the exit_code is 0" do
+      it "returns an :ok with the response" do
+        status, response = run
+        expect(status).to eq(:ok)
+        expect(response.stdout).to eq("stdout")
+      end
+    end
+
+    context "when the exit_code is not 0" do
+      let(:stderr) { "stderr" }
+
+      before do
+        winrm_stub.stub(:run_cmd).and_yield(stdout, stderr).and_return({exitcode: 1})
+      end
+
+      it "returns an :error with the response" do
+        status, response = run
+        expect(status).to eq(:error)
+        expect(response.stderr).to eq("stderr")        
+      end
+    end
+
+    context "when an error is raised" do
+      let(:stderr) { "error" }
+
+      before do
+        winrm_stub.stub(:run_cmd).and_yield(stdout, stderr).and_raise("error")
+      end
+
+      it "returns an :error with the response" do
+        status, response = run
+        expect(status).to eq(:error)
+        expect(response.stderr).to eq("error")
+      end
+    end
+  end
+
   describe "#chef_client" do
     subject(:chef_client) { winrm_worker.chef_client }
 
