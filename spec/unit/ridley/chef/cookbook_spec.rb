@@ -15,8 +15,11 @@ describe Ridley::Chef::Cookbook do
         subject.from_path(cookbook_path).cookbook_name.should eql("example_cookbook")
       end
 
-      it "sets the cookbook_name attribute to the value of the :name option if given" do
-        subject.from_path(cookbook_path, name: "rspec_tester").cookbook_name.should eql("rspec_tester")
+      it "does not set the cookbook_name attribute if a value for the :name option is given" do
+        cached_name = subject.from_path(cookbook_path, name: "rspec_tester").cookbook_name
+
+        cached_name.should_not eql("rspec_tester")
+        cached_name.should eql("example_cookbook")
       end
 
       context "given a path that does not contain a metadata file" do
