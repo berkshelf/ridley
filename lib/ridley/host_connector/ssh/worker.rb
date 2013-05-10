@@ -7,6 +7,8 @@ module Ridley
         include Celluloid
         include Celluloid::Logger
 
+        task_class TaskThread
+
         attr_reader :sudo
         attr_reader :user
         attr_reader :host

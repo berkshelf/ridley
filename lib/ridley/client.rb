@@ -24,6 +24,8 @@ module Ridley
   #   connection.role.find("new-role") => <#Ridley::RoleResource: @name="new-role">
   class Client
     class ConnectionSupervisor < ::Celluloid::SupervisionGroup
+      task_class TaskThread
+
       def initialize(registry, options)
         super(registry)
         pool(Ridley::Connection, size: options[:pool_size], args: [
@@ -36,6 +38,8 @@ module Ridley
     end
 
     class ResourcesSupervisor < ::Celluloid::SupervisionGroup
+      task_class TaskThread
+
       def initialize(registry, connection_registry, options)
         super(registry)
         supervise_as :client_resource, Ridley::ClientResource, connection_registry
@@ -88,6 +92,8 @@ module Ridley
     extend Forwardable
     include Celluloid
     include Ridley::Logging
+
+    task_class TaskThread
 
     finalizer do
       @connection_supervisor.terminate if @connection_supervisor && @connection_supervisor.alive?

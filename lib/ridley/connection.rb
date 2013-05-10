@@ -7,6 +7,8 @@ module Ridley
   class Connection < Faraday::Connection
     include Celluloid
 
+    task_class TaskThread
+
     VALID_OPTIONS = [
       :retries,
       :retry_interval,
