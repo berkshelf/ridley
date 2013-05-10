@@ -1,3 +1,5 @@
+require 'shellwords'
+
 module Ridley::Chef
   class Cookbook
     # @author Jamie Winsor <reset@riotgames.com>
@@ -125,7 +127,7 @@ module Ridley::Chef
       end
 
       def validate_template(erb_file)
-        result = quietly { shell_out("erubis -x #{erb_file} | ruby -c") }
+        result = quietly { shell_out("erubis -x #{erb_file.shellescape} | ruby -c") }
         result.error!
         true
       rescue Mixlib::ShellOut::ShellCommandFailed
@@ -136,7 +138,7 @@ module Ridley::Chef
       end
 
       def validate_ruby_file(ruby_file)
-        result = quietly { shell_out("ruby -c #{ruby_file}") }
+        result = quietly { shell_out("ruby -c #{ruby_file.shellescape}") }
         result.error!
         true
       rescue Mixlib::ShellOut::ShellCommandFailed
