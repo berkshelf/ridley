@@ -96,15 +96,15 @@ describe Ridley::HostConnector do
 
     context "when an SSH port is open" do
       it "returns Ridley::HostConnector::SSH" do
-        subject.stub(:connector_port_open?).and_return(true)
-        subject.best_connector_for(host).should eq(Ridley::HostConnector::SSH)
+        subject.stub(:connector_port_open?).and_return(false, true)
+        expect(subject.best_connector_for(host)).to eq(Ridley::HostConnector::SSH)
       end
     end
 
     context "when an SSH port isnt open and a WinRM port is open" do
       it "retrns Ridley::HostConnector::WinRM" do
-        subject.stub(:connector_port_open?).and_return(false, true)
-        subject.best_connector_for(host).should eq(Ridley::HostConnector::WinRM)
+        subject.stub(:connector_port_open?).and_return(true, false)
+        expect(subject.best_connector_for(host)).to eq(Ridley::HostConnector::WinRM)
       end
     end
 
@@ -119,9 +119,9 @@ describe Ridley::HostConnector do
 
     context "when a block is provided" do
       it "yields the best HostConnector to the block" do
-        subject.stub(:connector_port_open?).and_return(true)
+        subject.stub(:connector_port_open?).and_return(false, true)
         subject.best_connector_for(host) do |yielded|
-          yielded.should eq(Ridley::HostConnector::SSH)
+          expect(yielded).to eq(Ridley::HostConnector::SSH)
         end
       end
     end
