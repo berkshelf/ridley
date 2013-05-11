@@ -83,9 +83,7 @@ module Ridley
 
     # @return [Array<Object>]
     def delete_all
-      all.collect do |resource|
-        future(:delete, resource)
-      end.map(&:value)
+      all.collect { |resource| future(:delete, resource) }.map(&:value)
     end
 
     # @param [#to_hash] object
