@@ -41,7 +41,7 @@ module Ridley
     #
     # @return [Array<String, Symbol>]
     def indexes
-      connection.get(self.class.resource_path).body.collect { |name, _| name }
+      request(:get, self.class.resource_path).collect { |name, _| name }
     end
 
     # Executes the built up query on the search's client
@@ -80,7 +80,7 @@ module Ridley
     def run(index, query_string, resources_registry, options = {})
       query_uri = self.class.query_uri(index)
       query     = self.class.build_query(query_string, options)
-      response  = connection.get(query_uri, query).body
+      response  = request(:get, query_uri, query)
 
       case index.to_sym
       when :node

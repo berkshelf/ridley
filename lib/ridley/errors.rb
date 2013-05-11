@@ -110,6 +110,15 @@ module Ridley
       end
     end
 
+    class HTTPUnknownMethod < HTTPError
+      attr_reader :method
+
+      def initialize(method)
+        @method  = method
+        @message = "unknown http method: #{method}"
+      end
+    end
+
     class HTTP3XXError < HTTPError; end
     class HTTP4XXError < HTTPError; end
     class HTTP5XXError < HTTPError; end

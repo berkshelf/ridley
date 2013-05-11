@@ -49,8 +49,9 @@ module Ridley
 
       request(:delete, url)
       true
-    rescue Errors::HTTPNotFound
-      true
+    rescue AbortError => ex
+      return nil if ex.cause.is_a?(Errors::HTTPNotFound)
+      abort(ex.cause)
     end
 
     # Delete all of the versions of a given cookbook on the remote Chef server
@@ -92,8 +93,9 @@ module Ridley
     def find(object, version)
       chef_id = object.respond_to?(:chef_id) ? object.chef_id : object
       new(request(:get, "#{self.class.resource_path}/#{chef_id}/#{version}"))
-    rescue Errors::HTTPNotFound
-      nil
+    rescue AbortError => ex
+      return nil if ex.cause.is_a?(Errors::HTTPNotFound)
+      abort(ex.cause)
     end
 
     # Return the latest version of the given cookbook found on the remote Chef server
@@ -157,8 +159,11 @@ module Ridley
       url << "?force=true" if options[:force]
 
       request(:put, url, cookbook.to_json)
-    rescue Ridley::Errors::HTTPConflict => ex
-      abort Ridley::Errors::FrozenCookbook.new(ex)
+    rescue AbortError => ex
+      if ex.cause.is_a?(Errors::HTTPConflict)
+        abort Ridley::Errors::FrozenCookbook.new(ex)
+      end
+      abort(ex.cause)
     end
     alias_method :create, :update
 
@@ -221,8 +226,11 @@ module Ridley
       response[name]["versions"].collect do |cb_ver|
         cb_ver["version"]
       end
-    rescue Errors::HTTPNotFound => ex
-      abort(Errors::ResourceNotFound.new(ex))
+    rescue AbortError => ex
+      if ex.cause.is_a?(Errors::HTTPNotFound)
+        abort Errors::ResourceNotFound.new(ex)
+      end
+      abort(ex.cause)
     end
 
     private

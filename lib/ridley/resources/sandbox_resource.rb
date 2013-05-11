@@ -34,7 +34,7 @@ module Ridley
       sumhash = { checksums: Hash.new }.tap do |chks|
         Array(checksums).each { |chk| chks[:checksums][chk] = nil }
       end
-      new(connection.post(self.class.resource_path, MultiJson.encode(sumhash)).body)
+      new(request(:post, self.class.resource_path, MultiJson.encode(sumhash)))
     end
 
     # @param [#chef_id] object
@@ -46,13 +46,15 @@ module Ridley
     # @return [Hash]
     def commit(object)
       chef_id = object.respond_to?(:chef_id) ? object.chef_id : object
-      connection.put("#{self.class.resource_path}/#{chef_id}", MultiJson.encode(is_completed: true)).body
-    rescue Ridley::Errors::HTTPBadRequest => ex
-      abort Ridley::Errors::SandboxCommitError.new(ex.message)
-    rescue Ridley::Errors::HTTPNotFound => ex
-      abort Ridley::Errors::ResourceNotFound.new(ex.message)
-    rescue Ridley::Errors::HTTPUnauthorized, Ridley::Errors::HTTPForbidden => ex
-      abort Ridley::Errors::PermissionDenied.new(ex.message)
+      request(:put, "#{self.class.resource_path}/#{chef_id}", MultiJson.encode(is_completed: true))
+    rescue AbortError => ex
+      case ex.cause
+      when Ridley::Errors::HTTPBadRequest; abort Ridley::Errors::SandboxCommitError.new(ex.message)
+      when Ridley::Errors::HTTPNotFound; abort Ridley::Errors::ResourceNotFound.new(ex.message)
+      when Ridley::Errors::HTTPUnauthorized, Ridley::Errors::HTTPForbidden
+        abort Ridley::Errors::PermissionDenied.new(ex.message)
+      else; abort(ex.cause)
+      end
     end
 
     # Concurrently upload all of the files in the given sandbox
@@ -75,23 +77,23 @@ module Ridley
     end
 
     def update(*args)
-      raise RuntimeError, "action not supported"
+      abort RuntimeError.new("action not supported")
     end
 
     def all(*args)
-      raise RuntimeError, "action not supported"
+      abort RuntimeError.new("action not supported")
     end
 
     def find(*args)
-      raise RuntimeError, "action not supported"
+      abort RuntimeError.new("action not supported")
     end
 
     def delete(*args)
-      raise RuntimeError, "action not supported"
+      abort RuntimeError.new("action not supported")
     end
 
     def delete_all(*args)
-      raise RuntimeError, "action not supported"
+      abort RuntimeError.new("action not supported")
     end
 
     private
