@@ -37,6 +37,7 @@ module Ridley
       self.class.representation.new(Actor.current, *args)
     end
 
+    # @return [Ridley::Connection]
     def connection
       @connection_registry[:connection_pool]
     end
@@ -52,12 +53,13 @@ module Ridley
 
     # @param [String, #chef_id] object
     #
-    # @return [nil, Object]
+    # @return [Object, nil]
     def find(object)
       chef_id = object.respond_to?(:chef_id) ? object.chef_id : object
       new(request(:get, "#{self.class.resource_path}/#{chef_id}"))
-    rescue Errors::HTTPNotFound => ex
-      nil
+    rescue AbortError => ex
+      return nil if ex.cause.is_a?(Errors::HTTPNotFound)
+      abort(ex.cause)
     end
 
     # @param [#to_hash] object
@@ -68,16 +70,17 @@ module Ridley
       new_attributes = request(:post, self.class.resource_path, resource.to_json)
       resource.mass_assign(resource._attributes_.deep_merge(new_attributes))
       resource
-    rescue Errors::HTTPConflict => ex
-      abort(ex)
     end
 
     # @param [String, #chef_id] object
     #
-    # @return [Object]
+    # @return [Object, nil]
     def delete(object)
       chef_id = object.respond_to?(:chef_id) ? object.chef_id : object
       new(request(:delete, "#{self.class.resource_path}/#{chef_id}"))
+    rescue AbortError => ex
+      return nil if ex.cause.is_a?(Errors::HTTPNotFound)
+      abort(ex.cause)
     end
 
     # @return [Array<Object>]
@@ -89,12 +92,13 @@ module Ridley
 
     # @param [#to_hash] object
     #
-    # @return [Object]
+    # @return [Object, nil]
     def update(object)
       resource = new(object.to_hash)
       new(request(:put, "#{self.class.resource_path}/#{resource.chef_id}", resource.to_json))
-    rescue Errors::HTTPConflict => ex
-      abort(ex)
+    rescue AbortError => ex
+      return nil if ex.cause.is_a?(Errors::HTTPConflict)
+      abort(ex.cause)
     end
 
     private
@@ -107,10 +111,12 @@ module Ridley
       # @param [Symbol] method
       def raw_request(method, *args)
         unless Connection::METHODS.include?(method)
-          raise
+          raise Errors::HTTPUnknownMethod, "unknown http method: #{method}"
         end
 
         defer { connection.send(method, *args) }
+      rescue Errors::HTTPError => ex
+        abort(ex)
       end
   end
 end

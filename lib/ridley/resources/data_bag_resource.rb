@@ -24,10 +24,11 @@ module Ridley
     # @return [nil, Ridley::DataBagResource]
     def find(object)
       chef_id = object.respond_to?(:chef_id) ? object.chef_id : object
-      connection.get("#{self.class.resource_path}/#{chef_id}")
+      request(:get, "#{self.class.resource_path}/#{chef_id}")
       new(name: chef_id)
-    rescue Errors::HTTPNotFound
-      nil
+    rescue AbortError => ex
+      return nil if ex.cause.is_a?(Errors::HTTPNotFound)
+      abort(ex.cause)
     end
   end
 end

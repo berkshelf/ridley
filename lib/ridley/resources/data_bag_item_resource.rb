@@ -16,7 +16,7 @@ module Ridley
     #
     # @return [Array<Object>]
     def all(data_bag)
-      connection.get("#{DataBagResource.resource_path}/#{data_bag.name}").body.collect do |id, location|
+      request(:get, "#{DataBagResource.resource_path}/#{data_bag.name}").collect do |id, location|
         new(data_bag, id: id)
       end
     end
@@ -24,38 +24,40 @@ module Ridley
     # @param [Ridley::DataBagObject] data_bag
     # @param [String, #chef_id] object
     #
-    # @return [Ridley::DataBagItemObject]
+    # @return [Ridley::DataBagItemObject, nil]
     def find(data_bag, object)
       chef_id = object.respond_to?(:chef_id) ? object.chef_id : object
-      new(data_bag).from_hash(connection.get("#{DataBagResource.resource_path}/#{data_bag.name}/#{chef_id}").body)
-    rescue Errors::HTTPNotFound
-      nil
+      new(data_bag).from_hash(request(:get, "#{DataBagResource.resource_path}/#{data_bag.name}/#{chef_id}"))
+    rescue AbortError => ex
+      return nil if ex.cause.is_a?(Errors::HTTPNotFound)
+      abort(ex.cause)
     end
 
     # @param [Ridley::DataBagObject] data_bag
     # @param [#to_hash] object
     #
-    # @return [Ridley::DataBagItemObject]
+    # @return [Ridley::DataBagItemObject, nil]
     def create(data_bag, object)
       resource = new(data_bag, object.to_hash)
       unless resource.valid?
         abort Errors::InvalidResource.new(resource.errors)
       end
 
-      new_attributes = connection.post("#{DataBagResource.resource_path}/#{data_bag.name}", resource.to_json).body
+      new_attributes = request(:post, "#{DataBagResource.resource_path}/#{data_bag.name}", resource.to_json)
       resource.mass_assign(new_attributes)
       resource
-    rescue Errors::HTTPConflict => ex
-      abort(ex)
     end
 
     # @param [Ridley::DataBagObject] data_bag
     # @param [String, #chef_id] object
     #
-    # @return [Ridley::DataBagItemObject]
+    # @return [Ridley::DataBagItemObject, nil]
     def delete(data_bag, object)
       chef_id = object.respond_to?(:chef_id) ? object.chef_id : object
-      new(data_bag).from_hash(connection.delete("#{DataBagResource.resource_path}/#{data_bag.name}/#{chef_id}").body)
+      new(data_bag).from_hash(request(:delete, "#{DataBagResource.resource_path}/#{data_bag.name}/#{chef_id}"))
+    rescue AbortError => ex
+      return nil if ex.cause.is_a?(Errors::HTTPNotFound)
+      abort(ex.cause)
     end
 
     # @param [Ridley::DataBagObject] data_bag
@@ -73,14 +75,15 @@ module Ridley
     # @param [Ridley::DataBagObject] data_bag
     # @param [#to_hash] object
     #
-    # @return [Ridley::DataBagItemObject]
+    # @return [Ridley::DataBagItemObject, nil]
     def update(data_bag, object)
       resource = new(data_bag, object.to_hash)
       new(data_bag).from_hash(
-        connection.put("#{DataBagResource.resource_path}/#{data_bag.name}/#{resource.chef_id}", resource.to_json).body
+        request(:put, "#{DataBagResource.resource_path}/#{data_bag.name}/#{resource.chef_id}", resource.to_json)
       )
-    rescue Errors::HTTPConflict => ex
-      abort(ex)
+    rescue AbortError => ex
+      return nil if ex.cause.is_a?(Errors::HTTPConflict)
+      abort(ex.cause)
     end
   end
 end
