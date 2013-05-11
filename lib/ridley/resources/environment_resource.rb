@@ -32,9 +32,7 @@ module Ridley
     # @return [Array<Ridley::EnvironmentObject>]
     def delete_all
       envs = all.reject { |env| env.name.to_s == '_default' }
-      envs.collect do |resource|
-        future(:delete, resource)
-      end.map(&:value)
+      envs.collect { |resource| future(:delete, resource) }.map(&:value)
     end
   end
 end
