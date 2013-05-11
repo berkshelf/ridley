@@ -62,12 +62,7 @@ module Ridley
     #
     # @return [Array<Ridley::DataBagItemObject>]
     def delete_all(data_bag)
-      mutex = Mutex.new
-      deleted = []
-
-      all(data_bag).collect do |resource|
-        future(:delete, data_bag, resource)
-      end.map(&:value)
+      all(data_bag).collect { |resource| future(:delete, data_bag, resource) }.map(&:value)
     end
 
     # @param [Ridley::DataBagObject] data_bag
