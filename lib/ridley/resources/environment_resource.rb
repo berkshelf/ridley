@@ -19,8 +19,11 @@ module Ridley
       run_list = Array(run_list).flatten
       chef_id  = environment.respond_to?(:chef_id) ? environment.chef_id : environment
       request(:post, "#{self.class.resource_path}/#{chef_id}/cookbook_versions", MultiJson.encode(run_list: run_list))
-    rescue Errors::HTTPNotFound => ex
-      abort Errors::ResourceNotFound.new(ex)
+    rescue AbortError => ex
+      if ex.cause.is_a?(Errors::HTTPNotFound)
+        abort Errors::ResourceNotFound.new(ex)
+      end
+      abort(ex.cause)
     end
 
     # Delete all of the environments on the client. The '_default' environment
