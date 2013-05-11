@@ -42,7 +42,7 @@ module Ridley::Chef
           raise IOError, "no metadata.rb or metadata.json found at #{path}"
         end
 
-        metadata.name(options[:name].presence || metadata.name.presence || File.basename(path))
+        metadata.name(metadata.name.presence || File.basename(path))
         new(metadata.name, path, metadata)
       end
     end
