@@ -34,7 +34,6 @@ module Ridley
   autoload :Bootstrapper, 'ridley/bootstrapper'
   autoload :Client, 'ridley/client'
   autoload :Connection, 'ridley/connection'
-  autoload :ChainLink, 'ridley/chain_link'
   autoload :Chef, 'ridley/chef'
   autoload :ChefObject, 'ridley/chef_object'
   autoload :DSL, 'ridley/dsl'
