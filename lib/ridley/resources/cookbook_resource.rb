@@ -60,9 +60,7 @@ module Ridley
     #
     # @option options [Boolean] purge (false)
     def delete_all(name, options = {})
-      versions(name).each do |version|
-        future(:delete, name, version, options)
-      end.map(&:value)
+      versions(name).collect { |version| future(:delete, name, version, options) }.map(&:value)
     end
 
     # Download the entire cookbook
