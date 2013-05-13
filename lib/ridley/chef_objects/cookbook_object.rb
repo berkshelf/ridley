@@ -118,7 +118,7 @@ module Ridley
     #
     # @return [nil]
     def download_file(filetype, path, destination)
-      files = case filetype.to_sym
+      file_list = case filetype.to_sym
       when :attribute, :attributes; attributes
       when :definition, :definitions; definitions
       when :file, :files; files
@@ -132,7 +132,7 @@ module Ridley
         raise Errors::UnknownCookbookFileType.new(filetype)
       end
 
-      file  = files.find { |f| f[:path] == path }
+      file  = file_list.find { |f| f[:path] == path }
       return nil if file.nil?
 
       destination = File.expand_path(destination)
