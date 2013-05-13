@@ -46,4 +46,5 @@ group :test do
   gem 'json_spec'
   gem 'webmock'
   gem 'chef-zero'
+  gem 'chef', '~> 11.4.4'
 end
