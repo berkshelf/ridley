@@ -5,6 +5,10 @@ module Ridley
     class InternalError < RidleyError; end
     class ArgumentError < InternalError; end
 
+    class ClientError < RidleyError; end
+    class ConnectionFailed < ClientError; end
+    class TimeoutError < ClientError; end
+
     class ResourceNotFound < RidleyError; end
     class ValidatorNotFound < RidleyError; end
 
