@@ -19,7 +19,7 @@ module Ridley
       def on_complete(env)
         log.debug { "==> handling Chef response" }
         log.debug { "request env: #{env}" }
-        
+
         unless self.class.success?(env)
           log.debug { "** error encounted in Chef response" }
           raise Errors::HTTPError.fabricate(env)

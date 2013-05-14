@@ -1,13 +1,15 @@
 module Ridley
   # @author Jamie Winsor <reset@riotgames.com>
   module Middleware
-    CONTENT_TYPE = 'content-type'.freeze
+    CONTENT_TYPE     = 'content-type'.freeze
+    CONTENT_ENCODING = 'content-encoding'.freeze
 
     require_relative 'middleware/parse_json'
     require_relative 'middleware/chef_response'
     require_relative 'middleware/chef_auth'
     require_relative 'middleware/follow_redirects'
     require_relative 'middleware/retry'
+    require_relative 'middleware/gzip'
 
     Faraday.register_middleware :request,
       chef_auth: -> { Ridley::Middleware::ChefAuth }

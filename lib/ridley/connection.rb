@@ -48,6 +48,7 @@ module Ridley
 
       options[:builder] = Faraday::Builder.new do |b|
         b.response :json
+        b.response :gzip
         b.request :retry,
           max: @retries,
           interval: @retry_interval,
