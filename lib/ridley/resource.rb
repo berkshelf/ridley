@@ -111,7 +111,7 @@ module Ridley
         end
 
         defer { connection.send(method, *args) }
-      rescue Errors::HTTPError => ex
+      rescue Errors::HTTPError, Errors::ClientError => ex
         abort(ex)
       end
   end
