@@ -58,3 +58,5 @@ module Ridley
     end
   end
 end
+
+Faraday.register_middleware(:request, retry: Ridley::Middleware::Retry)

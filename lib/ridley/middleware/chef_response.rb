@@ -28,3 +28,5 @@ module Ridley
     end
   end
 end
+
+Faraday.register_middleware(:response, chef_response: Ridley::Middleware::ChefResponse)
