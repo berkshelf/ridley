@@ -1,27 +1,5 @@
 module Ridley
   # @author Jamie Winsor <reset@riotgames.com>
-  #
-  # @example
-  #   connection = Ridley::Client.new
-  #   connection.role.all
-  #
-  #   connection.role.find("reset") => Ridley::RoleResource.find(connection, "reset")
-  #
-  # @example instantiating new resources
-  #   connection = Ridley::Connection.new
-  #   connection.role.new(name: "hello") => <#Ridley::RoleResource: @name="hello">
-  #
-  #   New instances of resources can be instantiated by calling new on the Ridley::Context. These messages
-  #   will be send to the Chef resource's class in Ridley and can be treated as a normal Ruby object. Each
-  #   instantiated object will have the connection information contained within so you can do things like
-  #   save a role after changing it's attributes.
-  #
-  #   r = connection.role.new(name: "new-role")
-  #   r.name => "new-role"
-  #   r.name = "other-name"
-  #   r.save
-  #
-  #   connection.role.find("new-role") => <#Ridley::RoleResource: @name="new-role">
   class Client
     class ConnectionSupervisor < ::Celluloid::SupervisionGroup
       def initialize(registry, options)
