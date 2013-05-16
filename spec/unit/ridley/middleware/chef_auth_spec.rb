@@ -20,7 +20,6 @@ describe Ridley::Middleware::ChefAuth do
       end
 
       context "when the :client_key is an actual key" do
-        # https://github.com/mitchellh/vagrant/blob/master/keys/vagrant
         let(:client_key) { File.read(fixtures_path.join("reset.pem")) }
 
         it "returns a Hash of authentication headers" do
