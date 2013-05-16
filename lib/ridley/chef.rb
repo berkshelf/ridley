@@ -4,8 +4,8 @@ module Ridley
   # Classes and modules used for integrating with a Chef Server, the Chef community
   # site, and Chef Cookbooks
   module Chef
-    autoload :Cookbook, 'ridley/chef/cookbook'
-    autoload :Chefignore, 'ridley/chef/chefignore'
-    autoload :Digester, 'ridley/chef/digester'
+    require_relative 'chef/cookbook'
+    require_relative 'chef/chefignore'
+    require_relative 'chef/digester'
   end
 end

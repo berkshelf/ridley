@@ -1,8 +1,9 @@
+require_relative 'bootstrapper/context'
+require_relative 'logging'
+
 module Ridley
   # @author Jamie Winsor <reset@riotgames.com>
   class Bootstrapper
-    autoload :Context, 'ridley/bootstrapper/context'
-
     include Celluloid
     include Ridley::Logging
 

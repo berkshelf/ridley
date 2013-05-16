@@ -4,7 +4,7 @@ module Ridley
   module HostConnector
     # @author Jamie Winsor <reset@riotgames.com>
     class SSH
-      autoload :Worker, 'ridley/host_connector/ssh/worker'
+      require_relative 'ssh/worker'
 
       class << self
         # @param [Ridley::NodeObject, Array<Ridley::NodeObject>] nodes
