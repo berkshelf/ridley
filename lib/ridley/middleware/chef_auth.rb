@@ -11,12 +11,15 @@ module Ridley
         #
         # @param [String] client_name
         # @param [String] client_key
+        #   the path OR actual client key
         #
         # @option options [String] :host
         #
         # @see {#signing_object} for options
         def authentication_headers(client_name, client_key, options = {})
-          rsa_key = OpenSSL::PKey::RSA.new(File.read(client_key))
+          contents = (client_key.to_s.length < 100) ? File.read(client_key) : client_key.to_s
+          rsa_key = OpenSSL::PKey::RSA.new(contents)
+
           headers = signing_object(client_name, options).sign(rsa_key).merge(host: options[:host])
           headers.inject({}) { |memo, kv| memo["#{kv[0].to_s.upcase}"] = kv[1];memo }
         end
