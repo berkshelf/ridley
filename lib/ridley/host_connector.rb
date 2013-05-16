@@ -4,10 +4,10 @@ require 'timeout'
 module Ridley
   # @author Kyle Allan <kallan@riotgames.com>
   module HostConnector
-    autoload :Response, 'ridley/host_connector/response'
-    autoload :ResponseSet, 'ridley/host_connector/response_set'
-    autoload :SSH, 'ridley/host_connector/ssh'
-    autoload :WinRM, 'ridley/host_connector/winrm'
+    require_relative 'host_connector/response'
+    require_relative 'host_connector/response_set'
+    require_relative 'host_connector/ssh'
+    require_relative 'host_connector/winrm'
 
     DEFAULT_SSH_PORT   = 22.freeze
     DEFAULT_WINRM_PORT = 5985.freeze

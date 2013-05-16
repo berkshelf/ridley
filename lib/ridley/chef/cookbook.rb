@@ -1,8 +1,8 @@
 module Ridley::Chef
   # @author Jamie Winsor <reset@riotgames.com>
   class Cookbook
-    autoload :Metadata, 'ridley/chef/cookbook/metadata'
-    autoload :SyntaxCheck, 'ridley/chef/cookbook/syntax_check'
+    require_relative 'cookbook/metadata'
+    require_relative 'cookbook/syntax_check'
 
     class << self
       # @param [String] filepath

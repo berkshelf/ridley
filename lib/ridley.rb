@@ -5,16 +5,17 @@ silence_warnings do
   # Requiring winrm before all other gems because of https://github.com/WinRb/WinRM/issues/39
   require 'winrm'
 end
-require 'chozo'
-require 'celluloid'
-require 'faraday'
-require 'addressable/uri'
-require 'multi_json'
-require 'solve'
+
 require 'active_support/inflector'
+require 'addressable/uri'
+require 'celluloid'
+require 'chozo'
+require 'faraday'
 require 'forwardable'
-require 'thread'
+require 'multi_json'
 require 'pathname'
+require 'solve'
+require 'thread'
 
 if jruby?
   require 'json/pure'
@@ -22,26 +23,30 @@ else
   require 'json/ext'
 end
 
-require 'ridley/version'
-require 'ridley/errors'
-
 JSON.create_id = nil
 
 # @author Jamie Winsor <reset@riotgames.com>
 module Ridley
+
   CHEF_VERSION = '11.4.0'.freeze
 
-  autoload :Bootstrapper, 'ridley/bootstrapper'
-  autoload :Client, 'ridley/client'
-  autoload :Connection, 'ridley/connection'
-  autoload :Chef, 'ridley/chef'
-  autoload :ChefObject, 'ridley/chef_object'
-  autoload :DSL, 'ridley/dsl'
-  autoload :Logging, 'ridley/logging'
-  autoload :Mixin, 'ridley/mixin'
-  autoload :Resource, 'ridley/resource'
-  autoload :SandboxUploader, 'ridley/sandbox_uploader'
-  autoload :HostConnector, 'ridley/host_connector'
+  require_relative 'ridley/mixin'
+
+  require_relative 'ridley/bootstrap_bindings'
+  require_relative 'ridley/bootstrapper'
+  require_relative 'ridley/chef_object'
+  require_relative 'ridley/chef_objects'
+  require_relative 'ridley/client'
+  require_relative 'ridley/connection'
+  require_relative 'ridley/chef'
+  require_relative 'ridley/host_connector'
+  require_relative 'ridley/logging'
+  require_relative 'ridley/middleware'
+  require_relative 'ridley/resource'
+  require_relative 'ridley/resources'
+  require_relative 'ridley/sandbox_uploader'
+  require_relative 'ridley/version'
+  require_relative 'ridley/errors'
 
   class << self
     extend Forwardable
@@ -68,8 +73,3 @@ module Ridley
 end
 
 Celluloid.logger = Ridley.logger
-
-require 'ridley/bootstrap_bindings'
-require 'ridley/middleware'
-require 'ridley/chef_objects'
-require 'ridley/resources'
