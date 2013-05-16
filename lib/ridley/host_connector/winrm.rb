@@ -2,8 +2,8 @@ module Ridley
   module HostConnector
     # @author Kyle Allan <kallan@riotgames.com>
     class WinRM
-      autoload :CommandUploader, 'ridley/host_connector/winrm/command_uploader'
-      autoload :Worker, 'ridley/host_connector/winrm/worker'
+      require_relative 'winrm/command_uploader'
+      require_relative 'winrm/worker'
 
       class << self
         # @param [Ridley::NodeResource, Array<Ridley::NodeResource>] nodes
