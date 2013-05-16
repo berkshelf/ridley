@@ -3,11 +3,11 @@ module Ridley
   module Middleware
     CONTENT_TYPE = 'content-type'.freeze
 
-    require 'ridley/middleware/parse_json'
-    require 'ridley/middleware/chef_response'
-    require 'ridley/middleware/chef_auth'
-    require 'ridley/middleware/follow_redirects'
-    require 'ridley/middleware/retry'
+    require_relative 'middleware/parse_json'
+    require_relative 'middleware/chef_response'
+    require_relative 'middleware/chef_auth'
+    require_relative 'middleware/follow_redirects'
+    require_relative 'middleware/retry'
 
     Faraday.register_middleware :request,
       chef_auth: -> { Ridley::Middleware::ChefAuth }
