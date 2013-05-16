@@ -17,7 +17,7 @@ module Ridley
         #
         # @see {#signing_object} for options
         def authentication_headers(client_name, client_key, options = {})
-          contents = (client_key.to_s.length < 100) ? File.read(client_key) : client_key.to_s
+          contents = File.exists?(client_key) ? File.read(client_key) : client_key.to_s
           rsa_key = OpenSSL::PKey::RSA.new(contents)
 
           headers = signing_object(client_name, options).sign(rsa_key).merge(host: options[:host])
