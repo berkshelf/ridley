@@ -15,7 +15,6 @@ require 'forwardable'
 require 'multi_json'
 require 'pathname'
 require 'solve'
-require 'thread'
 
 if jruby?
   require 'json/pure'
@@ -27,11 +26,9 @@ JSON.create_id = nil
 
 # @author Jamie Winsor <reset@riotgames.com>
 module Ridley
-
   CHEF_VERSION = '11.4.0'.freeze
 
   require_relative 'ridley/mixin'
-
   require_relative 'ridley/bootstrap_bindings'
   require_relative 'ridley/bootstrapper'
   require_relative 'ridley/chef_object'
