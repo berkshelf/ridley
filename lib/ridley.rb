@@ -27,6 +27,11 @@ JSON.create_id = nil
 
 # @author Jamie Winsor <reset@riotgames.com>
 module Ridley
+
+  CHEF_VERSION = '11.4.0'.freeze
+
+  require_relative 'ridley/mixin'
+
   require_relative 'ridley/bootstrap_bindings'
   require_relative 'ridley/bootstrapper'
   require_relative 'ridley/chef_object'
@@ -37,14 +42,11 @@ module Ridley
   require_relative 'ridley/host_connector'
   require_relative 'ridley/logging'
   require_relative 'ridley/middleware'
-  require_relative 'ridley/mixin'
   require_relative 'ridley/resource'
   require_relative 'ridley/resources'
   require_relative 'ridley/sandbox_uploader'
   require_relative 'ridley/version'
   require_relative 'ridley/errors'
-
-  CHEF_VERSION = '11.4.0'.freeze
 
   class << self
     extend Forwardable
