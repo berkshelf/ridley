@@ -90,4 +90,14 @@ describe Ridley::CookbookObject do
       subject.manifest.values.should each be_empty
     end
   end
+
+  describe "#reload" do
+    it "returns the updated self" do
+      other = subject.dup
+      other.version = "1.2.3"
+      resource.should_receive(:find).with(subject, subject.version).and_return(other)
+
+      expect(subject.reload).to eq(other)
+    end
+  end
 end
