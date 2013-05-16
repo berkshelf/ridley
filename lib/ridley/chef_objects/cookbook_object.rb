@@ -15,7 +15,7 @@ module Ridley
       :root_files
     ].freeze
 
-    set_chef_id "name"
+    set_chef_id "cookbook_name"
     set_chef_type "cookbook"
     set_chef_json_class "Chef::Cookbook"
 
@@ -165,6 +165,14 @@ module Ridley
           manifest[filetype] = get_attribute(filetype)
         end
       end
+    end
+
+    # Reload the attributes of the instantiated resource
+    #
+    # @return [Ridley::CookbookObject]
+    def reload
+      mass_assign(resource.find(self, self.version)._attributes_)
+      self
     end
 
     def to_s
