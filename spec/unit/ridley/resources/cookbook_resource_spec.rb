@@ -12,12 +12,6 @@ describe Ridley::CookbookResource do
     let(:version) { "0.1.0" }
     let(:destination) { tmp_path.join("example_cookbook-0.1.0").to_s }
 
-    context "when the cookbook of the name/version is found" do
-      it "downloads the cookbook to the destination" do
-        pending "can't test downloading until https://github.com/jkeiser/chef-zero/issues/5 is fixed"
-      end
-    end
-
     context "when the cookbook of the name/version is not found" do
       before { subject.should_receive(:find).with(name, version).and_return(nil) }
 
