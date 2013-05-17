@@ -60,7 +60,7 @@ module Ridley
       def call(env)
         signing_options = {
           http_method: env[:method],
-          host: env[:url].host || "localhost",
+          host: "#{env[:url].host}:#{env[:url].port}",
           path: env[:url].path,
           body: env[:body] || ''
         }
