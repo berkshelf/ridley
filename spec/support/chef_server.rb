@@ -25,7 +25,6 @@ module Ridley::RSpec
       end
 
       def start
-        Thin::Logging.silent = true
         server.start_background
         server.on_response do |request, response|
           request_log << [ request, response ]
