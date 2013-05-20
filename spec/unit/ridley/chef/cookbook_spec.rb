@@ -46,7 +46,7 @@ describe Ridley::Chef::Cookbook do
         before do
           FileUtils.mkdir_p(cookbook_path)
           File.open(File.join(cookbook_path, 'metadata.json'), 'w+') do |f|
-            f.write MultiJson.encode(name: "rspec_test")
+            f.write JSON.fast_generate(name: "rspec_test")
           end
         end
 

@@ -17,7 +17,7 @@ describe Ridley::SandboxResource do
 
     before(:each) do
       connection.stub(:post).
-        with(subject.class.resource_path, MultiJson.encode(checksums: checksums)).
+        with(subject.class.resource_path, JSON.fast_generate(checksums: checksums)).
         and_return(response)
     end
 
@@ -77,7 +77,7 @@ describe Ridley::SandboxResource do
     end
 
     it "sends a /PUT to the sandbox resource with is_complete set to true" do
-      connection.should_receive(:put).with(sandbox_path, MultiJson.encode(is_completed: true)).and_return(response)
+      connection.should_receive(:put).with(sandbox_path, JSON.fast_generate(is_completed: true)).and_return(response)
 
       subject.commit(sandbox_id)
     end

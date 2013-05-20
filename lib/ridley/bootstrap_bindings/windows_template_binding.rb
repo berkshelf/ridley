@@ -140,7 +140,7 @@ WGET_PS
 
     # @return [String]
     def first_boot
-      escape_and_echo(MultiJson.encode attributes.merge(run_list: run_list))
+      escape_and_echo(JSON.fast_generate(attributes.merge(run_list: run_list)))
     end
 
     # @return [String]
