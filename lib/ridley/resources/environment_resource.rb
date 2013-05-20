@@ -18,7 +18,7 @@ module Ridley
     def cookbook_versions(environment, run_list = [])
       run_list = Array(run_list).flatten
       chef_id  = environment.respond_to?(:chef_id) ? environment.chef_id : environment
-      request(:post, "#{self.class.resource_path}/#{chef_id}/cookbook_versions", MultiJson.encode(run_list: run_list))
+      request(:post, "#{self.class.resource_path}/#{chef_id}/cookbook_versions", JSON.fast_generate(run_list: run_list))
     rescue AbortError => ex
       if ex.cause.is_a?(Errors::HTTPNotFound)
         abort Errors::ResourceNotFound.new(ex)

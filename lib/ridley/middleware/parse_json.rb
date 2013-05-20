@@ -5,8 +5,8 @@ module Ridley
       include Ridley::Logging
 
       JSON_TYPE  = 'application/json'.freeze
-      
-      BRACKETS   = [ 
+
+      BRACKETS   = [
         "[",
         "{"
       ].freeze
@@ -17,10 +17,10 @@ module Ridley
         "\r",
         "\t"
       ].freeze
-      
+
       class << self
         include Ridley::Logging
-        
+
         # Takes a string containing JSON and converts it to a Ruby hash
         # symbols for keys
         #
@@ -28,13 +28,13 @@ module Ridley
         #
         # @return [Hash]
         def parse(body)
-          result = MultiJson.decode(body)
+          result = JSON.parse(body)
           result.is_a?(Hash) ? Hashie::Mash.new(result) : result
         end
 
         # Extracts the type of the response from the response headers
         # of a Faraday request env. 'text/html' will be returned if no
-        # content-type is specified in the response 
+        # content-type is specified in the response
         #
         # @example
         #   env = {

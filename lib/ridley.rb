@@ -12,15 +12,9 @@ require 'celluloid'
 require 'chozo'
 require 'faraday'
 require 'forwardable'
-require 'multi_json'
+require 'json'
 require 'pathname'
 require 'solve'
-
-if jruby?
-  require 'json/pure'
-else
-  require 'json/ext'
-end
 
 JSON.create_id = nil
 
