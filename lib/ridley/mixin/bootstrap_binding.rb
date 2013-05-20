@@ -54,7 +54,7 @@ module Ridley
 
     # @return [String]
     def first_boot
-      MultiJson.encode attributes.merge(run_list: run_list)
+      JSON.fast_generate(attributes.merge(run_list: run_list))
     end
 
     # The validation key to create a new client for the node

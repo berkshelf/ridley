@@ -34,7 +34,7 @@ module Ridley
       sumhash = { checksums: Hash.new }.tap do |chks|
         Array(checksums).each { |chk| chks[:checksums][chk] = nil }
       end
-      new(request(:post, self.class.resource_path, MultiJson.encode(sumhash)))
+      new(request(:post, self.class.resource_path, JSON.fast_generate(sumhash)))
     end
 
     # @param [#chef_id] object
@@ -46,7 +46,7 @@ module Ridley
     # @return [Hash]
     def commit(object)
       chef_id = object.respond_to?(:chef_id) ? object.chef_id : object
-      request(:put, "#{self.class.resource_path}/#{chef_id}", MultiJson.encode(is_completed: true))
+      request(:put, "#{self.class.resource_path}/#{chef_id}", JSON.fast_generate(is_completed: true))
     rescue AbortError => ex
       case ex.cause
       when Ridley::Errors::HTTPBadRequest; abort Ridley::Errors::SandboxCommitError.new(ex.message)

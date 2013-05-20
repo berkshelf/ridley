@@ -463,7 +463,7 @@ module Ridley::Chef
       end
 
       def from_json(json)
-        from_hash MultiJson.decode(json)
+        from_hash JSON.parse(json)
       end
 
       private
