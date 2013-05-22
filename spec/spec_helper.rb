@@ -26,10 +26,6 @@ def setup_rspec
       Ridley::RSpec::ChefServer.start
     end
 
-    config.after(:all) do
-      Ridley::RSpec::ChefServer.stop
-    end
-
     config.before(:each) do
       Celluloid.shutdown
       Celluloid.boot
