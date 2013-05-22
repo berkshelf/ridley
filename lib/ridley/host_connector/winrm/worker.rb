@@ -87,6 +87,13 @@ module Ridley
         # @return [WinRM::WinRMWebService]
         def winrm
           @winrm_client ||= begin
+            require 'active_support/core_ext/kernel/reporting'
+            # Silencing warnings because not all versions of GSSAPI support all of the GSSAPI methods
+            # the gssapi gem attempts to attach to and these warnings are dumped to STDERR.
+            silence_warnings do
+              require 'winrm'
+            end
+
             client = ::WinRM::WinRMWebService.new(winrm_endpoint, :plaintext,
               user: user, pass: password, disable_sspi: true, basic_auth_only: true)
             client.set_timeout(6000)
