@@ -25,7 +25,9 @@ describe Ridley::HostConnector::WinRM::Worker do
   describe "#winrm" do
     subject { winrm_worker.winrm }
 
-    it { should be_a(WinRM::WinRMWebService) }
+    it "returns a WinRM::WinRMWebService" do
+      expect(subject).to be_a(::WinRM::WinRMWebService)
+    end
   end
 
   describe "#get_command" do
@@ -83,7 +85,7 @@ describe Ridley::HostConnector::WinRM::Worker do
       it "returns an :error with the response" do
         status, response = run
         expect(status).to eq(:error)
-        expect(response.stderr).to eq("stderr")        
+        expect(response.stderr).to eq("stderr")
       end
     end
 
