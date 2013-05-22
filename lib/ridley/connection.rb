@@ -1,6 +1,7 @@
 require 'open-uri'
 require 'retryable'
 require 'tempfile'
+require 'zlib'
 
 module Ridley
   # @author Jamie Winsor <reset@riotgames.com>
@@ -48,6 +49,7 @@ module Ridley
 
       options[:builder] = Faraday::Builder.new do |b|
         b.response :json
+        b.response :gzip
         b.request :retry,
           max: @retries,
           interval: @retry_interval,
@@ -141,7 +143,14 @@ module Ridley
       defer {
         retryable(tries: retries, on: OpenURI::HTTPError, sleep: retry_interval) do
           open(target, 'rb', headers) do |remote|
-            local.write(remote.read)
+            body = remote.read
+            case remote.content_encoding
+            when ['gzip']
+              body = Zlib::GzipReader.new(StringIO.new(body), encoding: 'ASCII-8BIT').read
+            when ['deflate']
+              body = Zlib::Inflate.inflate(body)
+            end
+            local.write(body)
           end
         end
 
