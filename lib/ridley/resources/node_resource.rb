@@ -161,12 +161,16 @@ module Ridley
     # @option options [Hash] :attributes
     #   attributes of normal precedence to merge
     #
-    # @raise [Errors::HTTPNotFound]
+    # @raise [Errors::ResourceNotFound]
     #   if the target node is not found
     #
     # @return [Ridley::NodeResource]
     def merge_data(target, options = {})
-      find(target).merge_data(options)
+      unless node = find(target)
+        abort Errors::ResourceNotFound.new
+      end
+
+      update(node.merge_data(options))
     end
   end
 end

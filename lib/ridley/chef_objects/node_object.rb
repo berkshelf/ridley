@@ -154,7 +154,6 @@ module Ridley
         self.normal = self.normal.deep_merge(options[:attributes])
       end
 
-      self.update
       self
     end
   end
