@@ -209,10 +209,7 @@ describe Ridley::NodeObject do
   end
 
   describe "#merge_data" do
-    before(:each) do
-      subject.name = "reset.riotgames.com"
-      subject.should_receive(:update)
-    end
+    before(:each) { subject.name = "reset.riotgames.com" }
 
     it "appends items to the run_list" do
       subject.merge_data(run_list: ["cook::one", "cook::two"])

@@ -136,14 +136,31 @@ describe Ridley::NodeResource do
 
   describe "#merge_data" do
     subject { instance }
+    let(:node) { double('node') }
+    let(:data) { double('data') }
 
-    it "finds the target node and sends it the merge_data message" do
-      data = double('data')
-      node = double('node')
-      node.should_receive(:merge_data).with(data)
-      subject.should_receive(:find).and_return(node)
+    before { subject.stub(find: nil) }
 
-      subject.merge_data(node, data)
+    context "when a node with the given name exists" do
+      before { subject.should_receive(:find).and_return(node) }
+
+      it "finds the target node, sends it the merge_data message, and updates it" do
+        updated = double('updated')
+        node.should_receive(:merge_data).with(data).and_return(updated)
+        subject.should_receive(:update).with(updated)
+
+        subject.merge_data(node, data)
+      end
+    end
+
+    context "when a node with the given name does not exist" do
+      before { subject.should_receive(:find).with(node).and_return(nil) }
+
+      it "raises a ResourceNotFound error" do
+        expect {
+          subject.merge_data(node, data)
+        }.to raise_error(Ridley::Errors::ResourceNotFound)
+      end
     end
   end
 end
