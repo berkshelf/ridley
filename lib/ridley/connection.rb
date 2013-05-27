@@ -48,8 +48,6 @@ module Ridley
       @retry_interval = options[:retry_interval]
 
       options[:builder] = Faraday::Builder.new do |b|
-        b.response :json
-        b.response :gzip
         b.request :retry,
           max: @retries,
           interval: @retry_interval,
@@ -58,8 +56,11 @@ module Ridley
             Errno::ETIMEDOUT,
             Faraday::Error::TimeoutError
           ]
-        b.response :chef_response
         b.request :chef_auth, client_name, client_key
+
+        b.response :parse_json
+        b.response :gzip
+        b.response :chef_response
 
         b.adapter :net_http_persistent
       end
