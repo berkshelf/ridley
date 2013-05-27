@@ -25,7 +25,7 @@ describe Ridley::Middleware::ChefResponse do
         end
       end
 
-      it "returns false if response status is in the 400 range" do        
+      it "returns false if response status is in the 400 range" do
         (400..499).each do |code|
           env.should_receive(:[]).with(:status).and_return(code)
 
@@ -46,7 +46,7 @@ describe Ridley::Middleware::ChefResponse do
   subject do
     Faraday.new(server_url) do |conn|
       conn.response :chef_response
-      conn.response :json
+      conn.response :parse_json
       conn.adapter Faraday.default_adapter
     end
   end
@@ -73,7 +73,7 @@ describe Ridley::Middleware::ChefResponse do
 
   let(:chef_unauthorized) do
     {
-      status: 401, 
+      status: 401,
       body: generate_normalized_json(error: "401 - Unauthorized.  You must properly authenticate your API requests!"),
       headers: {
         content_type: "application/json; charset=utf8"
@@ -83,7 +83,7 @@ describe Ridley::Middleware::ChefResponse do
 
   let(:chef_forbidden) do
     {
-      status: 403, 
+      status: 403,
       body: generate_normalized_json(error: "403 - Forbidden."),
       headers: {
         content_type: "application/json; charset=utf8"
@@ -170,7 +170,7 @@ describe Ridley::Middleware::ChefResponse do
       stub_request(:get, File.join(server_url, 'not_existant_route')).to_return(chef_not_found)
     end
 
-    it "raises a Ridley::Errors::HTTPNotFound" do      
+    it "raises a Ridley::Errors::HTTPNotFound" do
       lambda {
         subject.get('not_existant_route')
       }.should raise_error(Ridley::Errors::HTTPNotFound)
