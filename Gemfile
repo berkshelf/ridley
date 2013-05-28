@@ -45,5 +45,5 @@ group :test do
   gem 'fuubar'
   gem 'json_spec'
   gem 'webmock'
-  gem 'chef-zero', '= 1.0.1'
+  gem 'chef-zero', '~> 1.1.1'
 end
