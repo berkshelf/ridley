@@ -8,9 +8,7 @@ module Ridley
 
     attr_reader :item_resource
 
-    finalizer do
-      item_resource.terminate if item_resource && item_resource.alive?
-    end
+    finalizer :finalize_callback
 
     # @param [Celluloid::Registry] connection_registry
     # @param [String] data_bag_secret
@@ -30,5 +28,11 @@ module Ridley
       return nil if ex.cause.is_a?(Errors::HTTPNotFound)
       abort(ex.cause)
     end
+
+    private
+
+      def finalize_callback
+        item_resource.terminate if item_resource && item_resource.alive?
+      end
   end
 end

@@ -67,10 +67,7 @@ module Ridley
     include Celluloid
     include Ridley::Logging
 
-    finalizer do
-      @connection_supervisor.terminate if @connection_supervisor && @connection_supervisor.alive?
-      @resources_supervisor.terminate if @resources_supervisor && @resources_supervisor.alive?
-    end
+    finalizer :finalize_callback
 
     def_delegator :connection, :build_url
     def_delegator :connection, :scheme
@@ -250,6 +247,11 @@ module Ridley
 
       def connection
         @connection_registry[:connection_pool]
+      end
+
+      def finalize_callback
+        @connection_supervisor.terminate if @connection_supervisor && @connection_supervisor.alive?
+        @resources_supervisor.terminate if @resources_supervisor && @resources_supervisor.alive?
       end
   end
 end

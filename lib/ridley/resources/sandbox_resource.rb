@@ -4,9 +4,7 @@ module Ridley
     set_resource_path "sandboxes"
     represented_by Ridley::SandboxObject
 
-    finalizer do
-      uploader.terminate if uploader && uploader.alive?
-    end
+    finalizer :finalize_callback
 
     def initialize(connection_registry, client_name, client_key, options = {})
       super(connection_registry)
@@ -99,5 +97,9 @@ module Ridley
     private
 
       attr_reader :uploader
+
+      def finalize_callback
+        uploader.terminate if uploader && uploader.alive?
+      end
   end
 end
