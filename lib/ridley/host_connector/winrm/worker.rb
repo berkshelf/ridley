@@ -22,7 +22,7 @@ module Ridley
         # @return [Array]
         attr_reader :command_uploaders
 
-        finalizer :finalizer
+        finalizer :finalize_callback
 
         EMBEDDED_RUBY_PATH = 'C:\opscode\chef\embedded\bin\ruby'.freeze
 
@@ -40,10 +40,6 @@ module Ridley
           @password          = @options[:password]
           @winrm_endpoint    = "http://#{host}:#{winrm_port}/wsman"
           @command_uploaders = Array.new
-        end
-
-        def finalizer
-          command_uploaders.map(&:cleanup)
         end
 
         def run(command)
@@ -151,6 +147,12 @@ module Ridley
           command = "#{EMBEDDED_RUBY_PATH} -e \"#{command_lines.join(';')}\""
           run(command)
         end
+
+        private
+
+          def finalize_callback
+            command_uploaders.map(&:cleanup)
+          end
       end
     end
   end
