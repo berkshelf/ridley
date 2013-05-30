@@ -19,12 +19,12 @@ def setup_rspec
     config.filter_run focus: true
     config.run_all_when_everything_filtered = true
 
-    config.before(:suite) { Ridley::RSpec::ChefServer.start }
-
-    config.before(:all) do
-      Ridley.logger = Celluloid.logger = nil
+    config.before(:suite) do
       WebMock.disable_net_connect!(allow_localhost: true, net_http_connect_on_start: true)
+      Ridley::RSpec::ChefServer.start
     end
+
+    config.before(:all) { Ridley.logger = Celluloid.logger = nil }
 
     config.before(:each) do
       Celluloid.shutdown

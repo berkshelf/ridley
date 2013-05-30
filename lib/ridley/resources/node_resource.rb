@@ -164,7 +164,7 @@ module Ridley
     # @raise [Errors::ResourceNotFound]
     #   if the target node is not found
     #
-    # @return [Ridley::NodeResource]
+    # @return [Ridley::NodeObject]
     def merge_data(target, options = {})
       unless node = find(target)
         abort Errors::ResourceNotFound.new
