@@ -144,14 +144,17 @@ module Ridley
     # @option options [Hash] :attributes
     #   attributes of normal precedence to merge
     #
-    # @return [Ridley::NodeResource]
+    # @return [Ridley::NodeObject]
     def merge_data(options = {})
-      unless options[:run_list].nil?
-        self.run_list = (self.run_list + Array(options[:run_list])).uniq
+      new_run_list   = Array(options[:run_list])
+      new_attributes = options[:attributes]
+
+      unless new_run_list.empty?
+        self.run_list = self.run_list | new_run_list
       end
 
-      unless options[:attributes].nil?
-        self.normal = self.normal.deep_merge(options[:attributes])
+      unless new_attributes.nil?
+        self.normal = self.normal.deep_merge(new_attributes)
       end
 
       self
