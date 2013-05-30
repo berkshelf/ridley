@@ -15,7 +15,7 @@ module Ridley::RSpec
       end
 
       def server
-        @server ||= ChefZero::Server.new(port: PORT)
+        @server ||= ChefZero::Server.new(port: PORT, generate_real_keys: false)
       end
 
       def server_url
