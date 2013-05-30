@@ -1,9 +1,7 @@
 require 'spec_helper'
 
 describe Ridley::HostConnector do
-  subject do
-    described_class
-  end
+  subject { described_class }
 
   it "returns 22 as the default SSH port" do
     described_class::DEFAULT_SSH_PORT.should eq(22)

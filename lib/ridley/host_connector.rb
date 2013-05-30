@@ -4,6 +4,54 @@ require 'timeout'
 module Ridley
   # @author Kyle Allan <kallan@riotgames.com>
   module HostConnector
+    class Base
+      class << self
+        # @param [String] host
+        # @param [String] command
+        # @param [Hash] options
+        def run(host, command, options = {})
+          connector = new(nodes, options)
+          connector.run(command)
+        ensure
+          connector.terminate if connector && connector.alive?
+        end
+      end
+
+      include Celluloid
+      include Celluloid::Logger
+
+      def run(host, command, options = {})
+        raise RuntimeError, "abstract function: must be implemented on includer"
+      end
+
+      # Executes a chef-client command on the nodes
+      #
+      # @return [#run]
+      def chef_client(host, options = {})
+        raise RuntimeError, "abstract function: must be implemented on includer"
+      end
+
+      # Writes the given encrypted data bag secret to the node
+      #
+      # @param [String] secret
+      #   your organization's encrypted data bag secret
+      #
+      # @return [#run]
+      def put_secret(host, secret, options = {})
+        raise RuntimeError, "abstract function: must be implemented on includer"
+      end
+
+      # Executes a provided Ruby script in the embedded Ruby installation
+      #
+      # @param [Array<String>] command_lines
+      #   An Array of lines of the command to be executed
+      #
+      # @return [#run]
+      def ruby_script(host, command_lines, options = {})
+        raise RuntimeError, "abstract function: must be implemented on includer"
+      end
+    end
+
     require_relative 'host_connector/response'
     require_relative 'host_connector/response_set'
     require_relative 'host_connector/ssh'
@@ -32,7 +80,7 @@ module Ridley
       # @return [SSH::Worker, WinRM::Worker]
       def new(host, options = {})
         HostConnector.best_connector_for(host, options) do |host_connector|
-          host_connector::Worker.new(host, options)
+          host_connector.new(host, options)
         end
       end
 

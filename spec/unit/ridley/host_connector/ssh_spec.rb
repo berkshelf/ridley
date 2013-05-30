@@ -1,51 +1,47 @@
 require 'spec_helper'
 
 describe Ridley::HostConnector::SSH do
-  let(:resource) { double('resource') }
+  subject { connector }
+  let(:connector) { described_class.new }
 
-  let(:node_one) do
-    Ridley::NodeObject.new(resource, automatic: { cloud: { public_hostname: "33.33.33.10" } })
-  end
+  let(:host) { 'reset.riotgames.com' }
+  let(:options) { Hash.new }
 
-  let(:node_two) do
-    Ridley::NodeObject.new(resource, automatic: { cloud: { public_hostname: "33.33.33.11" } })
-  end
+  describe "#chef_client" do
+    subject(:chef_client) { connector.chef_client(host, options) }
 
-  let(:options) do
-    {
-      user: "vagrant",
-      password: "vagrant",
-      timeout: 1
-    }
-  end
+    it { should be_a(Array) }
 
-  describe "ClassMethods" do
-    subject { described_class }
-
-    describe "::start" do
-      it "raises a LocalJumpError if a block is not provided" do
-        expect {
-          subject.start([node_one, node_two], options)
-        }.to raise_error(LocalJumpError)
-      end
+    it "sends a run command to execute chef-client" do
+      connector.should_receive(:run).with(host, "chef-client", options)
+      chef_client
     end
   end
 
-  subject do
-    Ridley::HostConnector::SSH.new([node_one, node_two], ssh: { user: "vagrant", password: "vagrant", timeout: 1 })
+  describe "#put_secret" do
+    subject(:put_secret) { connector.put_secret(host, secret, options) }
+    let(:encrypted_data_bag_secret_path) { fixtures_path.join("encrypted_data_bag_secret").to_s }
+    let(:secret) { File.read(encrypted_data_bag_secret_path).chomp }
+
+    it "receives a run command with echo" do
+      connector.should_receive(:run).with(host,
+        "echo '#{secret}' > /etc/chef/encrypted_data_bag_secret; chmod 0600 /etc/chef/encrypted_data_bag_secret",
+        options
+      )
+      put_secret
+    end
   end
 
-  describe "#run" do
-    let(:worker) { double('worker', terminate: nil) }
-    let(:response) { Ridley::HostConnector::Response.new("host") }
-    before { Ridley::HostConnector::SSH::Worker.stub(:new).and_return(worker) }
+  describe "#ruby_script" do
+    subject(:ruby_script) { connector.ruby_script(host, command_lines, options) }
+    let(:command_lines) { ["puts 'hello'", "puts 'there'"] }
 
-    before do
-      worker.stub_chain(:future, :run).and_return(double(value: [:ok, response]))
-    end
-
-    it "returns an SSH::ResponseSet" do
-      subject.run("ls").should be_a(Ridley::HostConnector::ResponseSet)
+    it "receives a ruby call with the command" do
+      connector.should_receive(:run).with(host,
+        "#{described_class::EMBEDDED_RUBY_PATH} -e \"puts 'hello';puts 'there'\"",
+        options
+      )
+      ruby_script
     end
   end
 end

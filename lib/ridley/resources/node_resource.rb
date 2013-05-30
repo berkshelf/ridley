@@ -172,5 +172,14 @@ module Ridley
 
       update(node.merge_data(options))
     end
+
+    # @param [String] host
+    #
+    # @option options [Boolean] :skip_chef
+    def purge(host, options = {})
+      # delete /etc/chef
+      # delete /var/chef
+      # delete /opt/chef
+    end
   end
 end
