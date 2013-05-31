@@ -83,8 +83,8 @@ module Ridley
         if command.length < CommandUploader::CHUNK_LIMIT
           command
         else
-          log.debug "Detected a command that was longer than #{CommandUploader::CHUNK_LIMIT} characters, \
-            uploading command as a file to the host."
+          log.debug "Detected a command that was longer than #{CommandUploader::CHUNK_LIMIT} characters. " +
+            "Uploading command as a file to the host."
           command_uploader.upload(command)
           command_uploader.command
         end
@@ -161,10 +161,18 @@ module Ridley
 
       private
 
+        # @param [String] host
+        # @param [Integer] port
+        #
+        # @option options [String] :user
+        # @option options [String] :password
+        #
         # @return [WinRM::WinRMWebService]
         def winrm(host, port, options = {})
-          options = options.merge(disable_sspi: true, basic_auth_only: true)
-          client = ::WinRM::WinRMWebService.new("http://#{host}:#{port}/wsman", :plaintext, options)
+          winrm_opts = { disable_sspi: true, basic_auth_only: true }
+          winrm_opts[:user] = options[:user]
+          winrm_opts[:pass] = options[:password]
+          client = ::WinRM::WinRMWebService.new("http://#{host}:#{port}/wsman", :plaintext, winrm_opts)
           client.set_timeout(6000)
           client
         end
