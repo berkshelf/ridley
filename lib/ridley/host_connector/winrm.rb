@@ -1,3 +1,10 @@
+require 'active_support/core_ext/kernel/reporting'
+# Silencing warnings because not all versions of GSSAPI support all of the GSSAPI methods
+# the gssapi gem attempts to attach to and these warnings are dumped to STDERR.
+silence_warnings do
+  require 'winrm'
+end
+
 module Ridley
   module HostConnector
     # @author Kyle Allan <kallan@riotgames.com>
@@ -17,22 +24,23 @@ module Ridley
         password          = options[:password]
         port              = options[:port] || Ridley::HostConnector::DEFAULT_WINRM_PORT
         command_uploaders = Array.new
+        connection        = winrm(host, port, options.slice(:user, :password))
 
         response = Ridley::HostConnector::Response.new(host)
-        command_uploaders << command_uploader = CommandUploader.new(winrm)
+        command_uploaders << command_uploader = CommandUploader.new(connection)
         command = get_command(command, command_uploader)
 
-        debug "Running WinRM Command: '#{command}' on: '#{host}' as: '#{user}'"
+        log.info "Running WinRM Command: '#{command}' on: '#{host}' as: '#{user}'"
 
-        output = winrm(host, port).run_cmd(command) do |stdout, stderr|
+        output = connection.run_cmd(command) do |stdout, stderr|
           if stdout
             response.stdout += stdout
-            info "NODE[#{host}] #{stdout}"
+            log.info "[#{host}](WinRM) #{stdout}"
           end
 
           if stderr
             response.stderr += stderr unless stderr.nil?
-            info "NODE[#{host}] #{stdout}"
+            log.info "[#{host}](WinRM) #{stdout}"
           end
         end
 
@@ -40,18 +48,15 @@ module Ridley
 
         case response.exit_code
         when 0
-          debug "Successfully ran WinRM command on: '#{host}' as: '#{user}'"
+          log.info "Successfully ran WinRM command on: '#{host}' as: '#{user}'"
           [ :ok, response ]
         else
-          error "Successfully ran WinRM command on: '#{host}' as: '#{user}', but it failed"
-          error response.stdout
+          log.info "Successfully ran WinRM command on: '#{host}' as: '#{user}', but it failed"
           [ :error, response ]
         end
-      rescue => e
-        error "Failed to run WinRM command on: '#{host}' as: '#{user}'"
-        error "#{e.class}: #{e.message}"
+      rescue ::WinRM::WinRMHTTPTransportError => ex
         response.exit_code = -1
-        response.stderr = e.message
+        response.stderr    = ex.message
         [ :error, response ]
       ensure
         command_uploaders.map(&:cleanup)
@@ -106,16 +111,9 @@ module Ridley
       private
 
         # @return [WinRM::WinRMWebService]
-        def winrm(host, port)
-          require 'active_support/core_ext/kernel/reporting'
-          # Silencing warnings because not all versions of GSSAPI support all of the GSSAPI methods
-          # the gssapi gem attempts to attach to and these warnings are dumped to STDERR.
-          silence_warnings do
-            require 'winrm'
-          end
-
-          client = ::WinRM::WinRMWebService.new("http://#{host}:#{winrm_port}/wsman", :plaintext,
-            user: user, pass: password, disable_sspi: true, basic_auth_only: true)
+        def winrm(host, port, options = {})
+          options = options.merge(disable_sspi: true, basic_auth_only: true)
+          client = ::WinRM::WinRMWebService.new("http://#{host}:#{port}/wsman", :plaintext, options)
           client.set_timeout(6000)
           client
         end

@@ -3,7 +3,7 @@ module Ridley
   module HostConnector
     class Base
       include Celluloid
-      include Celluloid::Logger
+      include Ridley::Logging
 
       def run(host, command, options = {})
         raise RuntimeError, "abstract function: must be implemented on includer"
