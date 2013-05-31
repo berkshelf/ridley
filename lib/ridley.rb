@@ -16,15 +16,15 @@ module Ridley
   CHEF_VERSION = '11.4.0'.freeze
 
   require_relative 'ridley/mixin'
-  require_relative 'ridley/bootstrap_bindings'
-  require_relative 'ridley/bootstrapper'
+  require_relative 'ridley/logging'
+  require_relative 'ridley/bootstrap_context'
   require_relative 'ridley/chef_object'
   require_relative 'ridley/chef_objects'
   require_relative 'ridley/client'
   require_relative 'ridley/connection'
   require_relative 'ridley/chef'
+  require_relative 'ridley/host_commander'
   require_relative 'ridley/host_connector'
-  require_relative 'ridley/logging'
   require_relative 'ridley/middleware'
   require_relative 'ridley/resource'
   require_relative 'ridley/resources'

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Ridley::BootstrapBinding do
+describe Ridley::BootstrapContext::Base do
   let(:host) { "reset.riotgames.com" }
   let(:options) do
     {
@@ -13,11 +13,7 @@ describe Ridley::BootstrapBinding do
   end
 
   describe "ClassMethods" do
-    subject do
-      Class.new do
-        include Ridley::BootstrapBinding
-      end
-    end
+    subject { described_class }
 
     describe ":included" do
       context "when a class includes Ridley::BootstrapBinding" do

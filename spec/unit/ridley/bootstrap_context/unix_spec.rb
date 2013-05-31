@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Ridley::UnixTemplateBinding do
+describe Ridley::BootstrapContext::Unix do
   let(:options) do
     {
       server_url: "https://api.opscode.com/organizations/vialstudios",
@@ -34,7 +34,7 @@ describe Ridley::UnixTemplateBinding do
     end
   end
 
-  subject { Ridley::UnixTemplateBinding.new(options) }
+  subject { described_class.new(options) }
 
   describe "MixinMethods" do
 
