@@ -4,7 +4,16 @@ describe Ridley::HostConnector::WinRM do
   subject { connector }
   let(:connector) { described_class.new }
   let(:host) { 'reset.riotgames.com' }
-  let(:options) { {} }
+  let(:options) do
+    {
+      server_url: double('server_url'),
+      validator_path: fixtures_path.join('reset.pem'),
+      validator_client: double('validator_client'),
+      encrypted_data_bag_secret: 'encrypted_data_bag_secret',
+      winrm: Hash.new,
+      chef_version: double('chef_version')
+    }
+  end
 
   before { described_class::CommandUploader.stub(:new).and_return(double('command_uploader')) }
 
@@ -89,7 +98,10 @@ describe Ridley::HostConnector::WinRM do
   end
 
   describe "#bootstrap" do
-    pending
+    it "sends a #run message to self to bootstrap a node" do
+      connector.should_receive(:run).with(host, anything, options)
+      connector.bootstrap(host, options)
+    end
   end
 
   describe "#chef_client" do
