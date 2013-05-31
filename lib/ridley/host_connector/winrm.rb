@@ -31,9 +31,9 @@ module Ridley
           command_uploaders << command_uploader = CommandUploader.new(connection)
           command = get_command(command, command_uploader)
 
-          log.info "Running WinRM Command: '#{command}' on: '#{host}' as: '#{user}'"
-
           begin
+            log.info "Running WinRM Command: '#{command}' on: '#{host}' as: '#{user}'"
+
             output = connection.run_cmd(command) do |stdout, stderr|
               if stdout
                 response.stdout += stdout

@@ -11,36 +11,10 @@ module Ridley
         options = options.reverse_merge(paranoid: false, sudo: false)
         command = "sudo #{command}" if options[:sudo]
 
-        log.info "Running SSH command: '#{command}' on: '#{host}' as: '#{options[:user]}'"
-
         Ridley::HostConnector::Response.new(host).tap do |response|
-          channel_exec = ->(channel, command) do
-            channel.exec(command) do |ch, success|
-              unless success
-                raise "Channel execution failed while executing command #{command}"
-              end
-
-              channel.on_data do |ch, data|
-                response.stdout += data
-                log.info "[#{host}](SSH) #{data}" if data.present? and data != "\r\n"
-              end
-
-              channel.on_extended_data do |ch, type, data|
-                response.stderr += data
-                log.info "[#{host}](SSH) #{data}" if data.present? and data != "\r\n"
-              end
-
-              channel.on_request("exit-status") do |ch, data|
-                response.exit_code = data.read_long
-              end
-
-              channel.on_request("exit-signal") do |ch, data|
-                response.exit_signal = data.read_string
-              end
-            end
-          end
-
           begin
+            log.info "Running SSH command: '#{command}' on: '#{host}' as: '#{options[:user]}'"
+
             Net::SSH.start(host, options[:user], options.slice(*Net::SSH::VALID_OPTIONS)) do |ssh|
               ssh.open_channel do |channel|
                 if options[:sudo]
@@ -49,10 +23,10 @@ module Ridley
                       raise "Could not aquire pty: A pty is required for running sudo commands."
                     end
 
-                    channel_exec.call(channel, command)
+                    channel_exec(channel, command, response)
                   end
                 else
-                  channel_exec.call(channel, command)
+                  channel_exec(channel, command, response)
                 end
               end
               ssh.loop
@@ -99,6 +73,34 @@ module Ridley
       def ruby_script(host, command_lines, options = {})
         run(host, "#{EMBEDDED_RUBY_PATH} -e \"#{command_lines.join(';')}\"", options)
       end
+
+      private
+
+        def channel_exec(channel, command, response)
+          channel.exec(command) do |ch, success|
+            unless success
+              raise "Channel execution failed while executing command #{command}"
+            end
+
+            channel.on_data do |ch, data|
+              response.stdout += data
+              log.info "[#{host}](SSH) #{data}" if data.present? and data != "\r\n"
+            end
+
+            channel.on_extended_data do |ch, type, data|
+              response.stderr += data
+              log.info "[#{host}](SSH) #{data}" if data.present? and data != "\r\n"
+            end
+
+            channel.on_request("exit-status") do |ch, data|
+              response.exit_code = data.read_long
+            end
+
+            channel.on_request("exit-signal") do |ch, data|
+              response.exit_signal = data.read_string
+            end
+          end
+        end
     end
   end
 end
