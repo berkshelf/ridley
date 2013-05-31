@@ -11,47 +11,6 @@ module Ridley
     # https://github.com/opscode/knife-windows/blob/3b8886ddcfb928ca0958cd05b22f8c3d78bee86e/lib/chef/knife/bootstrap/windows-chef-client-msi.erb
     # https://github.com/opscode/knife-windows/blob/78d38bbed358ac20107fc2b5b427f4b5e52e5cb2/lib/chef/knife/core/windows_bootstrap_context.rb
     class Windows < BootstrapContext::Base
-      attr_reader :template_file
-
-      # @option options [String] :validator_client
-      # @option options [String] :validator_path
-      #   filepath to the validator used to bootstrap the node (required)
-      # @option options [String] :bootstrap_proxy (nil)
-      #   URL to a proxy server to bootstrap through
-      # @option options [String] :encrypted_data_bag_secret
-      #   your organizations encrypted data bag secret
-      # @option options [Hash] :hints (Hash.new)
-      #   a hash of Ohai hints to place on the bootstrapped node
-      # @option options [Hash] :attributes (Hash.new)
-      #   a hash of attributes to use in the first Chef run
-      # @option options [Array] :run_list (Array.new)
-      #   an initial run list to bootstrap with
-      # @option options [String] :chef_version (nil)
-      #   version of Chef to install on the node
-      # @option options [String] :environment ('_default')
-      #   environment to join the node to
-      # @option options [Boolean] :sudo (true)
-      #   bootstrap with sudo (default: true)
-      # @option options [String] :template ('windows_omnibus')
-      #   bootstrap template to use
-      def initialize(options = {})
-        options = self.class.default_options.merge(options)
-        options[:template] ||= default_template
-        self.class.validate_options(options)
-
-        @template_file             = options[:template]
-        @bootstrap_proxy           = options[:bootstrap_proxy]
-        @chef_version              = options[:chef_version] ? options[:chef_version] : "latest"
-        @validator_path            = options[:validator_path]
-        @encrypted_data_bag_secret = options[:encrypted_data_bag_secret]
-        @server_url                = options[:server_url]
-        @validator_client          = options[:validator_client]
-        @node_name                 = options[:node_name]
-        @attributes                = options[:attributes]
-        @run_list                  = options[:run_list]
-        @environment               = options[:environment]
-      end
-
       # @return [String]
       def boot_command
         template.evaluate(self)
