@@ -11,6 +11,7 @@ module Ridley
     class WinRM < HostConnector::Base
       require_relative 'winrm/command_uploader'
 
+      DEFAULT_PORT       = 5985
       EMBEDDED_RUBY_PATH = 'C:\opscode\chef\embedded\bin\ruby'.freeze
 
       # @option options [String] :user
@@ -20,13 +21,13 @@ module Ridley
       # @option options [Fixnum] :port (5985)
       #   the winrm port to connect on the node the bootstrap will be performed on
       def run(host, command, options = {})
+        command_uploaders = Array.new
         user              = options[:user]
         password          = options[:password]
-        port              = options[:port] || Ridley::HostConnector::DEFAULT_WINRM_PORT
-        command_uploaders = Array.new
+        port              = options[:port] || DEFAULT_PORT
         connection        = winrm(host, port, options.slice(:user, :password))
 
-        response = Ridley::HostConnector::Response.new(host)
+        response = HostConnector::Response.new(host)
         command_uploaders << command_uploader = CommandUploader.new(connection)
         command = get_command(command, command_uploader)
 
@@ -72,7 +73,7 @@ module Ridley
         if command.length < CommandUploader::CHUNK_LIMIT
           command
         else
-          debug "Detected a command that was longer than #{CommandUploader::CHUNK_LIMIT} characters, \
+          log.debug "Detected a command that was longer than #{CommandUploader::CHUNK_LIMIT} characters, \
             uploading command as a file to the host."
           command_uploader.upload(command)
           command_uploader.command

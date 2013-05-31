@@ -33,8 +33,6 @@ module Ridley
     include Celluloid
     include Ridley::Logging
 
-    DEFAULT_SSH_PORT   = 22
-    DEFAULT_WINRM_PORT = 5985
     PORT_CHECK_TIMEOUT = 3
 
     def initialize
@@ -99,8 +97,8 @@ module Ridley
       # @return [Symbol]
       def connector_for(host, options = {})
         options = options.reverse_merge(ssh: Hash.new, winrm: Hash.new)
-        options[:ssh][:port]   ||= DEFAULT_SSH_PORT
-        options[:winrm][:port] ||= DEFAULT_WINRM_PORT
+        options[:ssh][:port]   ||= HostConnector::SSH::DEFAULT_PORT
+        options[:winrm][:port] ||= HostConnector::WinRM::DEFAULT_PORT
 
         if self.class.connector_port_open?(host, options[:winrm][:port])
           [ winrm, options[:winrm] ]
