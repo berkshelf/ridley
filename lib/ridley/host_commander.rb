@@ -36,6 +36,8 @@ module Ridley
 
     PORT_CHECK_TIMEOUT = 3
 
+    finalizer :finalize_callback
+
     def initialize
       @connector_registry   = Celluloid::Registry.new
       @connector_supervisor = ConnectorSupervisor.new_link(@connector_registry)
@@ -188,6 +190,10 @@ module Ridley
         else
           raise Errors::HostConnectionError, "No connector ports open on '#{host}'"
         end
+      end
+
+      def finalize_callback
+        @connector_supervisor.terminate if @connector_supervisor && @connector_supervisor.alive?
       end
 
       def ssh
