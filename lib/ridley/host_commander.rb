@@ -80,8 +80,7 @@ module Ridley
       def execute(method, host, *args)
         options = args.last.is_a?(Hash) ? args.pop : Hash.new
 
-        connector, connector_opts = connector_for(host, options)
-        connector.send(method, host, *args, connector_opts)
+        connector_for(host, options).send(method, host, *args, options)
       rescue Errors::HostConnectionError => ex
         abort(ex)
       end
@@ -105,9 +104,11 @@ module Ridley
         options[:winrm][:port] ||= HostConnector::WinRM::DEFAULT_PORT
 
         if self.class.connector_port_open?(host, options[:winrm][:port])
-          [ winrm, options[:winrm] ]
+          options.delete(:ssh)
+          winrm
         elsif self.class.connector_port_open?(host, options[:ssh][:port], options[:ssh][:timeout])
-          [ ssh, options[:ssh] ]
+          options.delete(:winrm)
+          ssh
         else
           raise Errors::HostConnectionError, "No connector ports open on '#{host}'"
         end

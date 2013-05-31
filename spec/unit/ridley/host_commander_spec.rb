@@ -52,7 +52,7 @@ describe Ridley::HostCommander do
       end
 
       it "sends a #run message to the ssh host connector" do
-        subject.send(:ssh).should_receive(:run).with(host, command, options[:ssh])
+        subject.send(:ssh).should_receive(:run).with(host, command, options)
 
         subject.run(host, command, options)
       end
@@ -65,7 +65,7 @@ describe Ridley::HostCommander do
       end
 
       it "sends a #run message to the ssh host connector" do
-        subject.send(:winrm).should_receive(:run).with(host, command, options[:winrm])
+        subject.send(:winrm).should_receive(:run).with(host, command, options)
 
         subject.run(host, command, options)
       end
@@ -85,7 +85,7 @@ describe Ridley::HostCommander do
       end
 
       it "sends a #bootstrap message to the ssh host connector" do
-        subject.send(:ssh).should_receive(:bootstrap).with(host, options[:ssh])
+        subject.send(:ssh).should_receive(:bootstrap).with(host, options)
 
         subject.bootstrap(host, options)
       end
@@ -98,7 +98,7 @@ describe Ridley::HostCommander do
       end
 
       it "sends a #bootstrap message to the ssh host connector" do
-        subject.send(:winrm).should_receive(:bootstrap).with(host, options[:winrm])
+        subject.send(:winrm).should_receive(:bootstrap).with(host, options)
 
         subject.bootstrap(host, options)
       end
@@ -118,7 +118,7 @@ describe Ridley::HostCommander do
       end
 
       it "sends a #chef_client message to the ssh host connector" do
-        subject.send(:ssh).should_receive(:chef_client).with(host, options[:ssh])
+        subject.send(:ssh).should_receive(:chef_client).with(host, options)
 
         subject.chef_client(host, options)
       end
@@ -131,7 +131,7 @@ describe Ridley::HostCommander do
       end
 
       it "sends a #chef_client message to the ssh host connector" do
-        subject.send(:winrm).should_receive(:chef_client).with(host, options[:winrm])
+        subject.send(:winrm).should_receive(:chef_client).with(host, options)
 
         subject.chef_client(host, options)
       end
@@ -152,7 +152,7 @@ describe Ridley::HostCommander do
       end
 
       it "sends a #put_secret message to the ssh host connector" do
-        subject.send(:ssh).should_receive(:put_secret).with(host, secret, options[:ssh])
+        subject.send(:ssh).should_receive(:put_secret).with(host, secret, options)
 
         subject.put_secret(host, secret, options)
       end
@@ -165,7 +165,7 @@ describe Ridley::HostCommander do
       end
 
       it "sends a #put_secret message to the ssh host connector" do
-        subject.send(:winrm).should_receive(:put_secret).with(host, secret, options[:winrm])
+        subject.send(:winrm).should_receive(:put_secret).with(host, secret, options)
 
         subject.put_secret(host, secret, options)
       end
@@ -186,7 +186,7 @@ describe Ridley::HostCommander do
       end
 
       it "sends a #ruby_script message to the ssh host connector" do
-        subject.send(:ssh).should_receive(:ruby_script).with(host, command_lines, options[:ssh])
+        subject.send(:ssh).should_receive(:ruby_script).with(host, command_lines, options)
 
         subject.ruby_script(host, command_lines, options)
       end
@@ -199,7 +199,7 @@ describe Ridley::HostCommander do
       end
 
       it "sends a #ruby_script message to the ssh host connector" do
-        subject.send(:winrm).should_receive(:ruby_script).with(host, command_lines, options[:winrm])
+        subject.send(:winrm).should_receive(:ruby_script).with(host, command_lines, options)
 
         subject.ruby_script(host, command_lines, options)
       end

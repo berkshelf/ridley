@@ -42,7 +42,7 @@ describe Ridley::HostConnector::WinRM do
     before do
       described_class::CommandUploader.stub(:new).and_return(command_uploader_stub)
       connector.stub(:winrm).and_return(winrm_stub)
-      winrm_stub.stub(:run_cmd).and_yield(stdout, stderr).and_return({exitcode: 0})
+      winrm_stub.stub(:run_cmd).and_yield(stdout, stderr).and_return(exitcode: 0)
     end
 
     context "when the exit_code is 0" do
@@ -60,7 +60,7 @@ describe Ridley::HostConnector::WinRM do
       let(:stderr) { "stderr" }
 
       before do
-        winrm_stub.stub(:run_cmd).and_yield(stdout, stderr).and_return({exitcode: 1})
+        winrm_stub.stub(:run_cmd).and_yield(stdout, stderr).and_return(exitcode: 1)
       end
 
       it "returns an error HostConnector::Response with an error" do

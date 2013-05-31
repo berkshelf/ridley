@@ -8,14 +8,16 @@ module Ridley
       EMBEDDED_RUBY_PATH = '/opt/chef/embedded/bin/ruby'.freeze
 
       def run(host, command, options = {})
-        options = options.reverse_merge(paranoid: false, sudo: false)
+        options = options.reverse_merge(ssh: Hash.new)
+        options[:ssh].reverse_merge!(port: DEFAULT_PORT, paranoid: false, sudo: false)
+
         command = "sudo #{command}" if options[:sudo]
 
         Ridley::HostConnector::Response.new(host).tap do |response|
           begin
-            log.info "Running SSH command: '#{command}' on: '#{host}' as: '#{options[:user]}'"
+            log.info "Running SSH command: '#{command}' on: '#{host}' as: '#{options[:ssh][:user]}'"
 
-            Net::SSH.start(host, options[:user], options.slice(*Net::SSH::VALID_OPTIONS)) do |ssh|
+            Net::SSH.start(host, options[:ssh][:user], options[:ssh].slice(*Net::SSH::VALID_OPTIONS)) do |ssh|
               ssh.open_channel do |channel|
                 if options[:sudo]
                   channel.request_pty do |channel, success|
@@ -23,10 +25,10 @@ module Ridley
                       raise "Could not aquire pty: A pty is required for running sudo commands."
                     end
 
-                    channel_exec(channel, command, response)
+                    channel_exec(channel, command, host, response)
                   end
                 else
-                  channel_exec(channel, command, response)
+                  channel_exec(channel, command, host, response)
                 end
               end
               ssh.loop
@@ -39,19 +41,20 @@ module Ridley
 
           case response.exit_code
           when 0
-            log.info "Successfully ran SSH command on: '#{host}' as: '#{options[:user]}'"
+            log.info "Successfully ran SSH command on: '#{host}' as: '#{options[:ssh][:user]}'"
           else
-            log.info "Successfully ran SSH command on: '#{host}' as: '#{options[:user]}' but it failed"
+            log.info "Successfully ran SSH command on: '#{host}' as: '#{options[:ssh][:user]}' but it failed"
           end
         end
       end
 
       def bootstrap(host, options = {})
-        options = options.reverse_merge(sudo: true, timeout: 5.0)
+        options = options.reverse_merge(ssh: Hash.new)
+        options[:ssh].reverse_merge!(sudo: true, timeout: 5.0)
         context = BootstrapContext::Unix.new(options)
 
         log.info "Bootstrapping host: #{host}"
-        run(context.boot_command, options)
+        run(host, context.boot_command, options)
       end
 
       # Executes a chef-client command on the nodes
@@ -84,7 +87,7 @@ module Ridley
 
       private
 
-        def channel_exec(channel, command, response)
+        def channel_exec(channel, command, host, response)
           channel.exec(command) do |ch, success|
             unless success
               raise "Channel execution failed while executing command #{command}"

@@ -21,11 +21,14 @@ module Ridley
       # @option options [Fixnum] :port (5985)
       #   the winrm port to connect on the node the bootstrap will be performed on
       def run(host, command, options = {})
+        options = options.reverse_merge(winrm: Hash.new)
+        options[:winrm].reverse_merge!(port: DEFAULT_PORT)
+
         command_uploaders = Array.new
-        user              = options[:user]
-        password          = options[:password]
-        port              = options[:port] || DEFAULT_PORT
-        connection        = winrm(host, port, options.slice(:user, :password))
+        user              = options[:winrm][:user]
+        password          = options[:winrm][:password]
+        port              = options[:winrm][:port]
+        connection        = winrm(host, port, options[:winrm].slice(:user, :password))
 
         HostConnector::Response.new(host).tap do |response|
           command_uploaders << command_uploader = CommandUploader.new(connection)
