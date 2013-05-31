@@ -3,9 +3,11 @@ require 'spec_helper'
 describe Ridley::NodeResource do
   let(:host) { "33.33.33.10" }
   let(:worker) { double('worker', alive?: true, terminate: nil) }
+  let(:host_commander) { double('host-commander') }
+  let(:secret) { "super_secret" }
   let(:instance) do
-    inst = described_class.new(double)
-    inst.stub(connection: chef_zero_connection)
+    inst = described_class.new(double, encrypted_data_bag_secret: secret)
+    inst.stub(connection: chef_zero_connection, host_commander: host_commander)
     inst
   end
 
@@ -29,95 +31,34 @@ describe Ridley::NodeResource do
   end
 
   describe "#chef_run" do
-    let(:chef_run) { instance.chef_run(host) }
-    let(:response) { [:ok, double('response', stdout: 'success_message')] }
-    subject { chef_run }
-
-    before do
-      Ridley::HostConnector.stub(:new).and_return(worker)
-      worker.stub(:chef_client).and_return(response)
-    end
-
-    it { should eql(response) }
-
-    context "when it executes unsuccessfully" do
-      let(:response) { [ :error, double('response', stderr: 'failure_message') ] }
-
-      it { should eql(response) }
-    end
-
-    it "terminates the worker" do
-      worker.should_receive(:terminate)
-      chef_run
+    it "sends the message #chef_client to the instance's host_commander" do
+      host_commander.should_receive(:chef_client).with(host, ssh: instance.ssh, winrm: instance.winrm)
+      instance.chef_run(host)
     end
   end
 
   describe "#put_secret" do
-    let(:put_secret) { instance.put_secret(host) }
-    let(:response) { [ :ok, double('response', stdout: 'success_message') ] }
-    subject { put_secret }
-
-    before do
-      Ridley::HostConnector.stub(:new).and_return(worker)
-      worker.stub(:put_secret).and_return(response)
-    end
-
-    it { should eql(response) }
-
-    context "when it executes unsuccessfully" do
-      let(:response) { [ :error, double('response', stderr: 'failure_message') ] }
-
-      it { should eql(response) }
-    end
-
-    it "terminates the worker" do
-      worker.should_receive(:terminate)
-      put_secret
+    it "sends the message #put_secret to the instance's host_commander" do
+      host_commander.should_receive(:put_secret).with(host, secret, ssh: instance.ssh, winrm: instance.winrm)
+      instance.put_secret(host)
     end
   end
 
   describe "#ruby_script" do
-    let(:ruby_script) { instance.ruby_script(host, command_lines) }
-    let(:response) { [:ok, double('response', stdout: 'success_message')] }
     let(:command_lines) { ["puts 'hello'", "puts 'there'"] }
-    subject { ruby_script }
 
-    before do
-      Ridley::HostConnector.stub(:new).and_return(worker)
-      worker.stub(:ruby_script).and_return(response)
-    end
-
-    it { should eq(response) }
-
-    context "when it executes unsuccessfully" do
-      let(:response) { [:error, double('response', stderr: 'failure_message')] }
-
-      it { should eq(response) }
-    end
-
-    it "terminates the worker" do
-      worker.should_receive(:terminate)
-      ruby_script
+    it "sends the message #ruby_script to the instance's host_commander" do
+      host_commander.should_receive(:ruby_script).with(host, command_lines, ssh: instance.ssh, winrm: instance.winrm)
+      instance.ruby_script(host, command_lines)
     end
   end
 
   describe "#execute_command" do
-    let(:execute_command) { instance.execute_command(host, command) }
-    let(:response) { [:ok, double('response', stdout: 'success_message')] }
     let(:command) { "echo 'hello world'" }
-    subject { execute_command }
 
-    before do
-      Ridley::HostConnector.stub(:new).and_return(worker)
-      worker.stub(:run).and_return(response)
-    end
-
-    it { should eq(response) }
-
-    context "when it executes unsuccessfully" do
-      let(:response) { [:error, double('response', stderr: 'failure_message')] }
-
-      it { should eq(response) }
+    it "sends the message #run to the instance's host_commander" do
+      host_commander.should_receive(:run).with(host, command, ssh: instance.ssh, winrm: instance.winrm)
+      instance.execute_command(host, command)
     end
   end
 
