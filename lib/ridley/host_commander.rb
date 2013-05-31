@@ -19,12 +19,12 @@ module Ridley
     PORT_CHECK_TIMEOUT = 3
 
     def initialize
-      @connector_registry   = Celluloid.new
+      @connector_registry   = Celluloid::Registry.new
       @connector_supervisor = ConnectorSupervisor.new_link(@connector_registry)
     end
 
     def run(host, command, options = {})
-      execute(__method__, host, command, options = {})
+      execute(__method__, host, command, options)
     end
 
     # Executes a chef-client command on the nodes
@@ -59,14 +59,10 @@ module Ridley
       def execute(method, host, *args)
         options = args.last.is_a?(Hash) ? args.pop : Hash.new
 
-        connector, connector_opts = case connector_for(host, options)
-        when :ssh; [ ssh, options[:ssh] ]
-        when :winrm; [ winrm, options[:winrm] ]
-        else
-          raise RuntimeError, "what"
-        end
-
+        connector, connector_opts = connector_for(host, options)
         connector.send(method, host, *args, connector_opts)
+      rescue Errors::HostConnectionError => ex
+        abort(ex)
       end
 
       # Finds and returns the best HostConnector for a given host
@@ -83,14 +79,16 @@ module Ridley
       #
       # @return [Symbol]
       def connector_for(host, options = {})
-        options.reverse_merge(ssh: { port: DEFAULT_SSH_PORT }, winrm: { port: DEFAULT_WINRM_PORT })
+        options = options.reverse_merge(ssh: Hash.new, winrm: Hash.new)
+        options[:ssh][:port]   ||= DEFAULT_SSH_PORT
+        options[:winrm][:port] ||= DEFAULT_WINRM_PORT
 
-        if connector_port_open?(host, oprions[:winrm][:port])
-          :winrm
+        if connector_port_open?(host, options[:winrm][:port])
+          [ winrm, options[:winrm] ]
         elsif connector_port_open?(host, options[:ssh][:port], options[:ssh][:timeout])
-          :ssh
+          [ ssh, options[:ssh] ]
         else
-          raise Ridley::Errors::HostConnectionError, "No available connection method available on #{host}."
+          raise Errors::HostConnectionError, "No available connection method available on #{host}."
         end
       end
 
@@ -107,7 +105,8 @@ module Ridley
       # @return [Boolean]
       def connector_port_open?(host, port, timeout = nil)
         Timeout.timeout(timeout || PORT_CHECK_TIMEOUT) { TCPSocket.new(host, port).close; true }
-      rescue Timeout::Error, SocketError, Errno::ECONNREFUSED, Errno::EHOSTUNREACH
+      rescue Timeout::Error, SocketError, Errno::ECONNREFUSED, Errno::EHOSTUNREACH, Errno::EADDRNOTAVAIL => ex
+        log.debug "Connector port: '#{port}' not open on host: '#{host}' - #{ex}"
         false
       end
 
