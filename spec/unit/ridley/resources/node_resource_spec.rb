@@ -3,24 +3,11 @@ require 'spec_helper'
 describe Ridley::NodeResource do
   let(:host) { "33.33.33.10" }
   let(:worker) { double('worker', alive?: true, terminate: nil) }
-  let(:options) do
-    {
-      server_url: "https://api.opscode.com/organizations/vialstudios",
-      validator_path: "/some/path",
-      validator_client: "chef-validator",
-      encrypted_data_bag_secret: "hellokitty",
-      ssh: {
-        user: "reset",
-        password: "lol"
-      },
-      winrm: {
-        user: "Administrator",
-        password: "secret"
-      },
-      chef_version: "11.4.0"
-    }
+  let(:instance) do
+    inst = described_class.new(double)
+    inst.stub(connection: chef_zero_connection)
+    inst
   end
-  let(:instance) { described_class.new(double, options) }
 
   describe "#bootstrap" do
     let(:hosts) { [ "192.168.1.2" ] }
@@ -135,15 +122,39 @@ describe Ridley::NodeResource do
   end
 
   describe "#merge_data" do
-    subject { instance }
+    let(:node_name) { "rspec-test" }
+    let(:run_list) { [ "recipe[one]", "recipe[two]" ] }
+    let(:attributes) { { deep: { two: "val" } } }
 
-    it "finds the target node and sends it the merge_data message" do
-      data = double('data')
-      node = double('node')
-      node.should_receive(:merge_data).with(data)
-      subject.should_receive(:find).and_return(node)
+    subject(:result) { instance.merge_data(node_name, run_list: run_list, attributes: attributes) }
 
-      subject.merge_data(node, data)
+    context "when a node of the given name exists" do
+      before do
+        chef_node(node_name,
+          run_list: [ "recipe[one]", "recipe[three]" ],
+          normal: { deep: { one: "val" } }
+        )
+      end
+
+      it "returns a Ridley::NodeObject" do
+        expect(result).to be_a(Ridley::NodeObject)
+      end
+
+      it "has a union between the run list of the original node and the new run list" do
+        expect(result.run_list).to eql(["recipe[one]","recipe[three]","recipe[two]"])
+      end
+
+      it "has a deep merge between the attributes of the original node and the new attributes" do
+        expect(result.normal.to_hash).to eql(deep: { one: "val", two: "val" })
+      end
+    end
+
+    context "when a node with the given name does not exist" do
+      let(:node_name) { "does_not_exist" }
+
+      it "raises a ResourceNotFound error" do
+        expect { result }.to raise_error(Ridley::Errors::ResourceNotFound)
+      end
     end
   end
 end

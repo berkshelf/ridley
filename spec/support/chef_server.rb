@@ -3,8 +3,6 @@ require_relative 'spec_helpers'
 
 module Ridley::RSpec
   module ChefServer
-    PORT = 8889
-
     class << self
       include Ridley::SpecHelpers
 
@@ -17,7 +15,7 @@ module Ridley::RSpec
       end
 
       def server
-        @server ||= ChefZero::Server.new(port: PORT)
+        @server ||= ChefZero::Server.new(port: PORT, generate_real_keys: false)
       end
 
       def server_url
@@ -43,6 +41,10 @@ module Ridley::RSpec
       end
     end
 
+    include Ridley::SpecHelpers
+
+    PORT = 8889
+
     def chef_client(name, hash = Hash.new)
       load_data(:clients, name, hash)
     end
@@ -65,6 +67,10 @@ module Ridley::RSpec
 
     def chef_role(name, hash = Hash.new)
       load_data(:roles, name, hash)
+    end
+
+    def chef_zero_connection
+      Ridley::Connection.new(ChefServer.server_url, "reset", fixtures_path.join('reset.pem').to_s)
     end
 
     private

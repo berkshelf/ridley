@@ -96,8 +96,6 @@ module Ridley
       end
 
       def on_complete(env)
-        log.debug(env)
-
         if self.class.json_response?(env)
           log.debug { "==> parsing Chef response body as JSON" }
           env[:body] = self.class.parse(env[:body])
@@ -109,4 +107,4 @@ module Ridley
   end
 end
 
-Faraday.register_middleware(:response, json: Ridley::Middleware::ParseJson)
+Faraday.register_middleware(:response, parse_json: Ridley::Middleware::ParseJson)
