@@ -43,6 +43,7 @@ module Ridley
       @ssh                       = options[:ssh]
       @winrm                     = options[:winrm]
       @chef_version              = options[:chef_version]
+      @host_commander            = HostCommander.new_link
     end
 
     # @overload bootstrap(nodes, options = {})
@@ -104,10 +105,7 @@ module Ridley
     #
     # @return [HostConnector::Response]
     def chef_run(host)
-      worker = HostConnector.new(host, ssh: ssh, winrm: winrm)
-      worker.chef_client
-    ensure
-      worker.terminate if worker && worker.alive?
+      host_commander.chef_client(host, ssh: ssh, winrm: winrm)
     end
 
     # Puts a secret on the host using the best worker available for
@@ -117,10 +115,7 @@ module Ridley
     #
     # @return [HostConnector::Response]
     def put_secret(host)
-      worker = HostConnector.new(host, ssh: ssh, winrm: winrm)
-      worker.put_secret(encrypted_data_bag_secret)
-    ensure
-      worker.terminate if worker && worker.alive?
+      host_commander.put_secret(host, encrypted_data_bag_secret, ssh: ssh, winrm: winrm)
     end
 
     # Executes an arbitrary ruby script using the best worker available
@@ -131,10 +126,7 @@ module Ridley
     #
     # @return [HostConnector::Response]
     def ruby_script(host, command_lines)
-      worker = HostConnector.new(host, ssh: ssh, winrm: winrm)
-      worker.ruby_script(command_lines)
-    ensure
-      worker.terminate if worker && worker.alive?
+      host_commander.ruby_script(host, command_lines, ssh: ssh, winrm: winrm)
     end
 
     # Executes the given command on a node using the best worker
@@ -145,10 +137,7 @@ module Ridley
     #
     # @return [Array<Symbol, HostConnector::Response>]
     def execute_command(host, command)
-      worker = HostConnector.new(host, ssh: ssh, winrm: winrm)
-      worker.run(command)
-    ensure
-      worker.terminate if worker && worker.alive?
+      host_commander.run(host, command, ssh: ssh, winrm: winrm)
     end
 
     # Merges the given data with the the data of the target node on the remote
@@ -173,13 +162,9 @@ module Ridley
       update(node.merge_data(options))
     end
 
-    # @param [String] host
-    #
-    # @option options [Boolean] :skip_chef
-    def purge(host, options = {})
-      # delete /etc/chef
-      # delete /var/chef
-      # delete /opt/chef
-    end
+    private
+
+      # @return [Ridley::HostCommander]
+      attr_reader :host_commander
   end
 end

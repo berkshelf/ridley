@@ -1,0 +1,122 @@
+require 'socket'
+require 'timeout'
+
+module Ridley
+  class ConnectorSupervisor < ::Celluloid::SupervisionGroup
+    def initialize(registry)
+      super(registry)
+      supervise_as :ssh, HostConnector::SSH
+      supervise_as :winrm, HostConnector::WinRM
+    end
+  end
+
+  class HostCommander
+    include Celluloid
+    include Ridley::Logging
+
+    DEFAULT_SSH_PORT   = 22
+    DEFAULT_WINRM_PORT = 5985
+    PORT_CHECK_TIMEOUT = 3
+
+    def initialize
+      @connector_registry   = Celluloid.new
+      @connector_supervisor = ConnectorSupervisor.new_link(@connector_registry)
+    end
+
+    def run(host, command, options = {})
+      execute(__method__, host, command, options = {})
+    end
+
+    # Executes a chef-client command on the nodes
+    #
+    # @return [#run]
+    def chef_client(host, options = {})
+      execute(__method__, host, options)
+    end
+
+    # Writes the given encrypted data bag secret to the node
+    #
+    # @param [String] secret
+    #   your organization's encrypted data bag secret
+    #
+    # @return [#run]
+    def put_secret(host, secret, options = {})
+      execute(__method__, host, secret, options)
+    end
+
+    # Executes a provided Ruby script in the embedded Ruby installation
+    #
+    # @param [Array<String>] command_lines
+    #   An Array of lines of the command to be executed
+    #
+    # @return [#run]
+    def ruby_script(host, command_lines, options = {})
+      execute(__method__, host, command_lines, options)
+    end
+
+    private
+
+      def execute(method, host, *args)
+        options = args.last.is_a?(Hash) ? args.pop : Hash.new
+
+        connector, connector_opts = case connector_for(host, options)
+        when :ssh; [ ssh, options[:ssh] ]
+        when :winrm; [ winrm, options[:winrm] ]
+        else
+          raise RuntimeError, "what"
+        end
+
+        connector.send(method, host, *args, connector_opts)
+      end
+
+      # Finds and returns the best HostConnector for a given host
+      #
+      # @param  host [String]
+      #   the host to attempt to connect to
+      # @option options [Hash] :ssh
+      #   * :port (Fixnum) the ssh port to connect on the node the bootstrap will be performed on (22)
+      #   * :timeout (Float) [5.0] timeout value for testing SSH connection
+      # @option options [Hash] :winrm
+      #   * :port (Fixnum) the winrm port to connect on the node the bootstrap will be performed on (5985)
+      # @param block [Proc]
+      #   an optional block that is yielded the best HostConnector
+      #
+      # @return [Symbol]
+      def connector_for(host, options = {})
+        options.reverse_merge(ssh: { port: DEFAULT_SSH_PORT }, winrm: { port: DEFAULT_WINRM_PORT })
+
+        if connector_port_open?(host, oprions[:winrm][:port])
+          :winrm
+        elsif connector_port_open?(host, options[:ssh][:port], options[:ssh][:timeout])
+          :ssh
+        else
+          raise Ridley::Errors::HostConnectionError, "No available connection method available on #{host}."
+        end
+      end
+
+      # Checks to see if the given port is open for TCP connections
+      # on the given host.
+      #
+      # @param  host [String]
+      #   the host to attempt to connect to
+      # @param  port [Fixnum]
+      #   the port to attempt to connect on
+      # @param  timeout [Float]
+      #   the number of seconds to wait (default: {PORT_CHECK_TIMEOUT})
+      #
+      # @return [Boolean]
+      def connector_port_open?(host, port, timeout = nil)
+        Timeout.timeout(timeout || PORT_CHECK_TIMEOUT) { TCPSocket.new(host, port).close; true }
+      rescue Timeout::Error, SocketError, Errno::ECONNREFUSED, Errno::EHOSTUNREACH
+        false
+      end
+
+      def ssh
+        @connector_registry[:ssh]
+      end
+
+      def winrm
+        @connector_registry[:winrm]
+      end
+  end
+end
