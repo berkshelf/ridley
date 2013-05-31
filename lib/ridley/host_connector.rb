@@ -42,7 +42,6 @@ module Ridley
     end
 
     require_relative 'host_connector/response'
-    require_relative 'host_connector/response_set'
     require_relative 'host_connector/ssh'
     require_relative 'host_connector/winrm'
   end
