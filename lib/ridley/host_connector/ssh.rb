@@ -7,6 +7,20 @@ module Ridley
       DEFAULT_PORT       = 22
       EMBEDDED_RUBY_PATH = '/opt/chef/embedded/bin/ruby'.freeze
 
+      # Execute a shell command on a node
+      #
+      # @param [String] host
+      #   the host to perform the action on
+      # @param [String] command
+      #
+      # @option options [Hash] :ssh
+      #   * :user (String) a shell user that will login to each node and perform the bootstrap command on
+      #   * :password (String) the password for the shell user that will perform the bootstrap
+      #   * :keys (Array, String) an array of key(s) to authenticate the ssh user with instead of a password
+      #   * :timeout (Float) timeout value for SSH bootstrap (5.0)
+      #   * :sudo (Boolean) run as sudo
+      #
+      # @return [HostConnector::Response]
       def run(host, command, options = {})
         options = options.reverse_merge(ssh: Hash.new)
         options[:ssh].reverse_merge!(port: DEFAULT_PORT, paranoid: false, sudo: false)
@@ -48,6 +62,19 @@ module Ridley
         end
       end
 
+      # Bootstrap a node
+      #
+      # @param [String] host
+      #   the host to perform the action on
+      #
+      # @option options [Hash] :ssh
+      #   * :user (String) a shell user that will login to each node and perform the bootstrap command on
+      #   * :password (String) the password for the shell user that will perform the bootstrap
+      #   * :keys (Array, String) an array of key(s) to authenticate the ssh user with instead of a password
+      #   * :timeout (Float) timeout value for SSH bootstrap (5.0)
+      #   * :sudo (Boolean) run as sudo
+      #
+      # @return [HostConnector::Response]
       def bootstrap(host, options = {})
         options = options.reverse_merge(ssh: Hash.new)
         options[:ssh].reverse_merge!(sudo: true, timeout: 5.0)
@@ -57,30 +84,58 @@ module Ridley
         run(host, context.boot_command, options)
       end
 
-      # Executes a chef-client command on the nodes
+      # Perform a chef client run on a node
       #
-      # @return [#run]
+      # @param [String] host
+      #   the host to perform the action on
+      #
+      # @option options [Hash] :ssh
+      #   * :user (String) a shell user that will login to each node and perform the bootstrap command on
+      #   * :password (String) the password for the shell user that will perform the bootstrap
+      #   * :keys (Array, String) an array of key(s) to authenticate the ssh user with instead of a password
+      #   * :timeout (Float) timeout value for SSH bootstrap (5.0)
+      #   * :sudo (Boolean) run as sudo
+      #
+      # @return [HostConnector::Response]
       def chef_client(host, options = {})
         run(host, "chef-client", options)
       end
 
-      # Writes the given encrypted data bag secret to the node
+      # Write your encrypted data bag secret on a node
       #
+      # @param [String] host
+      #   the host to perform the action on
       # @param [String] secret
       #   your organization's encrypted data bag secret
       #
-      # @return [#run]
+      # @option options [Hash] :ssh
+      #   * :user (String) a shell user that will login to each node and perform the bootstrap command on
+      #   * :password (String) the password for the shell user that will perform the bootstrap
+      #   * :keys (Array, String) an array of key(s) to authenticate the ssh user with instead of a password
+      #   * :timeout (Float) timeout value for SSH bootstrap (5.0)
+      #   * :sudo (Boolean) run as sudo
+      #
+      # @return [HostConnector::Response]
       def put_secret(host, secret, options = {})
         cmd = "echo '#{secret}' > /etc/chef/encrypted_data_bag_secret; chmod 0600 /etc/chef/encrypted_data_bag_secret"
         run(host, cmd, options)
       end
 
-      # Executes a provided Ruby script in the embedded Ruby installation
+      # Execute line(s) of Ruby code on a node using Chef's embedded Ruby
       #
+      # @param [String] host
+      #   the host to perform the action on
       # @param [Array<String>] command_lines
       #   An Array of lines of the command to be executed
       #
-      # @return [#run]
+      # @option options [Hash] :ssh
+      #   * :user (String) a shell user that will login to each node and perform the bootstrap command on
+      #   * :password (String) the password for the shell user that will perform the bootstrap
+      #   * :keys (Array, String) an array of key(s) to authenticate the ssh user with instead of a password
+      #   * :timeout (Float) timeout value for SSH bootstrap (5.0)
+      #   * :sudo (Boolean) run as sudo
+      #
+      # @return [HostConnector::Response]
       def ruby_script(host, command_lines, options = {})
         run(host, "#{EMBEDDED_RUBY_PATH} -e \"#{command_lines.join(';')}\"", options)
       end

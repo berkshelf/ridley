@@ -5,37 +5,62 @@ module Ridley
       include Celluloid
       include Ridley::Logging
 
+      # Execute a shell command on a node
+      #
+      # @param [String] host
+      #   the host to perform the action on
+      # @param [String] command
+      # @param [Hash] options
+      #
+      # @return [HostConnector::Response]
       def run(host, command, options = {})
         raise RuntimeError, "abstract function: must be implemented on includer"
       end
 
+      # Bootstrap a node
+      #
+      # @param [String] host
+      #   the host to perform the action on
+      # @param [Hash] options
+      #
+      # @return [HostConnector::Response]
       def bootstrap(host, options = {})
         raise RuntimeError, "abstract function: must be implemented on includer"
       end
 
-      # Executes a chef-client command on the nodes
+      # Perform a chef client run on a node
       #
-      # @return [#run]
+      # @param [String] host
+      #   the host to perform the action on
+      # @param [Hash] options
+      #
+      # @return [HostConnector::Response]
       def chef_client(host, options = {})
         raise RuntimeError, "abstract function: must be implemented on includer"
       end
 
-      # Writes the given encrypted data bag secret to the node
+      # Write your encrypted data bag secret on a node
       #
+      # @param [String] host
+      #   the host to perform the action on
       # @param [String] secret
       #   your organization's encrypted data bag secret
+      # @param [Hash] options
       #
-      # @return [#run]
+      # @return [HostConnector::Response]
       def put_secret(host, secret, options = {})
         raise RuntimeError, "abstract function: must be implemented on includer"
       end
 
-      # Executes a provided Ruby script in the embedded Ruby installation
+      # Execute line(s) of Ruby code on a node using Chef's embedded Ruby
       #
+      # @param [String] host
+      #   the host to perform the action on
       # @param [Array<String>] command_lines
       #   An Array of lines of the command to be executed
+      # @param [Hash] options
       #
-      # @return [#run]
+      # @return [HostConnector::Response]
       def ruby_script(host, command_lines, options = {})
         raise RuntimeError, "abstract function: must be implemented on includer"
       end

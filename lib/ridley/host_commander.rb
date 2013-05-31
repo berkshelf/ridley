@@ -3,6 +3,7 @@ require 'timeout'
 
 module Ridley
   class ConnectorSupervisor < ::Celluloid::SupervisionGroup
+    # @param [Celluloid::Registry] registry
     def initialize(registry)
       super(registry)
       supervise_as :ssh, HostConnector::SSH
@@ -15,11 +16,11 @@ module Ridley
       # Checks to see if the given port is open for TCP connections
       # on the given host.
       #
-      # @param  host [String]
+      # @param [String] host
       #   the host to attempt to connect to
-      # @param  port [Fixnum]
+      # @param [Fixnum] port
       #   the port to attempt to connect on
-      # @param  timeout [Float]
+      # @param [Float] timeout
       #   the number of seconds to wait (default: {PORT_CHECK_TIMEOUT})
       #
       # @return [Boolean]
@@ -40,37 +41,112 @@ module Ridley
       @connector_supervisor = ConnectorSupervisor.new_link(@connector_registry)
     end
 
+    # Execute a shell command on a node
+    #
+    # @param [String] host
+    #   the host to perform the action on
+    # @param [String] command
+    #
+    # @option options [Hash] :ssh
+    #   * :user (String) a shell user that will login to each node and perform the bootstrap command on
+    #   * :password (String) the password for the shell user that will perform the bootstrap
+    #   * :keys (Array, String) an array of key(s) to authenticate the ssh user with instead of a password
+    #   * :timeout (Float) timeout value for SSH bootstrap (5.0)
+    #   * :sudo (Boolean) run as sudo
+    # @option options [Hash] :winrm
+    #   * :user (String) a user that will login to each node and perform the bootstrap command on
+    #   * :password (String) the password for the user that will perform the bootstrap (required)
+    #   * :port (Fixnum) the winrm port to connect on the node the bootstrap will be performed on (5985)
+    #
+    # @return [HostConnector::Response]
     def run(host, command, options = {})
       execute(__method__, host, command, options)
     end
 
+    # Bootstrap a node
+    #
+    # @param [String] host
+    #   the host to perform the action on
+    #
+    # @option options [Hash] :ssh
+    #   * :user (String) a shell user that will login to each node and perform the bootstrap command on
+    #   * :password (String) the password for the shell user that will perform the bootstrap
+    #   * :keys (Array, String) an array of key(s) to authenticate the ssh user with instead of a password
+    #   * :timeout (Float) timeout value for SSH bootstrap (5.0)
+    #   * :sudo (Boolean) run as sudo
+    # @option options [Hash] :winrm
+    #   * :user (String) a user that will login to each node and perform the bootstrap command on
+    #   * :password (String) the password for the user that will perform the bootstrap (required)
+    #   * :port (Fixnum) the winrm port to connect on the node the bootstrap will be performed on (5985)
+    #
+    # @return [HostConnector::Response]
     def bootstrap(host, options = {})
       execute(__method__, host, options)
     end
 
-    # Executes a chef-client command on the nodes
+    # Perform a chef client run on a node
     #
-    # @return [#run]
+    # @param [String] host
+    #   the host to perform the action on
+    #
+    # @option options [Hash] :ssh
+    #   * :user (String) a shell user that will login to each node and perform the bootstrap command on
+    #   * :password (String) the password for the shell user that will perform the bootstrap
+    #   * :keys (Array, String) an array of key(s) to authenticate the ssh user with instead of a password
+    #   * :timeout (Float) timeout value for SSH bootstrap (5.0)
+    #   * :sudo (Boolean) run as sudo
+    # @option options [Hash] :winrm
+    #   * :user (String) a user that will login to each node and perform the bootstrap command on
+    #   * :password (String) the password for the user that will perform the bootstrap (required)
+    #   * :port (Fixnum) the winrm port to connect on the node the bootstrap will be performed on (5985)
+    #
+    # @return [HostConnector::Response]
     def chef_client(host, options = {})
       execute(__method__, host, options)
     end
 
-    # Writes the given encrypted data bag secret to the node
+    # Write your encrypted data bag secret on a node
     #
+    # @param [String] host
+    #   the host to perform the action on
     # @param [String] secret
     #   your organization's encrypted data bag secret
     #
-    # @return [#run]
+    # @option options [Hash] :ssh
+    #   * :user (String) a shell user that will login to each node and perform the bootstrap command on
+    #   * :password (String) the password for the shell user that will perform the bootstrap
+    #   * :keys (Array, String) an array of key(s) to authenticate the ssh user with instead of a password
+    #   * :timeout (Float) timeout value for SSH bootstrap (5.0)
+    #   * :sudo (Boolean) run as sudo
+    # @option options [Hash] :winrm
+    #   * :user (String) a user that will login to each node and perform the bootstrap command on
+    #   * :password (String) the password for the user that will perform the bootstrap (required)
+    #   * :port (Fixnum) the winrm port to connect on the node the bootstrap will be performed on (5985)
+    #
+    # @return [HostConnector::Response]
     def put_secret(host, secret, options = {})
       execute(__method__, host, secret, options)
     end
 
-    # Executes a provided Ruby script in the embedded Ruby installation
+    # Execute line(s) of Ruby code on a node using Chef's embedded Ruby
     #
+    # @param [String] host
+    #   the host to perform the action on
     # @param [Array<String>] command_lines
     #   An Array of lines of the command to be executed
     #
-    # @return [#run]
+    # @option options [Hash] :ssh
+    #   * :user (String) a shell user that will login to each node and perform the bootstrap command on
+    #   * :password (String) the password for the shell user that will perform the bootstrap
+    #   * :keys (Array, String) an array of key(s) to authenticate the ssh user with instead of a password
+    #   * :timeout (Float) timeout value for SSH bootstrap (5.0)
+    #   * :sudo (Boolean) run as sudo
+    # @option options [Hash] :winrm
+    #   * :user (String) a user that will login to each node and perform the bootstrap command on
+    #   * :password (String) the password for the user that will perform the bootstrap (required)
+    #   * :port (Fixnum) the winrm port to connect on the node the bootstrap will be performed on (5985)
+    #
+    # @return [HostConnector::Response]
     def ruby_script(host, command_lines, options = {})
       execute(__method__, host, command_lines, options)
     end
@@ -87,7 +163,7 @@ module Ridley
 
       # Finds and returns the best HostConnector for a given host
       #
-      # @param  host [String]
+      # @param [String] host
       #   the host to attempt to connect to
       # @option options [Hash] :ssh
       #   * :port (Fixnum) the ssh port to connect on the node the bootstrap will be performed on (22)

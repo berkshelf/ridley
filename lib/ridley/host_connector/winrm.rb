@@ -14,12 +14,18 @@ module Ridley
       DEFAULT_PORT       = 5985
       EMBEDDED_RUBY_PATH = 'C:\opscode\chef\embedded\bin\ruby'.freeze
 
-      # @option options [String] :user
-      #   a user that will login to each node and perform the bootstrap command on (required)
-      # @option options [String] :password
-      #   the password for the user that will perform the bootstrap (required)
-      # @option options [Fixnum] :port (5985)
-      #   the winrm port to connect on the node the bootstrap will be performed on
+      # Execute a shell command on a node
+      #
+      # @param [String] host
+      #   the host to perform the action on
+      # @param [String] command
+      #
+      # @option options [Hash] :winrm
+      #   * :user (String) a user that will login to each node and perform the bootstrap command on
+      #   * :password (String) the password for the user that will perform the bootstrap (required)
+      #   * :port (Fixnum) the winrm port to connect on the node the bootstrap will be performed on (5985)
+      #
+      # @return [HostConnector::Response]
       def run(host, command, options = {})
         options = options.reverse_merge(winrm: Hash.new)
         options[:winrm].reverse_merge!(port: DEFAULT_PORT)
@@ -84,6 +90,17 @@ module Ridley
         end
       end
 
+      # Bootstrap a node
+      #
+      # @param [String] host
+      #   the host to perform the action on
+      #
+      # @option options [Hash] :winrm
+      #   * :user (String) a user that will login to each node and perform the bootstrap command on
+      #   * :password (String) the password for the user that will perform the bootstrap (required)
+      #   * :port (Fixnum) the winrm port to connect on the node the bootstrap will be performed on (5985)
+      #
+      # @return [HostConnector::Response]
       def bootstrap(host, options = {})
         context = BootstrapContext::Windows.new(options)
 
@@ -91,30 +108,52 @@ module Ridley
         run(host, context.boot_command, options)
       end
 
-      # Executes a chef-client run on the nodes
+      # Perform a chef client run on a node
       #
-      # @return [#run]
+      # @param [String] host
+      #   the host to perform the action on
+      #
+      # @option options [Hash] :winrm
+      #   * :user (String) a user that will login to each node and perform the bootstrap command on
+      #   * :password (String) the password for the user that will perform the bootstrap (required)
+      #   * :port (Fixnum) the winrm port to connect on the node the bootstrap will be performed on (5985)
+      #
+      # @return [HostConnector::Response]
       def chef_client(host, options = {})
         run(host, "chef-client", options)
       end
 
-      # Writes the given encrypted data bag secret to the node
+      # Write your encrypted data bag secret on a node
       #
+      # @param [String] host
+      #   the host to perform the action on
       # @param [String] secret
       #   your organization's encrypted data bag secret
       #
-      # @return [#run]
+      # @option options [Hash] :winrm
+      #   * :user (String) a user that will login to each node and perform the bootstrap command on
+      #   * :password (String) the password for the user that will perform the bootstrap (required)
+      #   * :port (Fixnum) the winrm port to connect on the node the bootstrap will be performed on (5985)
+      #
+      # @return [HostConnector::Response]
       def put_secret(host, secret, options = {})
         command = "echo #{secret} > C:\\chef\\encrypted_data_bag_secret"
         run(host, command, options)
       end
 
-      # Executes a provided Ruby script in the embedded Ruby installation
+      # Execute line(s) of Ruby code on a node using Chef's embedded Ruby
       #
+      # @param [String] host
+      #   the host to perform the action on
       # @param [Array<String>] command_lines
       #   An Array of lines of the command to be executed
       #
-      # @return [#run]
+      # @option options [Hash] :winrm
+      #   * :user (String) a user that will login to each node and perform the bootstrap command on
+      #   * :password (String) the password for the user that will perform the bootstrap (required)
+      #   * :port (Fixnum) the winrm port to connect on the node the bootstrap will be performed on (5985)
+      #
+      # @return [HostConnector::Response]
       def ruby_script(host, command_lines, options = {})
         command = "#{EMBEDDED_RUBY_PATH} -e \"#{command_lines.join(';')}\""
         run(host, command, options)
