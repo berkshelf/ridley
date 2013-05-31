@@ -60,16 +60,14 @@ module Ridley
           rescue Net::SSH::Exception => ex
             response.exit_code = -1
             response.stderr    = ex.message
-            return [ :error, response ]
+            return response
           end
 
           case response.exit_code
           when 0
             log.info "Successfully ran SSH command on: '#{host}' as: '#{options[:user]}'"
-            [ :ok, response ]
           else
             log.info "Successfully ran SSH command on: '#{host}' as: '#{options[:user]}' but it failed"
-            [ :error, response ]
           end
         end
       end

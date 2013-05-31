@@ -27,38 +27,39 @@ module Ridley
         port              = options[:port] || DEFAULT_PORT
         connection        = winrm(host, port, options.slice(:user, :password))
 
-        response = HostConnector::Response.new(host)
-        command_uploaders << command_uploader = CommandUploader.new(connection)
-        command = get_command(command, command_uploader)
+        HostConnector::Response.new(host).tap do |response|
+          command_uploaders << command_uploader = CommandUploader.new(connection)
+          command = get_command(command, command_uploader)
 
-        log.info "Running WinRM Command: '#{command}' on: '#{host}' as: '#{user}'"
+          log.info "Running WinRM Command: '#{command}' on: '#{host}' as: '#{user}'"
 
-        output = connection.run_cmd(command) do |stdout, stderr|
-          if stdout
-            response.stdout += stdout
-            log.info "[#{host}](WinRM) #{stdout}"
+          begin
+            output = connection.run_cmd(command) do |stdout, stderr|
+              if stdout
+                response.stdout += stdout
+                log.info "[#{host}](WinRM) #{stdout}"
+              end
+
+              if stderr
+                response.stderr += stderr unless stderr.nil?
+                log.info "[#{host}](WinRM) #{stdout}"
+              end
+            end
+
+            response.exit_code = output[:exitcode]
+          rescue ::WinRM::WinRMHTTPTransportError => ex
+            response.exit_code = -1
+            response.stderr    = ex.message
+            return response
           end
 
-          if stderr
-            response.stderr += stderr unless stderr.nil?
-            log.info "[#{host}](WinRM) #{stdout}"
+          case response.exit_code
+          when 0
+            log.info "Successfully ran WinRM command on: '#{host}' as: '#{user}'"
+          else
+            log.info "Successfully ran WinRM command on: '#{host}' as: '#{user}', but it failed"
           end
         end
-
-        response.exit_code = output[:exitcode]
-
-        case response.exit_code
-        when 0
-          log.info "Successfully ran WinRM command on: '#{host}' as: '#{user}'"
-          [ :ok, response ]
-        else
-          log.info "Successfully ran WinRM command on: '#{host}' as: '#{user}', but it failed"
-          [ :error, response ]
-        end
-      rescue ::WinRM::WinRMHTTPTransportError => ex
-        response.exit_code = -1
-        response.stderr    = ex.message
-        [ :error, response ]
       ensure
         command_uploaders.map(&:cleanup)
       end

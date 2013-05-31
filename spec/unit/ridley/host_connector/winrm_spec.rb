@@ -32,7 +32,7 @@ describe Ridley::HostConnector::WinRM do
   end
 
   describe "#run" do
-    subject(:run) { connector.run(host, command, options) }
+    subject(:result) { connector.run(host, command, options) }
     let(:command) { "dir" }
     let(:command_uploader_stub) { double('CommandUploader', cleanup: true) }
     let(:stdout) { "stdout" }
@@ -46,10 +46,13 @@ describe Ridley::HostConnector::WinRM do
     end
 
     context "when the exit_code is 0" do
-      it "returns an :ok with the response" do
-        status, response = run
-        expect(status).to eq(:ok)
-        expect(response.stdout).to eq("stdout")
+      it "returns a non-error HostConnector::Response" do
+        expect(result).to be_a(Ridley::HostConnector::Response)
+        expect(result).to_not be_error
+      end
+
+      it "sets the response's stdout message" do
+        expect(result.stdout).to eq("stdout")
       end
     end
 
@@ -60,24 +63,27 @@ describe Ridley::HostConnector::WinRM do
         winrm_stub.stub(:run_cmd).and_yield(stdout, stderr).and_return({exitcode: 1})
       end
 
-      it "returns an :error with the response" do
-        status, response = run
-        expect(status).to eq(:error)
-        expect(response.stderr).to eq("stderr")
+      it "returns an error HostConnector::Response with an error" do
+        expect(result).to be_a(Ridley::HostConnector::Response)
+        expect(result).to be_error
+      end
+
+      it "sets the response's stderr message" do
+        expect(result.stderr).to eq("stderr")
       end
     end
 
-    context "when an error is raised" do
+    context "when a WinRM::WinRMHTTPTransportError error is raised" do
       let(:stderr) { "error" }
+      before { winrm_stub.stub(:run_cmd).and_yield(stdout, stderr).and_raise(::WinRM::WinRMHTTPTransportError) }
 
-      before do
-        winrm_stub.stub(:run_cmd).and_yield(stdout, stderr).and_raise("error")
+      it "returns an error HostConnector::Response with an error" do
+        expect(result).to be_a(Ridley::HostConnector::Response)
+        expect(result).to be_error
       end
 
-      it "returns an :error with the response" do
-        status, response = run
-        expect(status).to eq(:error)
-        expect(response.stderr).to eq("error")
+      it "sets the response's stderr message to the exception's message" do
+        expect(result.stderr).to eql("WinRM::WinRMHTTPTransportError")
       end
     end
   end
