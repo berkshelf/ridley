@@ -88,6 +88,10 @@ describe Ridley::HostConnector::WinRM do
     end
   end
 
+  describe "#bootstrap" do
+    pending
+  end
+
   describe "#chef_client" do
     subject(:chef_client) { connector.chef_client(host, options) }
 

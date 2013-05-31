@@ -14,6 +14,12 @@ describe Ridley::HostConnector::Base do
     end
   end
 
+  describe "#bootstrap" do
+    it "raises a RuntimeError" do
+      expect { subject.bootstrap(host, options) }.to raise_error(RuntimeError)
+    end
+  end
+
   describe "#chef_client" do
     it "raises a RuntimeError" do
       expect { subject.chef_client(host, options) }.to raise_error(RuntimeError)

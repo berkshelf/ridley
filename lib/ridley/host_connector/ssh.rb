@@ -46,6 +46,14 @@ module Ridley
         end
       end
 
+      def bootstrap(host, options = {})
+        options = options.reverse_merge(sudo: true, timeout: 5.0)
+        context = BootstrapContext::Unix.new(options)
+
+        log.info "Bootstrapping host: #{host}"
+        run(context.boot_command, options)
+      end
+
       # Executes a chef-client command on the nodes
       #
       # @return [#run]

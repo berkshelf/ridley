@@ -7,6 +7,10 @@ describe Ridley::HostConnector::SSH do
   let(:host) { 'reset.riotgames.com' }
   let(:options) { Hash.new }
 
+  describe "#bootstrap" do
+    pending
+  end
+
   describe "#chef_client" do
     subject(:chef_client) { connector.chef_client(host, options) }
 

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Ridley::WindowsTemplateBinding do
+describe Ridley::BootstrapContext::Windows do
   let(:options) do
     {
       server_url: "https://api.opscode.com/organizations/vialstudios",
@@ -30,7 +30,7 @@ describe Ridley::WindowsTemplateBinding do
     end
   end
 
-  subject { Ridley::WindowsTemplateBinding.new(options) }
+  subject { described_class.new(options) }
 
   describe "MixinMethods" do
     describe "#templates_path" do

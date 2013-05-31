@@ -81,6 +81,13 @@ module Ridley
         end
       end
 
+      def bootstrap(host, options = {})
+        context = BootstrapContext::Windows.new(options)
+
+        log.info "Bootstrapping host: #{host}"
+        run(context.boot_command, options)
+      end
+
       # Executes a chef-client run on the nodes
       #
       # @return [#run]

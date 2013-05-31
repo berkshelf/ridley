@@ -4,29 +4,32 @@ describe Ridley::NodeResource do
   let(:host) { "33.33.33.10" }
   let(:worker) { double('worker', alive?: true, terminate: nil) }
   let(:host_commander) { double('host-commander') }
-  let(:secret) { "super_secret" }
+  let(:options) do
+    {
+      server_url: double('server_url'),
+      validator_path: double('validator_path'),
+      validator_client: double('validator_client'),
+      encrypted_data_bag_secret: double('encrypted_data_bag_secret'),
+      ssh: double('ssh'),
+      winrm: double('winrm'),
+      chef_version: double('chef_version')
+    }
+  end
   let(:instance) do
-    inst = described_class.new(double, encrypted_data_bag_secret: secret)
+    inst = described_class.new(double, options)
     inst.stub(connection: chef_zero_connection, host_commander: host_commander)
     inst
   end
 
   describe "#bootstrap" do
-    let(:hosts) { [ "192.168.1.2" ] }
-    let(:options) do
-      {
-        validator_path: fixtures_path.join("reset.pem").to_s,
-        encrypted_data_bag_secret: File.read(fixtures_path.join("reset.pem"))
-      }
+    it "sends the message #bootstrap to the instance's host_commander" do
+      host_commander.should_receive(:bootstrap).with(host, options)
+      instance.bootstrap(host)
     end
-    let(:bootstrapper) { double('bootstrapper', run: nil) }
-    subject { instance }
-    before { Ridley::Bootstrapper.should_receive(:new).with(hosts, anything).and_return(bootstrapper) }
 
-    it "runs the Bootstrapper" do
-      bootstrapper.should_receive(:run)
-
-      subject.bootstrap("192.168.1.2", options)
+    it "passes pre-configured options to #bootstrap" do
+      host_commander.should_receive(:bootstrap).with(host, options)
+      instance.bootstrap(host)
     end
   end
 
@@ -38,8 +41,10 @@ describe Ridley::NodeResource do
   end
 
   describe "#put_secret" do
+    let(:secret) { options[:encrypted_data_bag_secret] }
+
     it "sends the message #put_secret to the instance's host_commander" do
-      host_commander.should_receive(:put_secret).with(host, secret, ssh: instance.ssh, winrm: instance.winrm)
+      host_commander.should_receive(:put_secret).with(host, secret, options.slice(:ssh, :winrm))
       instance.put_secret(host)
     end
   end

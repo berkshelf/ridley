@@ -44,6 +44,10 @@ module Ridley
       execute(__method__, host, command, options)
     end
 
+    def bootstrap(host, options = {})
+      execute(__method__, host, options)
+    end
+
     # Executes a chef-client command on the nodes
     #
     # @return [#run]

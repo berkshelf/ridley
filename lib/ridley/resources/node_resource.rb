@@ -46,46 +46,42 @@ module Ridley
       @host_commander            = HostCommander.new_link
     end
 
-    # @overload bootstrap(nodes, options = {})
-    #   @param [Array<String>, String] nodes
+    # @param [String] host
     #
-    #   @option options [Hash] ssh
-    #     * :user (String) a shell user that will login to each node and perform the bootstrap command on (required)
-    #     * :password (String) the password for the shell user that will perform the bootstrap
-    #     * :keys (Array, String) an array of keys (or a single key) to authenticate the ssh user with instead of a password
-    #     * :timeout (Float) [5.0] timeout value for SSH bootstrap
-    #   @option options [Hash] :winrm
-    #     * :user (String) a user that will login to each node and perform the bootstrap command on (required)
-    #     * :password (String) the password for the user that will perform the bootstrap
-    #     * :port (Fixnum) the winrm port to connect on the node the bootstrap will be performed on (5985)
-    #   @option options [String] :validator_client
-    #   @option options [String] :validator_path
-    #     filepath to the validator used to bootstrap the node (required)
-    #   @option options [String] :bootstrap_proxy
-    #     URL to a proxy server to bootstrap through (default: nil)
-    #   @option options [String] :encrypted_data_bag_secret_path
-    #     filepath on your host machine to your organizations encrypted data bag secret (default: nil)
-    #   @option options [Hash] :hints
-    #     a hash of Ohai hints to place on the bootstrapped node (default: Hash.new)
-    #   @option options [Hash] :attributes
-    #     a hash of attributes to use in the first Chef run (default: Hash.new)
-    #   @option options [Array] :run_list
-    #     an initial run list to bootstrap with (default: Array.new)
-    #   @option options [String] :chef_version
-    #     version of Chef to install on the node (default: nil)
-    #   @option options [String] :environment
-    #     environment to join the node to (default: '_default')
-    #   @option options [Boolean] :sudo
-    #     bootstrap with sudo (default: true)
-    #   @option options [String] :template
-    #     bootstrap template to use (default: omnibus)
+    # @option options [Hash] ssh
+    #   * :user (String) a shell user that will login to each node and perform the bootstrap command on (required)
+    #   * :password (String) the password for the shell user that will perform the bootstrap
+    #   * :keys (Array, String) an array of keys (or a single key) to authenticate the ssh user with instead of a password
+    #   * :timeout (Float) [5.0] timeout value for SSH bootstrap
+    # @option options [Hash] :winrm
+    #   * :user (String) a user that will login to each node and perform the bootstrap command on (required)
+    #   * :password (String) the password for the user that will perform the bootstrap
+    #   * :port (Fixnum) the winrm port to connect on the node the bootstrap will be performed on (5985)
+    # @option options [String] :validator_client
+    # @option options [String] :validator_path
+    #   filepath to the validator used to bootstrap the node (required)
+    # @option options [String] :bootstrap_proxy
+    #   URL to a proxy server to bootstrap through (default: nil)
+    # @option options [String] :encrypted_data_bag_secret_path
+    #   filepath on your host machine to your organizations encrypted data bag secret (default: nil)
+    # @option options [Hash] :hints
+    #   a hash of Ohai hints to place on the bootstrapped node (default: Hash.new)
+    # @option options [Hash] :attributes
+    #   a hash of attributes to use in the first Chef run (default: Hash.new)
+    # @option options [Array] :run_list
+    #   an initial run list to bootstrap with (default: Array.new)
+    # @option options [String] :chef_version
+    #   version of Chef to install on the node (default: nil)
+    # @option options [String] :environment
+    #   environment to join the node to (default: '_default')
+    # @option options [Boolean] :sudo
+    #   bootstrap with sudo (default: true)
+    # @option options [String] :template
+    #   bootstrap template to use (default: omnibus)
     #
-    # @return [SSH::ResponseSet]
-    def bootstrap(*args)
-      args = args.dup
-      opts = args.extract_options!
-
-      options = opts.reverse_merge(
+    # @return [HostConnector::Response]
+    def bootstrap(host, options = {})
+      options = options.reverse_merge(
         server_url: server_url,
         validator_path: validator_path,
         validator_client: validator_client,
@@ -95,7 +91,7 @@ module Ridley
         chef_version: chef_version
       )
 
-      Bootstrapper.new(args, options).run
+      host_commander.bootstrap(host, options)
     end
 
     # Executes a Chef run using the best worker available for the given

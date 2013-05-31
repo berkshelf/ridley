@@ -9,6 +9,10 @@ module Ridley
         raise RuntimeError, "abstract function: must be implemented on includer"
       end
 
+      def bootstrap(host, options = {})
+        raise RuntimeError, "abstract function: must be implemented on includer"
+      end
+
       # Executes a chef-client command on the nodes
       #
       # @return [#run]

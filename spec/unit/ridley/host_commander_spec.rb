@@ -72,6 +72,39 @@ describe Ridley::HostCommander do
     end
   end
 
+  describe "#bootstrap" do
+    let(:host) { "reset.riotgames.com" }
+    let(:options) do
+      { ssh: { port: 22 }, winrm: { port: 5985 } }
+    end
+
+    context "when communicating to a unix node" do
+      before do
+        described_class.stub(:connector_port_open?).with(host, options[:winrm][:port]).and_return(false)
+        described_class.stub(:connector_port_open?).with(host, options[:ssh][:port], anything).and_return(true)
+      end
+
+      it "sends a #bootstrap message to the ssh host connector" do
+        subject.send(:ssh).should_receive(:bootstrap).with(host, options[:ssh])
+
+        subject.bootstrap(host, options)
+      end
+    end
+
+    context "when communicating to a windows node" do
+      before do
+        described_class.stub(:connector_port_open?).with(host, options[:winrm][:port]).and_return(true)
+        described_class.stub(:connector_port_open?).with(host, options[:ssh][:port], anything).and_return(false)
+      end
+
+      it "sends a #bootstrap message to the ssh host connector" do
+        subject.send(:winrm).should_receive(:bootstrap).with(host, options[:winrm])
+
+        subject.bootstrap(host, options)
+      end
+    end
+  end
+
   describe "#chef_client" do
     let(:host) { "reset.riotgames.com" }
     let(:options) do
