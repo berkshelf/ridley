@@ -14,6 +14,8 @@ module Ridley
     attr_reader :winrm
     attr_reader :chef_version
 
+    finalizer :finalize_callback
+
     # @param [Celluloid::Registry] connection_registry
     #
     # @option options [String] :server_url
@@ -162,5 +164,9 @@ module Ridley
 
       # @return [Ridley::HostCommander]
       attr_reader :host_commander
+
+      def finalize_callback
+        @host_commander.terminate if @host_commander && @host_commander.alive?
+      end
   end
 end
