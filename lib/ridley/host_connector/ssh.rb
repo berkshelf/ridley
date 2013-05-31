@@ -1,3 +1,5 @@
+require 'net/ssh'
+
 module Ridley
   module HostConnector
     # @author Jamie Winsor <reset@riotgames.com>

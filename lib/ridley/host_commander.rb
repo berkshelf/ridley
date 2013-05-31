@@ -11,6 +11,25 @@ module Ridley
   end
 
   class HostCommander
+    class << self
+      # Checks to see if the given port is open for TCP connections
+      # on the given host.
+      #
+      # @param  host [String]
+      #   the host to attempt to connect to
+      # @param  port [Fixnum]
+      #   the port to attempt to connect on
+      # @param  timeout [Float]
+      #   the number of seconds to wait (default: {PORT_CHECK_TIMEOUT})
+      #
+      # @return [Boolean]
+      def connector_port_open?(host, port, timeout = nil)
+        Timeout.timeout(timeout || PORT_CHECK_TIMEOUT) { TCPSocket.new(host, port).close; true }
+      rescue Timeout::Error, SocketError, Errno::ECONNREFUSED, Errno::EHOSTUNREACH, Errno::EADDRNOTAVAIL => ex
+        false
+      end
+    end
+
     include Celluloid
     include Ridley::Logging
 
@@ -83,31 +102,13 @@ module Ridley
         options[:ssh][:port]   ||= DEFAULT_SSH_PORT
         options[:winrm][:port] ||= DEFAULT_WINRM_PORT
 
-        if connector_port_open?(host, options[:winrm][:port])
+        if self.class.connector_port_open?(host, options[:winrm][:port])
           [ winrm, options[:winrm] ]
-        elsif connector_port_open?(host, options[:ssh][:port], options[:ssh][:timeout])
+        elsif self.class.connector_port_open?(host, options[:ssh][:port], options[:ssh][:timeout])
           [ ssh, options[:ssh] ]
         else
-          raise Errors::HostConnectionError, "No available connection method available on #{host}."
+          raise Errors::HostConnectionError, "No connector ports open on '#{host}'"
         end
-      end
-
-      # Checks to see if the given port is open for TCP connections
-      # on the given host.
-      #
-      # @param  host [String]
-      #   the host to attempt to connect to
-      # @param  port [Fixnum]
-      #   the port to attempt to connect on
-      # @param  timeout [Float]
-      #   the number of seconds to wait (default: {PORT_CHECK_TIMEOUT})
-      #
-      # @return [Boolean]
-      def connector_port_open?(host, port, timeout = nil)
-        Timeout.timeout(timeout || PORT_CHECK_TIMEOUT) { TCPSocket.new(host, port).close; true }
-      rescue Timeout::Error, SocketError, Errno::ECONNREFUSED, Errno::EHOSTUNREACH, Errno::EADDRNOTAVAIL => ex
-        log.debug "Connector port: '#{port}' not open on host: '#{host}' - #{ex}"
-        false
       end
 
       def ssh
