@@ -5,7 +5,9 @@ module Ridley
       class Response
         extend Forwardable
 
+        # @return [String]
         attr_reader :stdout
+        # @return [String]
         attr_reader :stderr
 
         def_delegator :process_status, :exitstatus
@@ -14,6 +16,9 @@ module Ridley
         def_delegator :process_status, :exited?
         def_delegator :process_status, :stopped?
 
+        # @param [Process::Status] process_status
+        # @param [String] stdout
+        # @param [String] stderr
         def initialize(process_status, stdout, stderr)
           @process_status = process_status
           @stdout         = stdout
@@ -27,6 +32,7 @@ module Ridley
 
         private
 
+          # @return [Process::Status]
           attr_reader :process_status
       end
 
@@ -38,14 +44,7 @@ module Ridley
       # @param [String] command
       #   The command to execute
       #
-      # @return [Mash]
-      #   A Hash containing the results of running the command
-      #     {
-      #       exit_status: 0,
-      #       stderr: "",
-      #       stdout: "",
-      #       pid: 93337
-      #     }
+      # @return [ShellOut::Response]
       def shell_out(command)
         process_status, out, err = jruby? ? jruby_out(command) : mri_out(command)
         Response.new(process_status, out, err)
@@ -53,6 +52,8 @@ module Ridley
 
       private
 
+        # @param [String] command
+        #   The command to execute
         def mri_out(command)
           out, err = Tempfile.new('ridley.shell_out.stdout'), Tempfile.new('ridley.shell_out.stderr')
 
@@ -70,6 +71,8 @@ module Ridley
           [ $?, File.read(out), File.read(err) ]
         end
 
+        # @param [String] command
+        #   The command to execute
         def jruby_out(command)
           out, err = StringIO.new, StringIO.new
           $stdout, $stderr = out, err
