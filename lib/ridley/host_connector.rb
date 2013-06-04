@@ -64,6 +64,17 @@ module Ridley
       def ruby_script(host, command_lines, options = {})
         raise RuntimeError, "abstract function: must be implemented on includer"
       end
+
+      # Uninstall Chef from a node
+      #
+      # @param [String] host
+      #   the host to perform the action on
+      # @param [Hash] options
+      #
+      # @return [HostConnector::Response]
+      def uninstall_chef(host, options = {})
+        raise RuntimeError, "abstract function: must be implemented on includer"
+      end
     end
 
     require_relative 'host_connector/response'
