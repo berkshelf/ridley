@@ -11,8 +11,12 @@ module Ridley
     class WinRM < HostConnector::Base
       require_relative 'winrm/command_uploader'
 
-      DEFAULT_PORT       = 5985
-      EMBEDDED_RUBY_PATH = 'C:\opscode\chef\embedded\bin\ruby'.freeze
+      DEFAULT_PORT                 = 5985
+      EMBEDDED_RUBY_PATH           = 'C:\opscode\chef\embedded\bin\ruby'.freeze
+      SESSION_TYPE_COMMAND_METHODS = {
+        powershell: :run_powershell_script,
+        cmd: :run_cmd
+      }.freeze
 
       # Execute a shell command on a node
       #
@@ -20,6 +24,9 @@ module Ridley
       #   the host to perform the action on
       # @param [String] command
       #
+      # @option options [Symbol] :session_type (:cmd)
+      #   * :powershell - run the given command in a powershell session
+      #   * :cmd - run the given command in a cmd session
       # @option options [Hash] :winrm
       #   * :user (String) a user that will login to each node and perform the bootstrap command on
       #   * :password (String) the password for the user that will perform the bootstrap (required)
@@ -27,7 +34,7 @@ module Ridley
       #
       # @return [HostConnector::Response]
       def run(host, command, options = {})
-        options = options.reverse_merge(winrm: Hash.new)
+        options = options.reverse_merge(winrm: Hash.new, session_type: :cmd)
         options[:winrm].reverse_merge!(port: DEFAULT_PORT)
 
         command_uploaders = Array.new
@@ -36,6 +43,11 @@ module Ridley
         port              = options[:winrm][:port]
         connection        = winrm(host, port, options[:winrm].slice(:user, :password))
 
+        unless command_method = SESSION_TYPE_COMMAND_METHODS[options[:session_type]]
+          raise RuntimeError, "unknown session type: #{options[:session_type]}. Known session types " +
+            "are: #{SESSION_TYPE_COMMAND_METHODS.keys}"
+        end
+
         HostConnector::Response.new(host).tap do |response|
           command_uploaders << command_uploader = CommandUploader.new(connection)
           command = get_command(command, command_uploader)
@@ -43,15 +55,15 @@ module Ridley
           begin
             log.info "Running WinRM Command: '#{command}' on: '#{host}' as: '#{user}'"
 
-            output = connection.run_cmd(command) do |stdout, stderr|
-              if stdout
+            output = connection.send(command_method, command) do |stdout, stderr|
+              if stdout && stdout.present?
                 response.stdout += stdout
                 log.info "[#{host}](WinRM) #{stdout}"
               end
 
-              if stderr
-                response.stderr += stderr unless stderr.nil?
-                log.info "[#{host}](WinRM) #{stdout}"
+              if stderr && stderr.present?
+                response.stderr += stderr
+                log.info "[#{host}](WinRM) #{stderr}"
               end
             end
 
@@ -175,6 +187,7 @@ module Ridley
       #
       # @return [HostConnector::Response]
       def uninstall_chef(host, options = {})
+        options[:session_type] = :powershell
         log.info "Uninstalling Chef from host: #{host}"
         run(host, CommandContext::WindowsUninstall.command(options), options)
       end
