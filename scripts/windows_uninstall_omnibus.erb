@@ -1,0 +1,10 @@
+$productName      = "Chef"
+$installDirectory = "<%= install_directory %>"
+$configDirectory  = "<%= config_directory %>"
+
+<% unless skip_chef -%>
+$app = Get-WmiObject -Class Win32_Product | Where-Object {  $_.Name -match $productName  }
+If ($app) { $app.Uninstall() }
+If (Test-Path $installDirectory) { Remove-Item -Recurse -Force $installDirectory }
+<% end -%>
+If (Test-Path $configDirectory) { Remove-Item -Recurse -Force $configDirectory }
