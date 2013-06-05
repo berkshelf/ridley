@@ -15,9 +15,39 @@ JSON.create_id = nil
 module Ridley
   CHEF_VERSION = '11.4.0'.freeze
 
+  class << self
+    extend Forwardable
+
+    def_delegator "Ridley::Logging", :logger
+    alias_method :log, :logger
+
+    def_delegator "Ridley::Logging", :logger=
+    def_delegator "Ridley::Logging", :set_logger
+
+    # @return [Ridley::Client]
+    def new(*args)
+      Client.new(*args)
+    end
+
+    def open(*args, &block)
+      Client.open(*args, &block)
+    end
+
+    # @return [Pathname]
+    def root
+      @root ||= Pathname.new(File.expand_path('../', File.dirname(__FILE__)))
+    end
+
+    # @return [Pathname]
+    def scripts
+      root.join('scripts')
+    end
+  end
+
   require_relative 'ridley/mixin'
   require_relative 'ridley/logging'
   require_relative 'ridley/bootstrap_context'
+  require_relative 'ridley/command_context'
   require_relative 'ridley/chef_object'
   require_relative 'ridley/chef_objects'
   require_relative 'ridley/client'
@@ -31,29 +61,6 @@ module Ridley
   require_relative 'ridley/sandbox_uploader'
   require_relative 'ridley/version'
   require_relative 'ridley/errors'
-
-  class << self
-    extend Forwardable
-
-    def_delegator "Ridley::Logging", :logger
-    alias_method :log, :logger
-
-    def_delegator "Ridley::Logging", :logger=
-    def_delegator "Ridley::Logging", :set_logger
-
-    def new(*args)
-      Client.new(*args)
-    end
-
-    def open(*args, &block)
-      Client.open(*args, &block)
-    end
-
-    # @return [Pathname]
-    def root
-      @root ||= Pathname.new(File.expand_path('../', File.dirname(__FILE__)))
-    end
-  end
 end
 
 Celluloid.logger = Ridley.logger

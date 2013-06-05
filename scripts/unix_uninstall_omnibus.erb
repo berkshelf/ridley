@@ -1,0 +1,31 @@
+bash -c '
+if [ -f "/etc/lsb-release" ]; then
+  platform=$(grep DISTRIB_ID /etc/lsb-release | cut -d "=" -f 2 | tr "[A-Z]" "[a-z]")
+elif [ -f "/etc/debian_version" ]; then
+  platform="debian"
+elif [ -f "/etc/redhat-release" ]; then
+  platform="el"
+elif [ -f "/etc/system-release" ]; then
+  platform=$(sed "s/^\(.\+\) release.\+/\1/" /etc/system-release | tr "[A-Z]" "[a-z]")
+  if [ "$platform" = "amazon linux ami" ]; then
+    platform="el"
+  fi
+elif [ -f "/etc/SuSE-release" ]; then
+  platform="el"
+fi
+
+<% unless skip_chef -%>
+echo "Un-Installing installed Chef package"
+case "$platform" in
+  "el") yum remove chef -y ;;
+  "debian") apt-get purge chef -y ;;
+esac
+<% end -%>
+
+rm -Rdf <%= config_directory %>
+rm -Rdf <%= data_directory %>
+
+<% unless skip_chef -%>
+rm -Rdf <%= install_directory %>
+<% end -%>
+'
