@@ -41,4 +41,10 @@ describe Ridley::HostConnector::Base do
       expect { subject.ruby_script(host, command_lines, options) }.to raise_error(RuntimeError)
     end
   end
+
+  describe "#uninstall_chef" do
+    it "raises a RuntimeError" do
+      expect { subject.uninstall_chef(host, options) }.to raise_error(RuntimeError)
+    end
+  end
 end
