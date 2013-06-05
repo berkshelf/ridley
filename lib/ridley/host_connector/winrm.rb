@@ -175,7 +175,8 @@ module Ridley
       #
       # @return [HostConnector::Response]
       def uninstall_chef(host, options = {})
-        raise RuntimeError, "not yet implemented for Windows"
+        log.info "Uninstalling Chef from host: #{host}"
+        run(host, CommandContext::WindowsUninstall.command(options), options)
       end
 
       private

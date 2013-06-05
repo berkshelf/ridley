@@ -1,0 +1,4 @@
+rmdir /s <%= config_directory %>
+<% unless skip_chef -%>
+rmdir /s <%= install_directory %>
+<% end -%>

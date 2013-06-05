@@ -1,8 +1,8 @@
 module Ridley
   module CommandContext
     # Context class for generating an uninstall command for Unix based OSes
-    class UnixUninstall < CommandContext::Unix
-      template_file 'unix_uninstall_omnibus'
+    class WindowsUninstall < CommandContext::Windows
+      template_file 'windows_uninstall_omnibus'
 
       # @return [Boolean]
       attr_reader :skip_chef
@@ -21,21 +21,14 @@ module Ridley
       #
       # @return [String]
       def config_directory
-        "/etc/chef"
-      end
-
-      # The path to the Chef data directory on the target host
-      #
-      # @return [String]
-      def data_directory
-        "/var/chef"
+        "C:\\chef"
       end
 
       # The path to the Omnibus Chef installation on the target host
       #
       # @return [String]
       def install_directory
-        "/opt/chef"
+        "C:\\opscode\\chef"
       end
     end
   end
