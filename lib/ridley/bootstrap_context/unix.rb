@@ -4,8 +4,6 @@ module Ridley
     # nodes, an instance of this class represents the customizable and necessary configurations
     # needed by the Host in order to install and connect to Chef. By default, this class will be used
     # when SSH is the best way to connect to the node.
-    #
-    # @author Kyle Allan <kallan@riotgames.com>
     class Unix < BootstrapContext::Base
       attr_reader :sudo
 

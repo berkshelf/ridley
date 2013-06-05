@@ -1,5 +1,4 @@
 module Ridley
-  # @author Jamie Winsor <reset@riotgames.com>
   module Middleware
     CONTENT_TYPE     = 'content-type'.freeze
     CONTENT_ENCODING = 'content-encoding'.freeze

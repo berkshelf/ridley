@@ -1,5 +1,4 @@
 module Ridley
-  # @author Jamie Winsor <reset@riotgames.com>
   class EnvironmentResource < Ridley::Resource
     set_resource_path "environments"
     represented_by Ridley::EnvironmentObject

@@ -1,5 +1,4 @@
 module Ridley
-  # @author Jamie Winsor <reset@riotgames.com>
   class DataBagItemResource < Ridley::Resource
     represented_by Ridley::DataBagItemObject
 

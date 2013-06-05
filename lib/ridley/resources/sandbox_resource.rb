@@ -1,5 +1,4 @@
 module Ridley
-  # @author Jamie Winsor <reset@riotgames.com>
   class SandboxResource < Ridley::Resource
     set_resource_path "sandboxes"
     represented_by Ridley::SandboxObject

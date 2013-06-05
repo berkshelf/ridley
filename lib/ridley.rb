@@ -11,7 +11,6 @@ require 'solve'
 
 JSON.create_id = nil
 
-# @author Jamie Winsor <reset@riotgames.com>
 module Ridley
   CHEF_VERSION = '11.4.0'.freeze
 
