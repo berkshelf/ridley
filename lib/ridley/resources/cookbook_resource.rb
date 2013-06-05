@@ -1,5 +1,4 @@
 module Ridley
-  # @author Jamie Winsor <reset@riotgames.com>
   class CookbookResource < Ridley::Resource
     set_resource_path "cookbooks"
     represented_by Ridley::CookbookObject

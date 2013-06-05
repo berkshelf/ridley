@@ -1,5 +1,4 @@
 module Ridley::Chef
-  # @author Jamie Winsor <reset@riotgames.com>
   class Cookbook
     require_relative 'cookbook/metadata'
     require_relative 'cookbook/syntax_check'

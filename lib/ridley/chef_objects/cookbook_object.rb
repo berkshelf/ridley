@@ -1,5 +1,4 @@
 module Ridley
-  # @author Jamie Winsor <reset@riotgames.com>
   class CookbookObject < Ridley::ChefObject
     include Ridley::Logging
 

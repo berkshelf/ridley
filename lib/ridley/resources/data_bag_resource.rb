@@ -1,5 +1,4 @@
 module Ridley
-  # @author Jamie Winsor <reset@riotgames.com>
   class DataBagResource < Ridley::Resource
     require_relative 'data_bag_item_resource'
 

@@ -7,7 +7,6 @@ end
 
 module Ridley
   module HostConnector
-    # @author Kyle Allan <kallan@riotgames.com>
     class WinRM < HostConnector::Base
       require_relative 'winrm/command_uploader'
 

@@ -1,5 +1,4 @@
 module Ridley
-  # @author Jamie Winsor <reset@riotgames.com>
   class NodeObject < Ridley::ChefObject
     set_chef_id "name"
     set_chef_type "node"

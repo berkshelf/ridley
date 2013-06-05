@@ -1,5 +1,4 @@
 module Ridley
-  # @author Jamie Winsor <reset@riotgames.com>
   class SandboxObject < ChefObject
     set_chef_id "sandbox_id"
 
