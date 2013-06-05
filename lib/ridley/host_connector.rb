@@ -1,5 +1,4 @@
 module Ridley
-  # @author Kyle Allan <kallan@riotgames.com>
   module HostConnector
     class Base
       include Celluloid

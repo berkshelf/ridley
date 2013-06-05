@@ -2,7 +2,6 @@ require 'zlib'
 
 module Ridley
   module Middleware
-    # @author Jamie Winsor <reset@riotgames.com>
     class Gzip < Faraday::Response::Middleware
       def on_complete(env)
         case env[:response_headers][CONTENT_ENCODING].to_s.downcase

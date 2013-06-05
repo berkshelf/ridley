@@ -1,9 +1,6 @@
 module Ridley
   module HostConnector
     class WinRM
-      # @author Kyle Allan <kallan@riotgames.com>
-      # @author Justin Campbell <justin.campbell@riotgames.com>
-      #
       # @example
       #   command_uploader = CommandUploader.new(long_command, winrm)
       #   command_uploader.upload

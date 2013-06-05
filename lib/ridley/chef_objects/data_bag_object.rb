@@ -1,5 +1,4 @@
 module Ridley
-  # @author Jamie Winsor <reset@riotgames.com>
   class DataBagObject < ChefObject
     set_chef_id "name"
 
@@ -10,7 +9,6 @@ module Ridley
       DataBagItemProxy.new(self, resource.item_resource)
     end
 
-    # @author Jamie Winsor <reset@riotgames.com>
     # @api private
     class DataBagItemProxy
       attr_reader :data_bag_object

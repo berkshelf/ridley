@@ -1,5 +1,4 @@
 module Ridley
-  # @author Jamie Winsor <reset@riotgames.com>
   class DataBagItemObject < ChefObject
     set_chef_id "id"
     set_assignment_mode :carefree

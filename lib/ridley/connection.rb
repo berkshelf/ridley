@@ -4,7 +4,6 @@ require 'tempfile'
 require 'zlib'
 
 module Ridley
-  # @author Jamie Winsor <reset@riotgames.com>
   class Connection < Faraday::Connection
     include Celluloid
 

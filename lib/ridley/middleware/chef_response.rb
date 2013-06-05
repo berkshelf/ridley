@@ -1,6 +1,5 @@
 module Ridley
   module Middleware
-    # @author Jamie Winsor <reset@riotgames.com>
     class ChefResponse < Faraday::Response::Middleware
       class << self
         # Determines if a response from the Chef server was successful

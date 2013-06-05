@@ -2,8 +2,6 @@ require 'shellwords'
 
 module Ridley::Chef
   class Cookbook
-    # @author Jamie Winsor <reset@riotgames.com>
-    #
     # Encapsulates the process of validating the ruby syntax of files in Chef
     # cookbooks.
     #

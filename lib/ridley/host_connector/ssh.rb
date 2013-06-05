@@ -2,7 +2,6 @@ require 'net/ssh'
 
 module Ridley
   module HostConnector
-    # @author Jamie Winsor <reset@riotgames.com>
     class SSH < HostConnector::Base
       DEFAULT_PORT       = 22
       EMBEDDED_RUBY_PATH = '/opt/chef/embedded/bin/ruby'.freeze
