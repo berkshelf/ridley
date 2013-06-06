@@ -6,6 +6,7 @@ require 'zlib'
 module Ridley
   class Connection < Faraday::Connection
     include Celluloid
+    task_class TaskThread
 
     VALID_OPTIONS = [
       :retries,
@@ -100,7 +101,7 @@ module Ridley
     # Override Faraday::Connection#run_request to catch exceptions from {Ridley::Middleware} that
     # we expect. Caught exceptions are re-raised with Celluloid#abort so we don't crash the connection.
     def run_request(*args)
-      defer { super }
+      super
     rescue Errors::HTTPError => ex
       abort ex
     rescue Faraday::Error::ConnectionFailed => ex
@@ -140,22 +141,20 @@ module Ridley
       local = Tempfile.new('ridley-stream')
       local.binmode
 
-      defer {
-        retryable(tries: retries, on: OpenURI::HTTPError, sleep: retry_interval) do
-          open(target, 'rb', headers) do |remote|
-            body = remote.read
-            case remote.content_encoding
-            when ['gzip']
-              body = Zlib::GzipReader.new(StringIO.new(body), encoding: 'ASCII-8BIT').read
-            when ['deflate']
-              body = Zlib::Inflate.inflate(body)
-            end
-            local.write(body)
+      retryable(tries: retries, on: OpenURI::HTTPError, sleep: retry_interval) do
+        open(target, 'rb', headers) do |remote|
+          body = remote.read
+          case remote.content_encoding
+          when ['gzip']
+            body = Zlib::GzipReader.new(StringIO.new(body), encoding: 'ASCII-8BIT').read
+          when ['deflate']
+            body = Zlib::Inflate.inflate(body)
           end
+          local.write(body)
         end
+      end
 
-        local.flush
-      }
+      local.flush
 
       FileUtils.mv(local.path, destination)
     rescue OpenURI::HTTPError => ex

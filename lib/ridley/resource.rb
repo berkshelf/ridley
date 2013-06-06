@@ -109,7 +109,7 @@ module Ridley
           raise Errors::HTTPUnknownMethod, "unknown http method: #{method}"
         end
 
-        defer { connection.send(method, *args) }
+        connection.send(method, *args)
       rescue Errors::HTTPError, Errors::ClientError => ex
         abort(ex)
       end
