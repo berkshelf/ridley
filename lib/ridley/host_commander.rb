@@ -200,7 +200,7 @@ module Ridley
       # @param block [Proc]
       #   an optional block that is yielded the best HostConnector
       #
-      # @return [Symbol]
+      # @return [HostConnector::SSH, HostConnector::WinRM]
       def connector_for(host, options = {})
         options = options.reverse_merge(ssh: Hash.new, winrm: Hash.new)
         options[:ssh][:port]   ||= HostConnector::SSH::DEFAULT_PORT

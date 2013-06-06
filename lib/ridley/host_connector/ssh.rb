@@ -24,7 +24,7 @@ module Ridley
         options = options.reverse_merge(ssh: Hash.new)
         options[:ssh].reverse_merge!(port: DEFAULT_PORT, paranoid: false, sudo: false)
 
-        command = "sudo #{command}" if options[:sudo]
+        command = "sudo #{command}" if options[:ssh][:sudo]
 
         Ridley::HostConnector::Response.new(host).tap do |response|
           begin
