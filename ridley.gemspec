@@ -20,6 +20,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'addressable'
   s.add_runtime_dependency 'chozo',                   '>= 0.6.0'
   s.add_runtime_dependency 'celluloid',               '~> 0.14.0'
+  s.add_runtime_dependency 'celluloid-io',            '~> 0.14.0'
   s.add_runtime_dependency 'erubis'
   s.add_runtime_dependency 'faraday',                 '>= 0.8.4'
   s.add_runtime_dependency 'hashie',                  '>= 2.0.2'

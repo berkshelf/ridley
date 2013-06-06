@@ -133,9 +133,10 @@ module Ridley
     # @param [String] command
     #
     # @return [Array<Symbol, HostConnector::Response>]
-    def execute_command(host, command)
+    def run(host, command)
       host_commander.run(host, command, ssh: ssh, winrm: winrm)
     end
+    alias_method :execute_command, :run
 
     # Merges the given data with the the data of the target node on the remote
     #

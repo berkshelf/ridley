@@ -1,6 +1,3 @@
-require 'socket'
-require 'timeout'
-
 module Ridley
   class ConnectorSupervisor < ::Celluloid::SupervisionGroup
     # @param [Celluloid::Registry] registry
@@ -12,25 +9,6 @@ module Ridley
   end
 
   class HostCommander
-    class << self
-      # Checks to see if the given port is open for TCP connections
-      # on the given host.
-      #
-      # @param [String] host
-      #   the host to attempt to connect to
-      # @param [Fixnum] port
-      #   the port to attempt to connect on
-      # @param [Float] timeout
-      #   the number of seconds to wait (default: {PORT_CHECK_TIMEOUT})
-      #
-      # @return [Boolean]
-      def connector_port_open?(host, port, timeout = nil)
-        Timeout.timeout(timeout || PORT_CHECK_TIMEOUT) { TCPSocket.new(host, port).close; true }
-      rescue Timeout::Error, SocketError, Errno::ECONNREFUSED, Errno::EHOSTUNREACH, Errno::EADDRNOTAVAIL => ex
-        false
-      end
-    end
-
     include Celluloid
     include Ridley::Logging
 
@@ -183,7 +161,7 @@ module Ridley
       def execute(method, host, *args)
         options = args.last.is_a?(Hash) ? args.pop : Hash.new
 
-        connector_for(host, options).send(method, host, *args, options)
+        defer { connector_for(host, options).send(method, host, *args, options) }
       rescue Errors::HostConnectionError => ex
         abort(ex)
       end
@@ -206,15 +184,32 @@ module Ridley
         options[:ssh][:port]   ||= HostConnector::SSH::DEFAULT_PORT
         options[:winrm][:port] ||= HostConnector::WinRM::DEFAULT_PORT
 
-        if self.class.connector_port_open?(host, options[:winrm][:port])
+        if connector_port_open?(host, options[:winrm][:port])
           options.delete(:ssh)
           winrm
-        elsif self.class.connector_port_open?(host, options[:ssh][:port], options[:ssh][:timeout])
+        elsif connector_port_open?(host, options[:ssh][:port], options[:ssh][:timeout])
           options.delete(:winrm)
           ssh
         else
           raise Errors::HostConnectionError, "No connector ports open on '#{host}'"
         end
+      end
+
+      # Checks to see if the given port is open for TCP connections
+      # on the given host.
+      #
+      # @param [String] host
+      #   the host to attempt to connect to
+      # @param [Fixnum] port
+      #   the port to attempt to connect on
+      # @param [Float] wait_time ({PORT_CHECK_TIMEOUT})
+      #   the number of seconds to wait
+      #
+      # @return [Boolean]
+      def connector_port_open?(host, port, wait_time = nil)
+        timeout(wait_time || PORT_CHECK_TIMEOUT) { Celluloid::IO::TCPSocket.new(host, port).close; true }
+      rescue Timeout::Error, SocketError, Errno::ECONNREFUSED, Errno::EHOSTUNREACH, Errno::EADDRNOTAVAIL => ex
+        false
       end
 
       def finalize_callback
