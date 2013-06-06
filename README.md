@@ -184,7 +184,7 @@ _With the `#regenerate_key` function on an instance of a Client Object_
 A data bag is managed exactly the same as any other Chef resource
 
     ridley = Ridley.new(...)
-    ridley.data_bag.create("ridley-test")
+    ridley.data_bag.create(name: "ridley-test")
 
 You can create, delete, update, or retrieve a data bag exactly how you would expect if you read through the
 Manipulating Chef Resources portion of this document.
@@ -194,7 +194,7 @@ Unlike a role, node, client, or environment, a data bag is a container for other
 ### Creating a Data Bag Item
 
     ridley   = Ridley.new(...)
-    data_bag = ridley.data_bag.create("ridley-test")
+    data_bag = ridley.data_bag.create(name: "ridley-test")
 
     data_bag.item.create(id: "appconfig", host: "reset.local", user: "jamie") #=>
       #<Ridley::DataBagItemObject: chef_id:appconfig, host="reset.local", user="jamie">
@@ -297,5 +297,6 @@ Search will return an array of the appropriate Chef Objects if one of the defaul
 # Authors and Contributors
 
 * Jamie Winsor (<reset@riotgames.com>)
+* Kyle Allan (<kallan@riotgames.com>)
 
 Thank you to all of our [Contributors](https://github.com/RiotGames/ridley/graphs/contributors), testers, and users.

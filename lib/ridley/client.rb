@@ -1,5 +1,4 @@
 module Ridley
-  # @author Jamie Winsor <reset@riotgames.com>
   class Client
     class ConnectionSupervisor < ::Celluloid::SupervisionGroup
       def initialize(registry, options)

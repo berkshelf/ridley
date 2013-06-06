@@ -1,6 +1,4 @@
 module Ridley
-  # @author Jamie Winsor <reset@riotgames.com>
-  #
   # @example listing all clients
   #   conn = Ridley.new(...)
   #   conn.client.all #=> [

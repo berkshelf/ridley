@@ -2,8 +2,6 @@ require 'shellwords'
 
 module Ridley::Chef
   class Cookbook
-    # @author Jamie Winsor <reset@riotgames.com>
-    #
     # Encapsulates the process of validating the ruby syntax of files in Chef
     # cookbooks.
     #
@@ -127,25 +125,29 @@ module Ridley::Chef
       end
 
       def validate_template(erb_file)
-        result = quietly { shell_out("erubis -x #{erb_file.shellescape} | ruby -c") }
-        result.error!
+        result = shell_out("erubis -x #{erb_file.shellescape} | ruby -c")
+
+        if result.error?
+          file_relative_path = erb_file[/^#{Regexp.escape(cookbook_path+File::Separator)}(.*)/, 1]
+          log.error { "Erb template #{file_relative_path} has a syntax error:" }
+          result.stderr.each_line { |l| Ridley.log.fatal(l.chomp) }
+          return false
+        end
+
         true
-      rescue Mixlib::ShellOut::ShellCommandFailed
-        file_relative_path = erb_file[/^#{Regexp.escape(cookbook_path+File::Separator)}(.*)/, 1]
-        log.error { "Erb template #{file_relative_path} has a syntax error:" }
-        result.stderr.each_line { |l| Ridley.log.fatal(l.chomp) }
-        false
       end
 
       def validate_ruby_file(ruby_file)
-        result = quietly { shell_out("ruby -c #{ruby_file.shellescape}") }
-        result.error!
+        result = shell_out("ruby -c #{ruby_file.shellescape}")
+
+        if result.error?
+          file_relative_path = ruby_file[/^#{Regexp.escape(cookbook_path+File::Separator)}(.*)/, 1]
+          log.error { "Cookbook file #{file_relative_path} has a ruby syntax error:" }
+          result.stderr.each_line { |l| Ridley.log.error(l.chomp) }
+          return false
+        end
+
         true
-      rescue Mixlib::ShellOut::ShellCommandFailed
-        file_relative_path = ruby_file[/^#{Regexp.escape(cookbook_path+File::Separator)}(.*)/, 1]
-        log.error { "Cookbook file #{file_relative_path} has a ruby syntax error:" }
-        result.stderr.each_line { |l| Ridley.log.error(l.chomp) }
-        false
       end
     end
   end

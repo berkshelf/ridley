@@ -1,5 +1,4 @@
 module Ridley
-  # @author Jamie Winsor <reset@riotgames.com>
   class SearchResource < Ridley::Resource
     class << self
       # @param [String] query_string

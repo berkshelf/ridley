@@ -1,3 +1,3 @@
 module Ridley
-  VERSION = "0.12.4"
+  VERSION = "1.0.0"
 end
