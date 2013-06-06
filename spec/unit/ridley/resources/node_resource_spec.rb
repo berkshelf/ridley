@@ -58,12 +58,12 @@ describe Ridley::NodeResource do
     end
   end
 
-  describe "#execute_command" do
+  describe "#run" do
     let(:command) { "echo 'hello world'" }
 
     it "sends the message #run to the instance's host_commander" do
       host_commander.should_receive(:run).with(host, command, ssh: instance.ssh, winrm: instance.winrm)
-      instance.execute_command(host, command)
+      instance.run(host, command)
     end
   end
 
