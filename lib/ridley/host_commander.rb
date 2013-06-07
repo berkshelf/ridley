@@ -161,7 +161,7 @@ module Ridley
       def execute(method, host, *args)
         options = args.last.is_a?(Hash) ? args.pop : Hash.new
 
-        defer { connector_for(host, options).send(method, host, *args, options) }
+        connector_for(host, options).send(method, host, *args, options)
       rescue Errors::HostConnectionError => ex
         abort(ex)
       end
@@ -207,7 +207,9 @@ module Ridley
       #
       # @return [Boolean]
       def connector_port_open?(host, port, wait_time = nil)
-        timeout(wait_time || PORT_CHECK_TIMEOUT) { Celluloid::IO::TCPSocket.new(host, port).close; true }
+        defer {
+          timeout(wait_time || PORT_CHECK_TIMEOUT) { Celluloid::IO::TCPSocket.new(host, port).close; true }
+        }
       rescue Timeout::Error, SocketError, Errno::ECONNREFUSED, Errno::EHOSTUNREACH, Errno::EADDRNOTAVAIL => ex
         false
       end
