@@ -30,26 +30,27 @@ module Ridley
           begin
             log.info "Running SSH command: '#{command}' on: '#{host}' as: '#{options[:ssh][:user]}'"
 
-            Net::SSH.start(host, options[:ssh][:user], options[:ssh].slice(*Net::SSH::VALID_OPTIONS)) do |ssh|
-              ssh.open_channel do |channel|
-                if options[:sudo]
-                  channel.request_pty do |channel, success|
-                    unless success
-                      raise "Could not aquire pty: A pty is required for running sudo commands."
-                    end
+            defer {
+              Net::SSH.start(host, options[:ssh][:user], options[:ssh].slice(*Net::SSH::VALID_OPTIONS)) do |ssh|
+                ssh.open_channel do |channel|
+                  if options[:sudo]
+                    channel.request_pty do |channel, success|
+                      unless success
+                        raise "Could not aquire pty: A pty is required for running sudo commands."
+                      end
 
+                      channel_exec(channel, command, host, response)
+                    end
+                  else
                     channel_exec(channel, command, host, response)
                   end
-                else
-                  channel_exec(channel, command, host, response)
                 end
+                ssh.loop
               end
-              ssh.loop
-            end
+            }
           rescue Net::SSH::Exception => ex
             response.exit_code = -1
             response.stderr    = ex.message
-            return response
           end
 
           case response.exit_code

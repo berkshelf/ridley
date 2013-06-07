@@ -54,23 +54,23 @@ module Ridley
           begin
             log.info "Running WinRM Command: '#{command}' on: '#{host}' as: '#{user}'"
 
-            output = connection.send(command_method, command) do |stdout, stderr|
-              if stdout && stdout.present?
-                response.stdout += stdout
-                log.info "[#{host}](WinRM) #{stdout}"
-              end
+            defer {
+              output = connection.send(command_method, command) do |stdout, stderr|
+                if stdout && stdout.present?
+                  response.stdout += stdout
+                  log.info "[#{host}](WinRM) #{stdout}"
+                end
 
-              if stderr && stderr.present?
-                response.stderr += stderr
-                log.info "[#{host}](WinRM) #{stderr}"
+                if stderr && stderr.present?
+                  response.stderr += stderr
+                  log.info "[#{host}](WinRM) #{stderr}"
+                end
               end
-            end
-
-            response.exit_code = output[:exitcode]
+              response.exit_code = output[:exitcode]
+            }
           rescue ::WinRM::WinRMHTTPTransportError => ex
             response.exit_code = -1
             response.stderr    = ex.message
-            return response
           end
 
           case response.exit_code
