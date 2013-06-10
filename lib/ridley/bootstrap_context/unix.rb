@@ -52,6 +52,7 @@ module Ridley
 
         body
       end
+      alias_method :config_content, :chef_config
 
       # @return [String]
       def bootstrap_directory
@@ -62,6 +63,7 @@ module Ridley
       def chef_run
         "chef-client -j #{bootstrap_directory}/first-boot.json -E #{environment}"
       end
+      alias_method :start_chef, :chef_run
 
       # @return [String]
       def default_template

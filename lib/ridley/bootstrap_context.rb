@@ -54,7 +54,14 @@ module Ridley
         @attributes                = options[:attributes]
         @run_list                  = options[:run_list]
         @environment               = options[:environment]
+        @chef_config               = options
       end
+
+      # @return [Hash]
+      def chef_config
+        @chef_config
+      end
+      alias_method :knife_config, :chef_config
 
       # @return [String]
       def bootstrap_command
