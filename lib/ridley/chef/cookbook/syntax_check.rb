@@ -68,7 +68,7 @@ module Ridley::Chef
       end
 
       include Ridley::Logging
-      include Ridley::Mixin::ShellOut
+      include ::Mixin::ShellOut
       include Ridley::Mixin::Checksum
 
       attr_reader :cookbook_path
