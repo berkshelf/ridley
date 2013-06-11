@@ -3,37 +3,30 @@ module Ridley
     # A Ruby platform agnostic way of executing shell commands on the local system
     module ShellOut
       class Response
-        extend Forwardable
-
+        # @return [Fixnum]
+        attr_reader :exitstatus
         # @return [String]
         attr_reader :stdout
         # @return [String]
         attr_reader :stderr
 
-        def_delegator :process_status, :exitstatus
-        def_delegator :process_status, :pid
-        def_delegator :process_status, :success?
-        def_delegator :process_status, :exited?
-        def_delegator :process_status, :stopped?
-
-        # @param [Process::Status] process_status
+        # @param [Fixnum] exitstatus
         # @param [String] stdout
         # @param [String] stderr
-        def initialize(process_status, stdout, stderr)
-          @process_status = process_status
-          @stdout         = stdout
-          @stderr         = stderr
+        def initialize(exitstatus, stdout, stderr)
+          @exitstatus = exitstatus
+          @stdout     = stdout
+          @stderr     = stderr
+        end
+
+        def success?
+          exitstatus == 0
         end
 
         def error?
           !success?
         end
         alias_method :failure?, :error?
-
-        private
-
-          # @return [Process::Status]
-          attr_reader :process_status
       end
 
       include Chozo::RubyEngine
@@ -58,9 +51,11 @@ module Ridley
           out, err = Tempfile.new('ridley.shell_out.stdout'), Tempfile.new('ridley.shell_out.stderr')
 
           begin
-            pid = Process.spawn(command, out: out.to_i, err: err.to_i)
-            Process.waitpid(pid)
-          rescue Errno::ENOENT
+            pid         = Process.spawn(command, out: out.to_i, err: err.to_i)
+            pid, status = Process.waitpid2(pid)
+            exitstatus  = status.exitstatus
+          rescue Errno::ENOENT => ex
+            exitstatus = 127
             out.write("")
             err.write("command not found: #{command}")
           end
@@ -68,7 +63,7 @@ module Ridley
           out.close
           err.close
 
-          [ $?, File.read(out), File.read(err) ]
+          [ exitstatus, File.read(out), File.read(err) ]
         end
 
         # @param [String] command
