@@ -1,4 +1,5 @@
 require 'shellwords'
+require 'mixin/shell_out'
 
 module Ridley::Chef
   class Cookbook
