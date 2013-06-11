@@ -13,7 +13,6 @@ describe Ridley::Mixin::ShellOut do
     its(:stdout) { should be_a(String) }
     its(:stderr) { should be_a(String) }
     its(:exitstatus) { should be_a(Fixnum) }
-    its(:pid) { should be_a(Fixnum) }
     its(:success?) { should be_true }
     its(:error?) { should be_false }
 
