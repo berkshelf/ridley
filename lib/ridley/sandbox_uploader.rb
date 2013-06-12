@@ -4,46 +4,30 @@ module Ridley
     class << self
       # Return the checksum of the contents of the file at the given filepath
       #
-      # @param [String] path
-      #   file to checksum
+      # @param [String] io
+      #   a filepath or an IO
+      # @param [Digest::Base] digest
       #
       # @return [String]
       #   the binary checksum of the contents of the file
-      def checksum(path)
-        File.open(path, 'rb') { |f| checksum_io(f, Digest::MD5.new) }
+      def checksum(io, digest = Digest::MD5.new)
+        io = io.dup
+        while chunk = io.read(1024 * 8)
+          digest.update(chunk)
+        end
+        digest.hexdigest
       end
 
       # Return a base64 encoded checksum of the contents of the given file. This is the expected
       # format of sandbox checksums given to the Chef Server.
       #
-      # @param [String] path
-      #
-      # @return [String]
-      #   a base64 encoded checksum
-      def checksum64(path)
-        Base64.encode64([checksum(path)].pack("H*")).strip
-      end
-
-      # Return a base64 encoded checksum of the contents of hte given string. This is the expected
-      # format of sandbox checksums given to the Chef Server.
-      #
-      # @param [String] content
-      #
-      # @return [String]
-      #   a base64 encoded checksum
-      def checksum64_string(string)
-        Base64.encode64([Digest::MD5.hexdigest(string)].pack("H*")).strip
-      end
-
       # @param [String] io
-      # @param [Object] digest
+      #   a filepath or an IO
       #
       # @return [String]
-      def checksum_io(io, digest)
-        while chunk = io.read(1024 * 8)
-          digest.update(chunk)
-        end
-        digest.hexdigest
+      #   a base64 encoded checksum
+      def checksum64(io)
+        Base64.encode64([checksum(io)].pack("H*")).strip
       end
     end
 
@@ -64,31 +48,30 @@ module Ridley
     # @param [Ridley::SandboxObject] sandbox
     # @param [String] chk_id
     #   checksum of the file being uploaded
-    # @param [String, #read] path_or_io
-    #   path to the file to upload, or an IO ducktype
+    # @param [String, #read] file
+    #   a filepath or an IO
+    #
+    # @raise [Errors::ChecksumMismatch]
+    #   if the given file does not match the expected checksum
     #
     # @return [Hash, nil]
-    def upload(sandbox, chk_id, path_or_io)
+    def upload(sandbox, chk_id, file)
       checksum = sandbox.checksum(chk_id)
+
       unless checksum[:needs_upload]
         return nil
       end
 
-      if path_or_io.respond_to? :read
-        contents = path_or_io.read
-      elsif path_or_io.kind_of? String
-        contents = File.read(path_or_io)
-      else
-        raise Ridley::Errors::ArgumentError, "Expected a String or an IO, but got #{path_or_io.inspect}"
+      io                  = file.respond_to?(:read) ? file : File.new(file, 'rb')
+      calculated_checksum = self.class.checksum64(io)
+      expected_checksum   = Base64.encode64([chk_id].pack('H*')).strip
+
+      unless calculated_checksum == expected_checksum
+        raise Errors::ChecksumMismatch,
+          "Error uploading #{chk_id}. Expected #{expected_checksum} but got #{calculated_checksum}"
       end
 
-      calculated_checksum = self.class.checksum64_string(contents)
-      expected_checksum = Base64.encode64([chk_id].pack('H*')).strip
-      unless expected_checksum == calculated_checksum
-        raise Ridley::Errors::ArgumentError, "Tried to upload #{path_or_io.inspect} for id #{chk_id} with wrong checksum ( calculated: #{calculated_checksum}, expected: #{expected_checksum} )."
-      end
-
-      headers  = {
+      headers = {
         'Content-Type' => 'application/x-binary',
         'content-md5' => calculated_checksum
       }
@@ -109,7 +92,7 @@ module Ridley
           c.response :follow_redirects
           c.request :chef_auth, self.client_name, self.client_key
           c.adapter :net_http
-        end.put(upload_path, contents, headers)
+        end.put(upload_path, io.read, headers)
       rescue Ridley::Errors::HTTPError => ex
         abort(ex)
       end

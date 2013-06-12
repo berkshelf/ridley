@@ -1,6 +1,24 @@
 require 'spec_helper'
 
 describe Ridley::SandboxUploader do
+  describe "ClassMethods" do
+    subject { described_class }
+
+    describe "::checksum" do
+      let(:io) { StringIO.new("some long string") }
+      subject { described_class.checksum(io) }
+
+      it { should eq("2fb66bbfb88cdf9e07a3f1d1dfad71ab") }
+    end
+
+    describe "::checksum64" do
+      let(:io) { StringIO.new("some long string") }
+      subject { described_class.checksum64(io) }
+
+      it { should eq("L7Zrv7iM354Ho/HR361xqw==") }
+    end
+  end
+
   let(:client_name) { "reset" }
   let(:client_key) { fixtures_path.join('reset.pem') }
   let(:connection) do
@@ -22,33 +40,6 @@ describe Ridley::SandboxUploader do
 
   let(:sandbox) { Ridley::SandboxObject.new(resource, checksums: checksums) }
 
-  describe "ClassMethods" do
-    subject { described_class }
-
-    describe "::checksum" do
-      subject { described_class.checksum(path) }
-
-      let(:path) { fixtures_path.join('reset.pem') }
-
-      it { should eq("a0608f1eb43ee4cca510bf95f8d209f7") }
-    end
-
-    describe "::checksum64" do
-      subject { described_class.checksum64(path) }
-
-      let(:path) { fixtures_path.join('reset.pem') }
-
-      it { should eq("oGCPHrQ+5MylEL+V+NIJ9w==") }
-    end
-
-    describe "::checksum64_string" do
-      it "returns the same as ::checksum64" do
-        subject.checksum64_string(File.read(fixtures_path.join('reset.pem'))).should == subject.checksum64(fixtures_path.join('reset.pem'))
-      end
-    end
-
-  end
-
   subject { described_class.new(client_name, client_key, {}) }
 
   describe "#upload" do
@@ -56,9 +47,7 @@ describe Ridley::SandboxUploader do
     let(:path) { fixtures_path.join('reset.pem').to_s }
     let(:different_path) { fixtures_path.join('recipe_one.rb').to_s }
 
-    before do
-      connection.stub(foss?: false)
-    end
+    before { connection.stub(foss?: false) }
 
     context "when the checksum needs uploading" do
       let(:checksums) do
@@ -76,8 +65,8 @@ describe Ridley::SandboxUploader do
         subject.upload(sandbox, chk_id, path)
       end
 
-      it "refuses to upload a wrong file" do
-        expect{ subject.upload(sandbox, chk_id, different_path) }.to raise_error(Ridley::Errors::ArgumentError)
+      it "raises an exception when the calcuated checksum does not match the expected checksum" do
+        expect { subject.upload(sandbox, chk_id, different_path) }.to raise_error(Ridley::Errors::ChecksumMismatch)
       end
     end
 
@@ -88,10 +77,6 @@ describe Ridley::SandboxUploader do
             needs_upload: false
           }
         }
-      end
-
-      let(:sandbox) do
-        Ridley::SandboxObject.new(double, checksums: checksums)
       end
 
       it "returns nil" do
@@ -119,36 +104,5 @@ describe Ridley::SandboxUploader do
         subject.upload(sandbox, chk_id, path)
       end
     end
-
-    context "when the checksum is passed with an IO" do
-
-      let(:chk_id){ 'b53227da4280f0e18270f21dd77c91d0' }
-
-      let(:checksums) do
-        {
-          chk_id => {
-            url: "https://api.opscode.com/organizations/vialstudios/sandboxes/bd091b150b0a4578b97771af6abf3e05",
-            needs_upload: true
-          }
-        }
-      end
-
-      let(:sandbox) { Ridley::SandboxObject.new(resource, checksums: checksums) }
-
-      it "accepts something that responds to read" do
-        stub_request(:put, checksums[chk_id][:url])
-        io = double("io")
-        io.should_receive(:read).once.and_return("Some content")
-        subject.upload(sandbox, chk_id, io)
-      end
-
-      it "refuses uploading something with a wrong checksum" do
-        io = double("io")
-        io.should_receive(:read).once.and_return("A different content")
-        expect{ subject.upload(sandbox, chk_id, io) }.to raise_error(Ridley::Errors::ArgumentError)
-      end
-
-    end
-
   end
 end
