@@ -8,8 +8,8 @@ describe "Sandbox API operations", type: "acceptance" do
 
   let(:checksums) do
     [
-      Ridley::SandboxUploader.checksum(fixtures_path.join("recipe_one.rb")),
-      Ridley::SandboxUploader.checksum(fixtures_path.join("recipe_two.rb"))
+      Ridley::SandboxUploader.checksum(File.open(fixtures_path.join("recipe_one.rb"))),
+      Ridley::SandboxUploader.checksum(File.open(fixtures_path.join("recipe_two.rb")))
     ]
   end
 

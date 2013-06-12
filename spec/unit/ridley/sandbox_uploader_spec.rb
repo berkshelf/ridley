@@ -1,6 +1,24 @@
 require 'spec_helper'
 
 describe Ridley::SandboxUploader do
+  describe "ClassMethods" do
+    subject { described_class }
+
+    describe "::checksum" do
+      let(:io) { StringIO.new("some long string") }
+      subject { described_class.checksum(io) }
+
+      it { should eq("2fb66bbfb88cdf9e07a3f1d1dfad71ab") }
+    end
+
+    describe "::checksum64" do
+      let(:io) { StringIO.new("some long string") }
+      subject { described_class.checksum64(io) }
+
+      it { should eq("L7Zrv7iM354Ho/HR361xqw==") }
+    end
+  end
+
   let(:client_name) { "reset" }
   let(:client_key) { fixtures_path.join('reset.pem') }
   let(:connection) do
@@ -22,35 +40,14 @@ describe Ridley::SandboxUploader do
 
   let(:sandbox) { Ridley::SandboxObject.new(resource, checksums: checksums) }
 
-  describe "ClassMethods" do
-    subject { described_class }
-
-    describe "::checksum" do
-      subject { described_class.checksum(path) }
-
-      let(:path) { fixtures_path.join('reset.pem') }
-
-      it { should eq("a0608f1eb43ee4cca510bf95f8d209f7") }
-    end
-
-    describe "::checksum64" do
-      subject { described_class.checksum64(path) }
-
-      let(:path) { fixtures_path.join('reset.pem') }
-
-      it { should eq("oGCPHrQ+5MylEL+V+NIJ9w==") }
-    end
-  end
-
   subject { described_class.new(client_name, client_key, {}) }
 
   describe "#upload" do
-    let(:chk_id) { "oGCPHrQ+5MylEL+V+NIJ9w==" }
+    let(:chk_id) { "a0608f1eb43ee4cca510bf95f8d209f7" }
     let(:path) { fixtures_path.join('reset.pem').to_s }
+    let(:different_path) { fixtures_path.join('recipe_one.rb').to_s }
 
-    before do
-      connection.stub(foss?: false)
-    end
+    before { connection.stub(foss?: false) }
 
     context "when the checksum needs uploading" do
       let(:checksums) do
@@ -67,6 +64,10 @@ describe Ridley::SandboxUploader do
 
         subject.upload(sandbox, chk_id, path)
       end
+
+      it "raises an exception when the calcuated checksum does not match the expected checksum" do
+        expect { subject.upload(sandbox, chk_id, different_path) }.to raise_error(Ridley::Errors::ChecksumMismatch)
+      end
     end
 
     context "when the checksum doesn't need uploading" do
@@ -76,10 +77,6 @@ describe Ridley::SandboxUploader do
             needs_upload: false
           }
         }
-      end
-
-      let(:sandbox) do
-        Ridley::SandboxObject.new(double, checksums: checksums)
       end
 
       it "returns nil" do

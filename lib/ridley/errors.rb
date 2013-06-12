@@ -65,6 +65,9 @@ module Ridley
     class SandboxCommitError < RidleyError; end
     class PermissionDenied < RidleyError; end
 
+    class SandboxUploadError < RidleyError; end
+    class ChecksumMismatch < RidleyError; end
+
     class HTTPError < RidleyError
       class << self
         def fabricate(env)
