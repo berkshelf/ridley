@@ -18,6 +18,7 @@ Gem::Specification.new do |s|
   s.required_ruby_version = ">= 1.9.1"
 
   s.add_runtime_dependency 'addressable'
+  s.add_runtime_dependency 'buff-shell_out',          '~> 0.1'
   s.add_runtime_dependency 'chozo',                   '>= 0.6.0'
   s.add_runtime_dependency 'celluloid',               '~> 0.14.0'
   s.add_runtime_dependency 'celluloid-io',            '~> 0.14.0'

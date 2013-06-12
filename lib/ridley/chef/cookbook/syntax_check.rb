@@ -1,4 +1,5 @@
 require 'shellwords'
+require 'buff/shell_out'
 
 module Ridley::Chef
   class Cookbook
@@ -67,8 +68,8 @@ module Ridley::Chef
           end
       end
 
+      include Buff::ShellOut
       include Ridley::Logging
-      include Ridley::Mixin::ShellOut
       include Ridley::Mixin::Checksum
 
       attr_reader :cookbook_path
