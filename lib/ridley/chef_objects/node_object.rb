@@ -30,11 +30,6 @@ module Ridley
     alias_method :default_attributes, :default
     alias_method :override_attributes, :override
 
-    alias_method :normal_attributes=, :normal=
-    alias_method :automatic_attributes=, :automatic=
-    alias_method :default_attributes=, :default=
-    alias_method :override_attributes=, :override=
-
     # Set a node level normal attribute given the dotted path representation of the Chef
     # attribute and value.
     #
