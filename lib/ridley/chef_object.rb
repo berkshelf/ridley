@@ -85,8 +85,9 @@ module Ridley
     #
     # @return [Object]
     def reload
-      @_attributes_ = nil
-      mass_assign(resource.find(self)._attributes_)
+      new_attributes = resource.find(self)._attributes_
+      @_attributes_  = nil
+      mass_assign(new_attributes)
       self
     end
 
