@@ -30,6 +30,14 @@ module Ridley
     alias_method :default_attributes, :default
     alias_method :override_attributes, :override
 
+    # A merged hash containing a deep merge of all of the attributes respecting the node attribute
+    # precedence level.
+    #
+    # @return [hashie::Mash]
+    def chef_attributes
+      default.merge(normal.merge(override.merge(automatic)))
+    end
+
     # Set a node level normal attribute given the dotted path representation of the Chef
     # attribute and value.
     #
