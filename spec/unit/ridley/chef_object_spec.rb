@@ -141,22 +141,29 @@ describe Ridley::ChefObject do
     end
   end
 
-  describe "#reload" do
-    let(:updated_subject) { double('updated_subject', _attributes_: { fake_attribute: "some_value" }) }
+  describe "#reload", focus: true do
+    let(:updated_subject) { double('updated_subject', _attributes_: { one: "val" }) }
 
     before(:each) do
-      subject.class.attribute(:fake_attribute)
-      resource.should_receive(:find).with(subject).and_return(updated_subject)
+      subject.class.attribute(:one)
+      subject.class.attribute(:two)
+      resource.stub(:find).with(subject).and_return(updated_subject)
     end
 
     it "returns itself" do
       subject.reload.should eql(subject)
     end
 
-    it "sets the attributes of self to include those of the reloaded object" do
+    it "sets the attributes of self to equal those of the updated object" do
       subject.reload
 
-      subject.get_attribute(:fake_attribute).should eql("some_value")
+      subject.get_attribute(:one).should eql("val")
+    end
+
+    it "does not include attributes not set by the updated object" do
+      subject.two = "other"
+      subject.reload
+      expect(subject.two).to be_nil
     end
   end
 
