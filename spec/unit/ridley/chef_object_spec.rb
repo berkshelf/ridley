@@ -141,7 +141,7 @@ describe Ridley::ChefObject do
     end
   end
 
-  describe "#reload", focus: true do
+  describe "#reload" do
     let(:updated_subject) { double('updated_subject', _attributes_: { one: "val" }) }
 
     before(:each) do
