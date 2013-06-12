@@ -5,6 +5,55 @@ describe Ridley::NodeObject do
   let(:instance) { described_class.new(resource) }
   subject { instance }
 
+  describe "#chef_attributes" do
+    subject { instance.chef_attributes }
+
+    it "returns a Hashie::Mash" do
+      expect(subject).to be_a(Hashie::Mash)
+    end
+
+    it "includes default attributes" do
+      instance.default = default = { default: { one: "val", two: "val" } }
+      expect(subject.to_hash).to include(default)
+    end
+
+    it "includes normal attributes" do
+      instance.normal = normal = { normal: { one: "new", two: "val" } }
+      expect(subject.to_hash).to include(normal)
+    end
+
+    it "includes override attributes" do
+      instance.override = override = { override: { one: "new", two: "val" } }
+      expect(subject.to_hash).to include(override)
+    end
+
+    it "includes automatic attributes" do
+      instance.automatic = automatic = { automatic: { one: "new", two: "val" } }
+      expect(subject.to_hash).to include(automatic)
+    end
+
+    it "overrides default attributes with normal attributes" do
+      instance.default = default = { one: "old", two: "old" }
+      instance.normal = normal = { one: "new" }
+      expect(subject[:one]).to eql("new")
+      expect(subject[:two]).to eql("old")
+    end
+
+    it "overrides normal attributes with override attributes" do
+      instance.normal = normal = { one: "old", two: "old" }
+      instance.override = override = { one: "new" }
+      expect(subject[:one]).to eql("new")
+      expect(subject[:two]).to eql("old")
+    end
+
+    it "overrides override attributes with automatic attributes" do
+      instance.override = override = { one: "old", two: "old" }
+      instance.automatic = automatic = { one: "new" }
+      expect(subject[:one]).to eql("new")
+      expect(subject[:two]).to eql("old")
+    end
+  end
+
   describe "#set_chef_attribute" do
     it "sets an normal node attribute at the nested path" do
        subject.set_chef_attribute('deep.nested.item', true)
