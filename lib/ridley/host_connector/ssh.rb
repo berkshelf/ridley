@@ -48,14 +48,28 @@ module Ridley
                 ssh.loop
               end
             }
+          rescue Net::SSH::AuthenticationFailed => ex
+            response.exit_code = -1
+            response.stderr    = "Authentication failure for user #{ex}"
+          rescue Net::SSH::ConnectionTimeout, Timeout::Error
+            response.exit_code = -1
+            response.stderr    = "Connection timed out"
+          rescue Errno::EHOSTUNREACH
+            response.exit_code = -1
+            response.stderr    = "Host unreachable"
+          rescue Errno::ECONNREFUSED
+            response.exit_code = -1
+            response.stderr    = "Connection refused"
           rescue Net::SSH::Exception => ex
             response.exit_code = -1
-            response.stderr    = ex.message
+            response.stderr    = ex.inspect
           end
 
           case response.exit_code
           when 0
             log.info "Successfully ran SSH command on: '#{host}' as: '#{options[:ssh][:user]}'"
+          when -1
+            log.info "Failed to run SSH command on: '#{host}' as: '#{options[:ssh][:user]}'"
           else
             log.info "Successfully ran SSH command on: '#{host}' as: '#{options[:ssh][:user]}' but it failed"
           end
