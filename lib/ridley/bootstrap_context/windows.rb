@@ -98,9 +98,8 @@ module Ridley
       end
 
       # @return [String]
-      def set_path
-        %Q{SET \"PATH=%PATH%;C:\\opscode\\chef\\bin;C:\\opscode\\chef\\embedded\\bin\"\n
-        SETX PATH \"%PATH%;C:\\opscode\\chef\\bin;C:\\opscode\\chef\\embedded\\bin\"\n}
+      def env_path
+        "C:\\opscode\\chef\\bin;C:\\opscode\\chef\\embedded\\bin"
       end
 
       # @return [String]
