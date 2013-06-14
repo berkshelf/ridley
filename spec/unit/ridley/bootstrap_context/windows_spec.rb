@@ -82,6 +82,12 @@ describe Ridley::BootstrapContext::Windows do
     end
   end
 
+  describe "#env_path" do
+    it "returns a string" do
+      expect(subject.env_path).to be_a(String)
+    end
+  end
+
   describe "#default_template" do
     it "returns a string" do
       subject.default_template.should be_a(String)

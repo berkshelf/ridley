@@ -98,8 +98,8 @@ module Ridley
       end
 
       # @return [String]
-      def set_path
-        "SET \"PATH=%PATH%;C:\\ruby\\bin;C:\\opscode\\chef\\bin;C:\\opscode\\chef\\embedded\\bin\"\n"
+      def env_path
+        "C:\\opscode\\chef\\bin;C:\\opscode\\chef\\embedded\\bin"
       end
 
       # @return [String]

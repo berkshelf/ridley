@@ -107,6 +107,7 @@ endlocal
  <%= first_boot %>
 )
 
-<%= set_path %>
+SET "PATH=%PATH%;<%= env_path %>"
+SETX PATH "%PATH;<%= env_path %>"
 
 <%= chef_run %>
