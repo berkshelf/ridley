@@ -39,6 +39,12 @@ describe Ridley::BootstrapContext::Windows do
       end
     end
 
+    describe "#knife_config" do
+      it "returns a hash" do
+        expect(subject.knife_config).to be_a(Hash)
+      end
+    end
+
     describe "#first_boot" do
       it "returns a string" do
         subject.first_boot.should be_a(String)
@@ -76,9 +82,21 @@ describe Ridley::BootstrapContext::Windows do
     end
   end
 
+  describe "#start_chef" do
+    it "returns a string" do
+      expect(subject.start_chef).to be_a(String)
+    end
+  end
+
   describe "#chef_config" do
     it "returns a string" do
       subject.chef_config.should be_a(String)
+    end
+  end
+
+  describe "#config_content" do
+    it "returns a string" do
+      subject.config_content.should be_a(String)
     end
   end
 
