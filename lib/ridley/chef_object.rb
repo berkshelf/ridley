@@ -1,3 +1,5 @@
+require 'varia_model'
+
 module Ridley
   class ChefObject
     class << self
@@ -40,7 +42,7 @@ module Ridley
       end
     end
 
-    include Chozo::VariaModel
+    include VariaModel
     include Comparable
 
     # @param [Ridley::Resource] resource

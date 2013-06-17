@@ -1,8 +1,6 @@
-require 'active_support/inflector'
 require 'addressable/uri'
 require 'celluloid'
 require 'celluloid/io'
-require 'chozo'
 require 'faraday'
 require 'forwardable'
 require 'hashie'

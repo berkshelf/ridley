@@ -187,9 +187,9 @@ module Ridley::Chef
       result[:name]          = name
       result[:cookbook_name] = cookbook_name
       result[:version]       = version
-      result[:metadata]      = metadata
+      result[:metadata]      = metadata.to_hash
       result[:frozen?]       = frozen
-      result.to_hash
+      result
     end
 
     def to_json(*args)

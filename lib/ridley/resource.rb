@@ -1,3 +1,5 @@
+require 'active_support/inflector'
+
 module Ridley
   class Resource
     class << self
