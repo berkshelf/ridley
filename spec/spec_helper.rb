@@ -1,6 +1,6 @@
 require 'rubygems'
 require 'bundler'
-require 'chozo'
+require 'buff/ruby_engine'
 
 def setup_rspec
   require 'rspec'
@@ -35,7 +35,7 @@ def setup_rspec
   end
 end
 
-if mri? && ENV['CI'] != 'true'
+if Buff::RubyEngine.mri? && ENV['CI'] != 'true'
   require 'spork'
 
   Spork.prefork do

@@ -55,8 +55,8 @@ module Ridley::Chef
         :replacing, :attributes, :groupings, :recipes, :version
       ]
 
-      include Chozo::Mixin::ParamsValidate
-      include Chozo::Mixin::FromFile
+      include Ridley::Mixin::ParamsValidate
+      include Ridley::Mixin::FromFile
 
       attr_reader :cookbook
       attr_reader :platforms

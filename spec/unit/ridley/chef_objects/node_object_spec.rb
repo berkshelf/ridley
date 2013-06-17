@@ -13,22 +13,22 @@ describe Ridley::NodeObject do
     end
 
     it "includes default attributes" do
-      instance.default = default = { default: { one: "val", two: "val" } }
+      instance.default = default = { "default" => { "one" => "val", "two" => "val" } }
       expect(subject.to_hash).to include(default)
     end
 
     it "includes normal attributes" do
-      instance.normal = normal = { normal: { one: "new", two: "val" } }
+      instance.normal = normal = { "normal" => { "one" => "val", "two" => "val" } }
       expect(subject.to_hash).to include(normal)
     end
 
     it "includes override attributes" do
-      instance.override = override = { override: { one: "new", two: "val" } }
+      instance.override = override = { "override" => { "one" => "val", "two" => "val" } }
       expect(subject.to_hash).to include(override)
     end
 
     it "includes automatic attributes" do
-      instance.automatic = automatic = { automatic: { one: "new", two: "val" } }
+      instance.automatic = automatic = { "automatic" => { "one" => "val", "two" => "val" } }
       expect(subject.to_hash).to include(automatic)
     end
 

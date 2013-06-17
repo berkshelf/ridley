@@ -403,9 +403,9 @@ describe Ridley::Chef::Cookbook do
       subject[:cookbook_name].should be_a(String)
     end
 
-    it "has a :metadata key with a Cookbook::Metadata value" do
+    it "has a :metadata key with a Hashie::Mash value" do
       subject.should have_key(:metadata)
-      subject[:metadata].should be_a(Ridley::Chef::Cookbook::Metadata)
+      subject[:metadata].should be_a(Hashie::Mash)
     end
 
     it "has a :version key with a String value" do

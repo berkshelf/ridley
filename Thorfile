@@ -3,10 +3,12 @@ $:.push File.expand_path("../lib", __FILE__)
 
 require 'bundler'
 require 'bundler/setup'
-
+require 'buff/ruby_engine'
 require 'ridley'
 
 class Default < Thor
+  extend Buff::RubyEngine
+
   unless jruby?
     require 'thor/rake_compat'
 
