@@ -148,7 +148,7 @@ module Ridley
     #
     # @return [Hash]
     def update(cookbook, options = {})
-      options.reverse_merge(force: false, freeze: false)
+      options = options.reverse_merge(force: false, freeze: false)
 
       cookbook.frozen = options[:freeze]
 
