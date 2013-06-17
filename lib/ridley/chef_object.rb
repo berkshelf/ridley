@@ -1,3 +1,5 @@
+require 'varia_model'
+
 module Ridley
   class ChefObject
     class << self
@@ -6,7 +8,7 @@ module Ridley
         @chef_id
       end
 
-      # @param [String, Symbol] identifier
+      # @param [#to_sym] identifier
       #
       # @return [String]
       def set_chef_id(identifier)
@@ -18,7 +20,7 @@ module Ridley
         @chef_type ||= self.class.name.underscore
       end
 
-      # @param [String, Symbol] type
+      # @param [#to_s] type
       #
       # @return [String]
       def set_chef_type(type)
@@ -40,7 +42,7 @@ module Ridley
       end
     end
 
-    include Chozo::VariaModel
+    include VariaModel
     include Comparable
 
     # @param [Ridley::Resource] resource

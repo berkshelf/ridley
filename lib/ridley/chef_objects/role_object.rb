@@ -34,9 +34,9 @@ module Ridley
     # @param [String] key
     # @param [Object] value
     #
-    # @return [HashWithIndifferentAccess]
+    # @return [Hashie::Mash]
     def set_override_attribute(key, value)
-      attr_hash = HashWithIndifferentAccess.from_dotted_path(key, value)
+      attr_hash = Hashie::Mash.from_dotted_path(key, value)
       self.override_attributes = self.override_attributes.deep_merge(attr_hash)
     end
 
@@ -52,9 +52,9 @@ module Ridley
     # @param [String] key
     # @param [Object] value
     #
-    # @return [HashWithIndifferentAccess]
+    # @return [Hashie::Mash]
     def set_default_attribute(key, value)
-      attr_hash = HashWithIndifferentAccess.from_dotted_path(key, value)
+      attr_hash = Hashie::Mash.from_dotted_path(key, value)
       self.default_attributes = self.default_attributes.deep_merge(attr_hash)
     end
   end

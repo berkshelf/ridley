@@ -98,7 +98,7 @@ module Ridley
     #
     # @param [#to_sym] filetype
     #   the type of file to download. These are broken up into the following types in Chef:
-    #     - attribute (unsupported until resolved https://github.com/reset/chozo/issues/17)
+    #     - attribute
     #     - definition
     #     - file
     #     - library

@@ -1,4 +1,3 @@
-require 'active_support/core_ext/kernel/reporting'
 # Silencing warnings because not all versions of GSSAPI support all of the GSSAPI methods
 # the gssapi gem attempts to attach to and these warnings are dumped to STDERR.
 silence_warnings do

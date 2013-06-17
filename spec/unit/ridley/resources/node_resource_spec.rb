@@ -91,7 +91,7 @@ describe Ridley::NodeResource do
       end
 
       it "has a deep merge between the attributes of the original node and the new attributes" do
-        expect(result.normal.to_hash).to eql(deep: { one: "val", two: "val" })
+        expect(result.normal.to_hash).to eql("deep" => { "one" => "val", "two" => "val" })
       end
     end
 
