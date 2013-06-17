@@ -11,7 +11,6 @@ module Ridley
       # @return [String]
       #   the binary checksum of the contents of the file
       def checksum(io, digest = Digest::MD5.new)
-        io = io.dup
         while chunk = io.read(1024 * 8)
           digest.update(chunk)
         end
@@ -87,6 +86,8 @@ module Ridley
       end
 
       begin
+        io.rewind
+
         Faraday.new(url, self.options) do |c|
           c.response :chef_response
           c.response :follow_redirects
