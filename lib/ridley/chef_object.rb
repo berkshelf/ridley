@@ -8,7 +8,7 @@ module Ridley
         @chef_id
       end
 
-      # @param [String, Symbol] identifier
+      # @param [#to_sym] identifier
       #
       # @return [String]
       def set_chef_id(identifier)
@@ -20,7 +20,7 @@ module Ridley
         @chef_type ||= self.class.name.underscore
       end
 
-      # @param [String, Symbol] type
+      # @param [#to_s] type
       #
       # @return [String]
       def set_chef_type(type)

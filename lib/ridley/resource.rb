@@ -1,11 +1,9 @@
-require 'active_support/inflector'
-
 module Ridley
   class Resource
     class << self
       # @return [String]
       def resource_path
-        @resource_path ||= representation.chef_type.pluralize
+        @resource_path ||= representation.chef_type
       end
 
       # @param [String] path

@@ -30,8 +30,8 @@ describe Ridley::Resource do
       context "when not explicitly set" do
         before { subject.set_resource_path(nil) }
 
-        it "returns the representation's chef type, pluralized" do
-          subject.resource_path.should eql(representation.chef_type.pluralize)
+        it "returns the representation's chef type" do
+          subject.resource_path.should eql(representation.chef_type)
         end
       end
 

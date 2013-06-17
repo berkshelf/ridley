@@ -18,9 +18,8 @@ Gem::Specification.new do |s|
   s.required_ruby_version = ">= 1.9.1"
 
   s.add_dependency 'addressable'
-  s.add_dependency 'activesupport',           '>= 3.2.0'
   s.add_dependency 'varia_model',             '~> 0.1'
-  s.add_dependency 'buff-extensions',         '~> 0.2'
+  s.add_dependency 'buff-extensions',         '~> 0.3'
   s.add_dependency 'buff-shell_out',          '~> 0.1'
   s.add_dependency 'celluloid',               '~> 0.14.0'
   s.add_dependency 'celluloid-io',            '~> 0.14.0'
