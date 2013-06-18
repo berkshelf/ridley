@@ -1,11 +1,13 @@
-script: "bundle exec thor spec:all"
+script: "bundle exec thor spec:$TEST_SUITE"
 language: ruby
+env:
+  - TEST_SUITE=unit
+  - TEST_SUITE=acceptance
 rvm:
   - 1.9.2
   - 1.9.3
   - 2.0.0
   - jruby-19mode
-
 matrix:
   allow_failures:
-    - rvm: jruby-19mode # Allow failure for now: https://github.com/RiotGames/ridley/issues/143
+    - rvm: jruby-19mode
