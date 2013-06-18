@@ -15,4 +15,4 @@ module Ridley
   end
 end
 
-Faraday.register_middleware(:response, gzip: Ridley::Middleware::ChefResponse)
+Faraday.register_middleware(:response, gzip: Ridley::Middleware::Gzip)
