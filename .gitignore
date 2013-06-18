@@ -17,3 +17,4 @@ test/version_tmp
 tmp
 *.sw[op]
 .DS_Store
+.rspec
