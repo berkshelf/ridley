@@ -132,7 +132,7 @@ module Ridley
     # @param [String] host
     # @param [String] command
     #
-    # @return [Array<Symbol, HostConnector::Response>]
+    # @return [HostConnector::Response]
     def run(host, command)
       host_commander.run(host, command, ssh: ssh, winrm: winrm)
     end
