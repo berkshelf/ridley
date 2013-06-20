@@ -151,8 +151,10 @@ module Ridley
     def platform_specific_run(host, commands)
       case (type = host_commander.connection_type_for(host))
       when HostConnector::SSH
+        raise Errors::CommandNotProvided.new(:ssh) unless commands[:ssh] and !commands[:ssh].empty?
         run(host, commands[:ssh])
       when HostConnector::WinRM
+        raise Errors::CommandNotProvided.new(:winrm) unless commands[:winrm] and !commands[:winrm].empty?
         run(host, commands[:winrm])
       else
         raise Errors::InternalError, "#{type.class.to_s} is not a supported connector for #{self.class}##{__method__}"
