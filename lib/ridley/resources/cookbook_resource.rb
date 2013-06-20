@@ -24,7 +24,7 @@ module Ridley
     #   a hash containing keys which represent cookbook names and values which contain
     #   an array of strings representing the available versions
     def all
-      response = request(:get, self.class.resource_path)
+      response = request(:get, self.class.resource_path, num_versions: "all")
 
       {}.tap do |cookbooks|
         response.each do |name, details|
