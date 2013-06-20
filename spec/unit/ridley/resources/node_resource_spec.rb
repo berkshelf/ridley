@@ -72,6 +72,7 @@ describe Ridley::NodeResource do
     let(:winrm_command) { "echo %COMPUTERNAME%" }
     let(:ssh_connector) { Ridley::HostConnector::SSH.new }
     let(:winrm_connector) { Ridley::HostConnector::WinRM.new }
+    let(:unsupported_connector) { Object.new }
 
     it "sends the ssh command if the connector is ssh" do
       host_commander.stub(:connection_type_for).with(host).and_return ssh_connector
@@ -83,6 +84,11 @@ describe Ridley::NodeResource do
       host_commander.stub(:connection_type_for).with(host).and_return winrm_connector
       instance.should_receive(:run).with(host, winrm_command)
       instance.platform_specific_run(host, ssh: ssh_command, winrm: winrm_command)
+    end
+
+    it "raises an error if an unsupported connector is used" do
+      host_commander.stub(:connection_type_for).with(host).and_return unsupported_connector
+      -> { instance.platform_specific_run(host, ssh: ssh_command, winrm: winrm_command) }.should raise_error(Ridley::Errors::InternalError)
     end
   end
 

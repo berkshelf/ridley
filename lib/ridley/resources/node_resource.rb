@@ -155,7 +155,7 @@ module Ridley
       when HostConnector::WinRM
         run(host, commands[:winrm])
       else
-        raise "#{type.to_s} is not a supported connector for #{self.class}##{__method__}"
+        raise Errors::InternalError, "#{type.class.to_s} is not a supported connector for #{self.class}##{__method__}"
       end
     end
     alias_method :execute_platform_specific_command, :platform_specific_run
