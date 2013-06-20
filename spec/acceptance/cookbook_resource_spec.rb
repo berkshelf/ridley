@@ -41,4 +41,20 @@ describe "Client API operations", type: "acceptance" do
       cookbook.root_files.should have(2).items
     end
   end
+
+  describe "listing cookbooks" do
+    before do
+      chef_cookbook("ruby", "1.0.0")
+      chef_cookbook("ruby", "2.0.0")
+      chef_cookbook("elixir", "3.0.0")
+      chef_cookbook("elixir", "3.0.1")
+    end
+
+    it "returns all of the cookbooks on the server" do
+      all_cookbooks = subject.all
+      expect(all_cookbooks).to have(2).items
+      expect(all_cookbooks["ruby"]).to have(2).items
+      expect(all_cookbooks["elixir"]).to have(2).items
+    end
+  end
 end
