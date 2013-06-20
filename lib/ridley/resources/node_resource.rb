@@ -152,6 +152,8 @@ module Ridley
       case (type = host_commander.connection_type_for(host))
       when HostConnector::SSH
         run(host, commands[:ssh])
+      when HostConnector::WinRM
+        run(host, commands[:winrm])
       else
         raise "#{type.to_s} is not a supported connector for #{self.class}##{__method__}"
       end

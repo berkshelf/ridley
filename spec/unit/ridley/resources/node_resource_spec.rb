@@ -78,6 +78,12 @@ describe Ridley::NodeResource do
       instance.should_receive(:run).with(host, ssh_command)
       instance.platform_specific_run(host, ssh: ssh_command, winrm: winrm_command)
     end
+
+    it "sends the ssh command if the connector is winrm" do
+      host_commander.stub(:connection_type_for).with(host).and_return winrm_connector
+      instance.should_receive(:run).with(host, winrm_command)
+      instance.platform_specific_run(host, ssh: ssh_command, winrm: winrm_command)
+    end
   end
 
   describe "#merge_data" do
