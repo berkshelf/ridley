@@ -184,6 +184,10 @@ module Ridley
         options[:ssh][:port]   ||= HostConnector::SSH::DEFAULT_PORT
         options[:winrm][:port] ||= HostConnector::WinRM::DEFAULT_PORT
 
+        connection_type_for(host)
+      end
+
+      def connection_type_for(host)
         if connector_port_open?(host, options[:winrm][:port])
           options.delete(:ssh)
           winrm

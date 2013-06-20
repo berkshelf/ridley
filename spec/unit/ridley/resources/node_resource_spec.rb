@@ -67,6 +67,19 @@ describe Ridley::NodeResource do
     end
   end
 
+  describe "#platform_specific_run" do
+    let(:ssh_command) { "hostname -f" }
+    let(:winrm_command) { "echo %COMPUTERNAME%" }
+    let(:ssh_connector) { Ridley::HostConnector::SSH.new }
+    let(:winrm_connector) { Ridley::HostConnector::WinRM.new }
+
+    it "sends the ssh command if the connector is ssh" do
+      host_commander.stub(:connection_type_for).with(host).and_return ssh_connector
+      instance.should_receive(:run).with(host, ssh_command)
+      instance.platform_specific_run(host, ssh: ssh_command, winrm: winrm_command)
+    end
+  end
+
   describe "#merge_data" do
     let(:node_name) { "rspec-test" }
     let(:run_list) { [ "recipe[one]", "recipe[two]" ] }
