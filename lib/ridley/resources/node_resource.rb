@@ -149,7 +149,7 @@ module Ridley
     #
     # @return [HostConnector::Response]
     def platform_specific_run(host, commands)
-      case (type = host_commander.connection_type_for(host, ssh: ssh, winrm: winrm))
+      case (type = host_commander.connector_for(host, ssh: ssh, winrm: winrm))
       when HostConnector::SSH
         raise Errors::CommandNotProvided.new(:ssh) unless commands[:ssh] and !commands[:ssh].empty?
         run(host, commands[:ssh])
