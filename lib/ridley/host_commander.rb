@@ -156,6 +156,20 @@ module Ridley
       execute(__method__, host, options)
     end
 
+
+    def connection_type_for(host, options)
+      if connector_port_open?(host, options[:winrm][:port])
+        options.delete(:ssh)
+        winrm
+      elsif connector_port_open?(host, options[:ssh][:port], options[:ssh][:timeout])
+        options.delete(:winrm)
+        ssh
+      else
+        raise Errors::HostConnectionError, "No connector ports open on '#{host}'"
+      end
+    end
+
+
     private
 
       def execute(method, host, *args)
@@ -184,19 +198,7 @@ module Ridley
         options[:ssh][:port]   ||= HostConnector::SSH::DEFAULT_PORT
         options[:winrm][:port] ||= HostConnector::WinRM::DEFAULT_PORT
 
-        connection_type_for(host)
-      end
-
-      def connection_type_for(host)
-        if connector_port_open?(host, options[:winrm][:port])
-          options.delete(:ssh)
-          winrm
-        elsif connector_port_open?(host, options[:ssh][:port], options[:ssh][:timeout])
-          options.delete(:winrm)
-          ssh
-        else
-          raise Errors::HostConnectionError, "No connector ports open on '#{host}'"
-        end
+        connection_type_for(host, options)
       end
 
       # Checks to see if the given port is open for TCP connections
