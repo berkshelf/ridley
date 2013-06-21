@@ -120,7 +120,7 @@ describe Ridley::NodeResource do
 
     it "raises an error if an unsupported connector is used" do
       host_commander.stub(:connector_for).and_return unsupported_connector
-      expect { instance.platform_specific_run(host, ssh: ssh_command, winrm: winrm_command) }.to raise_error(Ridley::Errors::InternalError)
+      expect { instance.platform_specific_run(host, ssh: ssh_command, winrm: winrm_command) }.to raise_error(Ridley::Errors::RidleyError)
     end
   end
 

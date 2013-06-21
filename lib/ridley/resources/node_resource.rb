@@ -157,7 +157,7 @@ module Ridley
         raise Errors::CommandNotProvided.new(:winrm) unless commands[:winrm] and !commands[:winrm].empty?
         run(host, commands[:winrm])
       else
-        raise Errors::InternalError, "#{type.class.to_s} is not a supported connector for #{self.class}##{__method__}"
+        raise Errors::RidleyError, "#{type.class.to_s} is not a supported connector for #{self.class}##{__method__}"
       end
     end
     alias_method :execute_platform_specific_command, :platform_specific_run
