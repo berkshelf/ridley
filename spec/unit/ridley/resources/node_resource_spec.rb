@@ -84,15 +84,21 @@ describe Ridley::NodeResource do
       end
 
       it "raises an error if no command is provided for the ssh connector when the ssh connector is used" do
-        expect { instance.platform_specific_run(host, winrm: winrm_command) }.to raise_error(Ridley::Errors::CommandNotProvided)
+        expect {
+          instance.platform_specific_run(host, winrm: winrm_command)
+        }.to raise_error(Ridley::Errors::CommandNotProvided)
       end
 
       it "raises an error if an empty command is provided for the ssh connector when the ssh connector is used" do
-        expect { instance.platform_specific_run(host, ssh: "", winrm: winrm_command) }.to raise_error(Ridley::Errors::CommandNotProvided)
+        expect {
+          instance.platform_specific_run(host, ssh: "", winrm: winrm_command)
+        }.to raise_error(Ridley::Errors::CommandNotProvided)
       end
 
       it "raises an error if a nil command is provided for the ssh connector when the ssh connector is used" do
-        expect { instance.platform_specific_run(host, ssh: nil, winrm: winrm_command) }.to raise_error(Ridley::Errors::CommandNotProvided)
+        expect {
+          instance.platform_specific_run(host, ssh: nil, winrm: winrm_command)
+        }.to raise_error(Ridley::Errors::CommandNotProvided)
       end
     end
 
@@ -106,21 +112,29 @@ describe Ridley::NodeResource do
       end
 
       it "raises an error if no command is provided for the winrm connector when the winrm connector is used" do
-        expect { instance.platform_specific_run(host, ssh: ssh_command) }.to raise_error(Ridley::Errors::CommandNotProvided)
+        expect {
+          instance.platform_specific_run(host, ssh: ssh_command)
+        }.to raise_error(Ridley::Errors::CommandNotProvided)
       end
 
       it "raises an error if an empty is provided for the winrm connector when the winrm connector is used" do
-        expect { instance.platform_specific_run(host, ssh: ssh_command, winrm: "") }.to raise_error(Ridley::Errors::CommandNotProvided)
+        expect {
+          instance.platform_specific_run(host, ssh: ssh_command, winrm: "")
+        }.to raise_error(Ridley::Errors::CommandNotProvided)
       end
 
       it "raises a nil command is provided for the winrm connector when the winrm connector is used" do
-        expect { instance.platform_specific_run(host, ssh: ssh_command, winrm: nil) }.to raise_error(Ridley::Errors::CommandNotProvided)
+        expect {
+          instance.platform_specific_run(host, ssh: ssh_command, winrm: nil)
+        }.to raise_error(Ridley::Errors::CommandNotProvided)
       end
     end
 
-    it "raises an error if an unsupported connector is used" do
+    it "raises a RuntimeError if an unsupported connector is used" do
       host_commander.stub(:connector_for).and_return unsupported_connector
-      expect { instance.platform_specific_run(host, ssh: ssh_command, winrm: winrm_command) }.to raise_error(Ridley::Errors::RidleyError)
+      expect {
+        instance.platform_specific_run(host, ssh: ssh_command, winrm: winrm_command)
+      }.to raise_error(RuntimeError)
     end
   end
 

@@ -143,7 +143,7 @@ module Ridley
     #
     # @param [String] host
     # @param [Hash] commands
-    # 
+    #
     # @example
     #   platform_specific_run("host.example.com", linux: "hostname -f", windows: "echo %COMPUTERNAME%")
     #
@@ -157,7 +157,7 @@ module Ridley
         raise Errors::CommandNotProvided.new(:winrm) unless commands[:winrm] and !commands[:winrm].empty?
         run(host, commands[:winrm])
       else
-        raise Errors::RidleyError, "#{type.class.to_s} is not a supported connector for #{self.class}##{__method__}"
+        raise RuntimeError, "#{type.class.to_s} is not a supported connector for #{self.class}##{__method__}"
       end
     end
     alias_method :execute_platform_specific_command, :platform_specific_run
