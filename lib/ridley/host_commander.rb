@@ -156,6 +156,36 @@ module Ridley
       execute(__method__, host, options)
     end
 
+    # Finds and returns the best HostConnector for a given host
+    #
+    # @param [String] host
+    #   the host to attempt to connect to
+    # @option options [Hash] :ssh
+    #   * :port (Fixnum) the ssh port to connect on the node the bootstrap will be performed on (22)
+    #   * :timeout (Float) [5.0] timeout value for testing SSH connection
+    # @option options [Hash] :winrm
+    #   * :port (Fixnum) the winrm port to connect on the node the bootstrap will be performed on (5985)
+    # @param block [Proc]
+    #   an optional block that is yielded the best HostConnector
+    #
+    # @return [HostConnector::SSH, HostConnector::WinRM]
+    def connector_for(host, options = {})
+      options = options.reverse_merge(ssh: Hash.new, winrm: Hash.new)
+      options[:ssh][:port]   ||= HostConnector::SSH::DEFAULT_PORT
+      options[:winrm][:port] ||= HostConnector::WinRM::DEFAULT_PORT
+
+      if connector_port_open?(host, options[:winrm][:port])
+        options.delete(:ssh)
+        winrm
+      elsif connector_port_open?(host, options[:ssh][:port], options[:ssh][:timeout])
+        options.delete(:winrm)
+        ssh
+      else
+        raise Errors::HostConnectionError, "No connector ports open on '#{host}'"
+      end
+    end
+
+
     private
 
       def execute(method, host, *args)
@@ -164,35 +194,6 @@ module Ridley
         connector_for(host, options).send(method, host, *args, options)
       rescue Errors::HostConnectionError => ex
         abort(ex)
-      end
-
-      # Finds and returns the best HostConnector for a given host
-      #
-      # @param [String] host
-      #   the host to attempt to connect to
-      # @option options [Hash] :ssh
-      #   * :port (Fixnum) the ssh port to connect on the node the bootstrap will be performed on (22)
-      #   * :timeout (Float) [5.0] timeout value for testing SSH connection
-      # @option options [Hash] :winrm
-      #   * :port (Fixnum) the winrm port to connect on the node the bootstrap will be performed on (5985)
-      # @param block [Proc]
-      #   an optional block that is yielded the best HostConnector
-      #
-      # @return [HostConnector::SSH, HostConnector::WinRM]
-      def connector_for(host, options = {})
-        options = options.reverse_merge(ssh: Hash.new, winrm: Hash.new)
-        options[:ssh][:port]   ||= HostConnector::SSH::DEFAULT_PORT
-        options[:winrm][:port] ||= HostConnector::WinRM::DEFAULT_PORT
-
-        if connector_port_open?(host, options[:winrm][:port])
-          options.delete(:ssh)
-          winrm
-        elsif connector_port_open?(host, options[:ssh][:port], options[:ssh][:timeout])
-          options.delete(:winrm)
-          ssh
-        else
-          raise Errors::HostConnectionError, "No connector ports open on '#{host}'"
-        end
       end
 
       # Checks to see if the given port is open for TCP connections

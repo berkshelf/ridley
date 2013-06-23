@@ -132,11 +132,35 @@ module Ridley
     # @param [String] host
     # @param [String] command
     #
-    # @return [Array<Symbol, HostConnector::Response>]
+    # @return [HostConnector::Response]
     def run(host, command)
       host_commander.run(host, command, ssh: ssh, winrm: winrm)
     end
     alias_method :execute_command, :run
+
+    # Executes the given command on a node using a platform specific
+    # command.
+    #
+    # @param [String] host
+    # @param [Hash] commands
+    #
+    # @example
+    #   platform_specific_run("host.example.com", linux: "hostname -f", windows: "echo %COMPUTERNAME%")
+    #
+    # @return [HostConnector::Response]
+    def platform_specific_run(host, commands)
+      case (type = host_commander.connector_for(host, ssh: ssh, winrm: winrm))
+      when HostConnector::SSH
+        raise Errors::CommandNotProvided.new(:ssh) unless commands[:ssh] and !commands[:ssh].empty?
+        run(host, commands[:ssh])
+      when HostConnector::WinRM
+        raise Errors::CommandNotProvided.new(:winrm) unless commands[:winrm] and !commands[:winrm].empty?
+        run(host, commands[:winrm])
+      else
+        raise RuntimeError, "#{type.class.to_s} is not a supported connector for #{self.class}##{__method__}"
+      end
+    end
+    alias_method :execute_platform_specific_command, :platform_specific_run
 
     # Merges the given data with the the data of the target node on the remote
     #
