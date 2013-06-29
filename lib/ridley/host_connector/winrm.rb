@@ -47,10 +47,10 @@ module Ridley
         end
 
         HostConnector::Response.new(host).tap do |response|
-          begin
-            command_uploaders << command_uploader = CommandUploader.new(connection)
-            command = get_command(command, command_uploader)
+          command_uploaders << command_uploader = CommandUploader.new(connection)
+          command = get_command(command, command_uploader)
 
+          begin
             log.info "Running WinRM Command: '#{command}' on: '#{host}' as: '#{user}'"
 
             defer {
