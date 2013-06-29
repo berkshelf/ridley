@@ -27,6 +27,19 @@ module Ridley
       Client.new(*args)
     end
 
+    # @return [Ridley::Client]
+    def from_chef_config(*args)
+      options = args.last.is_a?(Hash) ? args.pop : {}
+      config = Ridley::Chef::Config.new(args.first).to_hash
+
+      config[:validator_client] = config.delete(:validation_client_name)
+      config[:validator_path]   = config.delete(:validation_key)
+      config[:client_name]      = config.delete(:node_name)
+      config[:server_url]       = config.delete(:chef_server_url)
+
+      Client.new(config.merge(options))
+    end
+
     def open(*args, &block)
       Client.open(*args, &block)
     end
