@@ -80,7 +80,11 @@ module Ridley
           end
         end
       ensure
-        command_uploaders.map(&:cleanup)
+        begin
+          command_uploaders.map(&:cleanup)
+        rescue ::WinRM::WinRMHTTPTransportError => ex
+          log.info "Error cleaning up leftover Powershell scripts on some hosts"
+        end
       end
 
       # Returns the command if it does not break the WinRM command length
