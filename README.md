@@ -1,11 +1,10 @@
-Ridley
-======
+# Ridley
 [![Gem Version](https://badge.fury.io/rb/ridley.png)](http://badge.fury.io/rb/ridley)
 [![Build Status](https://secure.travis-ci.org/RiotGames/ridley.png?branch=master)](http://travis-ci.org/RiotGames/ridley)
 [![Dependency Status](https://gemnasium.com/RiotGames/ridley.png?travis)](https://gemnasium.com/RiotGames/ridley)
 [![Code Climate](https://codeclimate.com/github/RiotGames/ridley.png)](https://codeclimate.com/github/RiotGames/ridley)
 
-Ridley is a reliable Chef API client with a clean syntax for interacting with a remote Chef Server (Open Source, Private, and Hosted Chef).
+A reliable Chef API client with a clean syntax
 
 Installation
 ------------
