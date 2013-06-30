@@ -27,10 +27,17 @@ module Ridley
       Client.new(*args)
     end
 
+    # Create a new Ridley connection from the Chef config (knife.rb)
+    #
+    # @param [#to_s] filepath
+    #   the path to the Chef Config
+    #
+    # @param [hash] options
+    #   list of options to pass to the Ridley connection (@see {Ridley::Client#new})
+    #
     # @return [Ridley::Client]
-    def from_chef_config(*args)
-      options = args.last.is_a?(Hash) ? args.pop : {}
-      config = Ridley::Chef::Config.new(args.first).to_hash
+    def from_chef_config(filepath = nil, options = {})
+      config = Ridley::Chef::Config.new(filepath).to_hash
 
       config[:validator_client] = config.delete(:validation_client_name)
       config[:validator_path]   = config.delete(:validation_key)
