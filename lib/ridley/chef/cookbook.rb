@@ -96,7 +96,7 @@ module Ridley::Chef
         root_files: Array.new
       )
       @frozen        = false
-      @chefignore    = Ridley::Chef::Chefignore.new(@path)
+      @chefignore    = Ridley::Chef::Chefignore.new(@path) rescue nil
 
       load_files
     end
@@ -210,10 +210,9 @@ module Ridley::Chef
 
       # @return [Array]
       attr_reader :files
-      # @return [Ridley::Chef::Chefignore]
-      attr_reader :chefignore
 
-      def_delegator :chefignore, :ignored?
+      # @return [Ridley::Chef::Chefignore, nil]
+      attr_reader :chefignore
 
       def load_files
         load_shallow(:recipes, 'recipes', '*.rb')
@@ -262,6 +261,14 @@ module Ridley::Chef
 
       def syntax_checker
         @syntax_checker ||= Cookbook::SyntaxCheck.new(path.to_s)
+      end
+
+      # Determine if the given file should be ignored by the chefignore
+      #
+      # @return [Boolean]
+      #   true if it should be ignored, false otherwise
+      def ignored?(file)
+        !!chefignore && chefignore.send(:ignored?, file)
       end
   end
 end

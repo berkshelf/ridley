@@ -115,8 +115,35 @@ describe Ridley::CookbookResource do
     end
   end
 
-  describe "#upload" do
-    pending
+  describe "#upload", focus: true do
+    let(:name) { "upload_test" }
+    let(:cookbook_path) { fixtures_path.join('example_cookbook') }
+    let(:sandbox_resource) { double('sandbox_resource') }
+    let(:sandbox) { double('sandbox', upload: nil, commit: nil) }
+
+    before do
+      subject.stub(:sandbox_resource).and_return(sandbox_resource)
+    end
+
+    it 'does not include files that are ignored' do
+      # These are the SHAs for the files. It's not possible to check that
+      # the ignored files weren't uploaded, so we just check that the
+      # non-ignored files are the ONLY thing uploaded
+      sandbox_resource.should_receive(:create).with([
+        "211a3a8798d4acd424af15ff8a2e28a5",
+        "dbf3a6c4ab68a86172be748aced9f46e",
+        "cafb6869fca13f5c36f24a60de8fb982",
+        "e9a2e24281cfbd6be0a6b1af3b6d277e",
+        "7b1ebd2ff580ca9dc46fb27ec1653bf2",
+        "75077ba33d2887cc1746d1ef716bf8b7",
+        "a39eb80def9804f4b118099697cc2cd2",
+        "b70ba735f3af47e5d6fc71b91775b34c",
+        "dc6461b5da25775f3ef6a9cc1f6cff9f",
+        "3b50b9583a70de7d4a0eadda01ea7f2a",
+      ]).and_return(sandbox)
+
+      subject.upload(cookbook_path, validate: false)
+    end
   end
 
   describe "#update" do
