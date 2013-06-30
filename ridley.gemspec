@@ -19,6 +19,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'addressable'
   s.add_dependency 'varia_model',             '~> 0.1'
+  s.add_dependency 'buff-config',             '~> 0.2'
   s.add_dependency 'buff-extensions',         '~> 0.3'
   s.add_dependency 'buff-shell_out',          '~> 0.1'
   s.add_dependency 'celluloid',               '~> 0.14.0'
@@ -34,5 +35,5 @@ Gem::Specification.new do |s|
   s.add_dependency 'solve',                   '>= 0.4.4'
   s.add_dependency 'winrm',                   '~> 1.1.0'
 
-  s.add_development_dependency "buff-ruby_engine", "~> 0.1"
+  s.add_development_dependency 'buff-ruby_engine', '~> 0.1'
 end
