@@ -213,7 +213,7 @@ _With the `#update` function, the ID of the Object to update, and an attributes 
 ```ruby
 ridley = Ridley.new(...)
 ridley.role.update("motherbrain_srv", description: "testing updates") #=> #<Ridley::RoleObject chef_id:motherbrain_srv, description="testing updates" ...>
-``
+```
 
 _With the `#update` function and an instance of a Chef Object_
 
@@ -274,7 +274,7 @@ _With the `#regenerate_key` function on an instance of a Client Object_
 ```ruby
 obj = ridley.client.find("jamie")
 obj.regenerate_key #=> #<Ridley::ClientObject: chef_id:"jamie", private_key="**HIDDEN***" ...>
-```ruby
+```
 
 Cookbook Resource
 -----------------
