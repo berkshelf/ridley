@@ -40,6 +40,55 @@ Ridley exposes a number of functions that return resources which you can use to 
 
 For more information scroll down to the Manipulating Chef Resources section of this README.
 
+You can also tell Ridley to read the values from your Chef config (knife.rb):
+
+```ruby
+ridley = Ridley.from_chef_config('/path/to/knife.rb')
+ridley.role.all #=> [
+  #<Ridley::RoleObject chef_id:motherbrain_srv ...>,
+  #<Ridley::RoleObject chef_id:motherbrain_proxy ...>
+]
+```
+
+The mapping between Chef Config values and Ridley values is:
+
+<table>
+  <thead>
+    <tr>
+      <th>Ridley</th>
+      <th>Chef</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>validator_client</td>
+      <td>validation_client_name</td>
+    </tr>
+    <tr>
+      <td>validator_path</td>
+      <td>validation_key</td>
+    </tr>
+    <tr>
+      <td>client_name</td>
+      <td>node_name</td>
+    </tr>
+    <tr>
+      <td>server_url</td>
+      <td>chef_server_url</td>
+    </tr>
+  </tbody>
+</table>
+
+Additionally, you can leave the path blank and Ridley will perform a "knife.rb search" the same way Chef does:
+
+```ruby
+ridley = Ridley.from_chef_config
+ridley.role.all #=> [
+  #<Ridley::RoleObject chef_id:motherbrain_srv ...>,
+  #<Ridley::RoleObject chef_id:motherbrain_proxy ...>
+]
+```
+
 If you don't want to instantiate and manage a connection object you can use `Ridley.open` to open a connection, do some work, and it will be closed for you after the block executes.
 
     Ridley.open(server_url: "https://api.opscode.com", ...) do |r|
