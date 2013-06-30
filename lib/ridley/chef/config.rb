@@ -3,6 +3,43 @@ require 'socket'
 
 module Ridley::Chef
   class Config < Buff::Config::Ruby
+    class << self
+      # Return the most sensible path to the Chef configuration file. This can
+      # be configured by setting a value for the 'RIDLEY_CHEF_CONFIG' environment
+      # variable.
+      #
+      # @return [String, nil]
+      def location
+        possibles = []
+
+        possibles << ENV['RIDLEY_CHEF_CONFIG'] if ENV['RIDLEY_CHEF_CONFIG']
+        possibles << File.join(ENV['KNIFE_HOME'], 'knife.rb') if ENV['KNIFE_HOME']
+        possibles << File.join(working_dir, 'knife.rb') if working_dir
+
+        # Ascending search for .chef directory siblings
+        Pathname.new(working_dir).ascend do |file|
+          sibling_chef = File.join(file, '.chef')
+          possibles << File.join(sibling_chef, 'knife.rb')
+        end if working_dir
+
+        possibles << File.join(ENV['HOME'], '.chef', 'knife.rb') if ENV['HOME']
+        possibles.compact!
+
+        location = possibles.find { |loc| File.exists?(File.expand_path(loc)) }
+
+        File.expand_path(location) unless location.nil?
+      end
+
+      private
+
+        # The current working directory
+        #
+        # @return [String]
+        def working_dir
+          ENV['PWD'] || Dir.pwd
+        end
+    end
+
     set_assignment_mode :carefree
 
     attribute :node_name,
@@ -36,42 +73,6 @@ module Ridley::Chef
       default: Dir.mktmpdir
     attribute :cache_options,
       default: { path: defined?(syntax_check_cache_path) ? syntax_check_cache_path : Dir.mktmpdir }
-
-    class << self
-      # Return the most sensible path to the Chef configuration file. This can
-      # be configured by setting a value for the 'RIDLEY_CHEF_CONFIG' environment
-      # variable.
-      #
-      # @return [String, nil]
-      def location
-        possibles = []
-
-        possibles << ENV['RIDLEY_CHEF_CONFIG'] if ENV['RIDLEY_CHEF_CONFIG']
-        possibles << File.join(ENV['KNIFE_HOME'], 'knife.rb') if ENV['KNIFE_HOME']
-        possibles << File.join(working_dir, 'knife.rb') if working_dir
-
-        # Ascending search for .chef directory siblings
-        Pathname.new(working_dir).ascend do |file|
-          sibling_chef = File.join(file, '.chef')
-          possibles << File.join(sibling_chef, 'knife.rb')
-        end if working_dir
-
-        possibles << File.join(ENV['HOME'], '.chef', 'knife.rb') if ENV['HOME']
-        possibles.compact!
-
-        location = possibles.find { |loc| File.exists?(File.expand_path(loc)) }
-
-        File.expand_path(location) unless location.nil?
-      end
-
-      private
-        # The current working directory
-        #
-        # @return [String]
-        def working_dir
-          ENV['PWD'] || Dir.pwd
-        end
-    end
 
     # Create a new Chef Config object.
     #
