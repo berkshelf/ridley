@@ -115,7 +115,7 @@ describe Ridley::CookbookResource do
     end
   end
 
-  describe "#upload", focus: true do
+  describe "#upload" do
     let(:name) { "upload_test" }
     let(:cookbook_path) { fixtures_path.join('example_cookbook') }
     let(:sandbox_resource) { double('sandbox_resource') }
