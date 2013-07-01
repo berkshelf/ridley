@@ -268,7 +268,7 @@ module Ridley::Chef
       # @return [Boolean]
       #   true if it should be ignored, false otherwise
       def ignored?(file)
-        !!chefignore && chefignore.send(:ignored?, file)
+        !!chefignore && chefignore.ignored?(file)
       end
   end
 end
