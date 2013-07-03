@@ -199,7 +199,7 @@ module Ridley
     # Perform a search the Chef Server
     #
     # @param [#to_sym, #to_s] index
-    # @param [#to_s] query_string
+    # @param [#to_s] query
     #
     # @option options [String] :sort
     #   a sort string such as 'name DESC'
@@ -208,7 +208,7 @@ module Ridley
     # @option options [Integer] :start
     #   the result number to start from
     #
-    # @return [Hash]
+    # @return [Array<ChefObject>, Hash]
     def search(index, query = nil, options = {})
       @resources_registry[:search_resource].run(index, query, @resources_registry, options)
     end
@@ -216,13 +216,42 @@ module Ridley
     # Return the array of all possible search indexes for the including connection
     #
     # @example
-    #   conn = Ridley.new(...)
-    #   conn.search_indexes =>
+    #   ridley = Ridley.new(...)
+    #   ridley.search_indexes #=>
     #     [:client, :environment, :node, :role, :"ridley-two", :"ridley-one"]
     #
     # @return [Array<Symbol, String>]
     def search_indexes
       @resources_registry[:search_resource].indexes
+    end
+
+    # Perform a partial search the Chef Server. Partial objects or a smaller hash will be returned resulting
+    # in a faster response for larger response sets. Specify the attributes you want returned with the
+    # attributes parameter.
+    #
+    # @param [#to_sym, #to_s] index
+    # @param [#to_s] query
+    # @param [Array] attributes
+    #   an array of strings in dotted hash notation representing the attributes to return
+    #
+    # @option options [String] :sort
+    #   a sort string such as 'name DESC'
+    # @option options [Integer] :rows
+    #   how many rows to return
+    # @option options [Integer] :start
+    #   the result number to start from
+    #
+    # @example
+    #   ridley = Ridley.new(...)
+    #   ridley.partial_search(:node, "chef_environment:RESET", [ 'ipaddress', 'some.application.setting' ]) #=>
+    #     [
+    #       #<Ridley::NodeObject: chef_id:"reset.riotgames.com" normal:
+    #         { "ipaddress" => "192.168.1.1", "some" => { "application" => { "setting" => "value" } } } ...>
+    #     ]
+    #
+    # @return [Array<ChefObject>, Hash]
+    def partial_search(index, query = nil, attributes = [], options = {})
+      @resources_registry[:search_resource].partial(index, query, Array(attributes), @resources_registry, options)
     end
 
     # The encrypted data bag secret for this connection.
