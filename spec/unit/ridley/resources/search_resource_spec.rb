@@ -49,6 +49,44 @@ describe Ridley::SearchResource do
       end
     end
 
+    describe "::build_param_string" do
+      let(:query) { "*:*" }
+      let(:options) { Hash.new }
+
+      subject { described_class.build_param_string(query, options) }
+
+      it "returns a string containing the query string" do
+        expect(subject).to eq("?q=#{query}")
+      end
+
+      context "when the :start option is given" do
+        let(:start) { 10 }
+        let(:options) { { start: start } }
+
+        it "contains the start query param" do
+          expect(subject).to eq("?q=#{query}&start=#{start}")
+        end
+      end
+
+      context "when the :sort option is given" do
+        let(:sort) { "DESC" }
+        let(:options) { { sort: sort } }
+
+        it "contains the sort query param" do
+          expect(subject).to eq("?q=#{query}&sort=#{sort}")
+        end
+      end
+
+      context "when the :rows option is given" do
+        let(:rows) { 20 }
+        let(:options) { { rows: rows } }
+
+        it "contains the rows query param" do
+          expect(subject).to eq("?q=#{query}&rows=#{rows}")
+        end
+      end
+    end
+
     describe "::query_uri" do
       it "returns a URI path containing the search resource path and index" do
         subject.query_uri(:nodes).should eql("search/nodes")
