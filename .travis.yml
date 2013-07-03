@@ -4,7 +4,6 @@ env:
   - TEST_SUITE=unit
   - TEST_SUITE=acceptance
 rvm:
-  - 1.9.2
   - 1.9.3
   - 2.0.0
   - jruby-19mode
