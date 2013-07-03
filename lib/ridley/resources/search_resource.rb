@@ -131,18 +131,30 @@ module Ridley
     def partial(index, query_string, attributes, resources_registry, options = {})
       query_uri    = self.class.query_uri(index)
       param_string = self.class.build_param_string(query_string, options)
-
-      chef_id = chef_id_for_index(index)
-
-      body = Hash.new.tap do |body|
-        body[chef_id] = [ chef_id ] if chef_id
-        attributes.collect { |attr| body[attr] = attr.split('.') }
-      end
+      body         = build_partial_body(index, attributes)
 
       handle_partial(index, resources_registry, request(:post, "#{query_uri}#{param_string}", JSON.generate(body)))
     end
 
     private
+
+      def build_partial_body(index, attributes)
+        chef_id = chef_id_for_index(index)
+
+        Hash.new.tap do |body|
+          body[chef_id] = [ chef_id ] if chef_id
+
+          if index.to_sym == :node
+            body['cloud.public_hostname'] = [ 'cloud', 'public_hostname' ]
+            body['cloud.public_ip4v']     = [ 'cloud', 'public_ip4v' ]
+            body['cloud.provider']        = [ 'cloud', 'provider' ]
+            body['fqdn']                  = [ 'fqdn' ]
+            body['ipaddress']             = [ 'ipaddress' ]
+          end
+
+          attributes.collect { |attr| body[attr] = attr.split('.') }
+        end
+      end
 
       def chef_id_for_index(index)
         chef_id = index.to_sym == :node ? Ridley::NodeObject.chef_id : nil
@@ -159,7 +171,7 @@ module Ridley
               next if key.to_s == chef_id.to_s
               attributes.deep_merge!(Hash.from_dotted_path(key, value))
             end
-            registry[:node_resource].new(name: item[:data][chef_id], normal: attributes)
+            registry[:node_resource].new(name: item[:data][chef_id], automatic: attributes)
           end
         else
           response[:rows]
