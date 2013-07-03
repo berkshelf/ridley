@@ -67,7 +67,7 @@ module Ridley
     #
     # @return [String]
     def public_hostname
-      self.cloud? ? self.automatic[:cloud][:public_hostname] : self.automatic[:fqdn]
+      self.cloud? ? self.automatic[:cloud][:public_hostname] || self.automatic[:fqdn] : self.automatic[:fqdn]
     end
 
     # Returns the public IPv4 address of the instantiated node. This ip address should be
@@ -78,7 +78,7 @@ module Ridley
     #
     # @return [String]
     def public_ipv4
-      self.cloud? ? self.automatic[:cloud][:public_ipv4] : self.automatic[:ipaddress]
+      self.cloud? ? self.automatic[:cloud][:public_ipv4] || self.automatic[:ipaddress] : self.automatic[:ipaddress]
     end
     alias_method :public_ipaddress, :public_ipv4
 
