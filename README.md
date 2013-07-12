@@ -345,7 +345,7 @@ Search will return an array of the appropriate Chef Objects if one of the defaul
 
 # Authors and Contributors
 
-* Jamie Winsor (<reset@riotgames.com>)
+* Jamie Winsor (<jamie@vialstudios.com>)
 * Kyle Allan (<kallan@riotgames.com>)
 
 Thank you to all of our [Contributors](https://github.com/RiotGames/ridley/graphs/contributors), testers, and users.

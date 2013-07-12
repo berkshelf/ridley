@@ -3,7 +3,7 @@ require File.expand_path('../lib/ridley/version', __FILE__)
 
 Gem::Specification.new do |s|
   s.authors       = ["Jamie Winsor", "Kyle Allan"]
-  s.email         = ["reset@riotgames.com", "kallan@riotgames.com"]
+  s.email         = ["jamie@vialstudios.com", "kallan@riotgames.com"]
   s.description   = %q{A reliable Chef API client with a clean syntax}
   s.summary       = s.description
   s.homepage      = "https://github.com/RiotGames/ridley"
