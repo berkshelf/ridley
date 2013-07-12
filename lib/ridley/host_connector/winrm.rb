@@ -68,13 +68,15 @@ module Ridley
               response.exit_code = output[:exitcode]
             }
           rescue ::WinRM::WinRMHTTPTransportError => ex
-            response.exit_code = -1
+            response.exit_code = :transport_error
             response.stderr    = ex.message
           end
 
           case response.exit_code
           when 0
             log.info "Successfully ran WinRM command on: '#{host}' as: '#{user}'"
+          when :transport_error
+            log.info "A transport error occured while attempting to run a WinRM command on: '#{host}' as: '#{user}'"
           else
             log.info "Successfully ran WinRM command on: '#{host}' as: '#{user}', but it failed"
           end

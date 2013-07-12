@@ -185,7 +185,6 @@ module Ridley
       end
     end
 
-
     private
 
       def execute(method, host, *args)
@@ -194,6 +193,8 @@ module Ridley
         connector_for(host, options).send(method, host, *args, options)
       rescue Errors::HostConnectionError => ex
         abort(ex)
+      rescue Resolv::ResolvError => ex
+        abort Errors::DNSResolvError.new(ex)
       end
 
       # Checks to see if the given port is open for TCP connections
