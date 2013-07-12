@@ -103,6 +103,8 @@ module Ridley
     # @return [HostConnector::Response]
     def chef_run(host)
       host_commander.chef_client(host, ssh: ssh, winrm: winrm)
+    rescue Errors::HostConnectionError => ex
+      abort(ex)
     end
 
     # Puts a secret on the host using the best worker available for
