@@ -1,76 +1,50 @@
+require 'buff/ignore'
+
 module Ridley::Chef
-  # Borrowed and modified from:
-  # {https://raw.github.com/opscode/chef/62f9b0e3be8e22eef092163c331b7d3f8d350f94/lib/chef/cookbook/chefignore.rb}
-  #
-  # Copyright:: Copyright (c) 2011 Opscode, Inc.
-  #
-  # Licensed under the Apache License, Version 2.0 (the "License");
-  # you may not use this file except in compliance with the License.
-  # You may obtain a copy of the License at
-  #
-  #     http://www.apache.org/licenses/LICENSE-2.0
-  #
-  # Unless required by applicable law or agreed to in writing, software
-  # distributed under the License is distributed on an "AS IS" BASIS,
-  # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  # See the License for the specific language governing permissions and
-  # limitations under the License.
-  class Chefignore
-    class << self
-      # Traverse a path in relative context to find a Chefignore file
-      #
-      # @param [String] path
-      #   path to traverse
-      #
-      # @return [String, nil]
-      def find_relative_to(path)
-        [
-          File.join(path, FILENAME),
-          File.join(path, 'cookbooks', FILENAME)
-        ].find { |f| File.exists?(f) }
+  class Chefignore < Buff::Ignore::IgnoreFile
+    include Ridley::Logging
+
+    # The filename of the chefignore
+    #
+    # @return [String]
+    FILENAME = 'chefignore'.freeze
+
+    # Create a new chefignore
+    #
+    # @param [#to_s] path
+    #   the path to find a chefignore from (default: `Dir.pwd`)
+    def initialize(path = Dir.pwd)
+      ignore = chefignore(path)
+
+      if ignore
+        log.debug "Using Chefignore at '#{ignore}'"
+      else
+        log.debug "Could not find a Chefignore at '#{path}'"
       end
-    end
 
-    FILENAME                = "chefignore".freeze
-    COMMENTS_AND_WHITESPACE = /^\s*(?:#.*)?$/
-
-    attr_reader :ignores
-
-    def initialize(ignore_file_or_repo)
-      @ignore_file = find_ignore_file(ignore_file_or_repo)
-      @ignores     = parse_ignore_file
-    end
-
-    def remove_ignores_from(file_list)
-      Array(file_list).inject([]) do |unignored, file|
-        ignored?(file) ? unignored : unignored << file
-      end
-    end
-
-    def ignored?(file_name)
-      @ignores.any? { |glob| File.fnmatch?(glob, file_name) }
+      super(ignore, base: path)
     end
 
     private
+      # Find the chefignore file in the current directory
+      #
+      # @return [String, nil]
+      #   the path to the chefignore file or nil if one was not
+      #   found
+      def chefignore(path)
+        Pathname.new(path).ascend do |dir|
+          next unless dir.directory?
 
-      def parse_ignore_file
-        ignore_globs = []
-
-        if File.exist?(@ignore_file) && File.readable?(@ignore_file)
-          File.foreach(@ignore_file) do |line|
-            ignore_globs << line.strip unless line =~ COMMENTS_AND_WHITESPACE
+          [
+            dir.join(FILENAME),
+            dir.join('cookbooks', FILENAME),
+            dir.join('.chef',     FILENAME),
+          ].each do |possible|
+            return possible.expand_path.to_s if possible.exist?
           end
         end
 
-        ignore_globs
-      end
-
-      def find_ignore_file(path)
-        if File.basename(path) =~ /#{FILENAME}/
-          path
-        else
-          File.join(path, FILENAME)
-        end
+        return nil
       end
   end
 end

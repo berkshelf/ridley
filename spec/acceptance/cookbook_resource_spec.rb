@@ -26,7 +26,7 @@ describe "Client API operations", type: "acceptance" do
   describe "uploading a cookbook" do
     let(:path) { fixtures_path.join("example_cookbook") }
 
-    it "uploads the entire contents of the cookbook in the given path" do
+    it "uploads the entire contents of the cookbook in the given path, applying chefignore" do
       subject.upload(path)
       cookbook = subject.find("example_cookbook", "0.1.0")
 
@@ -38,7 +38,7 @@ describe "Client API operations", type: "acceptance" do
       cookbook.recipes.should have(1).item
       cookbook.resources.should have(1).item
       cookbook.templates.should have(1).item
-      cookbook.root_files.should have(2).items
+      cookbook.root_files.should have(1).items
     end
   end
 
