@@ -200,7 +200,7 @@ module Ridley
       end
 
       checksums = cookbook.checksums.dup
-      sandbox   = sandbox_resource.create(checksums.keys)
+      sandbox   = sandbox_resource.create(checksums.keys.sort)
 
       sandbox.upload(checksums)
       sandbox.commit
