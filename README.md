@@ -305,9 +305,6 @@ data_bag.item.create(id: "appconfig", host: "reset.local", user: "jamie") #=> #<
 Environment Resource
 --------------------
 
-Node Resource
--------------
-
 ### Setting Attributes
 
 Setting a default environment attribute is just like setting a node level default attribute
@@ -325,6 +322,9 @@ And the same goes for setting an environment level override attribute
 production_env.set_override_attribute("my_app.proxy.enabled", false)
 production_env.save #=> true
 ```
+
+Node Resource
+-------------
 
 ### Bootstrapping Unix nodes
 
