@@ -48,12 +48,29 @@ describe Ridley::Resource do
 
   let(:connection) { double('chef-connection') }
   let(:response) { double('chef-response', body: Hash.new) }
+  let(:resource_json) { '{"some":"valid json"}' }
 
   subject { resource_class.new(double('registry')) }
 
   before do
     resource_class.stub(representation: representation)
     subject.stub(connection: connection)
+  end
+
+  describe "::from_file" do
+    it "reads the file and calls ::from_json with contents" do
+      File.stub(:read) { resource_json }
+      subject.should_receive(:from_json).with(resource_json)
+      subject.from_file('/bogus/filename.json')
+    end
+  end
+
+  describe "::from_json" do
+    it "parses the argument and calls ::new with newly built hash" do
+      hashed_json = JSON.parse(resource_json)
+      subject.should_receive(:new).with(hashed_json).and_return representation
+      subject.from_json(resource_json)
+    end
   end
 
   describe "::all" do
