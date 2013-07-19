@@ -26,6 +26,7 @@ module Ridley::Chef
     end
 
     private
+
       # Find the chefignore file in the current directory
       #
       # @return [String, nil]
@@ -44,7 +45,7 @@ module Ridley::Chef
           end
         end
 
-        return nil
+        nil
       end
   end
 end
