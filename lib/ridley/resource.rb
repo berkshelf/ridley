@@ -34,6 +34,26 @@ module Ridley
       self.class.representation.new(Actor.current, *args)
     end
 
+    # Used to build a representation from a file with the current Actor's resource
+    #
+    # @param [String] filename
+    #   a full filename from which to build this representation (currently only supports .json files)
+    #
+    # @return [representation.class]
+    def from_file(filename)
+      from_json(File.read(filename))
+    end
+
+    # Used to build a representation from a serialized json string with the current Actor's resource
+    #
+    # @param [String] json
+    #   a representation serialized into json
+    #
+    # @return [representation.class]
+    def from_json(json)
+      new(JSON.parse(json))
+    end
+
     # @return [Ridley::Connection]
     def connection
       @connection_registry[:connection_pool]

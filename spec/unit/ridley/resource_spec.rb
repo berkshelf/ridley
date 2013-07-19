@@ -56,6 +56,18 @@ describe Ridley::Resource do
     subject.stub(connection: connection)
   end
 
+  describe "::from_file" do
+    pending "reads the file and calls ::from_json with contents" do
+
+    end
+  end
+
+  describe "::from_json" do
+    pending "parses the argument and calls ::new with newly built hash" do
+
+    end
+  end
+
   describe "::all" do
     it "sends GET to /{resource_path}" do
       connection.should_receive(:get).with(subject.class.resource_path).and_return(response)

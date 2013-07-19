@@ -121,7 +121,7 @@ Most resources can be listed, retrieved, created, updated, and destroyed. These 
 
 #### Create
 
-A new Chef Object can be created in a three ways
+A new Chef Object can be created in a four ways
 
 _With the `#create` function and an attribute hash_
 
@@ -138,6 +138,11 @@ _With the `#save` function on an instance of a Chef Object_
 
     obj = ridley.role.new
     obj.name = "reset"
+    obj.save #=> #<Ridley::RoleObject: chef_id:reset>
+
+_With the `#save` function on an instance of a Chef Object built from serialized json_
+
+    obj = ridley.role.from_file('/path/to/role.json')
     obj.save #=> #<Ridley::RoleObject: chef_id:reset>
 
 Each of these methods produce an identical object on the Chef server. It is up to you on how you'd like to create new resources.
