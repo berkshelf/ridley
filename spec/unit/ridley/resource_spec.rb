@@ -63,8 +63,11 @@ describe Ridley::Resource do
   end
 
   describe "::from_json" do
-    pending "parses the argument and calls ::new with newly built hash" do
-
+    it "parses the argument and calls ::new with newly built hash" do
+      valid_json = '{"some":"json"}'
+      hashed_json = JSON.parse(valid_json)
+      subject.should_receive(:new).with(hashed_json).and_return representation
+      subject.from_json(valid_json)
     end
   end
 
