@@ -1,3 +1,5 @@
+require 'yaml'
+
 module Ridley
   class DataBagItemObject < ChefObject
     set_chef_id "id"
@@ -57,18 +59,14 @@ module Ridley
     #
     # @return [Hash] a decrypted attribute value
     def decrypt_value(value)
-      if encrypted_data_bag_secret.nil?
-        raise Errors::EncryptedDataBagSecretNotSet
+      case format_version_of(value)
+      when 0
+        decrypt_v0_value(value)
+      when 1
+        decrypt_v1_value(value)
+      else
+        raise NotImplementedError, "Currently decrypting only version 0 & 1 databags are supported"
       end
-
-      decoded_value = Base64.decode64(value)
-
-      cipher = OpenSSL::Cipher::Cipher.new('aes-256-cbc')
-      cipher.decrypt
-      cipher.pkcs5_keyivgen(encrypted_data_bag_secret)
-      decrypted_value = cipher.update(decoded_value) + cipher.final
-
-      YAML.load(decrypted_value)
     end
 
     # Reload the attributes of the instantiated resource
@@ -105,8 +103,46 @@ module Ridley
 
     private
 
-      def encrypted_data_bag_secret
-        resource.encrypted_data_bag_secret
+    # Shamelessly lifted from https://github.com/opscode/chef/blob/2c0040c95bb942d13ad8c47498df56be43e9a82e/lib/chef/encrypted_data_bag_item.rb#L209-L215
+    def format_version_of(encrypted_value)
+      if encrypted_value.respond_to?(:key?)
+        encrypted_value["version"]
+      else
+        0
       end
+    end
+
+    def decrypt_v0_value(value)
+      if encrypted_data_bag_secret.nil?
+        raise Errors::EncryptedDataBagSecretNotSet
+      end
+
+      decoded_value = Base64.decode64(value)
+
+      cipher = OpenSSL::Cipher::Cipher.new('aes-256-cbc')
+      cipher.decrypt
+      cipher.pkcs5_keyivgen(encrypted_data_bag_secret)
+      decrypted_value = cipher.update(decoded_value) + cipher.final
+
+      YAML.load(decrypted_value)
+    end
+
+    def decrypt_v1_value(attrs)
+      if encrypted_data_bag_secret.nil?
+        raise Errors::EncryptedDataBagSecretNotSet
+      end
+
+      cipher = OpenSSL::Cipher::Cipher.new(attrs[:cipher])
+      cipher.decrypt
+      cipher.key = Digest::SHA256.digest(encrypted_data_bag_secret)
+      cipher.iv = Base64.decode64(attrs[:iv])
+      decrypted_value = cipher.update(Base64.decode64(attrs[:encrypted_data])) + cipher.final
+
+      YAML.load(decrypted_value)["json_wrapper"]
+    end
+
+    def encrypted_data_bag_secret
+      resource.encrypted_data_bag_secret
+    end
   end
 end

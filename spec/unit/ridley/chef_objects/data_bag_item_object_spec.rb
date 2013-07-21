@@ -44,10 +44,20 @@ describe Ridley::DataBagItemObject do
       resource.stub(encrypted_data_bag_secret: File.read(fixtures_path.join("encrypted_data_bag_secret").to_s))
     end
 
-    it "decrypts an encrypted value" do
+    it "decrypts an encrypted v0 value" do
       subject.attributes[:test] = "Xk0E8lV9r4BhZzcg4wal0X4w9ZexN3azxMjZ9r1MCZc="
       subject.decrypt
       subject.attributes[:test][:database][:username].should == "test"
+    end
+
+    it "decrypts an encrypted v1 value" do
+      subject.attributes[:password] = Hashie::Mash.new
+      subject.attributes[:password][:version] = 1
+      subject.attributes[:password][:cipher] = "aes-256-cbc"
+      subject.attributes[:password][:encrypted_data] = "zG+tTjtwOWA4vEYDoUwPYreXLZ1pFyKoWDGezEejmKs="
+      subject.attributes[:password][:iv] = "URVhHxv/ZrnABJBvl82qsg=="
+      subject.decrypt
+      subject.attributes[:password].should == "password123"
     end
 
     it "does not decrypt the id field" do
