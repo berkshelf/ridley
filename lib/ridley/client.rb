@@ -139,22 +139,23 @@ module Ridley
       @chef_version     = @options[:chef_version]
       @validator_client = @options[:validator_client]
 
-      @options[:client_key] = File.expand_path(@options[:client_key])
-
       if @options[:validator_path]
         @validator_path = File.expand_path(@options[:validator_path])
       end
 
-      if @options[:encrypted_data_bag_secret_path]
-        @encrypted_data_bag_secret_path = File.expand_path(@options[:encrypted_data_bag_secret_path])
+      @options[:encrypted_data_bag_secret] ||= begin
+        if @options[:encrypted_data_bag_secret_path]
+          @encrypted_data_bag_secret_path = File.expand_path(@options[:encrypted_data_bag_secret_path])
+        end
+
+        encrypted_data_bag_secret
       end
 
-      @options[:encrypted_data_bag_secret] = encrypted_data_bag_secret
-
-      unless @options[:client_key].present? && File.exist?(@options[:client_key])
-        raise Errors::ClientKeyFileNotFound, "client key not found at: '#{@options[:client_key]}'"
+      unless @options[:raw_key]
+        @options[:client_key] = File.expand_path(@options[:client_key])
+        raise Errors::ClientKeyFileNotFound, "client key not found at: '#{@options[:client_key]}'" unless File.exist?(@options[:client_key])
       end
-
+      
       @connection_registry   = Celluloid::Registry.new
       @resources_registry    = Celluloid::Registry.new
       @connection_supervisor = ConnectionSupervisor.new(@connection_registry, @options)

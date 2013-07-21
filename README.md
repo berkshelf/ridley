@@ -30,6 +30,17 @@ Creating a new instance of Ridley requires the following options:
 * client_name
 * client_key
 
+client_key is assumed to be a file path. If you want to pass in a key as a string you will also need to set raw_key to true:
+
+    ridley = Ridley.new(
+      server_url: "https://api.opscode.com/organizations/ridley",
+      client_name: "reset",
+      client_key: "some key data",
+      raw_key: true
+    )
+
+You can also optionally supply an encrypted data bag secret for decrypting encrypted data bags. The option is "encrypted_data_bag_secret" This can be a file name or the key itself as a string.
+
 Ridley exposes a number of functions that return resources which you can use to retrieve or create objects on your Chef server. Here is a simple example of getting a list of all the roles on your Chef server.
 
     ridley = Ridley.new(...)
