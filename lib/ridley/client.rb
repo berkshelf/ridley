@@ -124,8 +124,8 @@ module Ridley
     # @option options [Integer] :pool_size (4)
     #   size of the connection pool
     #
-    # @raise [Errors::ClientKeyFileNotFound] if the option for :client_key does not contain
-    #   a file path pointing to a readable client key
+    # @raise [Errors::ClientKeyFileNotFoundOrInvalid] if the option for :client_key does not contain
+    #   a file path pointing to a readable client key, or is a string containing a valid key
     def initialize(options = {})
       @options = options.reverse_merge(
         ssh: Hash.new,
@@ -151,9 +151,9 @@ module Ridley
         encrypted_data_bag_secret
       end
 
-      unless @options[:raw_key]
+      unless verify_client_key(@options[:client_key])
         @options[:client_key] = File.expand_path(@options[:client_key])
-        raise Errors::ClientKeyFileNotFound, "client key not found at: '#{@options[:client_key]}'" unless File.exist?(@options[:client_key])
+        raise Errors::ClientKeyFileNotFoundOrInvalid, "client key is invalid or not found at: '#{@options[:client_key]}'" unless File.exist?(@options[:client_key]) && verify_client_key(::IO.read(@options[:client_key]))
       end
       
       @connection_registry   = Celluloid::Registry.new
@@ -273,6 +273,13 @@ module Ridley
     end
 
     private
+
+      def verify_client_key(key)
+        OpenSSL::PKey::RSA.new(key)
+        true
+      rescue
+        false
+      end
 
       def connection
         @connection_registry[:connection_pool]
