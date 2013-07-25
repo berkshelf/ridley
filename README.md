@@ -12,7 +12,7 @@ A reliable Chef API client with a clean syntax
 
 ## Usage
 
-Require Ridley into your application
+Require Ridley into your application:
 
     require 'ridley'
 
