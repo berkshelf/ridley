@@ -17,13 +17,7 @@ module Ridley
 
       # @return [String]
       def boot_command
-        cmd = template.evaluate(self)
-
-        if sudo
-          cmd = "sudo #{cmd}"
-        end
-
-        cmd
+        template.evaluate(self)
       end
 
       # @return [String]
