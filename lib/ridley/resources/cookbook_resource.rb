@@ -1,5 +1,7 @@
 module Ridley
   class CookbookResource < Ridley::Resource
+    task_class TaskThread
+
     set_resource_path "cookbooks"
     represented_by Ridley::CookbookObject
 
