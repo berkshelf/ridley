@@ -87,18 +87,24 @@ describe Ridley::Client do
         }.to raise_error(ArgumentError, "Missing required option(s): 'client_key'")
       end
 
-      it "raises a ClientKeyFileNotFound if the filepath for client_key is not found" do
+      it "raises a ClientKeyFileNotFound if the client_key is not found or an invalid key" do
         config[:client_key] = "/tmp/nofile.xxsa"
 
         expect {
           described_class.new(config)
-        }.to raise_error(Ridley::Errors::ClientKeyFileNotFound)
+        }.to raise_error(Ridley::Errors::ClientKeyFileNotFoundOrInvalid)
       end
 
       it "expands the path of the client_key" do
-        config[:client_key] = "~/"
+        config[:client_key] = "spec/fixtures/reset.pem"
 
-        described_class.new(config).client_key.should_not == "~/"
+        described_class.new(config).client_key[0..4].should_not == "spec/"
+      end
+
+      it "accepts a client key as a string" do
+        key = File.read(fixtures_path.join("reset.pem").to_s)
+        config[:client_key] = key.dup
+        described_class.new(config).client_key.should == key
       end
 
       it "assigns a 'ssh' attribute from the given 'ssh' option" do

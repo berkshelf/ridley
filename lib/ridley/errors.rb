@@ -44,7 +44,7 @@ module Ridley
     end
 
     class BootstrapError < RidleyError; end
-    class ClientKeyFileNotFound < BootstrapError; end
+    class ClientKeyFileNotFoundOrInvalid < BootstrapError; end
     class EncryptedDataBagSecretNotFound < BootstrapError; end
 
     class HostConnectionError < RidleyError; end
