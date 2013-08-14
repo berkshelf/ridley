@@ -90,7 +90,7 @@ module Ridley::Chef
 
 
       def ruby_files
-        Dir[File.join(cookbook_path, '**', '*.rb')].select { |f| ignored?(f) }
+        Dir[File.join(cookbook_path, '**', '*.rb')].select { |f| ! ignored?(f) }
       end
 
       def untested_ruby_files
@@ -98,7 +98,7 @@ module Ridley::Chef
       end
 
       def template_files
-        Dir[File.join(cookbook_path, '**', '*.erb')].select { |f| ignored?(f) }
+        Dir[File.join(cookbook_path, '**', '*.erb')].select { |f| ! ignored?(f) }
       end
 
       def untested_template_files
