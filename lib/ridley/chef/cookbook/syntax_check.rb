@@ -61,11 +61,11 @@ module Ridley::Chef
 
         private
 
-          def ensure_cache_path_created
-            return true if @cache_path_created
-            FileUtils.mkdir_p(cache_path)
-            @cache_path_created = true
-          end
+        def ensure_cache_path_created
+          return true if @cache_path_created
+          FileUtils.mkdir_p(cache_path)
+          @cache_path_created = true
+        end
       end
 
       include Buff::ShellOut
@@ -82,13 +82,15 @@ module Ridley::Chef
       #
       # @param [String] cookbook_path
       #   the (on disk) path to the cookbook
-      def initialize(cookbook_path)
+      def initialize(cookbook_path, chefignore = nil)
         @cookbook_path   = cookbook_path
         @validated_files = PersistentSet.new
+        @chefignore      = chefignore
       end
 
+
       def ruby_files
-        Dir[File.join(cookbook_path, '**', '*.rb')]
+        Dir[File.join(cookbook_path, '**', '*.rb')].select { |f| ignored?(f) }
       end
 
       def untested_ruby_files
@@ -96,7 +98,7 @@ module Ridley::Chef
       end
 
       def template_files
-        Dir[File.join(cookbook_path, '**', '*.erb')]
+        Dir[File.join(cookbook_path, '**', '*.erb')].select { |f| ignored?(f) }
       end
 
       def untested_template_files
@@ -149,6 +151,15 @@ module Ridley::Chef
         end
 
         true
+      end
+
+      private
+
+      # @return [Ridley::Chef::Chefignore, nil]
+      attr_reader :chefignore
+
+      def ignored?(file)
+        !!chefignore && chefignore.ignored?(file)
       end
     end
   end
