@@ -61,11 +61,11 @@ module Ridley::Chef
 
         private
 
-        def ensure_cache_path_created
-          return true if @cache_path_created
-          FileUtils.mkdir_p(cache_path)
-          @cache_path_created = true
-        end
+          def ensure_cache_path_created
+            return true if @cache_path_created
+            FileUtils.mkdir_p(cache_path)
+            @cache_path_created = true
+          end
       end
 
       include Buff::ShellOut
@@ -155,12 +155,12 @@ module Ridley::Chef
 
       private
 
-      # @return [Ridley::Chef::Chefignore, nil]
-      attr_reader :chefignore
+        # @return [Ridley::Chef::Chefignore, nil]
+        attr_reader :chefignore
 
-      def ignored?(file)
-        !!chefignore && chefignore.ignored?(file)
-      end
+        def ignored?(file)
+          !!chefignore && chefignore.ignored?(file)
+        end
     end
   end
 end
