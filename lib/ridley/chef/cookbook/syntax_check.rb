@@ -82,6 +82,8 @@ module Ridley::Chef
       #
       # @param [String] cookbook_path
       #   the (on disk) path to the cookbook
+      # @param [Ridley::Chef::Chefignore] chefignore
+      #   the instance of R::C::Chefignore to filter out
       def initialize(cookbook_path, chefignore = nil)
         @cookbook_path   = cookbook_path
         @validated_files = PersistentSet.new
@@ -90,7 +92,7 @@ module Ridley::Chef
 
 
       def ruby_files
-        Dir[File.join(cookbook_path, '**', '*.rb')].select { |f| ! ignored?(f) }
+        Dir[File.join(cookbook_path, '**', '*.rb')].reject { |f| ignored?(f) }
       end
 
       def untested_ruby_files
@@ -98,7 +100,7 @@ module Ridley::Chef
       end
 
       def template_files
-        Dir[File.join(cookbook_path, '**', '*.erb')].select { |f| ! ignored?(f) }
+        Dir[File.join(cookbook_path, '**', '*.erb')].reject { |f| ignored?(f) }
       end
 
       def untested_template_files
