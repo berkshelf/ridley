@@ -59,6 +59,7 @@ describe Ridley::Chef::Cookbook::SyntaxCheck do
 
   describe "#validated" do
     let(:validated_files) { double('validated_files') }
+
     before(:each) do
       subject.stub(:validated_files) { validated_files }
     end
@@ -68,60 +69,57 @@ describe Ridley::Chef::Cookbook::SyntaxCheck do
       file_checksum = Ridley::Chef::Digester.checksum_for_file(template_file)
 
       validated_files.should_receive(:add).with(file_checksum)
-
-      subject.validated(template_file)
+      subject.validated(template_file).should be_nil
     end
   end
 
   describe "#validate_ruby_files" do
-    it "asks #untested_ruby_files for a list of files and calls #validate_ruby_file on each"
-    it "marks the successfully validated ruby files"
-    it "returns false if any ruby file fails to validate"
+
+    it "asks #untested_ruby_files for a list of files and calls #validate_ruby_file on each" do
+      subject.stub(:validate_ruby_file).with(anything()).exactly(9).times { true }
+      subject.validate_ruby_files.should be_true
+    end
+
+    it "marks the successfully validated ruby files" do
+      subject.stub(:validated).with(anything()).exactly(9).times
+      subject.validate_ruby_files.should be_true
+    end
+
+    it "returns false if any ruby file fails to validate" do
+      subject.stub(:validate_ruby_file).with(/\.rb$/) { false }
+      subject.validate_ruby_files.should be_false
+    end
   end
 
   describe "#validate_templates" do
-    it "asks #untested_template_files for a list of erb files and calls #validate_template on each"
-    it "marks the successfully validated erb files"
-    it "returns false if any erb file fails to validate"
+
+    it "asks #untested_template_files for a list of erb files and calls #validate_template on each" do
+      subject.stub(:validate_template).with(anything()).exactly(9).times { true }
+      subject.validate_templates.should be_true
+    end
+
+    it "marks the successfully validated erb files" do
+      subject.stub(:validated).with(anything()).exactly(9).times
+      subject.validate_templates.should be_true
+    end
+
+    it "returns false if any erb file fails to validate" do
+      subject.stub(:validate_template).with(/\.erb$/) { false }
+      subject.validate_templates.should be_false
+    end
+
   end
 
   describe "#validate_template" do
+
     it "asks #shell_out to check the files syntax"
+
   end
 
   describe "#validate_ruby_file" do
+
     it "asks #shell_out to check the files syntax"
+
   end
 
-  #describe "#validate" do
-  #  let(:syntax_checker) { double('syntax_checker') }
-  #
-  #  before(:each) do
-  #    subject.stub(:syntax_checker) { syntax_checker }
-  #  end
-  #
-  #  it "asks the syntax_checker to validate the ruby and template files of the cookbook" do
-  #    syntax_checker.should_receive(:validate_ruby_files).and_return(true)
-  #    syntax_checker.should_receive(:validate_templates).and_return(true)
-  #
-  #    subject.validate
-  #  end
-  #
-  #  it "raises CookbookSyntaxError if the cookbook contains invalid ruby files" do
-  #    syntax_checker.should_receive(:validate_ruby_files).and_return(false)
-  #
-  #    lambda {
-  #      subject.validate
-  #    }.should raise_error(Ridley::Errors::CookbookSyntaxError)
-  #  end
-  #
-  #  it "raises CookbookSyntaxError if the cookbook contains invalid template files" do
-  #    syntax_checker.should_receive(:validate_ruby_files).and_return(true)
-  #    syntax_checker.should_receive(:validate_templates).and_return(false)
-  #
-  #    lambda {
-  #      subject.validate
-  #    }.should raise_error(Ridley::Errors::CookbookSyntaxError)
-  #  end
-  #end
 end
