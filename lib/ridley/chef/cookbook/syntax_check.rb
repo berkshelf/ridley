@@ -120,6 +120,7 @@ module Ridley::Chef
           return false unless validate_ruby_file(ruby_file)
           validated(ruby_file)
         end
+        true
       end
 
       def validate_templates
@@ -127,6 +128,7 @@ module Ridley::Chef
           return false unless validate_template(template)
           validated(template)
         end
+        true
       end
 
       def validate_template(erb_file)
