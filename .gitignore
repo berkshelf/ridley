@@ -18,3 +18,5 @@ tmp
 *.sw[op]
 .DS_Store
 .rspec
+.bin/
+vendor/

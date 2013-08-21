@@ -260,7 +260,7 @@ module Ridley::Chef
       end
 
       def syntax_checker
-        @syntax_checker ||= Cookbook::SyntaxCheck.new(path.to_s)
+        @syntax_checker ||= Cookbook::SyntaxCheck.new(path.to_s, chefignore)
       end
 
       # Determine if the given file should be ignored by the chefignore
