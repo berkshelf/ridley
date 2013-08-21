@@ -19,6 +19,7 @@ describe Ridley::Chef::Cookbook::SyntaxCheck do
     it "lists the rb files in a cookbook" do
       expect(subject.ruby_files).to include(cookbook_dir.join("libraries/my_lib.rb").to_s)
     end
+
     it "does not list the rb files in a cookbook that are ignored" do
       expect(subject.ruby_files).not_to include(cookbook_dir.join("ignores/magic.rb").to_s)
     end
@@ -36,6 +37,7 @@ describe Ridley::Chef::Cookbook::SyntaxCheck do
     it "lists the erb files in a cookbook" do
       expect(subject.template_files).to include(cookbook_dir.join("templates/default/temp.txt.erb").to_s)
     end
+
     it "does not list the erb files in a cookbook that are ignored" do
       expect(subject.template_files).not_to include(cookbook_dir.join("ignores/magic.erb").to_s)
     end
@@ -74,7 +76,6 @@ describe Ridley::Chef::Cookbook::SyntaxCheck do
   end
 
   describe "#validate_ruby_files" do
-
     it "asks #untested_ruby_files for a list of files and calls #validate_ruby_file on each" do
       subject.stub(:validate_ruby_file).with(anything()).exactly(9).times { true }
       expect(subject.validate_ruby_files).to be_true
@@ -92,7 +93,6 @@ describe Ridley::Chef::Cookbook::SyntaxCheck do
   end
 
   describe "#validate_templates" do
-
     it "asks #untested_template_files for a list of erb files and calls #validate_template on each" do
       subject.stub(:validate_template).with(anything()).exactly(9).times { true }
       expect(subject.validate_templates).to be_true
@@ -107,26 +107,21 @@ describe Ridley::Chef::Cookbook::SyntaxCheck do
       subject.stub(:validate_template).with(/\.erb$/) { false }
       expect(subject.validate_templates).to be_false
     end
-
   end
 
   describe "#validate_template" do
-
     it "asks #shell_out to check the files syntax"
-
   end
 
   describe "#validate_ruby_file" do
-
     it "asks #shell_out to check the files syntax"
-
   end
 
   describe "without a chefignore" do
     let(:chefignore) { nil }
+
     it "the file listing still works" do
       expect(subject.ruby_files).to include(cookbook_dir.join("libraries/my_lib.rb").to_s)
     end
   end
-
 end
