@@ -156,7 +156,7 @@ module Ridley
 
       local.flush
 
-      FileUtils.mv(local.path, destination)
+      FileUtils.cp(local.path, destination)
     rescue OpenURI::HTTPError => ex
       abort(ex)
     ensure
