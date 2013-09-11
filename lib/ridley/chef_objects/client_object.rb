@@ -25,7 +25,8 @@ module Ridley
       type: String
 
     attribute :private_key,
-      type: [ String, Boolean ]
+      type: [ String, Boolean ],
+      default: false
 
     attribute :orgname,
       type: String
