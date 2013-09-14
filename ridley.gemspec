@@ -23,8 +23,8 @@ Gem::Specification.new do |s|
   s.add_dependency 'buff-extensions',         '~> 0.3'
   s.add_dependency 'buff-ignore',             '~> 1.1'
   s.add_dependency 'buff-shell_out',          '~> 0.1'
-  s.add_dependency 'celluloid',               '~> 0.14.0'
-  s.add_dependency 'celluloid-io',            '~> 0.14.0'
+  s.add_dependency 'celluloid',               '~> 0.14'
+  s.add_dependency 'celluloid-io',            '~> 0.14'
   s.add_dependency 'nio4r',                   '>= 0.5.0' # berkshelf#774
   s.add_dependency 'erubis'
   s.add_dependency 'faraday',                 '>= 0.8.4'
