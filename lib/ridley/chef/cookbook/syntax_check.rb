@@ -132,7 +132,7 @@ module Ridley::Chef
       end
 
       def validate_template(erb_file)
-        result = shell_out("erubis -x \"#{erb_file}\" | ruby -c")
+        result = shell_out("erubis -x #{erb_file.shellescape} | ruby -c")
 
         if result.error?
           file_relative_path = erb_file[/^#{Regexp.escape(cookbook_path+File::Separator)}(.*)/, 1]
@@ -145,7 +145,7 @@ module Ridley::Chef
       end
 
       def validate_ruby_file(ruby_file)
-        result = shell_out("ruby -c \"#{ruby_file}\"")
+        result = shell_out("ruby -c #{ruby_file.shellescape}")
 
         if result.error?
           file_relative_path = ruby_file[/^#{Regexp.escape(cookbook_path+File::Separator)}(.*)/, 1]
