@@ -1,5 +1,10 @@
 require 'shellwords'
 require 'buff/shell_out'
+require 'rbconfig'
+
+if (RbConfig::CONFIG['host_os'] =~ /mswin|mingw|cygwin/)
+	require 'win32api'
+end
 
 module Ridley::Chef
   class Cookbook
@@ -130,9 +135,9 @@ module Ridley::Chef
         end
         true
       end
-
-      def validate_template(erb_file)
-        result = shell_out("erubis -x #{erb_file.shellescape} | ruby -c")
+ 
+      def validate_template(erb_file)		
+        result = shell_out("erubis -x #{erb_file.windows_safe_shellescape_path} | ruby -c")
 
         if result.error?
           file_relative_path = erb_file[/^#{Regexp.escape(cookbook_path+File::Separator)}(.*)/, 1]
@@ -144,8 +149,8 @@ module Ridley::Chef
         true
       end
 
-      def validate_ruby_file(ruby_file)
-        result = shell_out("ruby -c #{ruby_file.shellescape}")
+      def validate_ruby_file(ruby_file)	
+        result = shell_out("ruby -c #{ruby_file.windows_safe_shellescape_path}")
 
         if result.error?
           file_relative_path = ruby_file[/^#{Regexp.escape(cookbook_path+File::Separator)}(.*)/, 1]
@@ -167,4 +172,22 @@ module Ridley::Chef
         end
     end
   end
+end
+
+def get_short_win32_filename(long_name)
+	win_func = Win32API.new("kernel32","GetShortPathName","PPL"," L")
+	buf = 0.chr * 256
+	buf[0..long_name.length-1] = long_name
+	win_func.call(long_name, buf, buf.length)
+	return buf.split(0.chr).first
+end
+
+class String
+	def windows_safe_shellescape_path
+		if (RbConfig::CONFIG['host_os'] =~ /mswin|mingw|cygwin/)
+			get_short_win32_filename(self)
+		else
+			self.shellescape
+		end
+	end
 end
