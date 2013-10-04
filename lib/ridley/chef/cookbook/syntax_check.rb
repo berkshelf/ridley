@@ -182,12 +182,14 @@ module Shellwords
 		win_func.call(long_name, buf, buf.length)
 		return buf.split(0.chr).first
 	end
+	
+	module_function :get_short_win32_filename
 end
 
 class String
 	def shellescape
 		if (RbConfig::CONFIG['host_os'] =~ /mswin|mingw|cygwin/)
-			get_short_win32_filename(self)
+			Shellwords.get_short_win32_filename(self)
 		else
 			Shellwords.escape(self)  
 		end
