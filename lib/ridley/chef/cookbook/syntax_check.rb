@@ -174,12 +174,14 @@ module Ridley::Chef
   end
 end
 
-def get_short_win32_filename(long_name)
-	win_func = Win32API.new("kernel32","GetShortPathName","PPL"," L")
-	buf = 0.chr * 256
-	buf[0..long_name.length-1] = long_name
-	win_func.call(long_name, buf, buf.length)
-	return buf.split(0.chr).first
+module Shellwords
+	def get_short_win32_filename(long_name)
+		win_func = Win32API.new("kernel32","GetShortPathName","PPL"," L")
+		buf = 0.chr * 256
+		buf[0..long_name.length-1] = long_name
+		win_func.call(long_name, buf, buf.length)
+		return buf.split(0.chr).first
+	end
 end
 
 class String
