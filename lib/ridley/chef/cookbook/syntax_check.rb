@@ -135,7 +135,7 @@ module Ridley::Chef
         end
         true
       end
- 
+
       def validate_template(erb_file)
         result = shell_out("erubis -x #{erb_file.shellescape} | ruby -c")
 
