@@ -137,7 +137,7 @@ module Ridley::Chef
       end
  
       def validate_template(erb_file)		
-        result = shell_out("erubis -x #{erb_file.windows_safe_shellescape_path} | ruby -c")
+        result = shell_out("erubis -x #{erb_file.shellescape} | ruby -c")
 
         if result.error?
           file_relative_path = erb_file[/^#{Regexp.escape(cookbook_path+File::Separator)}(.*)/, 1]
@@ -150,7 +150,7 @@ module Ridley::Chef
       end
 
       def validate_ruby_file(ruby_file)	
-        result = shell_out("ruby -c #{ruby_file.windows_safe_shellescape_path}")
+        result = shell_out("ruby -c #{ruby_file.shellescape}")
 
         if result.error?
           file_relative_path = ruby_file[/^#{Regexp.escape(cookbook_path+File::Separator)}(.*)/, 1]
@@ -183,11 +183,11 @@ def get_short_win32_filename(long_name)
 end
 
 class String
-	def windows_safe_shellescape_path
+	def shellescape
 		if (RbConfig::CONFIG['host_os'] =~ /mswin|mingw|cygwin/)
 			get_short_win32_filename(self)
 		else
-			self.shellescape
+			Shellwords.escape(self)  
 		end
 	end
 end
