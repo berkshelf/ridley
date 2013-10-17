@@ -54,5 +54,43 @@ module Ridley
       attr_hash = Hashie::Mash.from_dotted_path(key, value)
       self.override_attributes = self.override_attributes.deep_merge(attr_hash)
     end
+
+    # Removes a environment default attribute given its dotted path
+    # representation. Returns the default attributes of the environment.
+    # 
+    # @param [String] key
+    #   the dotted path to an attribute
+    # 
+    # @return [Hashie::Mash]
+    def delete_default_attribute(key)
+      delete_attribute(key, :default)
+    end
+
+    # Removes a environment override attribute given its dotted path
+    # representation. Returns the override attributes of the environment.
+    # 
+    # @param [String] key
+    #   the dotted path to an attribute
+    # 
+    # @return [Hashie::Mash]
+    def delete_override_attribute(key)
+      delete_attribute(key, :override)
+    end
+
+    private
+
+      def delete_attribute(key, precedence)
+        dotted_path = key.split('.')
+        leaf_key = dotted_path.pop
+        case precedence
+        when :default
+          attributes_to_change = self.default_attributes  
+        when :override
+          attributes_to_change = self.override_attributes
+        end
+        leaf_hash = dotted_path.inject(attributes_to_change) { |hash, element| hash[element] }
+        leaf_hash.delete(leaf_key) unless leaf_hash.nil?
+        attributes_to_change
+      end
   end
 end

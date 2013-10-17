@@ -53,5 +53,52 @@ describe Ridley::EnvironmentObject do
         subject.default_attributes["deep"]["nested"]["item"].should be_true
       end
     end
+
+    describe "#delete_default_attribute" do
+      let(:delete_default_attribute) { subject.delete_default_attribute(attribute_key) }
+      let(:attribute_key) { "hello.world" }
+
+      before do
+        subject.set_default_attribute(attribute_key, true)
+      end
+
+      it "removes the default attribute" do
+        delete_default_attribute
+        expect(subject.default_attributes[:hello][:world]).to be_nil
+      end
+
+      context "when the attribute does not exist" do
+        let(:delete_default_attribute) { subject.delete_default_attribute("not.existing") }
+
+        it "does not delete anything" do
+          delete_default_attribute
+          expect(subject.default_attributes[:hello][:world]).to be_true
+        end
+      end
+    end
+
+    describe "#delete_override_attribute" do
+      let(:delete_override_attribute) { subject.delete_override_attribute(attribute_key) }
+      let(:attribute_key) { "hello.world" }
+
+      before do
+        subject.set_override_attribute(attribute_key, true)
+      end
+
+      it "removes the override attribute" do
+        delete_override_attribute
+        expect(subject.override_attributes[:hello][:world]).to be_nil
+      end
+
+      context "when the attribute does not exist" do
+        let(:delete_override_attribute) { subject.delete_override_attribute("not.existing") }
+
+        it "does not delete anything" do
+          delete_override_attribute
+          expect(subject.override_attributes[:hello][:world]).to be_true
+        end
+      end
+
+    end
   end
 end
