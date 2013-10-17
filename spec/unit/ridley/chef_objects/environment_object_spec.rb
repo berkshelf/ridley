@@ -98,7 +98,6 @@ describe Ridley::EnvironmentObject do
           expect(subject.override_attributes[:hello][:world]).to be_true
         end
       end
-
     end
   end
 end
