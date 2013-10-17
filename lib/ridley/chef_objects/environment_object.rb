@@ -79,6 +79,14 @@ module Ridley
 
     private
 
+      # Deletes an attribute at the given precedence using its dotted-path key.
+      # 
+      # @param [String] key
+      #   the dotted path to an attribute
+      # @param [Symbol] precedence
+      #   the precedence level to delete the attribute from
+      # 
+      # @return [Hashie::Mash]
       def delete_attribute(key, precedence)
         dotted_path = key.split('.')
         leaf_key = dotted_path.pop
