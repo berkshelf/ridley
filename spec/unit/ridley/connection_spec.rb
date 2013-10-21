@@ -65,6 +65,10 @@ describe Ridley::Connection do
       File.exist?(destination).should be_true
     end
 
+    it "returns true when the file was copied" do
+      expect(subject.stream(target, destination)).to be_true
+    end
+
     it "contains the contents of the response body" do
       subject.stream(target, destination)
 
