@@ -122,6 +122,8 @@ module Ridley
     #   a URL to stream the response body from
     # @param [String] destination
     #   a location on disk to stream the content of the response body to
+    #
+    # @return [Boolean] true when the destination file exists
     def stream(target, destination)
       FileUtils.mkdir_p(File.dirname(destination))
 
@@ -157,6 +159,7 @@ module Ridley
       local.flush
 
       FileUtils.cp(local.path, destination)
+      File.exists?(destination)
     rescue OpenURI::HTTPError => ex
       abort(ex)
     ensure
