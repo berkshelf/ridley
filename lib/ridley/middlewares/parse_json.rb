@@ -50,12 +50,12 @@ module Ridley
         #
         # @return [String]
         def response_type(env)
-          if env[:response_headers][CONTENT_TYPE].nil?
+          if env[:response_headers]['content-type'].nil?
             log.debug { "response did not specify a content type" }
             return "text/html"
           end
 
-          env[:response_headers][CONTENT_TYPE].split(';', 2).first
+          env[:response_headers]['content-type'].split(';', 2).first
         end
 
         # Determines if the response of the given Faraday request env

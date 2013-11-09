@@ -8,6 +8,12 @@ require 'json'
 require 'pathname'
 require 'solve'
 
+require_relative 'ridley/errors'
+require_relative 'ridley/logging'
+require_relative 'ridley/mixins/checksum'
+require_relative 'ridley/mixins/from_file'
+require_relative 'ridley/mixins/params_validate'
+
 JSON.create_id = nil
 
 module Ridley
@@ -62,23 +68,47 @@ module Ridley
     end
   end
 
-  require_relative 'ridley/mixin'
-  require_relative 'ridley/logging'
   require_relative 'ridley/bootstrap_context'
   require_relative 'ridley/command_context'
   require_relative 'ridley/chef_object'
-  require_relative 'ridley/chef_objects'
   require_relative 'ridley/client'
   require_relative 'ridley/connection'
-  require_relative 'ridley/chef'
   require_relative 'ridley/host_commander'
   require_relative 'ridley/host_connector'
-  require_relative 'ridley/middleware'
   require_relative 'ridley/resource'
-  require_relative 'ridley/resources'
   require_relative 'ridley/sandbox_uploader'
   require_relative 'ridley/version'
-  require_relative 'ridley/errors'
+
+  require_relative 'ridley/chef/cookbook'
+  require_relative 'ridley/chef/config'
+  require_relative 'ridley/chef/chefignore'
+  require_relative 'ridley/chef/digester'
+
+  require_relative 'ridley/chef_objects/client_object'
+  require_relative 'ridley/chef_objects/cookbook_object'
+  require_relative 'ridley/chef_objects/data_bag_item_object'
+  require_relative 'ridley/chef_objects/data_bag_object'
+  require_relative 'ridley/chef_objects/environment_object'
+  require_relative 'ridley/chef_objects/node_object'
+  require_relative 'ridley/chef_objects/role_object'
+  require_relative 'ridley/chef_objects/sandbox_object'
+
+  require_relative 'ridley/middlewares/chef_auth'
+  require_relative 'ridley/middlewares/chef_response'
+  require_relative 'ridley/middlewares/follow_redirects'
+  require_relative 'ridley/middlewares/gzip'
+  require_relative 'ridley/middlewares/parse_json'
+  require_relative 'ridley/middlewares/retry'
+
+  require_relative 'ridley/resources/client_resource'
+  require_relative 'ridley/resources/cookbook_resource'
+  require_relative 'ridley/resources/data_bag_item_resource'
+  require_relative 'ridley/resources/data_bag_resource'
+  require_relative 'ridley/resources/environment_resource'
+  require_relative 'ridley/resources/node_resource'
+  require_relative 'ridley/resources/role_resource'
+  require_relative 'ridley/resources/sandbox_resource'
+  require_relative 'ridley/resources/search_resource'
 end
 
 Celluloid.logger = Ridley.logger
