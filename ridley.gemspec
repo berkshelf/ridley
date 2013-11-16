@@ -31,10 +31,8 @@ Gem::Specification.new do |s|
   s.add_dependency 'json',                    '>= 1.7.7'
   s.add_dependency 'mixlib-authentication',   '>= 1.3.0'
   s.add_dependency 'net-http-persistent',     '>= 2.8'
-  s.add_dependency 'net-ssh'
   s.add_dependency 'retryable'
   s.add_dependency 'solve',                   '>= 0.4.4'
-  s.add_dependency 'winrm',                   '~> 1.1.0'
 
   s.add_development_dependency 'buff-ruby_engine', '~> 0.1'
 end

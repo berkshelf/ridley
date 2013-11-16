@@ -6,8 +6,6 @@ describe Ridley::Client do
   let(:client_key) { fixtures_path.join("reset.pem").to_s }
   let(:organization) { "vialstudios" }
   let(:encrypted_data_bag_secret_path) { fixtures_path.join("reset.pem").to_s }
-  let(:ssh) { {user: "reset", password: "password1", port: "222"} }
-  let(:winrm) { {user: "reset", password: "password2", port: "5986"} }
   let(:chef_version) { "10.24.0-01" }
 
   let(:config) do
@@ -17,8 +15,6 @@ describe Ridley::Client do
       client_key: client_key,
       organization: organization,
       encrypted_data_bag_secret_path: encrypted_data_bag_secret_path,
-      ssh: ssh,
-      winrm: winrm,
       chef_version: chef_version
     }
   end
@@ -105,14 +101,6 @@ describe Ridley::Client do
         key = File.read(fixtures_path.join("reset.pem").to_s)
         config[:client_key] = key.dup
         described_class.new(config).client_key.should == key
-      end
-
-      it "assigns a 'ssh' attribute from the given 'ssh' option" do
-        described_class.new(config).ssh.should eql({user: "reset", password: "password1", port: "222"})
-      end
-
-      it "assigns a 'winrm' attribute from the given 'winrm' option" do
-        described_class.new(config).winrm.should eql({user: "reset", password: "password2", port: "5986"})
       end
 
       it "assigns a 'chef_version' attribute from the given 'chef_version' option" do
