@@ -86,8 +86,6 @@ module Ridley
     attr_accessor :validator_client
     attr_accessor :validator_path
     attr_accessor :encrypted_data_bag_secret_path
-    attr_accessor :ssh
-    attr_accessor :winrm
     attr_accessor :chef_version
 
     # @option options [String] :server_url
@@ -99,16 +97,6 @@ module Ridley
     # @option options [String] :validator_client (nil)
     # @option options [String] :validator_path (nil)
     # @option options [String] :encrypted_data_bag_secret_path (nil)
-    # @option options [Hash] :ssh (Hash.new)
-    #   * :user (String) a shell user that will login to each node and perform the bootstrap command on (required)
-    #   * :password (String) the password for the shell user that will perform the bootstrap
-    #   * :keys (Array, String) an array of keys (or a single key) to authenticate the ssh user with instead of a password
-    #   * :timeout (Float) [5.0] timeout value for SSH bootstrap
-    #   * :sudo (Boolean) [true] bootstrap with sudo
-    # @option options [Hash] :winrm (Hash.new)
-    #   * :user (String) a user that will login to each node and perform the bootstrap command on (required)
-    #   * :password (String) the password for the user that will perform the bootstrap
-    #   * :port (Fixnum) the winrm port to connect on the node the bootstrap will be performed on (5985)
     # @option  options [String] :chef_version
     #   the version of Chef to use when bootstrapping
     # @option options [Hash] :params
@@ -128,14 +116,10 @@ module Ridley
     #   a file path pointing to a readable client key, or is a string containing a valid key
     def initialize(options = {})
       @options = options.reverse_merge(
-        ssh: Hash.new,
-        winrm: Hash.new,
         pool_size: 4
       ).deep_symbolize_keys
       self.class.validate_options(@options)
 
-      @ssh              = @options[:ssh]
-      @winrm            = @options[:winrm]
       @chef_version     = @options[:chef_version]
       @validator_client = @options[:validator_client]
 
