@@ -7,7 +7,7 @@ module Ridley
       # @return [Logger]
       def logger
         @logger ||= begin
-          Logger.new
+          Ridley::Logging::Logger.new
         end
       end
 

@@ -19,9 +19,13 @@ module Ridley
       # @param  &block
       #  a block that will be evaluated (for complicated logging)
       #
+      # @example
+      #   log.filter_param("hello")
+      #   log.info("hello world!") => "FILTERED world!"
+      #
       # @return [Boolean]
       def add(severity, message = nil, progname = nil, &block)
-        severity ||= UNKNOWN
+        severity ||= Logger::UNKNOWN
         if @logdev.nil? or severity < @level
           return true
         end
@@ -53,7 +57,7 @@ module Ridley
 
       def filter(message)
         filter_params.each do |param|
-          message.gsub!(param, 'FILTERED')
+          message.gsub!(param.to_s, 'FILTERED')
         end
         message
       end
