@@ -64,6 +64,7 @@ module Ridley
 
   require_relative 'ridley/mixin'
   require_relative 'ridley/logging'
+  require_relative 'ridley/logger'
   require_relative 'ridley/bootstrap_context'
   require_relative 'ridley/command_context'
   require_relative 'ridley/chef_object'

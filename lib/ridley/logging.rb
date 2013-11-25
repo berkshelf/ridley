@@ -3,12 +3,11 @@ require 'logger'
 module Ridley
   module Logging
     class << self
+
       # @return [Logger]
       def logger
         @logger ||= begin
-          log = Logger.new(STDOUT)
-          log.level = Logger::WARN
-          log
+          Ridley::Logging::Logger.new
         end
       end
 
