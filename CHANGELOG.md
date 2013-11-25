@@ -1,3 +1,7 @@
+# 2.1.0
+
+* [#228](https://github.com/RiotGames/ridley/pull/228) Add a new API for filtering log output. Useful for output you might not want to display because it is sensitive.
+
 # 2.0.0
 
 * [#227](https://github.com/RiotGames/ridley/pull/227) HostCommander and HostConnector code has been moved into its own gem - [found here](https://github.com/RiotGames/ridley-connectors)
