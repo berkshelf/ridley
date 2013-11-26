@@ -118,6 +118,14 @@ module Ridley::Chef
       end
     end
 
+    # Returns true if the cookbook instance has a compiled metadata file and false if it
+    # does not.
+    #
+    # @return [Boolean]
+    def compiled_metadata?
+      manifest[:root_files].any? { |file| file[:name].downcase == "metadata.json" }
+    end
+
     # @param [Symbol] category
     #   the category of file to generate metadata about
     # @param [String] target
