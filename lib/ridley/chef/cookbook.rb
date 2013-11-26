@@ -54,6 +54,7 @@ module Ridley::Chef
     attr_reader :cookbook_name
     attr_reader :path
     attr_reader :metadata
+
     # @return [Hashie::Mash]
     #   a Hashie::Mash containing Cookbook file category names as keys and an Array of Hashes
     #   containing metadata about the files belonging to that category. This is used
