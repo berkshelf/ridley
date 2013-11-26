@@ -33,12 +33,12 @@ module Ridley::Chef
       # @return [Ridley::Chef::Cookbook]
       def from_path(path, options = {})
         path     = Pathname.new(path)
-        metadata = if path.join('metadata.rb').exist?
-          Cookbook::Metadata.from_file(path.join('metadata.rb'))
-        elsif path.join('metadata.json').exist?
-          Cookbook::Metadata.from_json(File.read(path.join('metadata.json')))
+        metadata = if (metadata_file = path.join('metadata.json')).exist?
+          Cookbook::Metadata.from_json(File.read(metadata_file))
+        elsif (metadata_file = path.join('metadata.rb')).exist?
+          Cookbook::Metadata.from_file(metadata_file)
         else
-          raise IOError, "no metadata.rb or metadata.json found at #{path}"
+          raise IOError, "no metadata.json or metadata.rb found at #{path}"
         end
 
         metadata.name(options[:name].presence || metadata.name.presence || File.basename(path))
