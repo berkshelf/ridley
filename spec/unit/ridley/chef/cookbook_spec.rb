@@ -106,6 +106,63 @@ describe Ridley::Chef::Cookbook do
     end
   end
 
+  describe "#compile_metadata" do
+    let(:cookbook_path) { tmp_path.join("temp_cookbook").to_s }
+    subject { described_class.from_path(cookbook_path) }
+    before do
+      FileUtils.mkdir_p(cookbook_path)
+      File.open(File.join(cookbook_path, "metadata.rb"), "w+") do |f|
+        f.write <<-EOH
+          name "rspec_test"
+          version "1.2.3"
+        EOH
+      end
+    end
+
+    it "compiles the raw metadata.rb into a metadata.json file in the path of the cookbook" do
+      expect(subject.compiled_metadata?).to be_false
+      subject.compile_metadata
+      subject.reload
+      expect(subject.compiled_metadata?).to be_true
+      expect(subject.cookbook_name).to eql("rspec_test")
+      expect(subject.version).to eql("1.2.3")
+    end
+
+    context "when given an output path to write the metadata to" do
+      let(:out_path) { tmp_path.join("outpath") }
+      before { FileUtils.mkdir_p(out_path) }
+
+      it "writes the compiled metadata to a metadata.json file at the given out path" do
+        subject.compile_metadata(out_path)
+        expect(File.exist?(File.join(out_path, "metadata.json"))).to be_true
+      end
+    end
+  end
+
+  describe "#compiled_metadata?" do
+    let(:cookbook_path) { tmp_path.join("temp_cookbook").to_s }
+    subject { described_class.from_path(cookbook_path) }
+    before do
+      FileUtils.mkdir_p(cookbook_path)
+      FileUtils.touch(File.join(cookbook_path, "metadata.rb"))
+    end
+
+    context "when a metadata.json file is present" do
+      before do
+        File.open(File.join(cookbook_path, 'metadata.json'), 'w+') do |f|
+          f.write JSON.fast_generate(name: "json_metadata")
+        end
+      end
+
+      its(:compiled_metadata?) { should be_true }
+    end
+
+    context "when a metadata.json file is not present" do
+      before { FileUtils.rm_f(File.join(cookbook_path, "metadata.json")) }
+      its(:compiled_metadata?) { should be_false }
+    end
+  end
+
   describe "#manifest" do
     it "returns a Mash with a key for each cookbook file category" do
       [

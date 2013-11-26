@@ -30,23 +30,26 @@ module Ridley::Chef
         end
       end
 
-      NAME              = 'name'.freeze
-      DESCRIPTION       = 'description'.freeze
-      LONG_DESCRIPTION  = 'long_description'.freeze
-      MAINTAINER        = 'maintainer'.freeze
-      MAINTAINER_EMAIL  = 'maintainer_email'.freeze
-      LICENSE           = 'license'.freeze
-      PLATFORMS         = 'platforms'.freeze
-      DEPENDENCIES      = 'dependencies'.freeze
-      RECOMMENDATIONS   = 'recommendations'.freeze
-      SUGGESTIONS       = 'suggestions'.freeze
-      CONFLICTING       = 'conflicting'.freeze
-      PROVIDING         = 'providing'.freeze
-      REPLACING         = 'replacing'.freeze
-      ATTRIBUTES        = 'attributes'.freeze
-      GROUPINGS         = 'groupings'.freeze
-      RECIPES           = 'recipes'.freeze
-      VERSION           = 'version'.freeze
+      NAME             = 'name'.freeze
+      DESCRIPTION      = 'description'.freeze
+      LONG_DESCRIPTION = 'long_description'.freeze
+      MAINTAINER       = 'maintainer'.freeze
+      MAINTAINER_EMAIL = 'maintainer_email'.freeze
+      LICENSE          = 'license'.freeze
+      PLATFORMS        = 'platforms'.freeze
+      DEPENDENCIES     = 'dependencies'.freeze
+      RECOMMENDATIONS  = 'recommendations'.freeze
+      SUGGESTIONS      = 'suggestions'.freeze
+      CONFLICTING      = 'conflicting'.freeze
+      PROVIDING        = 'providing'.freeze
+      REPLACING        = 'replacing'.freeze
+      ATTRIBUTES       = 'attributes'.freeze
+      GROUPINGS        = 'groupings'.freeze
+      RECIPES          = 'recipes'.freeze
+      VERSION          = 'version'.freeze
+
+      COMPILED_FILE_NAME = "metadata.json".freeze
+      RAW_FILE_NAME      = "metadata.rb".freeze
 
       COMPARISON_FIELDS = [
         :name, :description, :long_description, :maintainer,
@@ -437,6 +440,11 @@ module Ridley::Chef
           RECIPES          => self.recipes,
           VERSION          => self.version
         }
+      end
+
+      # @return [String]
+      def to_json
+        JSON.fast_generate(to_hash)
       end
 
       def from_hash(o)
