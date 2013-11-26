@@ -40,18 +40,42 @@ describe Ridley::Chef::Cookbook do
         end
       end
 
-      context "when a metadata.rb is missing but metadata.json is present" do
+      context "when a metadata.json is missing but metadata.rb is present" do
         let(:cookbook_path) { tmp_path.join("temp_cookbook").to_s }
 
         before do
           FileUtils.mkdir_p(cookbook_path)
-          File.open(File.join(cookbook_path, 'metadata.json'), 'w+') do |f|
-            f.write JSON.fast_generate(name: "rspec_test")
+          File.open(File.join(cookbook_path, 'metadata.rb'), 'w+') do |f|
+            f.write <<-EOH
+              name 'rspec_test'
+            EOH
           end
         end
 
-        it "sets the name of the cookbook from the metadata.json" do
+        it "sets the name of the cookbook from the metadata.rb" do
           subject.from_path(cookbook_path).cookbook_name.should eql("rspec_test")
+        end
+      end
+
+      context "when a metadata.json and metadata.rb are both present" do
+        let(:cookbook_path) { tmp_path.join("temp_cookbook").to_s }
+
+        before do
+          FileUtils.mkdir_p(cookbook_path)
+
+          File.open(File.join(cookbook_path, 'metadata.json'), 'w+') do |f|
+            f.write JSON.fast_generate(name: "json_metadata")
+          end
+
+          File.open(File.join(cookbook_path, 'metadata.rb'), 'w+') do |f|
+            f.write <<-EOH
+              name 'ruby_metadata'
+            EOH
+          end
+        end
+
+        it "prefers the metadata.json" do
+          subject.from_path(cookbook_path).cookbook_name.should eql("json_metadata")
         end
       end
     end
