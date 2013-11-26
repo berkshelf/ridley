@@ -33,12 +33,12 @@ module Ridley::Chef
       # @return [Ridley::Chef::Cookbook]
       def from_path(path, options = {})
         path     = Pathname.new(path)
-        metadata = if (metadata_file = path.join('metadata.json')).exist?
+        metadata = if (metadata_file = path.join(Metadata::COMPILED_FILE_NAME)).exist?
           Cookbook::Metadata.from_json(File.read(metadata_file))
-        elsif (metadata_file = path.join('metadata.rb')).exist?
+        elsif (metadata_file = path.join(Metadata::RAW_FILE_NAME)).exist?
           Cookbook::Metadata.from_file(metadata_file)
         else
-          raise IOError, "no metadata.json or metadata.rb found at #{path}"
+          raise IOError, "no #{Metadata::COMPILED_FILE_NAME} or #{Metadata::RAW_FILE_NAME} found at #{path}"
         end
 
         metadata.name(options[:name].presence || metadata.name.presence || File.basename(path))
@@ -118,12 +118,23 @@ module Ridley::Chef
       end
     end
 
+    # Compiles the raw metadata of the cookbook and writes it to a metadata.json file at the given
+    # out path. The default out path is the directory containing the cookbook itself.
+    #
+    # @param [String] out
+    #   directory to output compiled metadata to
+    def compile_metadata(out = self.path)
+      File.open(File.join(out, Metadata::COMPILED_FILE_NAME), "w+") do |f|
+        f.write(metadata.to_json)
+      end
+    end
+
     # Returns true if the cookbook instance has a compiled metadata file and false if it
     # does not.
     #
     # @return [Boolean]
     def compiled_metadata?
-      manifest[:root_files].any? { |file| file[:name].downcase == "metadata.json" }
+      manifest[:root_files].any? { |file| file[:name].downcase == Metadata::COMPILED_FILE_NAME }
     end
 
     # @param [Symbol] category
@@ -175,6 +186,11 @@ module Ridley::Chef
     #     "nginx-0.101.2"
     def name
       "#{cookbook_name}-#{version}"
+    end
+
+    # Reload the cookbook from the files located on disk at `#path`.
+    def reload
+      load_files
     end
 
     def validate
