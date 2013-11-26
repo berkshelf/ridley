@@ -439,6 +439,10 @@ module Ridley::Chef
         }
       end
 
+      def to_json
+        JSON.fast_generate(to_hash)
+      end
+
       def from_hash(o)
         @name             = o[NAME] if o.has_key?(NAME)
         @description      = o[DESCRIPTION] if o.has_key?(DESCRIPTION)
