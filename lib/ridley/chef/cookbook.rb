@@ -84,21 +84,10 @@ module Ridley::Chef
       @cookbook_name = name
       @path          = Pathname.new(path)
       @metadata      = metadata
-      @files         = Array.new
-      @manifest      = Hashie::Mash.new(
-        recipes: Array.new,
-        definitions: Array.new,
-        libraries: Array.new,
-        attributes: Array.new,
-        files: Array.new,
-        templates: Array.new,
-        resources: Array.new,
-        providers: Array.new,
-        root_files: Array.new
-      )
       @frozen        = false
       @chefignore    = Ridley::Chef::Chefignore.new(@path) rescue nil
 
+      clear_files
       load_files
     end
 
@@ -196,6 +185,7 @@ module Ridley::Chef
 
     # Reload the cookbook from the files located on disk at `#path`.
     def reload
+      clear_files
       load_files
     end
 
@@ -244,6 +234,21 @@ module Ridley::Chef
 
       # @return [Ridley::Chef::Chefignore, nil]
       attr_reader :chefignore
+
+      def clear_files
+        @files    = Array.new
+        @manifest = Hashie::Mash.new(
+          recipes: Array.new,
+          definitions: Array.new,
+          libraries: Array.new,
+          attributes: Array.new,
+          files: Array.new,
+          templates: Array.new,
+          resources: Array.new,
+          providers: Array.new,
+          root_files: Array.new
+        )
+      end
 
       def load_files
         load_shallow(:recipes, 'recipes', '*.rb')

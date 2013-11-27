@@ -133,6 +133,7 @@ describe Ridley::CookbookResource do
         "211a3a8798d4acd424af15ff8a2e28a5",
         "75077ba33d2887cc1746d1ef716bf8b7",
         "7b1ebd2ff580ca9dc46fb27ec1653bf2",
+        "83128904bdb43eeeef131535c4a2ce8e",
         "a39eb80def9804f4b118099697cc2cd2",
         "b70ba735f3af47e5d6fc71b91775b34c",
         "cafb6869fca13f5c36f24a60de8fb982",
