@@ -186,8 +186,8 @@ module Ridley
     #
     # @return [Hash]
     def upload(path, options = {})
-      options   = options.reverse_merge(validate: true, force: false, freeze: false)
-      cookbook  = Ridley::Chef::Cookbook.from_path(path, options.slice(:name))
+      options  = options.reverse_merge(validate: true, force: false, freeze: false)
+      cookbook = Ridley::Chef::Cookbook.from_path(path, options.slice(:name))
 
       unless (existing = find(cookbook.cookbook_name, cookbook.version)).nil?
         if existing.frozen? && options[:force] == false
@@ -201,12 +201,21 @@ module Ridley
         cookbook.validate
       end
 
+      # Compile metadata on upload if it hasn't been compiled already
+      unless cookbook.compiled_metadata?
+        compiled_metadata = cookbook.compile_metadata
+        cookbook.reload
+      end
+
       checksums = cookbook.checksums.dup
       sandbox   = sandbox_resource.create(checksums.keys.sort)
 
       sandbox.upload(checksums)
       sandbox.commit
       update(cookbook, options.slice(:force, :freeze))
+    ensure
+      # Destroy the compiled metadata only if it was created
+      File.unlink(compiled_metadata) unless compiled_metadata.nil?
     end
 
     # Return a list of versions for the given cookbook present on the remote Chef server
