@@ -186,8 +186,8 @@ module Ridley
     #
     # @return [Hash]
     def upload(path, options = {})
-      options   = options.reverse_merge(validate: true, force: false, freeze: false)
-      cookbook  = Ridley::Chef::Cookbook.from_path(path, options.slice(:name))
+      options  = options.reverse_merge(validate: true, force: false, freeze: false)
+      cookbook = Ridley::Chef::Cookbook.from_path(path, options.slice(:name))
 
       unless (existing = find(cookbook.cookbook_name, cookbook.version)).nil?
         if existing.frozen? && options[:force] == false
@@ -201,12 +201,38 @@ module Ridley
         cookbook.validate
       end
 
+      # Compile metadata on upload if it hasn't been compiled already
+      unless cookbook.compiled_metadata?
+        compiled_metadata = cookbook.compile_metadata
+        cookbook.reload
+      end
+
+      # Skip uploading the raw metadata (metadata.rb). The raw metadata is unecessary for the
+      # client, and this is required until compiled metadata (metadata.json) takes precedence over
+      # raw metadata in the Chef-Client.
+      #
+      # We can change back to including the raw metadata in the future after this has been fixed or
+      # just remove these comments. There is no circumstance that I can currently think of where
+      # raw metadata should ever be read by the client.
+      #
+      # - Jamie
+      #
+      # See the following tickets for more information:
+      #   * https://tickets.opscode.com/browse/CHEF-4811
+      #   * https://tickets.opscode.com/browse/CHEF-4810
+      cookbook.manifest[:root_files].reject! do |file|
+        File.basename(file[:name]).downcase == Ridley::Chef::Cookbook::Metadata::RAW_FILE_NAME
+      end
+
       checksums = cookbook.checksums.dup
       sandbox   = sandbox_resource.create(checksums.keys.sort)
 
       sandbox.upload(checksums)
       sandbox.commit
       update(cookbook, options.slice(:force, :freeze))
+    ensure
+      # Destroy the compiled metadata only if it was created
+      File.delete(compiled_metadata) unless compiled_metadata.nil?
     end
 
     # Return a list of versions for the given cookbook present on the remote Chef server

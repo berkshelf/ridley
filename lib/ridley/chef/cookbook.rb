@@ -123,10 +123,16 @@ module Ridley::Chef
     #
     # @param [String] out
     #   directory to output compiled metadata to
+    #
+    # @return [String]
+    #   path to the compiled metadata
     def compile_metadata(out = self.path)
-      File.open(File.join(out, Metadata::COMPILED_FILE_NAME), "w+") do |f|
+      filepath = File.join(out, Metadata::COMPILED_FILE_NAME)
+      File.open(filepath, "w+") do |f|
         f.write(metadata.to_json)
       end
+
+      filepath
     end
 
     # Returns true if the cookbook instance has a compiled metadata file and false if it
