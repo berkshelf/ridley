@@ -1,3 +1,7 @@
+# 2.4.0
+
+* Add support for Chef 11 User Objects
+
 # 2.1.0
 
 * [#228](https://github.com/RiotGames/ridley/pull/228) Add a new API for filtering log output. Useful for output you might not want to display because it is sensitive.
