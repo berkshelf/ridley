@@ -26,6 +26,7 @@ module Ridley
         supervise_as :sandbox_resource, Ridley::SandboxResource, connection_registry,
           options[:client_name], options[:client_key], options.slice(*Ridley::Connection::VALID_OPTIONS)
         supervise_as :search_resource, Ridley::SearchResource, connection_registry
+        supervise_as :user_resource, Ridley::UserResource, connection_registry
       end
     end
 
@@ -179,6 +180,11 @@ module Ridley
     # @return [Ridley::SandboxResource]
     def sandbox
       @resources_registry[:sandbox_resource]
+    end
+
+    # @return [Ridley::UserResource]
+    def user
+      @resources_registry[:user_resource]
     end
 
     # Perform a search the Chef Server

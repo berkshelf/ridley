@@ -134,6 +134,7 @@ ridley.node        #=> Ridley::NodeResource
 ridley.role        #=> Ridley::RoleResource
 ridley.sandbox     #=> Ridley::SandboxResource
 ridley.search      #=> Ridley::SearchResource
+ridley.user        #=> Ridley::UserResource
 ```
 
 DataBagItems are the only exception to this rule. The DataBagItem resource is accessed from a DataBagObject
@@ -376,6 +377,21 @@ Search will return an array of the appropriate Chef Objects if one of the defaul
 -  role
 -  client
 -  environment
+
+User Resource
+-------------
+
+### Regenerating a user's private key
+
+Works the same way as with a client resource.
+
+### Authenticating user's password
+
+```ruby
+ridley = Ridley.new(...)
+ridley.user.authenticate('username', 'password')
+ridley.user.find('username').authenticate('password')
+```
 
 Authors and Contributors
 ------------------------
