@@ -29,7 +29,7 @@ module Ridley
 
     def authenticate(username, password)
       resp = request(:post, '/authenticate_user', {'name' => username, 'password' => password}.to_json)
-      abort("Usename mismatch: sent #{username}, received #{resp['name']}") unless resp['name'] == username
+      abort("Username mismatch: sent #{username}, received #{resp['name']}") unless resp['name'] == username
       resp['verified']
     end
   end
