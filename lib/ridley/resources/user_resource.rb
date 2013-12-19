@@ -2,15 +2,15 @@ module Ridley
   # @example listing all users
   #   conn = Ridley.new(...)
   #   conn.user.all #=> [
-  #     #<Ridley::ClientObject chef_id:'admin'>
+  #     #<Ridley::UserObject chef_id:'admin'>
   #   ]
   class UserResource < Ridley::Resource
     set_resource_path "users"
     represented_by Ridley::UserObject
 
     # Retrieves a user from the remote connection matching the given chef_id
-    # and regenerates it's private key. An instance of the updated object will
-    # be returned and have a value set for the 'private_key' accessor.
+    # and regenerates its private key. An instance of the updated object will
+    # be returned and will have a value set for the 'private_key' accessor.
     #
     # @param [String, #chef_id] chef_user
     #
