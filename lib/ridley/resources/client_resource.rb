@@ -10,8 +10,8 @@ module Ridley
     represented_by Ridley::ClientObject
 
     # Retrieves a client from the remote connection matching the given chef_id
-    # and regenerates it's private key. An instance of the updated object will
-    # be returned and have a value set for the 'private_key' accessor.
+    # and regenerates its private key. An instance of the updated object will
+    # be returned and will have a value set for the 'private_key' accessor.
     #
     # @param [String, #chef_id] chef_client
     #

@@ -122,7 +122,7 @@ end
 
 ### Manipulating Chef Resources
 
-Resources are access by instance functions on a new instance of `Ridley::Client`.
+Resources are accessed by instance functions on a new instance of `Ridley::Client`.
 
 ```ruby
 ridley = Ridley.new(...)
@@ -151,7 +151,7 @@ Most resources can be listed, retrieved, created, updated, and destroyed. These 
 
 #### Create
 
-A new Chef Object can be created in a four ways
+A new Chef Object can be created in four ways
 
 _With the `#create` function and an attribute hash_
 
@@ -192,7 +192,7 @@ Most resources have two read functions
 
 ##### Listing
 
-If you wanted to get a list of all of the roles on your Chef server
+If you want to get a list of all of the roles on your Chef server
 
 ```ruby
 ridley = Ridley.new(...)
@@ -248,7 +248,7 @@ obj.save #=> #<Ridley::RoleObject: chef_id:motherbrain_srv, description="saving 
 
 #### Destroy
 
-Destroying a resource can be express in three ways
+Destroying a resource can be expressed in three ways
 
 _With the `#delete` function and the ID of the Object to destroy_
 
@@ -267,7 +267,7 @@ ridley.role.delete(obj) => #<Ridley::RoleObject: chef_id:motherbrain_srv ...>
 _With the `#destroy` function on an instance of a Chef Object_
 
 ```ruby
-obj = conn.role.find("motherbrain_srv")
+obj = ridley.role.find("motherbrain_srv")
 obj.destroy #=> true
 ```
 
@@ -385,7 +385,7 @@ User Resource
 
 Works the same way as with a client resource.
 
-### Authenticating user's password
+### Authenticating a user's password
 
 ```ruby
 ridley = Ridley.new(...)

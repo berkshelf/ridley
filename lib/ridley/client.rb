@@ -204,7 +204,7 @@ module Ridley
       @resources_registry[:search_resource].run(index, query, @resources_registry, options)
     end
 
-    # Return the array of all possible search indexes for the including connection
+    # Return an array of all possible search indexes for the including connection
     #
     # @example
     #   ridley = Ridley.new(...)
@@ -216,7 +216,7 @@ module Ridley
       @resources_registry[:search_resource].indexes
     end
 
-    # Perform a partial search the Chef Server. Partial objects or a smaller hash will be returned resulting
+    # Perform a partial search on the Chef Server. Partial objects or a smaller hash will be returned resulting
     # in a faster response for larger response sets. Specify the attributes you want returned with the
     # attributes parameter.
     #
