@@ -75,7 +75,7 @@ module Ridley::Chef
     #     }
     attr_reader :manifest
 
-    # @return [Boolean]
+    # @return [Buff::Boolean]
     attr_accessor :frozen
 
     def_delegator :@metadata, :version
@@ -301,7 +301,7 @@ module Ridley::Chef
 
       # Determine if the given file should be ignored by the chefignore
       #
-      # @return [Boolean]
+      # @return [Buff::Boolean]
       #   true if it should be ignored, false otherwise
       def ignored?(file)
         !!chefignore && chefignore.ignored?(file)

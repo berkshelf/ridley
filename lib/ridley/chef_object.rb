@@ -58,7 +58,7 @@ module Ridley
     # @raise [Errors::InvalidResource]
     #   if the resource does not pass validations
     #
-    # @return [Boolean]
+    # @return [Buff::Boolean]
     def save
       raise Errors::InvalidResource.new(self.errors) unless valid?
 
@@ -75,7 +75,7 @@ module Ridley
     # @raise [Errors::InvalidResource]
     #   if the resource does not pass validations
     #
-    # @return [Boolean]
+    # @return [Buff::Boolean]
     def update
       raise Errors::InvalidResource.new(self.errors) unless valid?
 
@@ -104,7 +104,7 @@ module Ridley
 
     # @param [Object] other
     #
-    # @return [Boolean]
+    # @return [Buff::Boolean]
     def <=>(other)
       self.chef_id <=> other.chef_id
     end
@@ -115,7 +115,7 @@ module Ridley
 
     # @param [Object] other
     #
-    # @return [Boolean]
+    # @return [Buff::Boolean]
     def eql?(other)
       self.class == other.class && self == other
     end

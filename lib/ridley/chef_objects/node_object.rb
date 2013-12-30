@@ -98,28 +98,28 @@ module Ridley
 
     # Returns true if the node is identified as a cloud node.
     #
-    # @return [Boolean]
+    # @return [Buff::Boolean]
     def cloud?
       self.automatic.has_key?(:cloud)
     end
 
     # Returns true if the node is identified as a cloud node using the eucalyptus provider.
     #
-    # @return [Boolean]
+    # @return [Buff::Boolean]
     def eucalyptus?
       self.cloud_provider == "eucalyptus"
     end
 
     # Returns true if the node is identified as a cloud node using the ec2 provider.
     #
-    # @return [Boolean]
+    # @return [Buff::Boolean]
     def ec2?
       self.cloud_provider == "ec2"
     end
 
     # Returns true if the node is identified as a cloud node using the rackspace provider.
     #
-    # @return [Boolean]
+    # @return [Buff::Boolean]
     def rackspace?
       self.cloud_provider == "rackspace"
     end

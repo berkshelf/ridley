@@ -12,7 +12,7 @@ module Ridley
       type: Hash
 
     attribute :is_completed,
-      type: Boolean,
+      type: Buff::Boolean,
       default: false
 
     # Return information about the given checksum
