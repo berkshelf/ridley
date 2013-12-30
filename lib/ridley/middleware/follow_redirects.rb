@@ -42,7 +42,7 @@ module Ridley
       #
       # options - An options Hash (default: {}):
       #           limit - A Numeric redirect limit (default: 3)
-      #           standards_compliant - A Boolean indicating whether to respect
+      #           standards_compliant - A Buff::Boolean indicating whether to respect
       #                                 the HTTP spec when following 302
       #                                 (default: false)
       #          cookie - Use either an array of strings

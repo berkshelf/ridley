@@ -64,7 +64,7 @@ module Ridley
         # @param [Hash] env
         #   a Faraday request env
         #
-        # @return [Boolean]
+        # @return [Buff::Boolean]
         def json_response?(env)
           response_type(env) == JSON_TYPE && looks_like_json?(env)
         end
@@ -74,7 +74,7 @@ module Ridley
         #
         # @param [Hash] env
         #   a Faraday request env
-        # @return [Boolean]
+        # @return [Buff::Boolean]
         def looks_like_json?(env)
           return false unless env[:body].present?
 

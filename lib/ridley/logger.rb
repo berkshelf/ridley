@@ -23,7 +23,7 @@ module Ridley
       #   log.filter_param("hello")
       #   log.info("hello world!") => "FILTERED world!"
       #
-      # @return [Boolean]
+      # @return [Buff::Boolean]
       def add(severity, message = nil, progname = nil, &block)
         severity ||= Logger::UNKNOWN
         if @logdev.nil? or severity < @level

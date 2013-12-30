@@ -29,7 +29,7 @@ module Ridley
     # @raise [Errors::InvalidResource]
     #   if the resource does not pass validations
     #
-    # @return [Boolean]
+    # @return [Buff::Boolean]
     #   true if successful and false for failure
     def save
       raise Errors::InvalidResource.new(self.errors) unless valid?
@@ -83,7 +83,7 @@ module Ridley
     # @raise [Errors::InvalidResource]
     #   if the resource does not pass validations
     #
-    # @return [Boolean]
+    # @return [Buff::Boolean]
     def update
       raise Errors::InvalidResource.new(self.errors) unless valid?
 

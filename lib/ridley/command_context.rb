@@ -50,10 +50,10 @@ module Ridley
 
     # A command context for Unix based OSes
     class Unix < Base
-      # @return [Boolean]
+      # @return [Buff::Boolean]
       attr_reader :sudo
 
-      # @option options [Boolean] :sudo (true)
+      # @option options [Buff::Boolean] :sudo (true)
       #   bootstrap with sudo (default: true)
       def initialize(options = {})
         options = options.reverse_merge(sudo: true)

@@ -39,7 +39,7 @@ module Ridley
 
       # @raise [ArgumentError]
       #
-      # @return [Boolean]
+      # @return [Buff::Boolean]
       def validate_options(options)
         missing = (REQUIRED_OPTIONS - options.keys)
 
@@ -106,7 +106,7 @@ module Ridley
     # @option options [Hash] :request
     #   request options
     # @option options [Hash] :ssl
-    #   * :verify (Boolean) [true] set to false to disable SSL verification
+    #   * :verify (Buff::Boolean) [true] set to false to disable SSL verification
     # @option options [URI, String, Hash] :proxy
     #   URI, String, or Hash of HTTP proxy options
     # @option options [Integer] :pool_size (4)

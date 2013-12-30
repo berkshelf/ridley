@@ -40,9 +40,9 @@ module Ridley
     # @param [String] name
     # @param [String] version
     #
-    # @option options [Boolean] purge (false)
+    # @option options [Buff::Boolean] purge (false)
     #
-    # @return [Boolean]
+    # @return [Buff::Boolean]
     def delete(name, version, options = {})
       options = options.reverse_merge(purge: false)
       url = "#{self.class.resource_path}/#{name}/#{version}"
@@ -60,7 +60,7 @@ module Ridley
     # @param [String] name
     #   name of the cookbook to delete
     #
-    # @option options [Boolean] purge (false)
+    # @option options [Buff::Boolean] purge (false)
     def delete_all(name, options = {})
       versions(name).collect { |version| future(:delete, name, version, options) }.map(&:value)
     end
@@ -136,10 +136,10 @@ module Ridley
     # @param [Ridley::Chef::Cookbook] cookbook
     #   the cookbook to save
     #
-    # @option options [Boolean] :force
+    # @option options [Buff::Boolean] :force
     #   Upload the Cookbook even if the version already exists and is frozen on
     #   the target Chef Server
-    # @option options [Boolean] :freeze
+    # @option options [Buff::Boolean] :freeze
     #   Freeze the uploaded Cookbook on the Chef Server so that it cannot be
     #   overwritten
     #
@@ -175,13 +175,13 @@ module Ridley
     #   automatically populated by the metadata of the cookbook at the given path, but
     #   in the event that the metadata does not contain a name it can be specified with
     #   this option
-    # @option options [Boolean] :force (false)
+    # @option options [Buff::Boolean] :force (false)
     #   Upload the Cookbook even if the version already exists and is frozen on
     #   the target Chef Server
-    # @option options [Boolean] :freeze (false)
+    # @option options [Buff::Boolean] :freeze (false)
     #   Freeze the uploaded Cookbook on the Chef Server so that it cannot be
     #   overwritten
-    # @option options [Boolean] :validate (true)
+    # @option options [Buff::Boolean] :validate (true)
     #   Validate the contents of the cookbook before uploading
     #
     # @return [Hash]

@@ -4,7 +4,7 @@ module Ridley
     class WindowsUninstall < CommandContext::Windows
       template_file 'windows_uninstall_omnibus'
 
-      # @return [Boolean]
+      # @return [Buff::Boolean]
       attr_reader :skip_chef
 
       # @option options [Boolena] :skip_chef (false)
