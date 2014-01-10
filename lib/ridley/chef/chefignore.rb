@@ -17,9 +17,9 @@ module Ridley::Chef
       ignore = chefignore(path)
 
       if ignore
-        log.debug "Using Chefignore at '#{ignore}'"
+        log.debug "Using chefignore at '#{ignore}'"
       else
-        log.debug "Could not find a Chefignore at '#{path}'"
+        log.debug "Could not find a chefignore at '#{path}'"
       end
 
       super(ignore, base: path)
