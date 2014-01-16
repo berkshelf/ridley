@@ -201,6 +201,13 @@ ridley.role.all #=> [
   #<Ridley::RoleObject chef_id:motherbrain_proxy ...>
 ]
 ```
+Notify: You have to send the #reload message to node objects returned from a full listing. Their attributes aren't automatically populated from the initial search.
+
+```ruby
+ridley = Ridley.new(...)
+ridley.role.all.first  => #<Ridley::RoleObject chef_id:some_chef_id, attributes:#<VariaModel::Attributes chef_type="role" default_attributes=#<Hashie::Mash> description="" env_run_lists=#<VariaModel::Attributes> json_class="Chef::Role" name="some_chef_id" override_attributes=#<Hashie::Mash> run_list=[]>>
+ridley.role.all.first.reload => #<Ridley::RoleObject chef_id:some_chef_id, attributes:#<VariaModel::Attributes chef_type="role" default_attributes=#<Hashie::Mash SOME ATTRIBUTES> description="Some description" env_run_lists=#<VariaModel::Attributes> json_class="Chef::Role" name="some_chef_id" override_attributes=#<Hashie::Mash> run_list=[ SOME RUN LIST ]>>
+````
 
 ##### Finding
 
