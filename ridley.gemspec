@@ -26,7 +26,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'celluloid',               '~> 0.15'
   s.add_dependency 'celluloid-io',            '~> 0.15'
   s.add_dependency 'erubis'
-  s.add_dependency 'faraday',                 '>= 0.8.4'
+  s.add_dependency 'faraday',                 '~> 0.8.4'
   s.add_dependency 'hashie',                  '>= 2.0.2'
   s.add_dependency 'json',                    '>= 1.7.7'
   s.add_dependency 'mixlib-authentication',   '>= 1.3.0'
