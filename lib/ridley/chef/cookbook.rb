@@ -127,7 +127,7 @@ module Ridley::Chef
     # Returns true if the cookbook instance has a compiled metadata file and false if it
     # does not.
     #
-    # @return [Boolean]
+    # @return [Buff::Boolean]
     def compiled_metadata?
       manifest[:root_files].any? { |file| file[:name].downcase == Metadata::COMPILED_FILE_NAME }
     end
