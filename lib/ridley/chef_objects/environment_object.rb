@@ -96,7 +96,7 @@ module Ridley
         when :override
           attributes_to_change = self.override_attributes
         end
-        leaf_hash = dotted_path.inject(attributes_to_change) { |hash, element| hash[element] }
+        leaf_hash = dotted_path.inject(attributes_to_change) { |hash, element| hash[element] unless hash == nil }
         leaf_hash.delete(leaf_key) unless leaf_hash.nil?
         attributes_to_change
       end
