@@ -75,6 +75,19 @@ describe Ridley::EnvironmentObject do
           expect(subject.default_attributes[:hello][:world]).to be_true
         end
       end
+
+      context "when an internal hash is nil" do
+        let(:delete_default_attribute) { subject.delete_default_attribute("never.not.existing") }
+
+        before do
+          subject.default_attributes = Hash.new
+        end
+
+        it "does not delete anything" do
+          delete_default_attribute
+          expect(subject.default_attributes).to be_empty
+        end
+      end
     end
 
     describe "#delete_override_attribute" do
