@@ -1,3 +1,7 @@
+# 2.4.2
+
+* [#244](https://github.com/RiotGames/ridley/pull/244) Fix a bug with deleting deeply nested environment attributes.
+
 # 2.4.0
 
 * Add support for Chef 11 User Objects
