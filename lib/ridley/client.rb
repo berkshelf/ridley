@@ -26,6 +26,7 @@ module Ridley
         supervise_as :sandbox_resource, Ridley::SandboxResource, connection_registry,
           options[:client_name], options[:client_key], options.slice(*Ridley::Connection::VALID_OPTIONS)
         supervise_as :search_resource, Ridley::SearchResource, connection_registry
+        supervise_as :user_resource, Ridley::UserResource, connection_registry
       end
     end
 
@@ -181,6 +182,11 @@ module Ridley
       @resources_registry[:sandbox_resource]
     end
 
+    # @return [Ridley::UserResource]
+    def user
+      @resources_registry[:user_resource]
+    end
+
     # Perform a search the Chef Server
     #
     # @param [#to_sym, #to_s] index
@@ -198,7 +204,7 @@ module Ridley
       @resources_registry[:search_resource].run(index, query, @resources_registry, options)
     end
 
-    # Return the array of all possible search indexes for the including connection
+    # Return an array of all possible search indexes for the including connection
     #
     # @example
     #   ridley = Ridley.new(...)
@@ -210,7 +216,7 @@ module Ridley
       @resources_registry[:search_resource].indexes
     end
 
-    # Perform a partial search the Chef Server. Partial objects or a smaller hash will be returned resulting
+    # Perform a partial search on the Chef Server. Partial objects or a smaller hash will be returned resulting
     # in a faster response for larger response sets. Specify the attributes you want returned with the
     # attributes parameter.
     #

@@ -18,7 +18,7 @@ describe "Client API operations", type: "acceptance" do
       before { subject.download(name, version, destination) }
 
       it "downloads the cookbook to the destination" do
-        expect(File.exist?(destination.join("metadata.rb"))).to be_true
+        expect(File.exist?(destination.join("metadata.json"))).to be_true
       end
     end
   end
@@ -39,6 +39,14 @@ describe "Client API operations", type: "acceptance" do
       cookbook.resources.should have(1).item
       cookbook.templates.should have(1).item
       cookbook.root_files.should have(1).items
+    end
+
+    it "does not contain a raw metadata.rb but does contain a compiled metadata.json" do
+      subject.upload(path)
+      cookbook = subject.find("example_cookbook", "0.1.0")
+
+      expect(cookbook.root_files.any? { |f| f[:name] == "metadata.json" }).to be_true
+      expect(cookbook.root_files.any? { |f| f[:name] == "metadata.rb" }).to be_false
     end
   end
 
