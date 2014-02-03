@@ -140,8 +140,8 @@ describe Ridley::CookbookResource do
         "cafb6869fca13f5c36f24a60de8fb982", 
         "dbf3a6c4ab68a86172be748aced9f46e", 
         "dc6461b5da25775f3ef6a9cc1f6cff9f", 
-        "e9a2e24281cfbd6be0a6b1af3b6d277e"]
-      ).and_return(sandbox)
+        "e9a2e24281cfbd6be0a6b1af3b6d277e"
+      ]).and_return(sandbox)
 
       subject.upload(cookbook_path, validate: false)
     end
