@@ -38,6 +38,15 @@ describe Ridley::Chef::Cookbook::Metadata do
       lambda {
         subject.attribute("test_cookbook/test", options)
       }.should_not raise_error
+
+      options = {
+        :type => "numeric",
+        :choice => [ true, "false" ],
+        :default => false
+      }
+      lambda {
+        subject.attribute("test_cookbook/test", options)
+      }.should raise_error
     end
   end
 end

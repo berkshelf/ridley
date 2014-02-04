@@ -494,7 +494,7 @@ module Ridley::Chef
         # === Parameters
         # opts<Hash>:: The options hash
         def validate_choice_array(opts)
-          if opts[:choices].kind_of?(Array)
+          if opts[:choice].kind_of?(Array)
             case opts[:type]
             when "string"
               validator = [ String ]
@@ -510,8 +510,8 @@ module Ridley::Chef
               validator = [ Numeric ]
             end
 
-            opts[:choices].each do |choice|
-              validate( {:choice => choice}, {:choice => validator} )
+            opts[:choice].each do |choice|
+              validate( {:choice => choice}, {:choice => {:kind_of => validator}} )
             end
           end
         end
