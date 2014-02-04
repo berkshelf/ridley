@@ -495,8 +495,23 @@ module Ridley::Chef
         # opts<Hash>:: The options hash
         def validate_choice_array(opts)
           if opts[:choices].kind_of?(Array)
+            case opts[:type]
+            when "string"
+              validator = [ String ]
+            when "array"
+              validator = [ Array ]
+            when "hash"
+              validator = [ Hash ]
+            when "symbol"
+              validator = [ Symbol ]
+            when "boolean"
+              validator = [ TrueClass, FalseClass ]
+            when "numeric"
+              validator = [ Numeric ]
+            end
+
             opts[:choices].each do |choice|
-              validate( {:choice => choice}, {:choice => opts[:default]} )
+              validate( {:choice => choice}, {:choice => validator} )
             end
           end
         end
