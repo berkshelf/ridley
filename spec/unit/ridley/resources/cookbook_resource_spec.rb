@@ -130,11 +130,11 @@ describe Ridley::CookbookResource do
       # the ignored files weren't uploaded, so we just check that the
       # non-ignored files are the ONLY thing uploaded
       sandbox_resource.should_receive(:create).with([
-        "0fde3dd65385e87cf7caaa5ef459613c", 
         "211a3a8798d4acd424af15ff8a2e28a5", 
         "4f9051c3ac8031bdaff10300fa92e817", 
         "75077ba33d2887cc1746d1ef716bf8b7", 
         "7b1ebd2ff580ca9dc46fb27ec1653bf2", 
+        "84e12365e6f4ebe7db6a0e6a92473b16", 
         "a39eb80def9804f4b118099697cc2cd2", 
         "b70ba735f3af47e5d6fc71b91775b34c", 
         "cafb6869fca13f5c36f24a60de8fb982", 
