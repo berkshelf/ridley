@@ -16,3 +16,4 @@ attribute "example_cookbook/test",
   :required => "recommended",
   :recipes => [ 'example_cookbook::default' ],
   :default => "test1"
+  
