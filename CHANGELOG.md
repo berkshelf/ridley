@@ -1,3 +1,7 @@
+# 2.4.3
+
+* [#245](https://github.com/RiotGames/ridley/pull/245) Fix for numeric and boolean attribute types
+
 # 2.4.2
 
 * [#244](https://github.com/RiotGames/ridley/pull/244) Fix a bug with deleting deeply nested environment attributes.
