@@ -81,34 +81,34 @@ module Ridley
 
     private
 
-    # Deletes an attribute at the given precedence using its dotted-path key.
-    # 
-    # @param [String] key
-    #   the dotted path to an attribute
-    # @param [Symbol] precedence
-    #   the precedence level to delete the attribute from
-    # 
-    # @return [Hashie::Mash]
-    def unset_attribute(key, precedence)
-      keys = key.split(".")
-      leaf_key = keys.pop
-
-      attributes_to_change = case precedence
-                             when :default
-                               self.default_attributes  
-                             when :override
-                               self.override_attributes
-                             end
-
-      leaf_attributes = keys.inject(attributes_to_change) do |attributes, key|
-        if attributes[key] && attributes[key].kind_of?(VariaModel::Attributes)
-          attributes = attributes[key]
-        else 
-          return attributes_to_change
+      # Deletes an attribute at the given precedence using its dotted-path key.
+      # 
+      # @param [String] key
+      #   the dotted path to an attribute
+      # @param [Symbol] precedence
+      #   the precedence level to delete the attribute from
+      # 
+      # @return [Hashie::Mash]
+      def unset_attribute(key, precedence)
+        keys = key.split(".")
+        leaf_key = keys.pop
+  
+        attributes_to_change = case precedence
+                               when :default
+                                 self.default_attributes  
+                               when :override
+                                 self.override_attributes
+                               end
+  
+        leaf_attributes = keys.inject(attributes_to_change) do |attributes, key|
+          if attributes[key] && attributes[key].kind_of?(VariaModel::Attributes)
+            attributes = attributes[key]
+          else 
+            return attributes_to_change
+          end
         end
+        leaf_attributes.delete(leaf_key)
+        return attributes_to_change
       end
-      leaf_attributes.delete(leaf_key)
-      return attributes_to_change
-    end
   end
 end
