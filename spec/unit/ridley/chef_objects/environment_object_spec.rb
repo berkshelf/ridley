@@ -54,62 +54,52 @@ describe Ridley::EnvironmentObject do
       end
     end
 
-    describe "#delete_default_attribute" do
-      let(:delete_default_attribute) { subject.delete_default_attribute(attribute_key) }
+    shared_examples_for "attribute deleter" do
+      let(:precedence) { raise "You must provide the precedence level (let(:precedence) { \"default\" } in the shared example context" }
+      let(:delete_attribute) { subject.send(:"delete_#{precedence}_attribute", attribute_key) }
       let(:attribute_key) { "hello.world" }
 
       before do
-        subject.set_default_attribute(attribute_key, true)
+        subject.send(:"set_#{precedence}_attribute", "hello.world", true)
       end
 
-      it "removes the default attribute" do
-        delete_default_attribute
-        expect(subject.default_attributes[:hello][:world]).to be_nil
+      it "removes the attribute" do
+        delete_attribute
+        expect(subject.send(:"#{precedence}_attributes")[:hello][:world]).to be_nil
       end
 
       context "when the attribute does not exist" do
-        let(:delete_default_attribute) { subject.delete_default_attribute("not.existing") }
+        let(:attribute_key) { "not.existing" }
 
         it "does not delete anything" do
-          delete_default_attribute
-          expect(subject.default_attributes[:hello][:world]).to be_true
+          delete_attribute
+          expect(subject.send(:"#{precedence}_attributes")[:hello][:world]).to be_true
         end
       end
 
       context "when an internal hash is nil" do
-        let(:delete_default_attribute) { subject.delete_default_attribute("never.not.existing") }
+        let(:attribute_key) { "never.not.existing" }
 
         before do
-          subject.default_attributes = Hash.new
+          subject.send(:"#{precedence}_attributes=", Hash.new)
         end
 
         it "does not delete anything" do
-          delete_default_attribute
-          expect(subject.default_attributes).to be_empty
+          delete_attribute
+          expect(subject.send(:"#{precedence}_attributes")).to be_empty
         end
       end
     end
 
+    describe "#delete_default_attribute" do
+      it_behaves_like "attribute deleter" do
+        let(:precedence) { "default" }
+      end
+    end
+
     describe "#delete_override_attribute" do
-      let(:delete_override_attribute) { subject.delete_override_attribute(attribute_key) }
-      let(:attribute_key) { "hello.world" }
-
-      before do
-        subject.set_override_attribute(attribute_key, true)
-      end
-
-      it "removes the override attribute" do
-        delete_override_attribute
-        expect(subject.override_attributes[:hello][:world]).to be_nil
-      end
-
-      context "when the attribute does not exist" do
-        let(:delete_override_attribute) { subject.delete_override_attribute("not.existing") }
-
-        it "does not delete anything" do
-          delete_override_attribute
-          expect(subject.override_attributes[:hello][:world]).to be_true
-        end
+      it_behaves_like "attribute deleter" do
+        let(:precedence) { "override" }
       end
     end
   end
