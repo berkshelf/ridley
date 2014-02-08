@@ -101,7 +101,7 @@ module Ridley
                                end
   
         leaf_attributes = keys.inject(attributes_to_change) do |attributes, key|
-          if attributes[key] && attributes[key].kind_of?(VariaModel::Attributes)
+          if attributes[key] && attributes[key].kind_of?(Hashie::Mash)
             attributes = attributes[key]
           else 
             return attributes_to_change
