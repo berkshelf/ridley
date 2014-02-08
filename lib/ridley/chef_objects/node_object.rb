@@ -75,14 +75,16 @@ module Ridley
     # @return [Hashie::Mash]
     def unset_chef_attribute(key)
       keys = key.split(".")
-      attributes = keys[0..-2].inject(self.normal) do |attributes, key|
-        if attributes[key] && attributes[key].kind_of?(VariaModel::Attributes)
+      leaf_key = keys.pop
+      attributes = keys.inject(self.normal) do |attributes, key|
+        if attributes[key] && attributes[key].kind_of?(Hashie::Mash)
           attributes = attributes[key]
         else 
           return self.normal
         end
       end
-      attributes.delete(keys.pop)
+
+      attributes.delete(leaf_key)
       return self.normal
     end
 
