@@ -80,7 +80,7 @@ describe Ridley::NodeObject do
     end
   end
 
-  describe "#unset_chef_attribute", focus: true do
+  describe "#unset_chef_attribute" do
     context "when the attribute is set" do
       before do
         subject.normal = { foo: { bar: { baz: true } } }

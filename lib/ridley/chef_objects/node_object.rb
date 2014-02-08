@@ -60,7 +60,6 @@ module Ridley
       self.normal = self.normal.deep_merge(attr_hash)
     end
 
-
     # Unset a node level normal attribute given the dotted path representation of the Chef
     # attribute and value.
     #
