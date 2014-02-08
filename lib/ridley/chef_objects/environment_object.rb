@@ -62,9 +62,10 @@ module Ridley
     #   the dotted path to an attribute
     # 
     # @return [Hashie::Mash]
-    def delete_default_attribute(key)
-      delete_attribute(key, :default)
+    def unset_default_attribute(key)
+      unset_attribute(key, :default)
     end
+    alias :delete_default_attribute :unset_default_attribute
 
     # Removes a environment override attribute given its dotted path
     # representation. Returns the override attributes of the environment.
@@ -73,32 +74,41 @@ module Ridley
     #   the dotted path to an attribute
     # 
     # @return [Hashie::Mash]
-    def delete_override_attribute(key)
-      delete_attribute(key, :override)
+    def unset_override_attribute(key)
+      unset_attribute(key, :override)
     end
+    alias :delete_override_attribute :unset_override_attribute
 
     private
 
-      # Deletes an attribute at the given precedence using its dotted-path key.
-      # 
-      # @param [String] key
-      #   the dotted path to an attribute
-      # @param [Symbol] precedence
-      #   the precedence level to delete the attribute from
-      # 
-      # @return [Hashie::Mash]
-      def delete_attribute(key, precedence)
-        dotted_path = key.split('.')
-        leaf_key = dotted_path.pop
-        case precedence
-        when :default
-          attributes_to_change = self.default_attributes  
-        when :override
-          attributes_to_change = self.override_attributes
+    # Deletes an attribute at the given precedence using its dotted-path key.
+    # 
+    # @param [String] key
+    #   the dotted path to an attribute
+    # @param [Symbol] precedence
+    #   the precedence level to delete the attribute from
+    # 
+    # @return [Hashie::Mash]
+    def unset_attribute(key, precedence)
+      keys = key.split(".")
+      leaf_key = keys.pop
+
+      attributes_to_change = case precedence
+                             when :default
+                               self.default_attributes  
+                             when :override
+                               self.override_attributes
+                             end
+
+      leaf_attributes = keys.inject(attributes_to_change) do |attributes, key|
+        if attributes[key] && attributes[key].kind_of?(VariaModel::Attributes)
+          attributes = attributes[key]
+        else 
+          return attributes_to_change
         end
-        leaf_hash = dotted_path.inject(attributes_to_change) { |hash, element| hash[element] unless hash == nil }
-        leaf_hash.delete(leaf_key) unless leaf_hash.nil?
-        attributes_to_change
       end
+      leaf_attributes.delete(leaf_key)
+      return attributes_to_change
+    end
   end
 end
