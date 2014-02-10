@@ -55,7 +55,7 @@ describe Ridley::NodeObject do
   end
 
   describe "#set_chef_attribute" do
-    it "sets an normal node attribute at the nested path" do
+    it "sets a normal node attribute at the nested path" do
        subject.set_chef_attribute('deep.nested.item', true)
 
        subject.normal.should have_key("deep")
@@ -76,6 +76,43 @@ describe Ridley::NodeObject do
         subject.set_chef_attribute('deep.nested.item', true)
 
         subject.normal["deep"]["nested"]["item"].should be_true
+      end
+    end
+  end
+
+  describe "#unset_chef_attribute" do
+    context "when the attribute is set" do
+      before do
+        subject.normal = { foo: { bar: { baz: true } } }
+      end
+
+      it "unsets a normal node attribute at the nested path" do
+        subject.unset_chef_attribute("foo.bar.baz")
+        expect(subject.normal[:foo][:bar][:baz]).to be_nil
+      end
+    end
+
+    ["string", true, :symbol, ["array"], Object.new].each do |nonattrs|
+      context "when the attribute chain is partially set, interrupted by a #{nonattrs.class}" do
+        let(:attributes) { { 'foo' => { 'bar' => nonattrs } } }
+        before do
+          subject.normal = attributes
+        end
+
+        it "leaves the attributes unchanged" do
+          expect(subject.unset_chef_attribute("foo.bar.baz").to_hash).to eq(attributes)
+        end
+      end
+    end
+
+    context "when the attribute is not set" do
+      let(:attributes) { { 'bizz' => { 'bar' => { 'baz' => true } } } }
+      before do
+        subject.normal = attributes
+      end
+
+      it "leaves the attributes unchanged" do
+        expect(subject.unset_chef_attribute("foo.bar.baz").to_hash).to eq(attributes)
       end
     end
   end

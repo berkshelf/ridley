@@ -51,12 +51,41 @@ module Ridley
     #   obj.save
     #
     # @param [String] key
+    #   dotted path to key to be unset
     # @param [Object] value
     #
     # @return [Hashie::Mash]
     def set_chef_attribute(key, value)
       attr_hash   = Hashie::Mash.from_dotted_path(key, value)
       self.normal = self.normal.deep_merge(attr_hash)
+    end
+
+    # Unset a node level normal attribute given the dotted path representation of the Chef
+    # attribute and value.
+    #
+    # @example unsetting and saving a node level normal attribute
+    #
+    #   obj = node.find("foonode")
+    #   obj.unset_chef_attribute("my_app.service_one.service_state")
+    #   obj.save
+    #
+    # @param [String] key
+    #   dotted path to key to be unset
+    #
+    # @return [Hashie::Mash]
+    def unset_chef_attribute(key)
+      keys = key.split(".")
+      leaf_key = keys.pop
+      attributes = keys.inject(self.normal) do |attributes, key|
+        if attributes[key] && attributes[key].kind_of?(Hashie::Mash)
+          attributes = attributes[key]
+        else 
+          return self.normal
+        end
+      end
+
+      attributes.delete(leaf_key)
+      return self.normal
     end
 
     # Returns the public hostname of the instantiated node. This hostname should be used for
