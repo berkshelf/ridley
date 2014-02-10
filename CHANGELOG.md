@@ -1,3 +1,8 @@
+# 2.4.4
+
+* [#248](https://github.com/RiotGames/ridley/pull/248) Fix some edge cases and styling for deleting attributes from an environment
+* [#247](https://github.com/RiotGames/ridley/pull/247) Add support for removing attributes from a node
+
 # 2.4.3
 
 * [#245](https://github.com/RiotGames/ridley/pull/245) Fix for numeric and boolean attribute types
