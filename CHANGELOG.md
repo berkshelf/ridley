@@ -1,3 +1,7 @@
+# 2.5.0
+
+* Releasing 2.5.0 as a proper new version over 2.4.4.
+
 # 2.4.4
 
 * [#248](https://github.com/RiotGames/ridley/pull/248) Fix some edge cases and styling for deleting attributes from an environment
