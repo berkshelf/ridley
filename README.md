@@ -300,6 +300,31 @@ obj.regenerate_key #=> #<Ridley::ClientObject: chef_id:"jamie", private_key="**H
 Cookbook Resource
 -----------------
 
+Cookbooks can be created, listed, updated and deleted as shown in the Manipulating Chef Resources section of this README.
+
+To find a cookbook, you must provide both its name and version:
+
+```ruby
+ridley = Ridley.new(...)
+ridley.cookbook.find("apache2", "1.6.6")
+```
+
+Cookbooks can be downloaded. If no download path is specified, the chosen cookbook will be downloaded to a tmp folder.
+
+```ruby
+ridley = Ridley.new(...)
+ridley.cookbook.download("apache2", "1.6.6", "/path/to/download/cookbook") #=> "/path/to/download/cookbook"
+ridley.cookbook.download("apache2", "1.6.6") #=> "/tmp/d20140211-6621-kstalp"
+```
+
+A cookbook's metadata can be accessed using the `#metadata` method:
+
+```ruby
+ridley = Ridley.new(...)
+apache2 = ridley.cookbook.find("apache2", "1.6.6")
+apache2.metadata #=> Hashie::Mash
+```
+
 Data Bag Resource
 -----------------
 
