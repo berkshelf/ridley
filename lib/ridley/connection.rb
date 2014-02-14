@@ -3,6 +3,8 @@ require 'retryable'
 require 'tempfile'
 require 'zlib'
 
+Celluloid.task_class = Celluloid::TaskThread
+
 module Ridley
   class Connection < Faraday::Connection
     include Celluloid
