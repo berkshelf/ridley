@@ -1,3 +1,7 @@
+# 2.5.1
+
+* Fix no method error bug in partial search
+
 # 2.5.0
 
 * Releasing 2.5.0 as a proper new version over 2.4.4.
