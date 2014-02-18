@@ -42,6 +42,14 @@ module Ridley
         "no encrypted data bag secret was set for this Ridley connection"
       end
     end
+    class FromFileParserError < RidleyError
+      def initialize(filename, error)
+        super "Could not parse `#{filename}': #{error.message}"
+
+        # Populate the backtrace with the actual error though
+        set_backtrace(error.backtrace)
+      end
+    end
 
     class BootstrapError < RidleyError; end
     class ClientKeyFileNotFoundOrInvalid < BootstrapError; end
