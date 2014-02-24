@@ -37,7 +37,7 @@ module Ridley
     # @option options [Float] :retry_interval (0.5)
     #   how often we should pause between retries
     # @option options [Hash] :ssl
-    #   * :verify (Boolean) [true] set to false to disable SSL verification
+    #   * :verify (Buff::Boolean) [true] set to false to disable SSL verification
     # @option options [URI, String, Hash] :proxy
     #   URI, String, or Hash of HTTP proxy options
     def initialize(server_url, client_name, client_key, options = {})
@@ -88,12 +88,12 @@ module Ridley
       organization.nil? ? :foss : :hosted
     end
 
-    # @return [Boolean]
+    # @return [Buff::Boolean]
     def hosted?
       api_type == :hosted
     end
 
-    # @return [Boolean]
+    # @return [Buff::Boolean]
     def foss?
       api_type == :foss
     end
@@ -123,7 +123,7 @@ module Ridley
     # @param [String] destination
     #   a location on disk to stream the content of the response body to
     #
-    # @return [Boolean] true when the destination file exists
+    # @return [Buff::Boolean] true when the destination file exists
     def stream(target, destination)
       FileUtils.mkdir_p(File.dirname(destination))
 

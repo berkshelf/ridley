@@ -7,7 +7,7 @@ module Ridley
         # @param [Hash] env
         #   a faraday request env
         #
-        # @return [Boolean]
+        # @return [Buff::Boolean]
         def success?(env)
           (200..210).to_a.index(env[:status].to_i) ? true : false
         end

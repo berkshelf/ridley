@@ -373,7 +373,7 @@ module Ridley::Chef
       #   display_name<String>:: What a UI should show for this attribute
       #   description<String>:: A hint as to what this attr is for
       #   choice<Array>:: An array of choices to present to the user.
-      #   calculated<Boolean>:: If true, the default value is calculated by the recipe and cannot be displayed.
+      #   calculated<Buff::Boolean>:: If true, the default value is calculated by the recipe and cannot be displayed.
       #   type<String>:: "string" or "array" - default is "string"  ("hash" is supported for backwards compatibility)
       #   required<String>:: Whether this attr is 'required', 'recommended' or 'optional' - default 'optional' (true/false values also supported for backwards compatibility)
       #   recipes<Array>:: An array of recipes which need this attr set.
@@ -516,12 +516,12 @@ module Ridley::Chef
           end
         end
 
-        # For backwards compatibility, remap Boolean values to String
+        # For backwards compatibility, remap Buff::Boolean values to String
         #   true is mapped to "required"
         #   false is mapped to "optional"
         #
         # === Parameters
-        # required_attr<String><Boolean>:: The value of options[:required]
+        # required_attr<String><Buff::Boolean>:: The value of options[:required]
         #
         # === Returns
         # required_attr<String>:: "required", "recommended", or "optional"

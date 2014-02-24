@@ -75,7 +75,7 @@ module Ridley::Chef
     #     }
     attr_reader :manifest
 
-    # @return [Boolean]
+    # @return [Buff::Boolean]
     attr_accessor :frozen
 
     def_delegator :@metadata, :version
@@ -127,7 +127,7 @@ module Ridley::Chef
     # Returns true if the cookbook instance has a compiled metadata file and false if it
     # does not.
     #
-    # @return [Boolean]
+    # @return [Buff::Boolean]
     def compiled_metadata?
       manifest[:root_files].any? { |file| file[:name].downcase == Metadata::COMPILED_FILE_NAME }
     end
@@ -301,7 +301,7 @@ module Ridley::Chef
 
       # Determine if the given file should be ignored by the chefignore
       #
-      # @return [Boolean]
+      # @return [Buff::Boolean]
       #   true if it should be ignored, false otherwise
       def ignored?(file)
         !!chefignore && chefignore.ignored?(file)

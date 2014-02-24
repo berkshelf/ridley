@@ -4,7 +4,7 @@ module Ridley
     class UnixUninstall < CommandContext::Unix
       template_file 'unix_uninstall_omnibus'
 
-      # @return [Boolean]
+      # @return [Buff::Boolean]
       attr_reader :skip_chef
 
       # @option options [Boolena] :skip_chef (false)

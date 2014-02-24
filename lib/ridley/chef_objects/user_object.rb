@@ -9,7 +9,7 @@ module Ridley
       required: true
 
     attribute :admin,
-      type: Boolean,
+      type: Buff::Boolean,
       required: true,
       default: false
 
@@ -20,7 +20,7 @@ module Ridley
       type: String
 
     attribute :private_key,
-      type: [ String, Boolean ],
+      type: [ String, Buff::Boolean ],
       default: false
 
     attribute :password,
@@ -33,7 +33,7 @@ module Ridley
     # private key will be set to the value of the 'private_key' accessor
     # of the instantiated user object.
     #
-    # @return [Boolean]
+    # @return [Buff::Boolean]
     #   true for success and false for failure
     def regenerate_key
       self.private_key = true
