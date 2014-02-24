@@ -8,7 +8,7 @@ module Ridley
     def initialize(connection_registry, client_name, client_key, options = {})
       super(connection_registry)
       options   = options.reverse_merge(pool_size: 4)
-      @uploader = SandboxUploader.pool(size: options[:pool_size], args: [ client_name, client_key, options ])
+      @uploader = SandboxUploader.pool(size: options.delete(:pool_size), args: [ client_name, client_key, options ])
     end
 
     # Create a new Sandbox on the client's Chef Server. A Sandbox requires an
