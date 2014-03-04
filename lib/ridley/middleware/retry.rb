@@ -1,3 +1,5 @@
+require 'ridley/helpers'
+
 module Ridley
   # Catches exceptions and retries each request a limited number of times.
   #
@@ -19,7 +21,7 @@ module Ridley
     #   the list of exceptions to handle
     def initialize(app, options = {})
       super(app)
-      @options  = options.slice(:max, :interval, :exceptions)
+      @options  = Ridley::Helpers.options_slice(options, :max, :interval, :exceptions)
       @errmatch = build_exception_matcher(@options[:exceptions])
     end
 

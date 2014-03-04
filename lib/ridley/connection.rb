@@ -3,6 +3,8 @@ require 'retryable'
 require 'tempfile'
 require 'zlib'
 
+require 'ridley/helpers'
+
 module Ridley
   class Connection < Faraday::Connection
     include Celluloid
@@ -65,7 +67,7 @@ module Ridley
         b.adapter :net_http_persistent
       end
 
-      uri_hash = Addressable::URI.parse(server_url).to_hash.slice(:scheme, :host, :port)
+      uri_hash = Ridley::Helpers.options_slice(Addressable::URI.parse(server_url).to_hash, :scheme, :host, :port)
 
       unless uri_hash[:port]
         uri_hash[:port] = (uri_hash[:scheme] == "https" ? 443 : 80)

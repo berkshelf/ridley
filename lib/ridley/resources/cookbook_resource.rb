@@ -1,3 +1,5 @@
+require 'ridley/helpers'
+
 module Ridley
   class CookbookResource < Ridley::Resource
     task_class TaskThread
@@ -187,7 +189,7 @@ module Ridley
     # @return [Hash]
     def upload(path, options = {})
       options  = options.reverse_merge(validate: true, force: false, freeze: false)
-      cookbook = Ridley::Chef::Cookbook.from_path(path, options.slice(:name))
+      cookbook = Ridley::Chef::Cookbook.from_path(path, Ridley::Helpers.options_slice(options, :name))
 
       unless (existing = find(cookbook.cookbook_name, cookbook.version)).nil?
         if existing.frozen? && options[:force] == false
@@ -229,7 +231,7 @@ module Ridley
 
       sandbox.upload(checksums)
       sandbox.commit
-      update(cookbook, options.slice(:force, :freeze))
+      update(cookbook, Ridley::Helpers.options_slice(options, :force, :freeze))
     ensure
       # Destroy the compiled metadata only if it was created
       File.delete(compiled_metadata) unless compiled_metadata.nil?

@@ -1,3 +1,5 @@
+require 'ridley/helpers'
+
 module Ridley
   class Client
     class ConnectionSupervisor < ::Celluloid::SupervisionGroup
@@ -7,7 +9,7 @@ module Ridley
           options[:server_url],
           options[:client_name],
           options[:client_key],
-          options.slice(*Ridley::Connection::VALID_OPTIONS)
+          Ridley::Helpers.options_slice(options, *Ridley::Connection::VALID_OPTIONS)
         ], as: :connection_pool)
       end
     end
@@ -17,14 +19,14 @@ module Ridley
         super(registry)
         supervise_as :client_resource, Ridley::ClientResource, connection_registry
         supervise_as :cookbook_resource, Ridley::CookbookResource, connection_registry,
-          options[:client_name], options[:client_key], options.slice(*Ridley::Connection::VALID_OPTIONS)
+          options[:client_name], options[:client_key], Ridley::Helpers.options_slice(options, *Ridley::Connection::VALID_OPTIONS)
         supervise_as :data_bag_resource, Ridley::DataBagResource, connection_registry,
           options[:encrypted_data_bag_secret]
         supervise_as :environment_resource, Ridley::EnvironmentResource, connection_registry
         supervise_as :node_resource, Ridley::NodeResource, connection_registry, options
         supervise_as :role_resource, Ridley::RoleResource, connection_registry
         supervise_as :sandbox_resource, Ridley::SandboxResource, connection_registry,
-          options[:client_name], options[:client_key], options.slice(*Ridley::Connection::VALID_OPTIONS)
+          options[:client_name], options[:client_key], Ridley::Helpers.options_slice(options, *Ridley::Connection::VALID_OPTIONS)
         supervise_as :search_resource, Ridley::SearchResource, connection_registry
         supervise_as :user_resource, Ridley::UserResource, connection_registry
       end
