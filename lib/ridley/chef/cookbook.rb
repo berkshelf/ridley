@@ -34,7 +34,7 @@ module Ridley::Chef
       def from_path(path, options = {})
         path     = Pathname.new(path)
         metadata = if (metadata_file = path.join(Metadata::COMPILED_FILE_NAME)).exist?
-          Cookbook::Metadata.from_json(File.read(metadata_file))
+          Cookbook::Metadata.from_json(File.read(metadata_file, encoding: 'utf-8'))
         elsif (metadata_file = path.join(Metadata::RAW_FILE_NAME)).exist?
           Cookbook::Metadata.from_file(metadata_file)
         else
