@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 module Ridley::Chef
   class Cookbook
     require_relative 'cookbook/metadata'
