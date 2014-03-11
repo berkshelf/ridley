@@ -18,8 +18,6 @@ module Ridley::Chef
 
       if ignore
         log.debug "Using '#{FILENAME}' at '#{ignore}'"
-      else
-        log.debug "Could not find '#{FILENAME}' at '#{path}'"
       end
 
       super(ignore, base: path)
