@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 module Ridley
-  describe Mixin::FromFile, :focus do
+  describe Mixin::FromFile do
     describe '.from_file' do
       context 'when there is bad Ruby in the file' do
         let(:instance) { Class.new { include Ridley::Mixin::FromFile }.new }
