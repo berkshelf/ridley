@@ -26,24 +26,24 @@ module Ridley::Chef
       # @param [#to_s] path
       #   a path on disk to the location of a Cookbook
       #
-      # @option options [String] :name
-      #   explicitly supply the name of the cookbook we are loading. This is useful if
-      #   you are dealing with a cookbook that does not have well-formed metadata
-      #
       # @raise [IOError] if the path does not contain a metadata.rb or metadata.json file
       #
       # @return [Ridley::Chef::Cookbook]
-      def from_path(path, options = {})
-        path     = Pathname.new(path)
-        metadata = if (metadata_file = path.join(Metadata::COMPILED_FILE_NAME)).exist?
-          Cookbook::Metadata.from_json(File.read(metadata_file))
-        elsif (metadata_file = path.join(Metadata::RAW_FILE_NAME)).exist?
-          Cookbook::Metadata.from_file(metadata_file)
+      def from_path(path)
+        path = Pathname.new(path)
+
+        if (file = path.join(Metadata::COMPILED_FILE_NAME)).exist?
+          metadata = Metadata.from_json(File.read(file))
+        elsif (file = path.join(Metadata::RAW_FILE_NAME)).exist?
+          metadata = Metadata.from_file(file)
         else
           raise IOError, "no #{Metadata::COMPILED_FILE_NAME} or #{Metadata::RAW_FILE_NAME} found at #{path}"
         end
 
-        metadata.name(options[:name].presence || metadata.name.presence || File.basename(path))
+        unless metadata.name.presence
+          raise Ridley::Errors::MissingNameAttribute.new(path)
+        end
+
         new(metadata.name, path, metadata)
       end
     end
