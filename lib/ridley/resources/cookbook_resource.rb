@@ -171,10 +171,6 @@ module Ridley
     # @param [String] path
     #   path to a cookbook on local disk
     #
-    # @option options [String] :name
-    #   automatically populated by the metadata of the cookbook at the given path, but
-    #   in the event that the metadata does not contain a name it can be specified with
-    #   this option
     # @option options [Boolean] :force (false)
     #   Upload the Cookbook even if the version already exists and is frozen on
     #   the target Chef Server
@@ -187,7 +183,7 @@ module Ridley
     # @return [Hash]
     def upload(path, options = {})
       options  = options.reverse_merge(validate: true, force: false, freeze: false)
-      cookbook = Ridley::Chef::Cookbook.from_path(path, options.slice(:name))
+      cookbook = Ridley::Chef::Cookbook.from_path(path)
 
       unless (existing = find(cookbook.cookbook_name, cookbook.version)).nil?
         if existing.frozen? && options[:force] == false
