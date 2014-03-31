@@ -15,10 +15,6 @@ describe Ridley::Chef::Cookbook do
         subject.from_path(cookbook_path).cookbook_name.should eql("example_cookbook")
       end
 
-      it "sets the cookbook_name attribute to the value of the :name option if given" do
-        subject.from_path(cookbook_path, name: "rspec_tester").cookbook_name.should eql("rspec_tester")
-      end
-
       context "given a path that does not contain a metadata file" do
         it "raises an IOError" do
           lambda {
@@ -35,8 +31,10 @@ describe Ridley::Chef::Cookbook do
           FileUtils.touch(File.join(cookbook_path, 'metadata.rb'))
         end
 
-        it "sets the name of the cookbook to the name of the directory containing it" do
-          subject.from_path(cookbook_path).cookbook_name.should eql("directory_name")
+        it "raises an exception" do
+          expect {
+            subject.from_path(cookbook_path)
+          }.to raise_error(Ridley::Errors::MissingNameAttribute)
         end
       end
 
@@ -158,7 +156,14 @@ describe Ridley::Chef::Cookbook do
     end
 
     context "when a metadata.json file is not present" do
-      before { FileUtils.rm_f(File.join(cookbook_path, "metadata.json")) }
+      before do
+        FileUtils.rm_f(File.join(cookbook_path, 'metadata.json'))
+
+        File.open(File.join(cookbook_path, 'metadata.rb'), 'w+') do |f|
+          f.write "name 'cookbook'"
+        end
+      end
+
       its(:compiled_metadata?) { should be_false }
     end
   end
