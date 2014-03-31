@@ -3,7 +3,6 @@ require 'logger'
 module Ridley
   module Logging
     class << self
-
       # @return [Logger]
       def logger
         @logger ||= begin

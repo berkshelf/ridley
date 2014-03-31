@@ -98,7 +98,7 @@ module Ridley
       attr_reader :uploader
 
       def finalize_callback
-        uploader.terminate if uploader && uploader.alive?
+        uploader.async.terminate if uploader
       end
   end
 end

@@ -1,5 +1,5 @@
 RSpec.configuration.before(:each) do
-  class Celluloid::ActorProxy
+  class Celluloid::CellProxy
     unless @rspec_compatible
       @rspec_compatible = true
       undef_method :should_receive if method_defined?(:should_receive)

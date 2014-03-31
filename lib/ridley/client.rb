@@ -140,7 +140,7 @@ module Ridley
         @options[:client_key] = File.expand_path(@options[:client_key])
         raise Errors::ClientKeyFileNotFoundOrInvalid, "client key is invalid or not found at: '#{@options[:client_key]}'" unless File.exist?(@options[:client_key]) && verify_client_key(::IO.read(@options[:client_key]))
       end
-      
+
       @connection_registry   = Celluloid::Registry.new
       @resources_registry    = Celluloid::Registry.new
       @connection_supervisor = ConnectionSupervisor.new(@connection_registry, @options)
@@ -276,8 +276,8 @@ module Ridley
       end
 
       def finalize_callback
-        @connection_supervisor.terminate if @connection_supervisor && @connection_supervisor.alive?
-        @resources_supervisor.terminate if @resources_supervisor && @resources_supervisor.alive?
+        @connection_supervisor.async.terminate if @connection_supervisor
+        @resources_supervisor.async.terminate if @resources_supervisor
       end
   end
 end
