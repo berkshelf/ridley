@@ -132,4 +132,4 @@ module Ridley
   end
 end
 
-Faraday.register_middleware(:response, follow_redirects: Ridley::Middleware::FollowRedirects)
+Faraday::Response.register_middleware follow_redirects: Ridley::Middleware::FollowRedirects

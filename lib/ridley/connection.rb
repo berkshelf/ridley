@@ -44,10 +44,10 @@ module Ridley
       options         = options.reverse_merge(retries: 5, retry_interval: 0.5)
       @client_name    = client_name
       @client_key     = client_key
-      @retries        = options[:retries]
-      @retry_interval = options[:retry_interval]
+      @retries        = options.delete(:retries)
+      @retry_interval = options.delete(:retry_interval)
 
-      options[:builder] = Faraday::Builder.new do |b|
+      options[:builder] = Faraday::RackBuilder.new do |b|
         b.request :retry,
           max: @retries,
           interval: @retry_interval,
