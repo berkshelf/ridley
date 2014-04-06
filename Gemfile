@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'solve', github: 'berkshelf/solve'
+gem "semverse", github: "berkshelf/semverse"
 
 gemspec
 

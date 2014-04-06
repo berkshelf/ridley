@@ -124,9 +124,9 @@ module Ridley
     # @return [CookbookResource, nil]
     #   returns the cookbook resource for the best solution or nil if no solution exists
     def satisfy(name, constraint)
-      version = Solve::Solver.satisfy_best(constraint, versions(name)).to_s
+      version = Semverse::Constraint.satisfy_best(constraint, versions(name)).to_s
       find(name, version)
-    rescue Solve::Errors::NoSolutionError
+    rescue Semverse::NoSolutionError
       nil
     end
 
