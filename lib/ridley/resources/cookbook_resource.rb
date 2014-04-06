@@ -106,7 +106,7 @@ module Ridley
     # @return [String, nil]
     def latest_version(name)
       ver = versions(name).collect do |version|
-        Solve::Version.new(version)
+        Semverse::Version.new(version)
       end.sort.last
 
       ver.nil? ? nil : ver.to_s
@@ -116,7 +116,7 @@ module Ridley
     #
     # @param [String] name
     #   name of the cookbook
-    # @param [String, Solve::Constraint] constraint
+    # @param [String, Semverse::Constraint] constraint
     #   constraint to solve for
     #
     # @raise [Errors::ResourceNotFound] if the target cookbook has no versions

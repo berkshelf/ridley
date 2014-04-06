@@ -1,5 +1,7 @@
 source 'https://rubygems.org'
 
+gem 'solve', github: 'berkshelf/solve'
+
 gemspec
 
 platforms :jruby do
