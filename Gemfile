@@ -1,5 +1,7 @@
 source 'https://rubygems.org'
 
+gem "semverse", github: "berkshelf/semverse"
+
 gemspec
 
 platforms :jruby do

@@ -102,7 +102,7 @@ module Ridley::Chef
         @attributes = Hashie::Mash.new
         @groupings = Hashie::Mash.new
         @recipes = Hashie::Mash.new
-        @version = Solve::Version.new("0.0.0")
+        @version = Semverse::Version.new("0.0.0")
         if cookbook
           @recipes = cookbook.fully_qualified_recipe_names.inject({}) do |r, e|
             e = self.name if e =~ /::default$/
@@ -204,7 +204,7 @@ module Ridley::Chef
       # version<String>:: Returns the current version
       def version(arg = nil)
         if arg
-          @version = Solve::Version.new(arg)
+          @version = Semverse::Version.new(arg)
         end
 
         @version.to_s
@@ -237,7 +237,7 @@ module Ridley::Chef
       # versions<Array>:: Returns the list of versions for the platform
       def supports(platform, *version_args)
         version = version_args.first
-        @platforms[platform] = Solve::Constraint.new(version).to_s
+        @platforms[platform] = Semverse::Constraint.new(version).to_s
         @platforms[platform]
       end
 
@@ -253,7 +253,7 @@ module Ridley::Chef
       # versions<Array>:: Returns the list of versions for the platform
       def depends(cookbook, *version_args)
         version = version_args.first
-        @dependencies[cookbook] = Solve::Constraint.new(version).to_s
+        @dependencies[cookbook] = Semverse::Constraint.new(version).to_s
         @dependencies[cookbook]
       end
 
@@ -269,7 +269,7 @@ module Ridley::Chef
       # versions<Array>:: Returns the list of versions for the platform
       def recommends(cookbook, *version_args)
         version = version_args.first
-        @recommendations[cookbook] = Solve::Constraint.new(version).to_s
+        @recommendations[cookbook] = Semverse::Constraint.new(version).to_s
         @recommendations[cookbook]
       end
 
@@ -285,7 +285,7 @@ module Ridley::Chef
       # versions<Array>:: Returns the list of versions for the platform
       def suggests(cookbook, *version_args)
         version = version_args.first
-        @suggestions[cookbook] = Solve::Constraint.new(version).to_s
+        @suggestions[cookbook] = Semverse::Constraint.new(version).to_s
         @suggestions[cookbook]
       end
 
@@ -301,7 +301,7 @@ module Ridley::Chef
       # versions<Array>:: Returns the list of versions for the platform
       def conflicts(cookbook, *version_args)
         version = version_args.first
-        @conflicting[cookbook] = Solve::Constraint.new(version).to_s
+        @conflicting[cookbook] = Semverse::Constraint.new(version).to_s
         @conflicting[cookbook]
       end
 
@@ -321,7 +321,7 @@ module Ridley::Chef
       # versions<Array>:: Returns the list of versions for the platform
       def provides(cookbook, *version_args)
         version = version_args.first
-        @providing[cookbook] = Solve::Constraint.new(version).to_s
+        @providing[cookbook] = Semverse::Constraint.new(version).to_s
         @providing[cookbook]
       end
 
@@ -336,7 +336,7 @@ module Ridley::Chef
       # versions<Array>:: Returns the list of versions for the platform
       def replaces(cookbook, *version_args)
         version = version_args.first
-        @replacing[cookbook] = Solve::Constraint.new(version).to_s
+        @replacing[cookbook] = Semverse::Constraint.new(version).to_s
         @replacing[cookbook]
       end
 

@@ -6,7 +6,7 @@ require 'forwardable'
 require 'hashie'
 require 'json'
 require 'pathname'
-require 'solve'
+require 'semverse'
 
 JSON.create_id = nil
 
