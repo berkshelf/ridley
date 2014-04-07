@@ -55,11 +55,6 @@ module Ridley
     def root
       @root ||= Pathname.new(File.expand_path('../', File.dirname(__FILE__)))
     end
-
-    # @return [Pathname]
-    def scripts
-      root.join('scripts')
-    end
   end
 
   require_relative 'ridley/mixin'
