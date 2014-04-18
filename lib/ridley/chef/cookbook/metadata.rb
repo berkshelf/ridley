@@ -236,8 +236,7 @@ module Ridley::Chef
       # === Returns
       # versions<Array>:: Returns the list of versions for the platform
       def supports(platform, *version_args)
-        version = version_args.first
-        @platforms[platform] = Semverse::Constraint.new(version).to_s
+        @platforms[platform] = constraint_from_args(version_args)
         @platforms[platform]
       end
 
@@ -252,8 +251,7 @@ module Ridley::Chef
       # === Returns
       # versions<Array>:: Returns the list of versions for the platform
       def depends(cookbook, *version_args)
-        version = version_args.first
-        @dependencies[cookbook] = Semverse::Constraint.new(version).to_s
+        @dependencies[cookbook] = constraint_from_args(version_args)
         @dependencies[cookbook]
       end
 
@@ -268,8 +266,7 @@ module Ridley::Chef
       # === Returns
       # versions<Array>:: Returns the list of versions for the platform
       def recommends(cookbook, *version_args)
-        version = version_args.first
-        @recommendations[cookbook] = Semverse::Constraint.new(version).to_s
+        @recommendations[cookbook] = constraint_from_args(version_args)
         @recommendations[cookbook]
       end
 
@@ -284,8 +281,7 @@ module Ridley::Chef
       # === Returns
       # versions<Array>:: Returns the list of versions for the platform
       def suggests(cookbook, *version_args)
-        version = version_args.first
-        @suggestions[cookbook] = Semverse::Constraint.new(version).to_s
+        @suggestions[cookbook] = constraint_from_args(version_args)
         @suggestions[cookbook]
       end
 
@@ -300,8 +296,7 @@ module Ridley::Chef
       # === Returns
       # versions<Array>:: Returns the list of versions for the platform
       def conflicts(cookbook, *version_args)
-        version = version_args.first
-        @conflicting[cookbook] = Semverse::Constraint.new(version).to_s
+        @conflicting[cookbook] = constraint_from_args(version_args)
         @conflicting[cookbook]
       end
 
@@ -320,8 +315,7 @@ module Ridley::Chef
       # === Returns
       # versions<Array>:: Returns the list of versions for the platform
       def provides(cookbook, *version_args)
-        version = version_args.first
-        @providing[cookbook] = Semverse::Constraint.new(version).to_s
+        @providing[cookbook] = constraint_from_args(version_args)
         @providing[cookbook]
       end
 
@@ -335,8 +329,7 @@ module Ridley::Chef
       # === Returns
       # versions<Array>:: Returns the list of versions for the platform
       def replaces(cookbook, *version_args)
-        version = version_args.first
-        @replacing[cookbook] = Semverse::Constraint.new(version).to_s
+        @replacing[cookbook] = constraint_from_args(version_args)
         @replacing[cookbook]
       end
 
@@ -459,6 +452,18 @@ module Ridley::Chef
       end
 
       private
+
+        # Extact the constraint from the given arguments.
+        #
+        # @param [Array<String>] args
+        #   the list of args from the method
+        #
+        # @return [String]
+        #   the constraint
+        def constraint_from_args(args = [])
+          constraint = args.first || '>= 0.0.0'
+          Semverse::Constraint.new(constraint).to_s
+        end
 
         # Verify that the given array is an array of strings
         #
