@@ -440,7 +440,7 @@ module Ridley::Chef
         @maintainer       = o[MAINTAINER] if o.has_key?(MAINTAINER)
         @maintainer_email = o[MAINTAINER_EMAIL] if o.has_key?(MAINTAINER_EMAIL)
         @license          = o[LICENSE] if o.has_key?(LICENSE)
-        @platforms        = o[PLATFORMS] if o.has_key?(PLATFORMS)
+        @platforms        = handle_deprecated_constraints(o[PLATFORMS]) if o.has_key?(PLATFORMS)
         @dependencies     = handle_deprecated_constraints(o[DEPENDENCIES]) if o.has_key?(DEPENDENCIES)
         @recommendations  = handle_deprecated_constraints(o[RECOMMENDATIONS]) if o.has_key?(RECOMMENDATIONS)
         @suggestions      = handle_deprecated_constraints(o[SUGGESTIONS]) if o.has_key?(SUGGESTIONS)
@@ -548,15 +548,20 @@ module Ridley::Chef
         # Before we began respecting version constraints, we allowed
         # multiple constraints to be placed on cookbooks, as well as the
         # << and >> operators, which are now just < and >. For
-        # specifications with more than one constraint, we return an
-        # empty array (otherwise, we're silently abiding only part of
-        # the contract they have specified to us). If there is only one
+        # specifications with more than one constraint, this method switches to
+        # the default constraint from SemVerse. If there is only one
         # constraint, we are replacing the old << and >> with the new <
         # and >.
         def handle_deprecated_constraints(specification)
           specification.inject(Hashie::Mash.new) do |acc, (cb, constraints)|
             constraints = Array(constraints)
-            acc[cb] = (constraints.empty? || constraints.size > 1) ? [] : constraints.first.gsub(/>>/, '>').gsub(/<</, '<')
+
+            acc[cb] = if constraints.size == 1
+              constraints.first.gsub(/>>/, '>').gsub(/<</, '<')
+            else
+              Semverse::DEFAULT_CONSTRAINT.to_s
+            end
+
             acc
           end
         end
