@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'addressable'
   s.add_dependency 'varia_model',             '~> 0.3'
-  s.add_dependency 'buff-config',             '~> 0.2'
+  s.add_dependency 'buff-config',             '~> 0.4'
   s.add_dependency 'buff-extensions',         '~> 0.3'
   s.add_dependency 'buff-ignore',             '~> 1.1'
   s.add_dependency 'buff-shell_out',          '~> 0.1'
