@@ -9,7 +9,7 @@ module Ridley
       required: true
 
     attribute :admin,
-      type: Boolean,
+      type: Buff::Boolean,
       required: true,
       default: false
 
@@ -20,7 +20,7 @@ module Ridley
       type: String
 
     attribute :private_key,
-      type: [ String, Boolean ],
+      type: [ String, Buff::Boolean ],
       default: false
 
     attribute :password,
