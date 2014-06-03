@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.required_ruby_version = ">= 1.9.1"
 
   s.add_dependency 'addressable'
-  s.add_dependency 'varia_model',             '~> 0.3'
+  s.add_dependency 'varia_model',             '~> 0.4'
   s.add_dependency 'buff-config',             '~> 0.4'
   s.add_dependency 'buff-extensions',         '~> 0.3'
   s.add_dependency 'buff-ignore',             '~> 1.1'
@@ -27,7 +27,6 @@ Gem::Specification.new do |s|
   s.add_dependency 'celluloid-io',            '~> 0.16.0.pre'
   s.add_dependency 'erubis'
   s.add_dependency 'faraday',                 '~> 0.9.0'
-  s.add_dependency 'hashie',                  '>= 2.0.2'
   s.add_dependency 'json',                    '>= 1.7.7'
   s.add_dependency 'mixlib-authentication',   '>= 1.3.0'
   s.add_dependency 'net-http-persistent',     '>= 2.8'
