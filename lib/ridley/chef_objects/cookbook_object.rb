@@ -67,7 +67,7 @@ module Ridley
       type: String
 
     attribute :frozen?,
-      type: Boolean
+      type: Buff::Boolean
 
     # Download the entire cookbook
     #
