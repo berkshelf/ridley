@@ -43,13 +43,13 @@ module Ridley::Chef
     set_assignment_mode :carefree
 
     attribute :node_name,
-      default: Socket.gethostname
+      default: -> { Socket.gethostname }
     attribute :chef_server_url,
       default: 'http://localhost:4000'
     attribute :client_key,
-      default: platform_specific_path('/etc/chef/client.pem')
+      default: -> { platform_specific_path('/etc/chef/client.pem') }
     attribute :validation_key,
-      default: platform_specific_path('/etc/chef/validation.pem')
+      default: -> { platform_specific_path('/etc/chef/validation.pem') }
     attribute :validation_client_name,
       default: 'chef-validator'
 
@@ -70,9 +70,9 @@ module Ridley::Chef
     # deprecated in chef/config.rb but doesn't currently trigger a warning.
     # See also: CHEF-3715
     attribute :syntax_check_cache_path,
-      default: Dir.mktmpdir
+      default: -> { Dir.mktmpdir }
     attribute :cache_options,
-      default: { path: defined?(syntax_check_cache_path) ? syntax_check_cache_path : Dir.mktmpdir }
+      default: -> { { path: defined?(syntax_check_cache_path) ? syntax_check_cache_path : Dir.mktmpdir } }
 
     # Create a new Chef Config object.
     #
