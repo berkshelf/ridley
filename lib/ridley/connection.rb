@@ -65,7 +65,7 @@ module Ridley
         b.adapter :net_http_persistent
       end
 
-      uri_hash = Addressable::URI.parse(server_url).to_hash.slice(:scheme, :host, :port)
+      uri_hash = Buff::Extensions::Hash.slice(Addressable::URI.parse(server_url).to_hash, :scheme, :host, :port)
 
       unless uri_hash[:port]
         uri_hash[:port] = (uri_hash[:scheme] == "https" ? 443 : 80)

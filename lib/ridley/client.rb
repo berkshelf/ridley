@@ -7,7 +7,7 @@ module Ridley
           options[:server_url],
           options[:client_name],
           options[:client_key],
-          options.slice(*Ridley::Connection::VALID_OPTIONS)
+          Buff::Extensions::Hash.slice(options, *Ridley::Connection::VALID_OPTIONS)
         ], as: :connection_pool)
       end
     end
@@ -16,15 +16,15 @@ module Ridley
       def initialize(registry, connection_registry, options)
         super(registry)
         supervise_as :client_resource, Ridley::ClientResource, connection_registry
-        supervise_as :cookbook_resource, Ridley::CookbookResource, connection_registry,
-          options[:client_name], options[:client_key], options.slice(*Ridley::Connection::VALID_OPTIONS)
+        supervise_as :cookbook_resource, Ridley::CookbookResource, connection_registry, options[:client_name],
+          options[:client_key], Buff::Extensions::Hash.slice(options, *Ridley::Connection::VALID_OPTIONS)
         supervise_as :data_bag_resource, Ridley::DataBagResource, connection_registry,
           options[:encrypted_data_bag_secret]
         supervise_as :environment_resource, Ridley::EnvironmentResource, connection_registry
         supervise_as :node_resource, Ridley::NodeResource, connection_registry, options
         supervise_as :role_resource, Ridley::RoleResource, connection_registry
-        supervise_as :sandbox_resource, Ridley::SandboxResource, connection_registry,
-          options[:client_name], options[:client_key], options.slice(*Ridley::Connection::VALID_OPTIONS)
+        supervise_as :sandbox_resource, Ridley::SandboxResource, connection_registry, options[:client_name],
+          options[:client_key], Buff::Extensions::Hash.slice(options, *Ridley::Connection::VALID_OPTIONS)
         supervise_as :search_resource, Ridley::SearchResource, connection_registry
         supervise_as :user_resource, Ridley::UserResource, connection_registry
       end
@@ -49,7 +49,7 @@ module Ridley
           raise ArgumentError, "Missing required option(s): #{missing.join(', ')}"
         end
 
-        missing_values = options.slice(*REQUIRED_OPTIONS).select { |key, value| !value.present? }
+        missing_values = Buff::Extensions::Hash.slice(options, *REQUIRED_OPTIONS).select { |key, value| !value.present? }
         if missing_values.any?
           values = missing_values.keys.collect { |opt| "'#{opt}'" }
           raise ArgumentError, "Missing value for required option(s): '#{values.join(', ')}'"
