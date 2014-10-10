@@ -40,7 +40,9 @@ module Ridley::Chef
     private
 
       def checksum_file(file, digest)
-        File.open(file, 'rb') { |f| checksum_io(f, digest) }
+        File.open(file, 'rb') do |f|
+          checksum_io(f, digest)
+        end
       end
 
       def checksum_io(io, digest)
