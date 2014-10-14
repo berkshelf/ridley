@@ -44,10 +44,10 @@ module Ridley
       options         = options.reverse_merge(retries: 5, retry_interval: 0.5)
       @client_name    = client_name
       @client_key     = client_key
-      @retries        = options[:retries]
-      @retry_interval = options[:retry_interval]
+      @retries        = options.delete(:retries)
+      @retry_interval = options.delete(:retry_interval)
 
-      options[:builder] = Faraday::Builder.new do |b|
+      options[:builder] = Faraday::RackBuilder.new do |b|
         b.request :retry,
           max: @retries,
           interval: @retry_interval,
@@ -122,6 +122,8 @@ module Ridley
     #   a URL to stream the response body from
     # @param [String] destination
     #   a location on disk to stream the content of the response body to
+    #
+    # @return [Boolean] true when the destination file exists
     def stream(target, destination)
       FileUtils.mkdir_p(File.dirname(destination))
 
@@ -157,6 +159,7 @@ module Ridley
       local.flush
 
       FileUtils.cp(local.path, destination)
+      File.exists?(destination)
     rescue OpenURI::HTTPError => ex
       abort(ex)
     ensure

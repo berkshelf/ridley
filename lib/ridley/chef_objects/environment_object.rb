@@ -54,5 +54,61 @@ module Ridley
       attr_hash = Hashie::Mash.from_dotted_path(key, value)
       self.override_attributes = self.override_attributes.deep_merge(attr_hash)
     end
+
+    # Removes a environment default attribute given its dotted path
+    # representation. Returns the default attributes of the environment.
+    # 
+    # @param [String] key
+    #   the dotted path to an attribute
+    # 
+    # @return [Hashie::Mash]
+    def unset_default_attribute(key)
+      unset_attribute(key, :default)
+    end
+    alias :delete_default_attribute :unset_default_attribute
+
+    # Removes a environment override attribute given its dotted path
+    # representation. Returns the override attributes of the environment.
+    # 
+    # @param [String] key
+    #   the dotted path to an attribute
+    # 
+    # @return [Hashie::Mash]
+    def unset_override_attribute(key)
+      unset_attribute(key, :override)
+    end
+    alias :delete_override_attribute :unset_override_attribute
+
+    private
+
+      # Deletes an attribute at the given precedence using its dotted-path key.
+      # 
+      # @param [String] key
+      #   the dotted path to an attribute
+      # @param [Symbol] precedence
+      #   the precedence level to delete the attribute from
+      # 
+      # @return [Hashie::Mash]
+      def unset_attribute(key, precedence)
+        keys = key.split(".")
+        leaf_key = keys.pop
+  
+        attributes_to_change = case precedence
+                               when :default
+                                 self.default_attributes  
+                               when :override
+                                 self.override_attributes
+                               end
+  
+        leaf_attributes = keys.inject(attributes_to_change) do |attributes, key|
+          if attributes[key] && attributes[key].kind_of?(Hashie::Mash)
+            attributes = attributes[key]
+          else 
+            return attributes_to_change
+          end
+        end
+        leaf_attributes.delete(leaf_key)
+        return attributes_to_change
+      end
   end
 end

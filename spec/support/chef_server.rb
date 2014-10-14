@@ -69,6 +69,10 @@ module Ridley::RSpec
       load_data(:roles, name, hash)
     end
 
+    def chef_user(name, hash = Hash.new)
+      load_data(:users, name, hash)
+    end
+
     def chef_zero_connection
       Ridley::Connection.new(ChefServer.server_url, "reset", fixtures_path.join('reset.pem').to_s)
     end

@@ -31,7 +31,7 @@ module Ridley
     private
 
       def finalize_callback
-        item_resource.terminate if item_resource && item_resource.alive?
+        item_resource.async.terminate if item_resource
       end
   end
 end

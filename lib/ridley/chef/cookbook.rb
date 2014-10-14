@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 module Ridley::Chef
   class Cookbook
     require_relative 'cookbook/metadata'
@@ -24,24 +26,24 @@ module Ridley::Chef
       # @param [#to_s] path
       #   a path on disk to the location of a Cookbook
       #
-      # @option options [String] :name
-      #   explicitly supply the name of the cookbook we are loading. This is useful if
-      #   you are dealing with a cookbook that does not have well-formed metadata
-      #
       # @raise [IOError] if the path does not contain a metadata.rb or metadata.json file
       #
       # @return [Ridley::Chef::Cookbook]
-      def from_path(path, options = {})
-        path     = Pathname.new(path)
-        metadata = if path.join('metadata.rb').exist?
-          Cookbook::Metadata.from_file(path.join('metadata.rb'))
-        elsif path.join('metadata.json').exist?
-          Cookbook::Metadata.from_json(File.read(path.join('metadata.json')))
+      def from_path(path)
+        path = Pathname.new(path)
+
+        if (file = path.join(Metadata::COMPILED_FILE_NAME)).exist?
+          metadata = Metadata.from_json(File.read(file))
+        elsif (file = path.join(Metadata::RAW_FILE_NAME)).exist?
+          metadata = Metadata.from_file(file)
         else
-          raise IOError, "no metadata.rb or metadata.json found at #{path}"
+          raise IOError, "no #{Metadata::COMPILED_FILE_NAME} or #{Metadata::RAW_FILE_NAME} found at #{path}"
         end
 
-        metadata.name(options[:name].presence || metadata.name.presence || File.basename(path))
+        unless metadata.name.presence
+          raise Ridley::Errors::MissingNameAttribute.new(path)
+        end
+
         new(metadata.name, path, metadata)
       end
     end
@@ -54,6 +56,7 @@ module Ridley::Chef
     attr_reader :cookbook_name
     attr_reader :path
     attr_reader :metadata
+
     # @return [Hashie::Mash]
     #   a Hashie::Mash containing Cookbook file category names as keys and an Array of Hashes
     #   containing metadata about the files belonging to that category. This is used
@@ -83,21 +86,10 @@ module Ridley::Chef
       @cookbook_name = name
       @path          = Pathname.new(path)
       @metadata      = metadata
-      @files         = Array.new
-      @manifest      = Hashie::Mash.new(
-        recipes: Array.new,
-        definitions: Array.new,
-        libraries: Array.new,
-        attributes: Array.new,
-        files: Array.new,
-        templates: Array.new,
-        resources: Array.new,
-        providers: Array.new,
-        root_files: Array.new
-      )
       @frozen        = false
       @chefignore    = Ridley::Chef::Chefignore.new(@path) rescue nil
 
+      clear_files
       load_files
     end
 
@@ -115,6 +107,31 @@ module Ridley::Chef
           checksums[self.class.checksum(file)] = file
         end
       end
+    end
+
+    # Compiles the raw metadata of the cookbook and writes it to a metadata.json file at the given
+    # out path. The default out path is the directory containing the cookbook itself.
+    #
+    # @param [String] out
+    #   directory to output compiled metadata to
+    #
+    # @return [String]
+    #   path to the compiled metadata
+    def compile_metadata(out = self.path)
+      filepath = File.join(out, Metadata::COMPILED_FILE_NAME)
+      File.open(filepath, "w+") do |f|
+        f.write(metadata.to_json)
+      end
+
+      filepath
+    end
+
+    # Returns true if the cookbook instance has a compiled metadata file and false if it
+    # does not.
+    #
+    # @return [Boolean]
+    def compiled_metadata?
+      manifest[:root_files].any? { |file| file[:name].downcase == Metadata::COMPILED_FILE_NAME }
     end
 
     # @param [Symbol] category
@@ -168,6 +185,12 @@ module Ridley::Chef
       "#{cookbook_name}-#{version}"
     end
 
+    # Reload the cookbook from the files located on disk at `#path`.
+    def reload
+      clear_files
+      load_files
+    end
+
     def validate
       raise IOError, "No Cookbook found at: #{path}" unless path.exist?
 
@@ -213,6 +236,21 @@ module Ridley::Chef
 
       # @return [Ridley::Chef::Chefignore, nil]
       attr_reader :chefignore
+
+      def clear_files
+        @files    = Array.new
+        @manifest = Hashie::Mash.new(
+          recipes: Array.new,
+          definitions: Array.new,
+          libraries: Array.new,
+          attributes: Array.new,
+          files: Array.new,
+          templates: Array.new,
+          resources: Array.new,
+          providers: Array.new,
+          root_files: Array.new
+        )
+      end
 
       def load_files
         load_shallow(:recipes, 'recipes', '*.rb')

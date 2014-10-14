@@ -42,28 +42,32 @@ module Ridley
         "no encrypted data bag secret was set for this Ridley connection"
       end
     end
+    class FromFileParserError < RidleyError
+      def initialize(filename, error)
+        super "Could not parse `#{filename}': #{error.message}"
 
-    class BootstrapError < RidleyError; end
-    class ClientKeyFileNotFoundOrInvalid < BootstrapError; end
-    class EncryptedDataBagSecretNotFound < BootstrapError; end
+        # Populate the backtrace with the actual error though
+        set_backtrace(error.backtrace)
+      end
+    end
 
-    class HostConnectionError < RidleyError; end
-    class DNSResolvError < HostConnectionError; end
-
-    class RemoteCommandError < RidleyError; end
-    class RemoteScriptError < RemoteCommandError; end
-    class CommandNotProvided < RemoteCommandError
-      attr_reader :connector_type
-
-      # @params [Symbol] connector_type
-      def initialize(connector_type)
-        @connector_type = connector_type
+    class MissingNameAttribute < RidleyError
+      def initialize(path)
+        @path = path
       end
 
       def to_s
-        "No command provided in #{connector_type.inspect}, however the #{connector_type.inspect} connector was selected."
+        out =  "The metadata at '#{@path}' does not contain a 'name' "
+        out << "attribute. While Chef does not strictly enforce this "
+        out << "requirement, Ridley cannot continue without a valid metadata "
+        out << "'name' entry."
+        out
       end
+      alias_method :message, :to_s
     end
+
+    class ClientKeyFileNotFoundOrInvalid < RidleyError; end
+    class EncryptedDataBagSecretNotFound < RidleyError; end
 
     # Exception thrown when the maximum amount of requests is exceeded.
     class RedirectLimitReached < RidleyError

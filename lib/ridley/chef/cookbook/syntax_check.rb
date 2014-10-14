@@ -1,5 +1,4 @@
-require 'shellwords'
-require 'buff/shell_out'
+require 'erubis'
 require 'rbconfig'
 
 if (RbConfig::CONFIG['host_os'] =~ /mswin|mingw|cygwin/)
@@ -73,7 +72,6 @@ module Ridley::Chef
           end
       end
 
-      include Buff::ShellOut
       include Ridley::Logging
       include Ridley::Mixin::Checksum
 
@@ -136,30 +134,55 @@ module Ridley::Chef
         true
       end
 
+      # Borrowed from: https://github.com/opscode/chef/blob/d111e82/lib/chef/cookbook/syntax_check.rb#L191-L215
       def validate_template(erb_file)
-        result = shell_out("erubis -x #{erb_file.shellescape} | ruby -c")
+        old_stderr = $stderr
 
-        if result.error?
-          file_relative_path = erb_file[/^#{Regexp.escape(cookbook_path+File::Separator)}(.*)/, 1]
-          log.error { "Erb template #{file_relative_path} has a syntax error:" }
-          result.stderr.each_line { |l| Ridley.log.fatal(l.chomp) }
-          return false
-        end
+        engine = Erubis::Eruby.new
+        engine.convert!(IO.read(erb_file))
+
+        ruby_code = engine.src
+
+        # Even when we're compiling the code w/ RubyVM, syntax errors just
+        # print to $stderr. We want to capture this and handle the printing
+        # ourselves, so we must temporarily swap $stderr to capture the output.
+        tmp_stderr = $stderr = StringIO.new
+
+        abs_path = File.expand_path(erb_file)
+        RubyVM::InstructionSequence.new(ruby_code, erb_file, abs_path, 0)
 
         true
+      rescue SyntaxError
+        $stderr = old_stderr
+        invalid_erb_file(erb_file, tmp_stderr.string)
+        false
+      ensure
+        $stderr = old_stderr if defined?(old_stderr) && old_stderr
       end
 
+      # Borrowed from: https://github.com/opscode/chef/blob/d111e82/lib/chef/cookbook/syntax_check.rb#L242-L264
       def validate_ruby_file(ruby_file)
-        result = shell_out("ruby -c #{ruby_file.shellescape}")
+        # Even when we're compiling the code w/ RubyVM, syntax errors just
+        # print to $stderr. We want to capture this and handle the printing
+        # ourselves, so we must temporarily swap $stderr to capture the output.
+        old_stderr = $stderr
+        tmp_stderr = $stderr = StringIO.new
+        abs_path = File.expand_path(ruby_file)
+        file_content = IO.read(abs_path)
 
-        if result.error?
-          file_relative_path = ruby_file[/^#{Regexp.escape(cookbook_path+File::Separator)}(.*)/, 1]
-          log.error { "Cookbook file #{file_relative_path} has a ruby syntax error:" }
-          result.stderr.each_line { |l| Ridley.log.error(l.chomp) }
-          return false
-        end
-
+        # We have to wrap this in a block so the user code evaluates in a
+        # similar context as what Chef does normally. Otherwise RubyVM
+        # will reject some common idioms, like using `return` to end evaluation
+        # of a recipe. See also CHEF-5199
+        wrapped_content = "Object.new.instance_eval do\n#{file_content}\nend\n"
+        RubyVM::InstructionSequence.new(wrapped_content, ruby_file, abs_path, 0)
         true
+      rescue SyntaxError
+        $stderr = old_stderr
+        invalid_ruby_file(ruby_file, tmp_stderr.string)
+        false
+      ensure
+        $stderr = old_stderr if defined?(old_stderr) && old_stderr
       end
 
       private
@@ -169,6 +192,21 @@ module Ridley::Chef
 
         def ignored?(file)
           !!chefignore && chefignore.ignored?(file)
+        end
+
+        # Debug a syntax error in a template.
+        def invalid_erb_file(erb_file, error_message)
+          log.error("Erb template #{erb_file} has a syntax error:")
+          error_message.each_line { |l| log.error(l.chomp) }
+          nil
+        end
+
+        # Debugs ruby syntax errors by printing the path to the file and any
+        # diagnostic info given in +error_message+
+        def invalid_ruby_file(ruby_file, error_message)
+          log.error("Cookbook file #{ruby_file} has a ruby syntax error:")
+          error_message.each_line { |l| log.error(l.chomp) }
+          false
         end
     end
   end

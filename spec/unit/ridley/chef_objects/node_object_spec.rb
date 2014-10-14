@@ -55,7 +55,7 @@ describe Ridley::NodeObject do
   end
 
   describe "#set_chef_attribute" do
-    it "sets an normal node attribute at the nested path" do
+    it "sets a normal node attribute at the nested path" do
        subject.set_chef_attribute('deep.nested.item', true)
 
        subject.normal.should have_key("deep")
@@ -76,6 +76,43 @@ describe Ridley::NodeObject do
         subject.set_chef_attribute('deep.nested.item', true)
 
         subject.normal["deep"]["nested"]["item"].should be_true
+      end
+    end
+  end
+
+  describe "#unset_chef_attribute" do
+    context "when the attribute is set" do
+      before do
+        subject.normal = { foo: { bar: { baz: true } } }
+      end
+
+      it "unsets a normal node attribute at the nested path" do
+        subject.unset_chef_attribute("foo.bar.baz")
+        expect(subject.normal[:foo][:bar][:baz]).to be_nil
+      end
+    end
+
+    ["string", true, :symbol, ["array"], Object.new].each do |nonattrs|
+      context "when the attribute chain is partially set, interrupted by a #{nonattrs.class}" do
+        let(:attributes) { { 'foo' => { 'bar' => nonattrs } } }
+        before do
+          subject.normal = attributes
+        end
+
+        it "leaves the attributes unchanged" do
+          expect(subject.unset_chef_attribute("foo.bar.baz").to_hash).to eq(attributes)
+        end
+      end
+    end
+
+    context "when the attribute is not set" do
+      let(:attributes) { { 'bizz' => { 'bar' => { 'baz' => true } } } }
+      before do
+        subject.normal = attributes
+      end
+
+      it "leaves the attributes unchanged" do
+        expect(subject.unset_chef_attribute("foo.bar.baz").to_hash).to eq(attributes)
       end
     end
   end
@@ -238,22 +275,6 @@ describe Ridley::NodeObject do
       subject.automatic.delete(:cloud)
 
       subject.public_hostname.should eql("reset.internal.riotgames.com")
-    end
-  end
-
-  describe "#chef_run" do
-    it "sends the message #chef_run to the resource with the public_hostname of this instance" do
-      resource.should_receive(:chef_run).with(instance.public_hostname)
-
-      subject.chef_run
-    end
-  end
-
-  describe "#put_secret" do
-    it "sends the message #put_secret to the resource with the public_hostname of this instance" do
-      resource.should_receive(:put_secret).with(instance.public_hostname)
-
-      subject.put_secret
     end
   end
 

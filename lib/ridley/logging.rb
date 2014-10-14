@@ -6,9 +6,7 @@ module Ridley
       # @return [Logger]
       def logger
         @logger ||= begin
-          log = Logger.new(STDOUT)
-          log.level = Logger::WARN
-          log
+          Ridley::Logging::Logger.new
         end
       end
 

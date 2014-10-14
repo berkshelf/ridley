@@ -166,7 +166,7 @@ module Ridley
         case index.to_sym
         when :node
           response[:rows].collect do |item|
-            attributes = Hash.new
+            attributes = Hashie::Mash.new
             item[:data].each do |key, value|
               next if key.to_s == chef_id.to_s
               attributes.deep_merge!(Hash.from_dotted_path(key, value))

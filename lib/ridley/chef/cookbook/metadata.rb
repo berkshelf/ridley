@@ -30,23 +30,26 @@ module Ridley::Chef
         end
       end
 
-      NAME              = 'name'.freeze
-      DESCRIPTION       = 'description'.freeze
-      LONG_DESCRIPTION  = 'long_description'.freeze
-      MAINTAINER        = 'maintainer'.freeze
-      MAINTAINER_EMAIL  = 'maintainer_email'.freeze
-      LICENSE           = 'license'.freeze
-      PLATFORMS         = 'platforms'.freeze
-      DEPENDENCIES      = 'dependencies'.freeze
-      RECOMMENDATIONS   = 'recommendations'.freeze
-      SUGGESTIONS       = 'suggestions'.freeze
-      CONFLICTING       = 'conflicting'.freeze
-      PROVIDING         = 'providing'.freeze
-      REPLACING         = 'replacing'.freeze
-      ATTRIBUTES        = 'attributes'.freeze
-      GROUPINGS         = 'groupings'.freeze
-      RECIPES           = 'recipes'.freeze
-      VERSION           = 'version'.freeze
+      NAME             = 'name'.freeze
+      DESCRIPTION      = 'description'.freeze
+      LONG_DESCRIPTION = 'long_description'.freeze
+      MAINTAINER       = 'maintainer'.freeze
+      MAINTAINER_EMAIL = 'maintainer_email'.freeze
+      LICENSE          = 'license'.freeze
+      PLATFORMS        = 'platforms'.freeze
+      DEPENDENCIES     = 'dependencies'.freeze
+      RECOMMENDATIONS  = 'recommendations'.freeze
+      SUGGESTIONS      = 'suggestions'.freeze
+      CONFLICTING      = 'conflicting'.freeze
+      PROVIDING        = 'providing'.freeze
+      REPLACING        = 'replacing'.freeze
+      ATTRIBUTES       = 'attributes'.freeze
+      GROUPINGS        = 'groupings'.freeze
+      RECIPES          = 'recipes'.freeze
+      VERSION          = 'version'.freeze
+
+      COMPILED_FILE_NAME = "metadata.json".freeze
+      RAW_FILE_NAME      = "metadata.rb".freeze
 
       COMPARISON_FIELDS = [
         :name, :description, :long_description, :maintainer,
@@ -99,7 +102,7 @@ module Ridley::Chef
         @attributes = Hashie::Mash.new
         @groupings = Hashie::Mash.new
         @recipes = Hashie::Mash.new
-        @version = Solve::Version.new("0.0.0")
+        @version = Semverse::Version.new("0.0.0")
         if cookbook
           @recipes = cookbook.fully_qualified_recipe_names.inject({}) do |r, e|
             e = self.name if e =~ /::default$/
@@ -201,7 +204,7 @@ module Ridley::Chef
       # version<String>:: Returns the current version
       def version(arg = nil)
         if arg
-          @version = Solve::Version.new(arg)
+          @version = Semverse::Version.new(arg)
         end
 
         @version.to_s
@@ -234,10 +237,8 @@ module Ridley::Chef
       # versions<Array>:: Returns the list of versions for the platform
       def supports(platform, *version_args)
         version = version_args.first
-        @platforms[platform] = Solve::Constraint.new(version).to_s
+        @platforms[platform] = Semverse::Constraint.new(version).to_s
         @platforms[platform]
-      rescue Solve::Errors::InvalidConstraintFormat => ex
-        raise InvalidVersionConstraint, ex.to_s
       end
 
       # Adds a dependency on another cookbook, with version checking strings.
@@ -252,10 +253,8 @@ module Ridley::Chef
       # versions<Array>:: Returns the list of versions for the platform
       def depends(cookbook, *version_args)
         version = version_args.first
-        @dependencies[cookbook] = Solve::Constraint.new(version).to_s
+        @dependencies[cookbook] = Semverse::Constraint.new(version).to_s
         @dependencies[cookbook]
-      rescue Solve::Errors::InvalidConstraintFormat => ex
-        raise InvalidVersionConstraint, ex.to_s
       end
 
       # Adds a recommendation for another cookbook, with version checking strings.
@@ -270,10 +269,8 @@ module Ridley::Chef
       # versions<Array>:: Returns the list of versions for the platform
       def recommends(cookbook, *version_args)
         version = version_args.first
-        @recommendations[cookbook] = Solve::Constraint.new(version).to_s
+        @recommendations[cookbook] = Semverse::Constraint.new(version).to_s
         @recommendations[cookbook]
-      rescue Solve::Errors::InvalidConstraintFormat => ex
-        raise InvalidVersionConstraint, ex.to_s
       end
 
       # Adds a suggestion for another cookbook, with version checking strings.
@@ -288,10 +285,8 @@ module Ridley::Chef
       # versions<Array>:: Returns the list of versions for the platform
       def suggests(cookbook, *version_args)
         version = version_args.first
-        @suggestions[cookbook] = Solve::Constraint.new(version).to_s
+        @suggestions[cookbook] = Semverse::Constraint.new(version).to_s
         @suggestions[cookbook]
-      rescue Solve::Errors::InvalidConstraintFormat => ex
-        raise InvalidVersionConstraint, ex.to_s
       end
 
       # Adds a conflict for another cookbook, with version checking strings.
@@ -306,10 +301,8 @@ module Ridley::Chef
       # versions<Array>:: Returns the list of versions for the platform
       def conflicts(cookbook, *version_args)
         version = version_args.first
-        @conflicting[cookbook] = Solve::Constraint.new(version).to_s
+        @conflicting[cookbook] = Semverse::Constraint.new(version).to_s
         @conflicting[cookbook]
-      rescue Solve::Errors::InvalidConstraintFormat => ex
-        raise InvalidVersionConstraint, ex.to_s
       end
 
       # Adds a recipe, definition, or resource provided by this cookbook.
@@ -328,10 +321,8 @@ module Ridley::Chef
       # versions<Array>:: Returns the list of versions for the platform
       def provides(cookbook, *version_args)
         version = version_args.first
-        @providing[cookbook] = Solve::Constraint.new(version).to_s
+        @providing[cookbook] = Semverse::Constraint.new(version).to_s
         @providing[cookbook]
-      rescue Solve::Errors::InvalidConstraintFormat => ex
-        raise InvalidVersionConstraint, ex.to_s
       end
 
       # Adds a cookbook that is replaced by this one, with version checking strings.
@@ -345,10 +336,8 @@ module Ridley::Chef
       # versions<Array>:: Returns the list of versions for the platform
       def replaces(cookbook, *version_args)
         version = version_args.first
-        @replacing[cookbook] = Solve::Constraint.new(version).to_s
+        @replacing[cookbook] = Semverse::Constraint.new(version).to_s
         @replacing[cookbook]
-      rescue Solve::Errors::InvalidConstraintFormat => ex
-        raise InvalidVersionConstraint, ex.to_s
       end
 
       # Adds a description for a recipe.
@@ -390,14 +379,14 @@ module Ridley::Chef
             :description => { :kind_of => String },
             :choice => { :kind_of => [ Array ], :default => [] },
             :calculated => { :equal_to => [ true, false ], :default => false },
-            :type => { :equal_to => [ "string", "array", "hash", "symbol" ], :default => "string" },
+            :type => { :equal_to => [ "string", "array", "hash", "symbol", "boolean", "numeric" ], :default => "string" },
             :required => { :equal_to => [ "required", "recommended", "optional", true, false ], :default => "optional" },
             :recipes => { :kind_of => [ Array ], :default => [] },
-            :default => { :kind_of => [ String, Array, Hash ] }
+            :default => { :kind_of => [ String, Array, Hash, Symbol, Numeric, TrueClass, FalseClass ] }
           }
         )
         options[:required] = remap_required_attribute(options[:required]) unless options[:required].nil?
-        validate_string_array(options[:choice])
+        validate_choice_array(options)
         validate_calculated_default_rule(options)
         validate_choice_default_rule(options)
 
@@ -439,6 +428,11 @@ module Ridley::Chef
         }
       end
 
+      # @return [String]
+      def to_json
+        JSON.fast_generate(to_hash)
+      end
+
       def from_hash(o)
         @name             = o[NAME] if o.has_key?(NAME)
         @description      = o[DESCRIPTION] if o.has_key?(DESCRIPTION)
@@ -446,7 +440,7 @@ module Ridley::Chef
         @maintainer       = o[MAINTAINER] if o.has_key?(MAINTAINER)
         @maintainer_email = o[MAINTAINER_EMAIL] if o.has_key?(MAINTAINER_EMAIL)
         @license          = o[LICENSE] if o.has_key?(LICENSE)
-        @platforms        = o[PLATFORMS] if o.has_key?(PLATFORMS)
+        @platforms        = handle_deprecated_constraints(o[PLATFORMS]) if o.has_key?(PLATFORMS)
         @dependencies     = handle_deprecated_constraints(o[DEPENDENCIES]) if o.has_key?(DEPENDENCIES)
         @recommendations  = handle_deprecated_constraints(o[RECOMMENDATIONS]) if o.has_key?(RECOMMENDATIONS)
         @suggestions      = handle_deprecated_constraints(o[SUGGESTIONS]) if o.has_key?(SUGGESTIONS)
@@ -476,6 +470,34 @@ module Ridley::Chef
           if arry.kind_of?(Array)
             arry.each do |choice|
               validate( {:choice => choice}, {:choice => {:kind_of => String}} )
+            end
+          end
+        end
+
+        # Validate the choice of the options hash
+        #
+        # Raise an exception if the members of the array do not match the defaults
+        # === Parameters
+        # opts<Hash>:: The options hash
+        def validate_choice_array(opts)
+          if opts[:choice].kind_of?(Array)
+            case opts[:type]
+            when "string"
+              validator = [ String ]
+            when "array"
+              validator = [ Array ]
+            when "hash"
+              validator = [ Hash ]
+            when "symbol"
+              validator = [ Symbol ]
+            when "boolean"
+              validator = [ TrueClass, FalseClass ]
+            when "numeric"
+              validator = [ Numeric ]
+            end
+
+            opts[:choice].each do |choice|
+              validate( {:choice => choice}, {:choice => {:kind_of => validator}} )
             end
           end
         end
@@ -526,15 +548,20 @@ module Ridley::Chef
         # Before we began respecting version constraints, we allowed
         # multiple constraints to be placed on cookbooks, as well as the
         # << and >> operators, which are now just < and >. For
-        # specifications with more than one constraint, we return an
-        # empty array (otherwise, we're silently abiding only part of
-        # the contract they have specified to us). If there is only one
+        # specifications with more than one constraint, this method switches to
+        # the default constraint from SemVerse. If there is only one
         # constraint, we are replacing the old << and >> with the new <
         # and >.
         def handle_deprecated_constraints(specification)
           specification.inject(Hashie::Mash.new) do |acc, (cb, constraints)|
             constraints = Array(constraints)
-            acc[cb] = (constraints.empty? || constraints.size > 1) ? [] : constraints.first.gsub(/>>/, '>').gsub(/<</, '<')
+
+            acc[cb] = if constraints.size == 1
+              constraints.first.gsub(/>>/, '>').gsub(/<</, '<')
+            else
+              Semverse::DEFAULT_CONSTRAINT.to_s
+            end
+
             acc
           end
         end

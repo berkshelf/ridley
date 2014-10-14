@@ -87,4 +87,4 @@ module Ridley
   end
 end
 
-Faraday.register_middleware(:request, chef_auth: Ridley::Middleware::ChefAuth)
+Faraday::Request.register_middleware chef_auth: Ridley::Middleware::ChefAuth

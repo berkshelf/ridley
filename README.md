@@ -122,7 +122,7 @@ end
 
 ### Manipulating Chef Resources
 
-Resources are access by instance functions on a new instance of `Ridley::Client`.
+Resources are accessed by instance functions on a new instance of `Ridley::Client`.
 
 ```ruby
 ridley = Ridley.new(...)
@@ -134,6 +134,7 @@ ridley.node        #=> Ridley::NodeResource
 ridley.role        #=> Ridley::RoleResource
 ridley.sandbox     #=> Ridley::SandboxResource
 ridley.search      #=> Ridley::SearchResource
+ridley.user        #=> Ridley::UserResource
 ```
 
 DataBagItems are the only exception to this rule. The DataBagItem resource is accessed from a DataBagObject
@@ -150,7 +151,7 @@ Most resources can be listed, retrieved, created, updated, and destroyed. These 
 
 #### Create
 
-A new Chef Object can be created in a four ways
+A new Chef Object can be created in four ways
 
 _With the `#create` function and an attribute hash_
 
@@ -191,7 +192,7 @@ Most resources have two read functions
 
 ##### Listing
 
-If you wanted to get a list of all of the roles on your Chef server
+If you want to get a list of all of the roles on your Chef server
 
 ```ruby
 ridley = Ridley.new(...)
@@ -200,6 +201,13 @@ ridley.role.all #=> [
   #<Ridley::RoleObject chef_id:motherbrain_proxy ...>
 ]
 ```
+Notify: You have to send the #reload message to node objects returned from a full listing. Their attributes aren't automatically populated from the initial search.
+
+```ruby
+ridley = Ridley.new(...)
+ridley.role.all.first  => #<Ridley::RoleObject chef_id:some_chef_id, attributes:#<VariaModel::Attributes chef_type="role" default_attributes=#<Hashie::Mash> description="" env_run_lists=#<VariaModel::Attributes> json_class="Chef::Role" name="some_chef_id" override_attributes=#<Hashie::Mash> run_list=[]>>
+ridley.role.all.first.reload => #<Ridley::RoleObject chef_id:some_chef_id, attributes:#<VariaModel::Attributes chef_type="role" default_attributes=#<Hashie::Mash SOME ATTRIBUTES> description="Some description" env_run_lists=#<VariaModel::Attributes> json_class="Chef::Role" name="some_chef_id" override_attributes=#<Hashie::Mash> run_list=[ SOME RUN LIST ]>>
+````
 
 ##### Finding
 
@@ -247,7 +255,7 @@ obj.save #=> #<Ridley::RoleObject: chef_id:motherbrain_srv, description="saving 
 
 #### Destroy
 
-Destroying a resource can be express in three ways
+Destroying a resource can be expressed in three ways
 
 _With the `#delete` function and the ID of the Object to destroy_
 
@@ -266,7 +274,7 @@ ridley.role.delete(obj) => #<Ridley::RoleObject: chef_id:motherbrain_srv ...>
 _With the `#destroy` function on an instance of a Chef Object_
 
 ```ruby
-obj = conn.role.find("motherbrain_srv")
+obj = ridley.role.find("motherbrain_srv")
 obj.destroy #=> true
 ```
 
@@ -291,6 +299,31 @@ obj.regenerate_key #=> #<Ridley::ClientObject: chef_id:"jamie", private_key="**H
 
 Cookbook Resource
 -----------------
+
+Cookbooks can be created, listed, updated and deleted as shown in the Manipulating Chef Resources section of this README.
+
+To find a cookbook, you must provide both its name and version:
+
+```ruby
+ridley = Ridley.new(...)
+ridley.cookbook.find("apache2", "1.6.6")
+```
+
+Cookbooks can be downloaded. If no download path is specified, the chosen cookbook will be downloaded to a tmp folder.
+
+```ruby
+ridley = Ridley.new(...)
+ridley.cookbook.download("apache2", "1.6.6", "/path/to/download/cookbook") #=> "/path/to/download/cookbook"
+ridley.cookbook.download("apache2", "1.6.6") #=> "/tmp/d20140211-6621-kstalp"
+```
+
+A cookbook's metadata can be accessed using the `#metadata` method:
+
+```ruby
+ridley = Ridley.new(...)
+apache2 = ridley.cookbook.find("apache2", "1.6.6")
+apache2.metadata #=> Hashie::Mash
+```
 
 Data Bag Resource
 -----------------
@@ -337,61 +370,6 @@ production_env.set_override_attribute("my_app.proxy.enabled", false)
 production_env.save #=> true
 ```
 
-Node Resource
--------------
-
-### Bootstrapping Unix nodes
-
-```ruby
-ridley = Ridley.new(
-  server_url: "https://api.opscode.com",
-  organization: "vialstudios",
-  validator_client: "vialstudios-validator",
-  validator_path: "/Users/reset/.chef/vialstudios-validator.pem",
-  ssh: {
-    user: "vagrant",
-    password: "vagrant"
-  }
-)
-
-ridley.node.bootstrap("33.33.33.10", "33.33.33.11")
-```
-
-### Bootstrapping Windows Nodes
-
-Windows Nodes are bootstrapped using a combination of WinRM, Batch, and PowerShell. You will probably need to tweak some settings on your Windows servers to ensure the commands are successful.
-
-#### WinRM Settings
-
-1. Enable WinRM: `winrm quickconfig` and say Yes.
-2. Set some WinRM settings to ensure that you don't get 401 Unauthorized responses and 500 Responses because of timeouts.
-
-```
-winrm set winrm/config/service/auth @{Basic="true"}
-winrm set winrm/config/service @{AllowUnencrypted="true"}
-winrm set winrm/config/service @{EnumerationTimeoutms="600000"}
-winrm set winrm/config @{MaxTimeoutms="600000"}
-winrm set winrm/config/client @{TrustedHosts="*"}
-```
-
-#### PowerShell Settings
-
-1. You should also configure your PowerShell profile, so that PowerShell commands have a more lenient timeout period.
-
-```
-mkdir C:\Users\my_user\Documents\WindowsPowerShell
-echo "$PSSessionOption = New-PSSessionOption -OpenTimeout 0 -CancelTimeout 0 -IdleTimeout 0 -OperationTimeout 0" > C:\Users\my_user\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
-```
-
-Verify the PowerShell settings by opening up the PowerShell Console and entering `$PSSessionOption` and ensure those values are set, and that there are no errors output.
-
-The following links offer some information about configuring a machine's PowerShell settings:
-- [PowerShell Profiles](http://technet.microsoft.com/en-us/library/ee692764.aspx)
-- [The $PSSessionOptions Preference Variable](http://technet.microsoft.com/library/hh847796.aspx)
-- [Creating a new PSSessionOption](http://technet.microsoft.com/en-us/library/hh849703.aspx)
-
-You may also want to tweak your Windows boxes a bit more ex: turning UAC off, turning off the Windows Firewall.
-
 Role Resource
 -------------
 
@@ -431,6 +409,21 @@ Search will return an array of the appropriate Chef Objects if one of the defaul
 -  role
 -  client
 -  environment
+
+User Resource
+-------------
+
+### Regenerating a user's private key
+
+Works the same way as with a client resource.
+
+### Authenticating a user's password
+
+```ruby
+ridley = Ridley.new(...)
+ridley.user.authenticate('username', 'password')
+ridley.user.find('username').authenticate('password')
+```
 
 Authors and Contributors
 ------------------------

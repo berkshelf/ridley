@@ -106,4 +106,4 @@ module Ridley
   end
 end
 
-Faraday.register_middleware(:response, parse_json: Ridley::Middleware::ParseJson)
+Faraday::Response.register_middleware parse_json: Ridley::Middleware::ParseJson
