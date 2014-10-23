@@ -1,3 +1,5 @@
+require 'ridley/helpers'
+
 module Ridley
   class CookbookResource < Ridley::Resource
     task_class TaskThread
@@ -225,7 +227,7 @@ module Ridley
 
       sandbox.upload(checksums)
       sandbox.commit
-      update(cookbook, options.slice(:force, :freeze))
+      update(cookbook, Ridley::Helpers.options_slice(options, :force, :freeze))
     ensure
       # Destroy the compiled metadata only if it was created
       File.delete(compiled_metadata) unless compiled_metadata.nil?
