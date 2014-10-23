@@ -1,5 +1,6 @@
 # 4.1.0
 
+* Fix monkey patching issue with options#slice when running under Vagrant
 * Bump required version of Celluloid `~> 0.16.0`
 * Bump required version of Celluloid-IO `~> 0.16.1`
 
