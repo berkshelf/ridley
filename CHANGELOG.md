@@ -1,3 +1,8 @@
+# 4.1.0
+
+* Bump required version of Celluloid `~> 0.16.0`
+* Bump required version of Celluloid-IO `~> 0.16.1`
+
 # 4.0.0
 
 * Update many out of date dependencies
