@@ -33,6 +33,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'net-http-persistent',     '>= 2.8'
   s.add_dependency 'retryable'
   s.add_dependency 'semverse',                '~> 1.1'
+  s.add_dependency 'yajl-ruby',               '~> 1.2.0'
 
   s.add_development_dependency 'buff-ruby_engine', '~> 0.1'
 end

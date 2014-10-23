@@ -39,6 +39,32 @@ describe Ridley::DataBagItemObject do
     end
   end
 
+  describe "#encrypt_attributes" do
+
+    before(:each) do
+      resource.stub(encrypted_data_bag_secret: File.read(fixtures_path.join("encrypted_data_bag_secret").to_s))
+      subject.instance_variable_set(:@iv, 'HzNFP+HkzSYIxpQpiAgVSA==')
+    end
+
+    it "encrypts value with version 1" do
+      subject.attributes[:password] = "test"
+      subject.encrypt_attributes
+
+      subject.attributes[:password].encrypted_data.should == "1MkHPcHIC47i5jV1qzgBWIS9/MM8ZCqD5FcqmX2WqoM=\n"
+      subject.attributes[:password].cipher.should == 'aes-256-cbc'
+      subject.attributes[:password].version.should == 1
+      subject.attributes[:password].iv.should == "SHpORlArSGt6U1lJeHBRcGlBZ1ZTQT09\n"
+    end
+
+    it "does not encrypt the id field" do
+      id = "dbi_id"
+      subject.attributes[:id] = id
+      subject.encrypt_attributes
+      subject.attributes[:id].should == id
+    end
+  end
+
+
   describe "#decrypt" do
     before(:each) do
       resource.stub(encrypted_data_bag_secret: File.read(fixtures_path.join("encrypted_data_bag_secret").to_s))

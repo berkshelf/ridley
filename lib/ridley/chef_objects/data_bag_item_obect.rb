@@ -1,7 +1,9 @@
 require 'yaml'
+require 'yajl'
 
 module Ridley
   class DataBagItemObject < ChefObject
+    ALGORITHM = 'aes-256-cbc'
     set_chef_id "id"
     set_assignment_mode :carefree
 
@@ -47,6 +49,14 @@ module Ridley
     def decrypt
       decrypted_hash = Hash[_attributes_.map { |key, value| [key, key == "id" ? value : decrypt_value(value)] }]
       mass_assign(decrypted_hash)
+    end
+
+    # Encrypts attributes of this data bag item
+    #
+    # @return [Object]
+    def encrypt_attributes
+      self.attributes = Hash[_attributes_.map { |key, value| [key, key == "id" ? value : for_encrypted_item(value)] }]
+      self
     end
 
     # Decrypts an individual value stored inside the data bag item.
@@ -143,6 +153,56 @@ module Ridley
 
       def encrypted_data_bag_secret
         resource.encrypted_data_bag_secret
+      end
+
+      # Shamelessly lifted from https://github.com/opscode/chef/blob/master/lib/chef/encrypted_data_bag_item/encryptor.rb
+
+      # Returns a wrapped and encrypted version of +value+ suitable for
+      # using as the value in an encrypted data bag item.
+      def for_encrypted_item(value)
+        {
+            "encrypted_data" => encrypted_data(value),
+            "iv" => Base64.encode64(iv),
+            "version" => 1,
+            "cipher" => ALGORITHM
+        }
+      end
+
+      # Generates or returns the IV.
+      def iv
+        # Generated IV comes from OpenSSL::Cipher::Cipher#random_iv
+        # This gets generated when +openssl_encryptor+ gets created.
+        openssl_encryptor if @iv.nil?
+        @iv
+      end
+
+      # Generates (and memoizes) an OpenSSL::Cipher::Cipher object and configures
+      # it for the specified iv and encryption key.
+      def openssl_encryptor
+        @openssl_encryptor ||= begin
+          encryptor = OpenSSL::Cipher::Cipher.new(ALGORITHM)
+          encryptor.encrypt
+          @iv ||= encryptor.random_iv.chomp
+          encryptor.iv = @iv
+          encryptor.key = Digest::SHA256.digest(encrypted_data_bag_secret)
+          encryptor
+        end
+      end
+
+      # Encrypts and Base64 encodes +serialized_data+
+      def encrypted_data(value)
+        openssl_encryptor.reset
+        enc_data = openssl_encryptor.update(serialized_data(value))
+        enc_data << openssl_encryptor.final
+        Base64.encode64(enc_data)
+      end
+
+      # Wraps the data in a single key Hash (JSON Object) and converts to JSON.
+      # The wrapper is required because we accept values (such as Integers or
+      # Strings) that do not produce valid JSON when serialized without the
+      # wrapper.
+      def serialized_data(value)
+        Yajl::Encoder.encode(:json_wrapper => value)
       end
   end
 end
