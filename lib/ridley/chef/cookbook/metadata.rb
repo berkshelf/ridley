@@ -430,7 +430,7 @@ module Ridley::Chef
 
       # @return [String]
       def to_json
-        JSON.fast_generate(to_hash)
+        JSON.pretty_generate(to_hash)
       end
 
       def from_hash(o)
