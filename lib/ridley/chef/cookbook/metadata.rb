@@ -430,7 +430,10 @@ module Ridley::Chef
 
       # @return [String]
       def to_json
-        JSON.fast_generate(to_hash)
+        # Switched from fast to pretty generate here
+        # to match `knife cookbook metadata from file` format
+        # See https://github.com/RiotGames/ridley/pull/287
+        JSON.pretty_generate(to_hash)
       end
 
       def from_hash(o)
