@@ -1,3 +1,9 @@
+# 4.1.1
+
+* Enhancements
+  * Add support for metadata source_url field
+  * Add support for metadata issues_url field
+
 # 4.1.0
 
 * Fix monkey patching issue with options#slice when running under Vagrant
