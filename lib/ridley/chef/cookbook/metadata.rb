@@ -47,6 +47,8 @@ module Ridley::Chef
       GROUPINGS        = 'groupings'.freeze
       RECIPES          = 'recipes'.freeze
       VERSION          = 'version'.freeze
+      SOURCE_URL       = 'source_url'.freeze
+      ISSUES_URL       = 'issues_url'.freeze
 
       COMPILED_FILE_NAME = "metadata.json".freeze
       RAW_FILE_NAME      = "metadata.rb".freeze
@@ -55,7 +57,8 @@ module Ridley::Chef
         :name, :description, :long_description, :maintainer,
         :maintainer_email, :license, :platforms, :dependencies,
         :recommendations, :suggestions, :conflicting, :providing,
-        :replacing, :attributes, :groupings, :recipes, :version
+        :replacing, :attributes, :groupings, :recipes, :version,
+        :source_url, :issues_url
       ]
 
       include Ridley::Mixin::ParamsValidate
@@ -92,17 +95,20 @@ module Ridley::Chef
         self.maintainer_email(maintainer_email)
         self.license(license)
         self.description('A fabulous new cookbook')
-        @platforms = Hashie::Mash.new
-        @dependencies = Hashie::Mash.new
+        @platforms       = Hashie::Mash.new
+        @dependencies    = Hashie::Mash.new
         @recommendations = Hashie::Mash.new
-        @suggestions = Hashie::Mash.new
-        @conflicting = Hashie::Mash.new
-        @providing = Hashie::Mash.new
-        @replacing = Hashie::Mash.new
-        @attributes = Hashie::Mash.new
-        @groupings = Hashie::Mash.new
-        @recipes = Hashie::Mash.new
-        @version = Semverse::Version.new("0.0.0")
+        @suggestions     = Hashie::Mash.new
+        @conflicting     = Hashie::Mash.new
+        @providing       = Hashie::Mash.new
+        @replacing       = Hashie::Mash.new
+        @attributes      = Hashie::Mash.new
+        @groupings       = Hashie::Mash.new
+        @recipes         = Hashie::Mash.new
+        @version         = Semverse::Version.new("0.0.0")
+        @source_url      = ''
+        @issues_url      = ''
+
         if cookbook
           @recipes = cookbook.fully_qualified_recipe_names.inject({}) do |r, e|
             e = self.name if e =~ /::default$/
@@ -382,7 +388,9 @@ module Ridley::Chef
             :type => { :equal_to => [ "string", "array", "hash", "symbol", "boolean", "numeric" ], :default => "string" },
             :required => { :equal_to => [ "required", "recommended", "optional", true, false ], :default => "optional" },
             :recipes => { :kind_of => [ Array ], :default => [] },
-            :default => { :kind_of => [ String, Array, Hash, Symbol, Numeric, TrueClass, FalseClass ] }
+            :default => { :kind_of => [ String, Array, Hash, Symbol, Numeric, TrueClass, FalseClass ] },
+            :source_url => { :kind_of => String },
+            :issues_url => { :kind_of => String }
           }
         )
         options[:required] = remap_required_attribute(options[:required]) unless options[:required].nil?
@@ -424,7 +432,9 @@ module Ridley::Chef
           ATTRIBUTES       => self.attributes,
           GROUPINGS        => self.groupings,
           RECIPES          => self.recipes,
-          VERSION          => self.version
+          VERSION          => self.version,
+          SOURCE_URL       => self.source_url,
+          ISSUES_URL       => self.issues_url
         }
       end
 
@@ -454,11 +464,43 @@ module Ridley::Chef
         @groupings        = o[GROUPINGS] if o.has_key?(GROUPINGS)
         @recipes          = o[RECIPES] if o.has_key?(RECIPES)
         @version          = o[VERSION] if o.has_key?(VERSION)
+        @source_url       = o[SOURCE_URL] if o.has_key?(SOURCE_URL)
+        @issues_url       = o[ISSUES_URL] if o.has_key?(ISSUES_URL)
         self
       end
 
       def from_json(json)
         from_hash JSON.parse(json)
+      end
+
+      # Sets the cookbook's source URL, or returns it.
+      #
+      # === Parameters
+      # maintainer<String>:: The source URL
+      #
+      # === Returns
+      # source_url<String>:: Returns the current source URL.
+      def source_url(arg = nil)
+        set_or_return(
+          :source_url,
+          arg,
+          :kind_of => [ String ]
+        )
+      end
+
+      # Sets the cookbook's issues URL, or returns it.
+      #
+      # === Parameters
+      # issues_url<String>:: The issues URL
+      #
+      # === Returns
+      # issues_url<String>:: Returns the current issues URL.
+      def issues_url(arg = nil)
+        set_or_return(
+          :issues_url,
+          arg,
+          :kind_of => [ String ]
+        )
       end
 
       private
