@@ -230,7 +230,17 @@ module Ridley
       update(cookbook, Ridley::Helpers.options_slice(options, :force, :freeze))
     ensure
       # Destroy the compiled metadata only if it was created
-      File.delete(compiled_metadata) unless compiled_metadata.nil?
+      if compiled_metadata
+        # The garbage collector still has a reference to the file we'd
+        # like to delete. On *nix this isn't a big deal, but on Windows
+        # [ ruby 2.0.0p451 (2014-02-24) [i386-mingw32] ] open files
+        # cannot be deleted, so we're forced to garbage collect to
+        # ensure we can delete the file. This is CRITICAL to ensure that
+        # a stale metadata file isn't left on disk because next time we
+        # would use that file instead of recompiling.
+        GC.start
+        File.delete(compiled_metadata)
+      end
     end
 
     # Return a list of versions for the given cookbook present on the remote Chef server
