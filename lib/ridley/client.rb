@@ -139,6 +139,7 @@ module Ridley
       end
 
       unless verify_client_key(@options[:client_key])
+        @options[:client_key] = @options[:client_key].call if @options[:client_key].kind_of? Proc
         @options[:client_key] = File.expand_path(@options[:client_key])
         raise Errors::ClientKeyFileNotFoundOrInvalid, "client key is invalid or not found at: '#{@options[:client_key]}'" unless File.exist?(@options[:client_key]) && verify_client_key(::IO.read(@options[:client_key]))
       end
