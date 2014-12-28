@@ -126,17 +126,17 @@ describe Ridley::CookbookResource do
     end
 
     it 'does not include files that are ignored' do
-      # These are the SHAs for the files. It's not possible to check that
+      # These are the MD5s for the files. It's not possible to check that
       # the ignored files weren't uploaded, so we just check that the
       # non-ignored files are the ONLY thing uploaded
       sandbox_resource.should_receive(:create).with([
         "211a3a8798d4acd424af15ff8a2e28a5",
+        "64ac6346672c6bea4ade983e3d58cd14",
         "75077ba33d2887cc1746d1ef716bf8b7",
         "7b1ebd2ff580ca9dc46fb27ec1653bf2",
         "84e12365e6f4ebe7db6a0e6a92473b16",
         "a39eb80def9804f4b118099697cc2cd2",
         "b70ba735f3af47e5d6fc71b91775b34c",
-        "b946e579ba3640470c16f6fb3445e346",
         "cafb6869fca13f5c36f24a60de8fb982",
         "dbf3a6c4ab68a86172be748aced9f46e",
         "dc6461b5da25775f3ef6a9cc1f6cff9f",

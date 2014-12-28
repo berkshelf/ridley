@@ -145,7 +145,7 @@ module Ridley
       local = Tempfile.new('ridley-stream')
       local.binmode
 
-      retryable(tries: retries, on: OpenURI::HTTPError, sleep: retry_interval) do
+      Retryable.retryable(tries: retries, on: OpenURI::HTTPError, sleep: retry_interval) do
         open(target, 'rb', headers) do |remote|
           body = remote.read
           case remote.content_encoding
