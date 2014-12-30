@@ -33,7 +33,7 @@ module Ridley::Chef
         path = Pathname.new(path)
 
         if (file = path.join(Metadata::COMPILED_FILE_NAME)).exist?
-          metadata = Metadata.from_json(File.read(file))
+          metadata = Metadata.from_json(File.read(file, :encoding => Encoding::UTF_8))
         elsif (file = path.join(Metadata::RAW_FILE_NAME)).exist?
           metadata = Metadata.from_file(file)
         else
