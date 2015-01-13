@@ -1,3 +1,9 @@
+# 4.1.2
+
+* Fixed: permission denied errors on Windows while uploading cookbooks
+* Fixed: no proc error when evaluating client_key option
+* Bump required version of retryable
+
 # 4.1.1
 
 * Enhancements
