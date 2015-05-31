@@ -261,6 +261,45 @@ describe Ridley::Chef::Cookbook do
     end
   end
 
+  describe "#file_specificity" do
+    let(:category) { :templates }
+    let(:relpath) { 'default.rb' }
+    let(:file) { subject.path.join(category.to_s, relpath) }
+    before(:each) { @specificity = subject.file_specificity(category, file) }
+
+    context "given a recipe file" do
+      let(:category) { :recipes }
+
+      it "has a specificity of 'default'" do
+        @specificity.should eql("default")
+      end
+    end
+
+    context "given a template 'default/config.erb'" do
+      let(:relpath) { 'default/config.erb' }
+
+      it "has a specificity of 'default'" do
+        @specificity.should eql("default")
+      end
+    end
+
+    context "given a template 'centos/config.erb'" do
+      let(:relpath) { 'centos/config.erb' }
+
+      it "has a specificity of 'centos'" do
+        @specificity.should eql("centos")
+      end
+    end
+
+    context "given a template 'config.erb'" do
+      let(:relpath) { 'config.erb' }
+
+      it "has a specificity of 'root_default'" do
+        @specificity.should eql("root_default")
+      end
+    end
+  end
+
   describe "#to_hash" do
     subject { cookbook.to_hash }
 
