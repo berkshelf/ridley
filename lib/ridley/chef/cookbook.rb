@@ -170,7 +170,7 @@ module Ridley::Chef
       case category
       when :files, :templates
         relpath = target.relative_path_from(path).to_s
-        relpath.slice(/(.+)\/(.+)\/.+/, 2)
+        relpath.slice(/(.+)\/(.+)\/.+/, 2) || 'root_default'
       else
         'default'
       end
