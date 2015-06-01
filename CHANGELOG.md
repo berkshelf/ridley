@@ -1,3 +1,8 @@
+# 4.2.0
+
+* Enhancements
+  * Support 'root_default' files
+
 # 4.1.2
 
 * Fixed: permission denied errors on Windows while uploading cookbooks
