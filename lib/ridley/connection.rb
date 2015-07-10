@@ -61,10 +61,9 @@ module Ridley
         b.request :chef_auth, client_name, client_key
 
         b.response :parse_json
-        b.response :gzip
         b.response :chef_response
 
-        b.adapter :net_http_persistent
+        b.adapter :httpclient
       end
 
       uri_hash = Ridley::Helpers.options_slice(Addressable::URI.parse(server_url).to_hash, :scheme, :host, :port)

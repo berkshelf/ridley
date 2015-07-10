@@ -28,9 +28,9 @@ Gem::Specification.new do |s|
   s.add_dependency 'erubis'
   s.add_dependency 'faraday',                 '~> 0.9.0'
   s.add_dependency 'hashie',                  '>= 2.0.2', '< 3.0.0'
+  s.add_dependency 'httpclient',              '~> 2.6'
   s.add_dependency 'json',                    '>= 1.7.7'
   s.add_dependency 'mixlib-authentication',   '>= 1.3.0'
-  s.add_dependency 'net-http-persistent',     '>= 2.8'
   s.add_dependency 'retryable',               '~> 2.0'
   s.add_dependency 'semverse',                '~> 1.1'
 
