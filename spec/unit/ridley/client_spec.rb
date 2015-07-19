@@ -34,7 +34,7 @@ describe Ridley::Client do
       describe "parsing the 'server_url' option" do
         its(:host) { should eql("api.opscode.com") }
         its(:scheme) { should eql("https") }
-        its(:path_prefix) { should eql("/") }
+        its(:path_prefix) { should eql("/some_path") }
       end
 
       describe "with a server_url containing an organization" do
@@ -51,7 +51,7 @@ describe Ridley::Client do
           subject.organization.should eql(organization)
         end
 
-        it "sets the 'path_prefix' of the connection the organization sub URI" do
+        it "sets the 'path_prefix' of the connection to the organization sub URI" do
           subject.path_prefix.should eql("/organizations/#{organization}")
         end
       end

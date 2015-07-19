@@ -66,18 +66,14 @@ module Ridley
         b.adapter :httpclient
       end
 
-      uri_hash = Ridley::Helpers.options_slice(Addressable::URI.parse(server_url).to_hash, :scheme, :host, :port)
+      uri_hash = Ridley::Helpers.options_slice(Addressable::URI.parse(server_url).to_hash, :scheme, :host, :port, :path)
 
       unless uri_hash[:port]
         uri_hash[:port] = (uri_hash[:scheme] == "https" ? 443 : 80)
       end
 
-      if org_match = server_url.match(/.*\/organizations\/(.*)/)
+      if org_match = uri_hash[:path].match(/^\/organizations\/(.*)/)
         @organization = org_match[1]
-      end
-
-      unless @organization.nil?
-        uri_hash[:path] = "/organizations/#{@organization}"
       end
 
       super(Addressable::URI.new(uri_hash), options)
