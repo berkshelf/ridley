@@ -18,7 +18,7 @@ describe "Client API operations", type: "acceptance" do
       before { subject.download(name, version, destination) }
 
       it "downloads the cookbook to the destination" do
-        expect(File.exist?(destination.join("metadata.json"))).to be_true
+        expect(File.exist?(destination.join("metadata.json"))).to be_truthy
       end
     end
   end
@@ -30,23 +30,23 @@ describe "Client API operations", type: "acceptance" do
       subject.upload(path)
       cookbook = subject.find("example_cookbook", "0.1.0")
 
-      cookbook.attributes.should have(1).item
-      cookbook.definitions.should have(1).item
-      cookbook.files.should have(2).items
-      cookbook.libraries.should have(1).item
-      cookbook.providers.should have(1).item
-      cookbook.recipes.should have(1).item
-      cookbook.resources.should have(1).item
-      cookbook.templates.should have(1).item
-      cookbook.root_files.should have(1).items
+      expect(cookbook.attributes.size).to eq(1)
+      expect(cookbook.definitions.size).to eq(1)
+      expect(cookbook.files.size).to eq(2)
+      expect(cookbook.libraries.size).to eq(1)
+      expect(cookbook.providers.size).to eq(1)
+      expect(cookbook.recipes.size).to eq(1)
+      expect(cookbook.resources.size).to eq(1)
+      expect(cookbook.templates.size).to eq(1)
+      expect(cookbook.root_files.size).to eq(1)
     end
 
     it "does not contain a raw metadata.rb but does contain a compiled metadata.json" do
       subject.upload(path)
       cookbook = subject.find("example_cookbook", "0.1.0")
 
-      expect(cookbook.root_files.any? { |f| f[:name] == "metadata.json" }).to be_true
-      expect(cookbook.root_files.any? { |f| f[:name] == "metadata.rb" }).to be_false
+      expect(cookbook.root_files.any? { |f| f[:name] == "metadata.json" }).to be_truthy
+      expect(cookbook.root_files.any? { |f| f[:name] == "metadata.rb" }).to be_falsey
     end
   end
 
@@ -60,9 +60,9 @@ describe "Client API operations", type: "acceptance" do
 
     it "returns all of the cookbooks on the server" do
       all_cookbooks = subject.all
-      expect(all_cookbooks).to have(2).items
-      expect(all_cookbooks["ruby"]).to have(2).items
-      expect(all_cookbooks["elixir"]).to have(2).items
+      expect(all_cookbooks.size).to eq(2)
+      expect(all_cookbooks["ruby"].size).to eq(2)
+      expect(all_cookbooks["elixir"].size).to eq(2)
     end
   end
 end

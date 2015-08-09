@@ -8,14 +8,14 @@ describe Ridley::SandboxUploader do
       let(:io) { StringIO.new("some long string") }
       subject { described_class.checksum(io) }
 
-      it { should eq("2fb66bbfb88cdf9e07a3f1d1dfad71ab") }
+      it { is_expected.to eq("2fb66bbfb88cdf9e07a3f1d1dfad71ab") }
     end
 
     describe "::checksum64" do
       let(:io) { StringIO.new("some long string") }
       subject { described_class.checksum64(io) }
 
-      it { should eq("L7Zrv7iM354Ho/HR361xqw==") }
+      it { is_expected.to eq("L7Zrv7iM354Ho/HR361xqw==") }
     end
   end
 
@@ -80,7 +80,7 @@ describe Ridley::SandboxUploader do
       end
 
       it "returns nil" do
-        subject.upload(sandbox, chk_id, path).should be_nil
+        expect(subject.upload(sandbox, chk_id, path)).to be_nil
       end
     end
 

@@ -11,8 +11,8 @@ describe Ridley::SearchResource do
       it "contains a 'q' key/value" do
         result = subject.build_query(query_string, options)
 
-        result.should have_key(:q)
-        result[:q].should eql(query_string)
+        expect(result).to have_key(:q)
+        expect(result[:q]).to eql(query_string)
       end
 
       context "when :sort option is set" do
@@ -21,8 +21,8 @@ describe Ridley::SearchResource do
         it "contains a 'sort' key/value" do
           result = subject.build_query(query_string, options)
 
-          result.should have_key(:sort)
-          result[:sort].should eql("DESC")
+          expect(result).to have_key(:sort)
+          expect(result[:sort]).to eql("DESC")
         end
       end
 
@@ -32,8 +32,8 @@ describe Ridley::SearchResource do
         it "contains a 'start' key/value" do
           result = subject.build_query(query_string, options)
 
-          result.should have_key(:start)
-          result[:start].should eql(1)
+          expect(result).to have_key(:start)
+          expect(result[:start]).to eql(1)
         end
       end
 
@@ -43,8 +43,8 @@ describe Ridley::SearchResource do
         it "contains a 'rows' key/value" do
           result = subject.build_query(query_string, options)
 
-          result.should have_key(:rows)
-          result[:rows].should eql(1)
+          expect(result).to have_key(:rows)
+          expect(result[:rows]).to eql(1)
         end
       end
     end
@@ -89,7 +89,7 @@ describe Ridley::SearchResource do
 
     describe "::query_uri" do
       it "returns a URI path containing the search resource path and index" do
-        subject.query_uri(:nodes).should eql("search/nodes")
+        expect(subject.query_uri(:nodes)).to eql("search/nodes")
       end
     end
   end
@@ -118,7 +118,7 @@ describe Ridley::SearchResource do
     end
 
     it "contains a key for each index" do
-      subject.indexes.should have(4).items
+      expect(subject.indexes.size).to eq(4)
     end
   end
 
@@ -179,8 +179,8 @@ describe Ridley::SearchResource do
       it "returns an array of Ridley::NodeObject" do
         result = run
 
-        result.should be_a(Array)
-        result.should each be_a(Ridley::NodeObject)
+        expect(result).to be_a(Array)
+        expect(result).to each be_a(Ridley::NodeObject)
       end
 
       context "after the search has executed and results are returned" do
@@ -188,7 +188,7 @@ describe Ridley::SearchResource do
 
         it "Ridley::NodeObject instances contain the results" do
           first_result = search_results.first
-          first_result.name.should eq("ridley-one")
+          expect(first_result.name).to eq("ridley-one")
         end
       end
     end
@@ -217,8 +217,8 @@ describe Ridley::SearchResource do
       it "returns an array of Ridley::RoleObject" do
         result = run
 
-        result.should be_a(Array)
-        result.should each be_a(Ridley::RoleObject)
+        expect(result).to be_a(Array)
+        expect(result).to each be_a(Ridley::RoleObject)
       end
 
       context "after the search has executed and results are returned" do
@@ -226,7 +226,7 @@ describe Ridley::SearchResource do
 
         it "Ridley::RoleObject instances contain the results" do
           first_result = search_results.first
-          first_result.name.should eq("ridley-role-one")
+          expect(first_result.name).to eq("ridley-role-one")
         end
       end
     end
@@ -254,8 +254,8 @@ describe Ridley::SearchResource do
       it "returns an array of Ridley::EnvironmentObject" do
         result = run
 
-        result.should be_a(Array)
-        result.should each be_a(Ridley::EnvironmentObject)
+        expect(result).to be_a(Array)
+        expect(result).to each be_a(Ridley::EnvironmentObject)
       end
 
       context "after the search has executed and results are returned" do
@@ -263,7 +263,7 @@ describe Ridley::SearchResource do
 
         it "Ridley::EnvironmentObject instances contain the results" do
           first_result = search_results.first
-          first_result.name.should eq("ridley-env-test")
+          expect(first_result.name).to eq("ridley-env-test")
         end
       end
     end
@@ -292,8 +292,8 @@ describe Ridley::SearchResource do
       it "returns an array of Ridley::ClientObject" do
         result = run
 
-        result.should be_a(Array)
-        result.should each be_a(Ridley::ClientObject)
+        expect(result).to be_a(Array)
+        expect(result).to each be_a(Ridley::ClientObject)
       end
 
       context "after the search has executed and results are returned" do
@@ -301,7 +301,7 @@ describe Ridley::SearchResource do
 
         it "Ridley::ClientObject instances contain the results" do
           first_result = search_results.first
-          first_result.name.should eq("ridley-client-test")
+          expect(first_result.name).to eq("ridley-client-test")
         end
       end
     end

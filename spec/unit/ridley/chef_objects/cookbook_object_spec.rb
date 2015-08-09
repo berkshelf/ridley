@@ -7,7 +7,7 @@ describe Ridley::CookbookObject do
 
   describe "#download" do
     it "downloads each file" do
-      subject.stub(:manifest) do
+      allow(subject).to receive(:manifest) do
         {
           resources: [],
           providers: [],
@@ -37,8 +37,8 @@ describe Ridley::CookbookObject do
         }
       end
 
-      subject.should_receive(:download_file).with(:recipes, "recipes/default.rb", anything)
-      subject.should_receive(:download_file).with(:files, "files/default/plugins/README", anything)
+      expect(subject).to receive(:download_file).with(:recipes, "recipes/default.rb", anything)
+      expect(subject).to receive(:download_file).with(:files, "files/default/plugins/README", anything)
 
       subject.download
     end
@@ -48,11 +48,11 @@ describe Ridley::CookbookObject do
     let(:destination) { tmp_path.join('fake.file').to_s }
 
     before(:each) do
-      subject.stub(:root_files) { [ { path: 'metadata.rb', url: "http://test.it/file" } ] }
+      allow(subject).to receive(:root_files) { [ { path: 'metadata.rb', url: "http://test.it/file" } ] }
     end
 
     it "downloads the file from the file's url" do
-      connection.should_receive(:stream).with("http://test.it/file", destination)
+      expect(connection).to receive(:stream).with("http://test.it/file", destination)
 
       subject.download_file(:root_file, "metadata.rb", destination)
     end
@@ -67,27 +67,27 @@ describe Ridley::CookbookObject do
 
     context "when the cookbook doesn't have the specified file" do
       before(:each) do
-        subject.stub(:root_files) { Array.new }
+        allow(subject).to receive(:root_files) { Array.new }
       end
 
       it "returns nil" do
-        subject.download_file(:root_file, "metadata.rb", destination).should be_nil
+        expect(subject.download_file(:root_file, "metadata.rb", destination)).to be_nil
       end
     end
   end
 
   describe "#manifest" do
     it "returns a Hash" do
-      subject.manifest.should be_a(Hash)
+      expect(subject.manifest).to be_a(Hash)
     end
 
     it "has a key for each item in FILE_TYPES" do
-      subject.manifest.keys.should =~ described_class::FILE_TYPES
+      expect(subject.manifest.keys).to match_array(described_class::FILE_TYPES)
     end
 
     it "contains an empty array for each key" do
-      subject.manifest.should each be_a(Array)
-      subject.manifest.values.should each be_empty
+      expect(subject.manifest).to each be_a(Array)
+      expect(subject.manifest.values).to each be_empty
     end
   end
 
@@ -95,7 +95,7 @@ describe Ridley::CookbookObject do
     it "returns the updated self" do
       other = subject.dup
       other.version = "1.2.3"
-      resource.should_receive(:find).with(subject, subject.version).and_return(other)
+      expect(resource).to receive(:find).with(subject, subject.version).and_return(other)
 
       expect(subject.reload).to eq(other)
     end

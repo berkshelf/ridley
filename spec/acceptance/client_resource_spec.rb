@@ -11,30 +11,30 @@ describe "Client API operations", type: "acceptance" do
       before { chef_client("reset", admin: false) }
 
       it "returns a ClientObject" do
-        connection.client.find("reset").should be_a(Ridley::ClientObject)
+        expect(connection.client.find("reset")).to be_a(Ridley::ClientObject)
       end
     end
 
     context "when the server does not have the client" do
       it "returns a nil value" do
-        connection.client.find("not_there").should be_nil
+        expect(connection.client.find("not_there")).to be_nil
       end
     end
   end
 
   describe "creating a client" do
     it "returns a Ridley::ClientObject" do
-      connection.client.create(name: "reset").should be_a(Ridley::ClientObject)
+      expect(connection.client.create(name: "reset")).to be_a(Ridley::ClientObject)
     end
 
     it "adds a client to the chef server" do
       old = connection.client.all.length
       connection.client.create(name: "reset")
-      connection.client.all.should have(old + 1).items
+      expect(connection.client.all.size).to eq(old + 1)
     end
 
     it "has a value for #private_key" do
-      connection.client.create(name: "reset").private_key.should_not be_nil
+      expect(connection.client.create(name: "reset").private_key).not_to be_nil
     end
   end
 
@@ -42,13 +42,13 @@ describe "Client API operations", type: "acceptance" do
     before { chef_client("reset", admin: false) }
 
     it "returns a Ridley::ClientObject object" do
-      connection.client.delete("reset").should be_a(Ridley::ClientObject)
+      expect(connection.client.delete("reset")).to be_a(Ridley::ClientObject)
     end
 
     it "removes the client from the server" do
       connection.client.delete("reset")
 
-      connection.client.find("reset").should be_nil
+      expect(connection.client.find("reset")).to be_nil
     end
   end
 
@@ -59,12 +59,12 @@ describe "Client API operations", type: "acceptance" do
     end
 
     it "returns an array of Ridley::ClientObject objects" do
-      connection.client.delete_all.should each be_a(Ridley::ClientObject)
+      expect(connection.client.delete_all).to each be_a(Ridley::ClientObject)
     end
 
     it "deletes all clients from the remote" do
       connection.client.delete_all
-      connection.client.all.should have(0).clients
+      expect(connection.client.all.size).to eq(0)
     end
   end
 
@@ -75,11 +75,11 @@ describe "Client API operations", type: "acceptance" do
     end
 
     it "returns an array of Ridley::ClientObject objects" do
-      connection.client.all.should each be_a(Ridley::ClientObject)
+      expect(connection.client.all).to each be_a(Ridley::ClientObject)
     end
 
     it "returns all of the clients on the server" do
-      connection.client.all.should have(4).items
+      expect(connection.client.all.size).to eq(4)
     end
   end
 
@@ -87,7 +87,7 @@ describe "Client API operations", type: "acceptance" do
     before { chef_client("reset", admin: false) }
 
     it "returns a Ridley::ClientObject object with a value for #private_key" do
-      connection.client.regenerate_key("reset").private_key.should match(/^-----BEGIN RSA PRIVATE KEY-----/)
+      expect(connection.client.regenerate_key("reset").private_key).to match(/^-----BEGIN RSA PRIVATE KEY-----/)
     end
   end
 end

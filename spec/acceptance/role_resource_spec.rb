@@ -11,7 +11,7 @@ describe "Role API operations", type: "acceptance" do
     before { chef_role(role_name) }
 
     it "returns a Ridley::RoleObject" do
-      connection.role.find(role_name).should be_a(Ridley::RoleObject)
+      expect(connection.role.find(role_name)).to be_a(Ridley::RoleObject)
     end
   end
 
@@ -19,12 +19,12 @@ describe "Role API operations", type: "acceptance" do
     let(:role_name) { "ridley-role" }
 
     it "returns a new Ridley::RoleObject" do
-      connection.role.create(name: role_name).should be_a(Ridley::RoleObject)
+      expect(connection.role.create(name: role_name)).to be_a(Ridley::RoleObject)
     end
 
     it "adds a new role to the server" do
       connection.role.create(name: role_name)
-      connection.role.all.should have(1).role
+      expect(connection.role.all.size).to eq(1)
     end
   end
 
@@ -33,13 +33,13 @@ describe "Role API operations", type: "acceptance" do
     before { chef_role(role_name) }
 
     it "returns the deleted Ridley::RoleObject resource" do
-      connection.role.delete(role_name).should be_a(Ridley::RoleObject)
+      expect(connection.role.delete(role_name)).to be_a(Ridley::RoleObject)
     end
 
     it "removes the role from the server" do
       connection.role.delete(role_name)
 
-      connection.role.find(role_name).should be_nil
+      expect(connection.role.find(role_name)).to be_nil
     end
   end
 
@@ -52,7 +52,7 @@ describe "Role API operations", type: "acceptance" do
     it "deletes all nodes from the remote server" do
       connection.role.delete_all
 
-      connection.role.all.should have(0).roles
+      expect(connection.role.all.size).to eq(0)
     end
   end
 
@@ -65,8 +65,8 @@ describe "Role API operations", type: "acceptance" do
     it "should return an array of Ridley::RoleObject" do
       obj = connection.role.all
 
-      obj.should have(2).roles
-      obj.should each be_a(Ridley::RoleObject)
+      expect(obj.size).to eq(2)
+      expect(obj).to each be_a(Ridley::RoleObject)
     end
   end
 
@@ -76,7 +76,7 @@ describe "Role API operations", type: "acceptance" do
     let(:target) { connection.role.find(role_name) }
 
     it "returns an updated Ridley::RoleObject object" do
-      connection.role.update(target).should eql(target)
+      expect(connection.role.update(target)).to eql(target)
     end
 
     it "saves a new run_list" do
@@ -85,7 +85,7 @@ describe "Role API operations", type: "acceptance" do
       connection.role.update(target)
       obj = connection.role.find(target)
 
-      obj.run_list.should eql(run_list)
+      expect(obj.run_list).to eql(run_list)
     end
 
     it "saves a new env_run_lists" do
@@ -97,7 +97,7 @@ describe "Role API operations", type: "acceptance" do
       connection.role.update(target)
       obj = connection.role.find(target)
 
-      obj.env_run_lists.should eql(env_run_lists)
+      expect(obj.env_run_lists).to eql(env_run_lists)
     end
 
     it "saves a new description" do
@@ -106,7 +106,7 @@ describe "Role API operations", type: "acceptance" do
       connection.role.update(target)
       obj = connection.role.find(target)
 
-      obj.description.should eql(description)
+      expect(obj.description).to eql(description)
     end
 
     it "saves a new default_attributes" do
@@ -120,7 +120,7 @@ describe "Role API operations", type: "acceptance" do
       connection.role.update(target)
       obj = connection.role.find(target)
 
-      obj.default_attributes.should eql(defaults)
+      expect(obj.default_attributes).to eql(defaults)
     end
 
     it "saves a new override_attributes" do
@@ -134,7 +134,7 @@ describe "Role API operations", type: "acceptance" do
       connection.role.update(target)
       obj = connection.role.find(target)
 
-      obj.override_attributes.should eql(overrides)
+      expect(obj.override_attributes).to eql(overrides)
     end
   end
 end

@@ -5,5 +5,8 @@ describe Ridley::DataBagObject do
   let(:resource) { double('db-resource', item_resource: item_resource) }
   subject { described_class.new(resource) }
 
-  its(:item) { should be_a(Ridley::DataBagObject::DataBagItemProxy) }
+  describe '#item' do
+    subject { super().item }
+    it { is_expected.to be_a(Ridley::DataBagObject::DataBagItemProxy) }
+  end
 end

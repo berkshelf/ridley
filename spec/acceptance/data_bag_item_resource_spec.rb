@@ -14,7 +14,7 @@ describe "DataBag API operations", type: "acceptance" do
   describe "listing data bag items" do
     context "when the data bag has no items" do
       it "returns an empty array" do
-        data_bag.item.all.should have(0).items
+        expect(data_bag.item.all.size).to eq(0)
       end
     end
 
@@ -25,7 +25,7 @@ describe "DataBag API operations", type: "acceptance" do
       end
 
       it "returns an array with each item" do
-        data_bag.item.all.should have(2).items
+        expect(data_bag.item.all.size).to eq(2)
       end
     end
   end
@@ -34,7 +34,7 @@ describe "DataBag API operations", type: "acceptance" do
     it "adds a data bag item to the collection of data bag items" do
       data_bag.item.create(id: "appconfig", host: "host.local", port: 80, admin: false, servers: ["one"])
 
-      data_bag.item.all.should have(1).item
+      expect(data_bag.item.all.size).to eq(1)
     end
 
     context "when an 'id' field is missing" do
@@ -59,7 +59,7 @@ describe "DataBag API operations", type: "acceptance" do
       }
       data_bag.item.create(attributes)
 
-      data_bag.item.find("appconfig").to_hash.should eql(attributes)
+      expect(data_bag.item.find("appconfig").to_hash).to eql(attributes)
     end
   end
 
@@ -76,14 +76,14 @@ describe "DataBag API operations", type: "acceptance" do
     it "returns the deleted data bag item" do
       dbi = data_bag.item.delete(attributes["id"])
 
-      dbi.should be_a(Ridley::DataBagItemObject)
-      dbi.attributes.should eql(attributes)
+      expect(dbi).to be_a(Ridley::DataBagItemObject)
+      expect(dbi.attributes).to eql(attributes)
     end
 
     it "deletes the data bag item from the server" do
       data_bag.item.delete(attributes["id"])
 
-      data_bag.item.find(attributes["id"]).should be_nil
+      expect(data_bag.item.find(attributes["id"])).to be_nil
     end
   end
 
@@ -94,13 +94,13 @@ describe "DataBag API operations", type: "acceptance" do
     end
 
     it "returns the array of deleted data bag items" do
-      data_bag.item.delete_all.should each be_a(Ridley::DataBagItemObject)
+      expect(data_bag.item.delete_all).to each be_a(Ridley::DataBagItemObject)
     end
 
     it "removes all data bag items from the data bag" do
       data_bag.item.delete_all
 
-      data_bag.item.all.should have(0).items
+      expect(data_bag.item.all.size).to eq(0)
     end
   end
 
@@ -110,7 +110,7 @@ describe "DataBag API operations", type: "acceptance" do
     it "returns the updated data bag item" do
       dbi = data_bag.item.update(id: "one", name: "brooke")
 
-      dbi[:name].should eql("brooke")
+      expect(dbi[:name]).to eql("brooke")
     end
   end
 
@@ -120,14 +120,14 @@ describe "DataBag API operations", type: "acceptance" do
 
       it "returns true if successful" do
         dbi[:name] = "brooke"
-        dbi.save.should be_true
+        expect(dbi.save).to be_truthy
       end
 
       it "creates a new data bag item on the remote" do
         dbi[:name] = "brooke"
         dbi.save
 
-        data_bag.item.all.should have(1).item
+        expect(data_bag.item.all.size).to eq(1)
       end
     end
 
@@ -136,7 +136,7 @@ describe "DataBag API operations", type: "acceptance" do
         dbi = data_bag.item.new
 
         dbi.attributes = { id: "not-there", name: "brooke" }
-        dbi.save.should be_true
+        expect(dbi.save).to be_truthy
       end
 
       it "creates a new data bag item on the remote" do
@@ -144,7 +144,7 @@ describe "DataBag API operations", type: "acceptance" do
         dbi.attributes = { id: "not-there", name: "brooke" }
         dbi.save
 
-        data_bag.item.all.should have(1).item
+        expect(data_bag.item.all.size).to eq(1)
       end
     end
   end

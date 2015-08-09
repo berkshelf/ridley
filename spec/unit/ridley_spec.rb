@@ -9,9 +9,9 @@ describe Ridley do
     describe "::new" do
       it "creates a new Ridley::Connection" do
         client = double('client')
-        Ridley::Client.should_receive(:new).with(config).and_return(client)
+        expect(Ridley::Client).to receive(:new).with(config).and_return(client)
 
-        subject.new(config).should eql(client)
+        expect(subject.new(config)).to eql(client)
       end
     end
 
@@ -32,12 +32,12 @@ describe Ridley do
       let(:path) { tmp_path.join('config.rb').to_s }
 
       before do
-        Ridley::Client.stub(:new).and_return(client)
+        allow(Ridley::Client).to receive(:new).and_return(client)
         File.open(path, 'w') { |f| f.write(chef_config) }
       end
 
       it "creates a Ridley connection from the Chef config" do
-        Ridley::Client.should_receive(:new).with({
+        expect(Ridley::Client).to receive(:new).with({
           client_key: 'username.pem',
           client_name: 'username',
           validator_client: 'validator',
@@ -58,7 +58,7 @@ describe Ridley do
       end
 
       it "allows the user to override attributes" do
-        Ridley::Client.should_receive(:new).with({
+        expect(Ridley::Client).to receive(:new).with({
           client_key: 'bacon.pem',
           client_name: 'bacon',
           validator_client: 'validator',
@@ -88,7 +88,7 @@ describe Ridley do
         end
 
         it "does a knife.rb search" do
-          Ridley::Client.should_receive(:new).with({
+          expect(Ridley::Client).to receive(:new).with({
             client_key: 'username.pem',
             client_name: 'username',
             validator_client: 'validator',

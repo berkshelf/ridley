@@ -11,33 +11,33 @@ describe Ridley::Middleware::ChefResponse do
 
       it "returns true if response status between 200 and 210" do
         (200..210).each do |code|
-          env.should_receive(:[]).with(:status).and_return(code)
+          expect(env).to receive(:[]).with(:status).and_return(code)
 
-          subject.success?(env).should be_true
+          expect(subject.success?(env)).to be_truthy
         end
       end
 
       it "returns false if response status is in the 300 range" do
         (300..399).each do |code|
-          env.should_receive(:[]).with(:status).and_return(code)
+          expect(env).to receive(:[]).with(:status).and_return(code)
 
-          subject.success?(env).should be_false
+          expect(subject.success?(env)).to be_falsey
         end
       end
 
       it "returns false if response status is in the 400 range" do
         (400..499).each do |code|
-          env.should_receive(:[]).with(:status).and_return(code)
+          expect(env).to receive(:[]).with(:status).and_return(code)
 
-          subject.success?(env).should be_false
+          expect(subject.success?(env)).to be_falsey
         end
       end
 
       it "returns false if response status is in the 500 range" do
         (500..599).each do |code|
-          env.should_receive(:[]).with(:status).and_return(code)
+          expect(env).to receive(:[]).with(:status).and_return(code)
 
-          subject.success?(env).should be_false
+          expect(subject.success?(env)).to be_falsey
         end
       end
     end
@@ -117,15 +117,15 @@ describe Ridley::Middleware::ChefResponse do
     end
 
     it "raises a Ridley::Errors::HTTPBadRequest" do
-      lambda {
+      expect {
         subject.get('cookbooks')
-      }.should raise_error(Ridley::Errors::HTTPBadRequest)
+      }.to raise_error(Ridley::Errors::HTTPBadRequest)
     end
 
     it "should have the body of the response as the error's message" do
-      lambda {
+      expect {
         subject.get('cookbooks')
-      }.should raise_error("errors: '400 - Bad Request: Valid X-CHEF-VERSION header is required.'")
+      }.to raise_error("errors: '400 - Bad Request: Valid X-CHEF-VERSION header is required.'")
     end
   end
 
@@ -135,15 +135,15 @@ describe Ridley::Middleware::ChefResponse do
     end
 
     it "raises a Ridley::Errors::HTTPUnauthorized" do
-      lambda {
+      expect {
         subject.get('cookbooks')
-      }.should raise_error(Ridley::Errors::HTTPUnauthorized)
+      }.to raise_error(Ridley::Errors::HTTPUnauthorized)
     end
 
     it "should have the body of the response as the error's message" do
-      lambda {
+      expect {
         subject.get('cookbooks')
-      }.should raise_error("errors: '401 - Unauthorized.  You must properly authenticate your API requests!'")
+      }.to raise_error("errors: '401 - Unauthorized.  You must properly authenticate your API requests!'")
     end
   end
 
@@ -153,15 +153,15 @@ describe Ridley::Middleware::ChefResponse do
     end
 
     it "raises a Ridley::Errors::HTTPForbidden" do
-      lambda {
+      expect {
         subject.get('cookbooks')
-      }.should raise_error(Ridley::Errors::HTTPForbidden)
+      }.to raise_error(Ridley::Errors::HTTPForbidden)
     end
 
     it "should have the body of the response as the error's message" do
-      lambda {
+      expect {
         subject.get('cookbooks')
-      }.should raise_error("errors: '403 - Forbidden.'")
+      }.to raise_error("errors: '403 - Forbidden.'")
     end
   end
 
@@ -171,15 +171,15 @@ describe Ridley::Middleware::ChefResponse do
     end
 
     it "raises a Ridley::Errors::HTTPNotFound" do
-      lambda {
+      expect {
         subject.get('not_existant_route')
-      }.should raise_error(Ridley::Errors::HTTPNotFound)
+      }.to raise_error(Ridley::Errors::HTTPNotFound)
     end
 
     it "should have the body of the response as the error's message" do
-      lambda {
+      expect {
         subject.get('not_existant_route')
-      }.should raise_error(Ridley::Errors::HTTPNotFound, "errors: 'No routes match the request: /organizations/vialstudios/cookbookss/not_existant'")
+      }.to raise_error(Ridley::Errors::HTTPNotFound, "errors: 'No routes match the request: /organizations/vialstudios/cookbookss/not_existant'")
     end
   end
 
@@ -189,15 +189,15 @@ describe Ridley::Middleware::ChefResponse do
     end
 
     it "raises a Ridley::Errors::HTTPForbidden" do
-      lambda {
+      expect {
         subject.get('cookbooks')
-      }.should raise_error(Ridley::Errors::HTTPConflict)
+      }.to raise_error(Ridley::Errors::HTTPConflict)
     end
 
     it "should have the body of the response as the error's message" do
-      lambda {
+      expect {
         subject.get('cookbooks')
-      }.should raise_error("errors: '409 - Conflict.'")
+      }.to raise_error("errors: '409 - Conflict.'")
     end
   end
 
@@ -207,7 +207,7 @@ describe Ridley::Middleware::ChefResponse do
     end
 
     it "returns a body containing a hash" do
-      subject.get('roles/reset').env[:body].should be_a(Hash)
+      expect(subject.get('roles/reset').env[:body]).to be_a(Hash)
     end
   end
 end

@@ -2,11 +2,11 @@ RSpec::Matchers.define :each do |check|
   match do |actual|
     actual.each_with_index do |index, o|
       @object = o
-      index.should check
+      expect(index).to check
     end
   end
 
-  failure_message_for_should do |actual|
+  failure_message do |actual|
     "at[#{@object}] #{check.failure_message_for_should}"
   end
 end

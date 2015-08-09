@@ -32,9 +32,20 @@ describe Ridley::Client do
       subject { described_class.new(options) }
 
       describe "parsing the 'server_url' option" do
-        its(:host) { should eql("api.opscode.com") }
-        its(:scheme) { should eql("https") }
-        its(:path_prefix) { should eql("/") }
+        describe '#host' do
+          subject { super().host }
+          it { is_expected.to eql("api.opscode.com") }
+        end
+
+        describe '#scheme' do
+          subject { super().scheme }
+          it { is_expected.to eql("https") }
+        end
+
+        describe '#path_prefix' do
+          subject { super().path_prefix }
+          it { is_expected.to eql("/") }
+        end
       end
 
       describe "with a server_url containing an organization" do
@@ -43,16 +54,16 @@ describe Ridley::Client do
         end
 
         it "gets the host data from the server_url" do
-          subject.host.should eql("api.opscode.com")
-          subject.scheme.should eql("https")
+          expect(subject.host).to eql("api.opscode.com")
+          expect(subject.scheme).to eql("https")
         end
 
         it "takes the organization out of the server_url and assigns it to the organization reader" do
-          subject.organization.should eql(organization)
+          expect(subject.organization).to eql(organization)
         end
 
         it "sets the 'path_prefix' of the connection the organization sub URI" do
-          subject.path_prefix.should eql("/organizations/#{organization}")
+          expect(subject.path_prefix).to eql("/organizations/#{organization}")
         end
       end
 
@@ -94,26 +105,26 @@ describe Ridley::Client do
       it "expands the path of the client_key" do
         config[:client_key] = "spec/fixtures/reset.pem"
 
-        described_class.new(config).client_key[0..4].should_not == "spec/"
+        expect(described_class.new(config).client_key[0..4]).not_to eq("spec/")
       end
 
       it "accepts a client key as a string" do
         key = File.read(fixtures_path.join("reset.pem").to_s)
         config[:client_key] = key.dup
-        described_class.new(config).client_key.should == key
+        expect(described_class.new(config).client_key).to eq(key)
       end
 
       it "assigns a 'chef_version' attribute from the given 'chef_version' option" do
-        described_class.new(config).chef_version.should eql("10.24.0-01")
+        expect(described_class.new(config).chef_version).to eql("10.24.0-01")
       end
     end
 
     describe "::open" do
       it "instantiates a new connection, yields to it, and terminates it" do
         new_instance = double(alive?: true)
-        described_class.should_receive(:new).and_return(new_instance)
-        new_instance.should_receive(:hello)
-        new_instance.should_receive(:terminate)
+        expect(described_class).to receive(:new).and_return(new_instance)
+        expect(new_instance).to receive(:hello)
+        expect(new_instance).to receive(:terminate)
 
         described_class.open do |f|
           f.hello
@@ -126,18 +137,45 @@ describe Ridley::Client do
 
   subject { instance }
 
-  its(:client) { should be_a(Ridley::ClientResource) }
-  its(:cookbook) { should be_a(Ridley::CookbookResource) }
-  its(:data_bag) { should be_a(Ridley::DataBagResource) }
-  its(:environment) { should be_a(Ridley::EnvironmentResource) }
-  its(:node) { should be_a(Ridley::NodeResource) }
-  its(:role) { should be_a(Ridley::RoleResource) }
-  its(:sandbox) { should be_a(Ridley::SandboxResource) }
+  describe '#client' do
+    subject { super().client }
+    it { is_expected.to be_a(Ridley::ClientResource) }
+  end
+
+  describe '#cookbook' do
+    subject { super().cookbook }
+    it { is_expected.to be_a(Ridley::CookbookResource) }
+  end
+
+  describe '#data_bag' do
+    subject { super().data_bag }
+    it { is_expected.to be_a(Ridley::DataBagResource) }
+  end
+
+  describe '#environment' do
+    subject { super().environment }
+    it { is_expected.to be_a(Ridley::EnvironmentResource) }
+  end
+
+  describe '#node' do
+    subject { super().node }
+    it { is_expected.to be_a(Ridley::NodeResource) }
+  end
+
+  describe '#role' do
+    subject { super().role }
+    it { is_expected.to be_a(Ridley::RoleResource) }
+  end
+
+  describe '#sandbox' do
+    subject { super().sandbox }
+    it { is_expected.to be_a(Ridley::SandboxResource) }
+  end
 
   describe "#encrypted_data_bag_secret" do
     subject { instance.encrypted_data_bag_secret }
 
-    it { should be_a(String) }
+    it { is_expected.to be_a(String) }
 
     context "when a encrypted_data_bag_secret_path is not provided" do
       before(:each) do

@@ -7,10 +7,10 @@ describe Ridley::EnvironmentObject do
     it "sets an override node attribute at the nested path" do
       subject.set_override_attribute('deep.nested.item', true)
 
-      subject.override_attributes.should have_key("deep")
-      subject.override_attributes["deep"].should have_key("nested")
-      subject.override_attributes["deep"]["nested"].should have_key("item")
-      subject.override_attributes["deep"]["nested"]["item"].should be_true
+      expect(subject.override_attributes).to have_key("deep")
+      expect(subject.override_attributes["deep"]).to have_key("nested")
+      expect(subject.override_attributes["deep"]["nested"]).to have_key("item")
+      expect(subject.override_attributes["deep"]["nested"]["item"]).to be_truthy
     end
 
     context "when the override attribute is already set" do
@@ -24,7 +24,7 @@ describe Ridley::EnvironmentObject do
         }
         subject.set_override_attribute('deep.nested.item', true)
 
-        subject.override_attributes["deep"]["nested"]["item"].should be_true
+        expect(subject.override_attributes["deep"]["nested"]["item"]).to be_truthy
       end
     end
   end
@@ -33,10 +33,10 @@ describe Ridley::EnvironmentObject do
     it "sets an override node attribute at the nested path" do
       subject.set_default_attribute('deep.nested.item', true)
 
-      subject.default_attributes.should have_key("deep")
-      subject.default_attributes["deep"].should have_key("nested")
-      subject.default_attributes["deep"]["nested"].should have_key("item")
-      subject.default_attributes["deep"]["nested"]["item"].should be_true
+      expect(subject.default_attributes).to have_key("deep")
+      expect(subject.default_attributes["deep"]).to have_key("nested")
+      expect(subject.default_attributes["deep"]["nested"]).to have_key("item")
+      expect(subject.default_attributes["deep"]["nested"]["item"]).to be_truthy
     end
 
     context "when the override attribute is already set" do
@@ -50,7 +50,7 @@ describe Ridley::EnvironmentObject do
         }
         subject.set_default_attribute('deep.nested.item', true)
 
-        subject.default_attributes["deep"]["nested"]["item"].should be_true
+        expect(subject.default_attributes["deep"]["nested"]["item"]).to be_truthy
       end
     end
 

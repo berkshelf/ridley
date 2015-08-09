@@ -16,7 +16,7 @@ describe Ridley::Middleware::ChefAuth do
           host: "https://api.opscode.com",
           path: "/something.file"
         }
-        subject.authentication_headers(client_name, client_key, options).should be_a(Hash)
+        expect(subject.authentication_headers(client_name, client_key, options)).to be_a(Hash)
       end
 
       context "when the :client_key is an actual key" do
@@ -28,7 +28,7 @@ describe Ridley::Middleware::ChefAuth do
             host: "https://api.opscode.com",
             path: "/something.file"
           }
-          subject.authentication_headers(client_name, client_key, options).should be_a(Hash)
+          expect(subject.authentication_headers(client_name, client_key, options)).to be_a(Hash)
         end
       end
     end

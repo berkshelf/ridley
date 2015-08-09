@@ -22,7 +22,7 @@ describe Ridley::Resource do
       it "sets the resource_path attr on the class" do
         subject.set_resource_path("environments")
 
-        subject.resource_path.should eql("environments")
+        expect(subject.resource_path).to eql("environments")
       end
     end
 
@@ -31,7 +31,7 @@ describe Ridley::Resource do
         before { subject.set_resource_path(nil) }
 
         it "returns the representation's chef type" do
-          subject.resource_path.should eql(representation.chef_type)
+          expect(subject.resource_path).to eql(representation.chef_type)
         end
       end
 
@@ -40,7 +40,7 @@ describe Ridley::Resource do
         before { subject.set_resource_path(set_path) }
 
         it "returns the set value" do
-          subject.resource_path.should eql(set_path)
+          expect(subject.resource_path).to eql(set_path)
         end
       end
     end
@@ -97,7 +97,7 @@ describe Ridley::Resource do
       end
 
       it "returns nil" do
-        subject.find(id).should be_nil
+        expect(subject.find(id)).to be_nil
       end
     end
   end
@@ -135,7 +135,7 @@ describe Ridley::Resource do
 
   describe "::delete_all" do
     it "sends a delete request for every object in the collection" do
-      pending
+      skip
     end
   end
 

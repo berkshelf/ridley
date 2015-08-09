@@ -22,24 +22,24 @@ describe Ridley::SandboxResource do
     end
 
     it "returns a Ridley::SandboxObject" do
-      subject.create.should be_a(Ridley::SandboxObject)
+      expect(subject.create).to be_a(Ridley::SandboxObject)
     end
 
     it "has a value of 'false' for :is_completed" do
-      subject.create.is_completed.should be_false
+      expect(subject.create.is_completed).to be_falsey
     end
 
     it "has an empty Hash of checksums" do
-      subject.create.checksums.should be_a(Hash)
-      subject.create.checksums.should be_empty
+      expect(subject.create.checksums).to be_a(Hash)
+      expect(subject.create.checksums).to be_empty
     end
 
     it "has a value for :uri" do
-      subject.create.uri.should eql(sandbox_uri)
+      expect(subject.create.uri).to eql(sandbox_uri)
     end
 
     it "has a value for :sandbox_id" do
-      subject.create.sandbox_id.should eql(sandbox_id)
+      expect(subject.create.sandbox_id).to eql(sandbox_id)
     end
 
     context "when given an array of checksums" do
@@ -54,7 +54,7 @@ describe Ridley::SandboxResource do
       let(:checksum_array) { checksums.keys }
 
       it "has a Hash of checksums with each of the given checksum ids" do
-        subject.create(checksum_array).checksums.should have(checksum_array.length).checksums
+        expect(subject.create(checksum_array).checksums.size).to eq(checksum_array.length)
       end
     end
   end
