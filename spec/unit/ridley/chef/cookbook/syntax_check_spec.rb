@@ -12,7 +12,7 @@ describe Ridley::Chef::Cookbook::SyntaxCheck do
   subject { syntax_check }
 
   before(:each) do
-    subject.stub(:chefignore) { chefignore }
+    allow(subject).to receive(:chefignore) { chefignore }
   end
 
   describe "#ruby_files" do
@@ -55,7 +55,7 @@ describe Ridley::Chef::Cookbook::SyntaxCheck do
     it "checks if a file has already been validated" do
       valid_template_file = cookbook_dir.join("templates/default/temp.txt.erb").to_s
       subject.validated(valid_template_file)
-      expect(subject.validated?(valid_template_file)).to be_true
+      expect(subject.validated?(valid_template_file)).to be_truthy
     end
   end
 
@@ -63,7 +63,7 @@ describe Ridley::Chef::Cookbook::SyntaxCheck do
     let(:validated_files) { double('validated_files') }
 
     before(:each) do
-      subject.stub(:validated_files) { validated_files }
+      allow(subject).to receive(:validated_files) { validated_files }
     end
 
     it "records a file as validated" do
@@ -77,35 +77,35 @@ describe Ridley::Chef::Cookbook::SyntaxCheck do
 
   describe "#validate_ruby_files" do
     it "asks #untested_ruby_files for a list of files and calls #validate_ruby_file on each" do
-      subject.stub(:validate_ruby_file).with(anything()).exactly(9).times { true }
-      expect(subject.validate_ruby_files).to be_true
+      allow(subject).to receive(:validate_ruby_file).with(anything()).exactly(9).times { true }
+      expect(subject.validate_ruby_files).to be_truthy
     end
 
     it "marks the successfully validated ruby files" do
-      subject.stub(:validated).with(anything()).exactly(9).times
-      expect(subject.validate_ruby_files).to be_true
+      allow(subject).to receive(:validated).with(anything()).exactly(9).times
+      expect(subject.validate_ruby_files).to be_truthy
     end
 
     it "returns false if any ruby file fails to validate" do
-      subject.stub(:validate_ruby_file).with(/\.rb$/) { false }
-      expect(subject.validate_ruby_files).to be_false
+      allow(subject).to receive(:validate_ruby_file).with(/\.rb$/) { false }
+      expect(subject.validate_ruby_files).to be_falsey
     end
   end
 
   describe "#validate_templates" do
     it "asks #untested_template_files for a list of erb files and calls #validate_template on each" do
-      subject.stub(:validate_template).with(anything()).exactly(9).times { true }
-      expect(subject.validate_templates).to be_true
+      allow(subject).to receive(:validate_template).with(anything()).exactly(9).times { true }
+      expect(subject.validate_templates).to be_truthy
     end
 
     it "marks the successfully validated erb files" do
-      subject.stub(:validated).with(anything()).exactly(9).times
-      expect(subject.validate_templates).to be_true
+      allow(subject).to receive(:validated).with(anything()).exactly(9).times
+      expect(subject.validate_templates).to be_truthy
     end
 
     it "returns false if any erb file fails to validate" do
-      subject.stub(:validate_template).with(/\.erb$/) { false }
-      expect(subject.validate_templates).to be_false
+      allow(subject).to receive(:validate_template).with(/\.erb$/) { false }
+      expect(subject.validate_templates).to be_falsey
     end
   end
 

@@ -8,13 +8,16 @@ describe Ridley::DataBagResource do
     subject { instance.item_resource }
 
     it "returns a DataBagItemResource" do
-      subject.should be_a(Ridley::DataBagItemResource)
+      expect(subject).to be_a(Ridley::DataBagItemResource)
     end
 
-    its(:encrypted_data_bag_secret) { should eql(secret) }
+    describe '#encrypted_data_bag_secret' do
+      subject { super().encrypted_data_bag_secret }
+      it { is_expected.to eql(secret) }
+    end
   end
 
   describe "#find" do
-    pending
+    skip
   end
 end

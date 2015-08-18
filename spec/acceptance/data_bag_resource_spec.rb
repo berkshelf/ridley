@@ -9,7 +9,7 @@ describe "DataBag API operations", type: "acceptance" do
   describe "listing data bags" do
     context "when no data bags exist" do
       it "returns an empty array" do
-        connection.data_bag.all.should have(0).items
+        expect(connection.data_bag.all.size).to eq(0)
       end
     end
 
@@ -20,18 +20,18 @@ describe "DataBag API operations", type: "acceptance" do
       end
 
       it "returns an array of data bags" do
-        connection.data_bag.all.should each be_a(Ridley::DataBagObject)
+        expect(connection.data_bag.all).to each be_a(Ridley::DataBagObject)
       end
 
       it "returns all of the data bags on the server" do
-        connection.data_bag.all.should have(2).items
+        expect(connection.data_bag.all.size).to eq(2)
       end
     end
   end
 
   describe "creating a data bag" do
     it "returns a Ridley::DataBagObject" do
-      connection.data_bag.create(name: "ridley-one").should be_a(Ridley::DataBagObject)
+      expect(connection.data_bag.create(name: "ridley-one")).to be_a(Ridley::DataBagObject)
     end
   end
 end

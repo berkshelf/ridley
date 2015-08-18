@@ -11,7 +11,7 @@ describe "Node API operations", type: "acceptance" do
     before { chef_node(node_name) }
 
     it "returns a Ridley::NodeObject" do
-      connection.node.find(node_name).should be_a(Ridley::NodeObject)
+      expect(connection.node.find(node_name)).to be_a(Ridley::NodeObject)
     end
   end
 
@@ -19,13 +19,13 @@ describe "Node API operations", type: "acceptance" do
     let(:node_name) { "ridley.localhost" }
 
     it "returns a new Ridley::NodeObject object" do
-      connection.node.create(name: node_name).should be_a(Ridley::NodeObject)
+      expect(connection.node.create(name: node_name)).to be_a(Ridley::NodeObject)
     end
 
     it "adds a new node to the server" do
       connection.node.create(name: node_name)
 
-      connection.node.all.should have(1).node
+      expect(connection.node.all.size).to eq(1)
     end
   end
 
@@ -34,13 +34,13 @@ describe "Node API operations", type: "acceptance" do
     before { chef_node(node_name) }
 
     it "returns a Ridley::NodeObject" do
-      connection.node.delete(node_name).should be_a(Ridley::NodeObject)
+      expect(connection.node.delete(node_name)).to be_a(Ridley::NodeObject)
     end
 
     it "removes the node from the server" do
       connection.node.delete(node_name)
 
-      connection.node.find(node_name).should be_nil
+      expect(connection.node.find(node_name)).to be_nil
     end
   end
 
@@ -53,7 +53,7 @@ describe "Node API operations", type: "acceptance" do
     it "deletes all nodes from the remote server" do
       connection.node.delete_all
 
-      connection.node.all.should have(0).nodes
+      expect(connection.node.all.size).to eq(0)
     end
   end
 
@@ -66,8 +66,8 @@ describe "Node API operations", type: "acceptance" do
     it "returns an array of Ridley::NodeObject" do
       obj = connection.node.all
 
-      obj.should each be_a(Ridley::NodeObject)
-      obj.should have(2).nodes
+      expect(obj).to each be_a(Ridley::NodeObject)
+      expect(obj.size).to eq(2)
     end
   end
 
@@ -77,7 +77,7 @@ describe "Node API operations", type: "acceptance" do
     let(:target) { connection.node.find(node_name) }
 
     it "returns the updated node" do
-      connection.node.update(target).should eql(target)
+      expect(connection.node.update(target)).to eql(target)
     end
 
     it "saves a new set of 'normal' attributes" do
@@ -91,7 +91,7 @@ describe "Node API operations", type: "acceptance" do
       connection.node.update(target)
       obj = connection.node.find(target)
 
-      obj.normal.should eql(normal)
+      expect(obj.normal).to eql(normal)
     end
 
     it "saves a new set of 'default' attributes" do
@@ -105,7 +105,7 @@ describe "Node API operations", type: "acceptance" do
       connection.node.update(target)
       obj = connection.node.find(target)
 
-      obj.default.should eql(defaults)
+      expect(obj.default).to eql(defaults)
     end
 
     it "saves a new set of 'automatic' attributes" do
@@ -119,7 +119,7 @@ describe "Node API operations", type: "acceptance" do
       connection.node.update(target)
       obj = connection.node.find(target)
 
-      obj.automatic.should eql(automatics)
+      expect(obj.automatic).to eql(automatics)
     end
 
     it "saves a new set of 'override' attributes" do
@@ -133,7 +133,7 @@ describe "Node API operations", type: "acceptance" do
       connection.node.update(target)
       obj = connection.node.find(target)
 
-      obj.override.should eql(overrides)
+      expect(obj.override).to eql(overrides)
     end
 
     it "places a node in a new 'chef_environment'" do
@@ -142,7 +142,7 @@ describe "Node API operations", type: "acceptance" do
       connection.node.update(target)
       obj = connection.node.find(target)
 
-      obj.chef_environment.should eql(environment)
+      expect(obj.chef_environment).to eql(environment)
     end
 
     it "saves a new 'run_list' for the node" do
@@ -151,7 +151,7 @@ describe "Node API operations", type: "acceptance" do
       connection.node.update(target)
       obj = connection.node.find(target)
 
-      obj.run_list.should eql(run_list)
+      expect(obj.run_list).to eql(run_list)
     end
   end
 end

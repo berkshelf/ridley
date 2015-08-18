@@ -21,7 +21,7 @@ describe Ridley::DataBagItemObject do
       end
 
       it "returns a new object from attributes in the 'raw_data' field" do
-        subject.from_hash(response).attributes.should eql(response["raw_data"])
+        expect(subject.from_hash(response).attributes).to eql(response["raw_data"])
       end
     end
 
@@ -34,20 +34,20 @@ describe Ridley::DataBagItemObject do
       end
 
       it "returns a new object from the hash" do
-        subject.from_hash(response).attributes.should eql(response)
+        expect(subject.from_hash(response).attributes).to eql(response)
       end
     end
   end
 
   describe "#decrypt" do
     before(:each) do
-      resource.stub(encrypted_data_bag_secret: File.read(fixtures_path.join("encrypted_data_bag_secret").to_s))
+      allow(resource).to receive_messages(encrypted_data_bag_secret: File.read(fixtures_path.join("encrypted_data_bag_secret").to_s))
     end
 
     it "decrypts an encrypted v0 value" do
       subject.attributes[:test] = "Xk0E8lV9r4BhZzcg4wal0X4w9ZexN3azxMjZ9r1MCZc="
       subject.decrypt
-      subject.attributes[:test][:database][:username].should == "test"
+      expect(subject.attributes[:test][:database][:username]).to eq("test")
     end
 
     it "decrypts an encrypted v1 value" do
@@ -57,21 +57,21 @@ describe Ridley::DataBagItemObject do
       subject.attributes[:password][:encrypted_data] = "zG+tTjtwOWA4vEYDoUwPYreXLZ1pFyKoWDGezEejmKs="
       subject.attributes[:password][:iv] = "URVhHxv/ZrnABJBvl82qsg=="
       subject.decrypt
-      subject.attributes[:password].should == "password123"
+      expect(subject.attributes[:password]).to eq("password123")
     end
 
     it "does not decrypt the id field" do
       id = "dbi_id"
       subject.attributes[:id] = id
       subject.decrypt
-      subject.attributes[:id].should == id
+      expect(subject.attributes[:id]).to eq(id)
     end
   end
 
   describe "#decrypt_value" do
     context "when no encrypted_data_bag_secret has been configured" do
       before do
-        resource.stub(encrypted_data_bag_secret: nil)
+        allow(resource).to receive_messages(encrypted_data_bag_secret: nil)
       end
 
       it "raises an EncryptedDataBagSecretNotSet error" do

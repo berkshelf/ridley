@@ -10,7 +10,7 @@ describe Ridley::ChefObject do
           name: "a name"
         }
 
-        subject.any_instance.should_receive(:mass_assign).with(new_attrs)
+        expect_any_instance_of(subject).to receive(:mass_assign).with(new_attrs)
         subject.new(resource, new_attrs)
       end
     end
@@ -19,7 +19,7 @@ describe Ridley::ChefObject do
       it "sets the chef_type attr on the class" do
         subject.set_chef_type("environment")
 
-        subject.chef_type.should eql("environment")
+        expect(subject.chef_type).to eql("environment")
       end
     end
 
@@ -27,7 +27,7 @@ describe Ridley::ChefObject do
       it "sets the chef_json_class attr on the class" do
         subject.set_chef_json_class("Chef::Environment")
 
-        subject.chef_json_class.should eql("Chef::Environment")
+        expect(subject.chef_json_class).to eql("Chef::Environment")
       end
     end
 
@@ -35,25 +35,25 @@ describe Ridley::ChefObject do
       it "sets the chef_id attribute on the class" do
         subject.set_chef_id(:environment)
 
-        subject.chef_id.should eql(:environment)
+        expect(subject.chef_id).to eql(:environment)
       end
     end
 
     describe "::chef_type" do
       it "returns the underscored name of the including class if nothing is set" do
-        subject.chef_type.should eql(subject.class.name.underscore)
+        expect(subject.chef_type).to eql(subject.class.name.underscore)
       end
     end
 
     describe "::chef_json_class" do
       it "returns the chef_json if nothing has been set" do
-        subject.chef_json_class.should be_nil
+        expect(subject.chef_json_class).to be_nil
       end
     end
 
     describe "::chef_id" do
       it "returns nil if nothing is set" do
-        subject.chef_id.should be_nil
+        expect(subject.chef_id).to be_nil
       end
     end
   end
@@ -64,12 +64,12 @@ describe Ridley::ChefObject do
 
   describe "#save" do
     context "when the object is valid" do
-      before(:each) { subject.stub(:valid?).and_return(true) }
+      before(:each) { allow(subject).to receive(:valid?).and_return(true) }
 
       it "sends a create message to the implementing class" do
         updated = double('updated')
-        updated.stub(:_attributes_).and_return(Hash.new)
-        resource.should_receive(:create).with(subject).and_return(updated)
+        allow(updated).to receive(:_attributes_).and_return(Hash.new)
+        expect(resource).to receive(:create).with(subject).and_return(updated)
 
         subject.save
       end
@@ -77,10 +77,10 @@ describe Ridley::ChefObject do
       context "when there is an HTTPConflict" do
         it "sends the update message to self" do
           updated = double('updated')
-          updated.stub(:[]).and_return(Hash.new)
-          updated.stub(:_attributes_).and_return(Hash.new)
-          resource.should_receive(:create).and_raise(Ridley::Errors::HTTPConflict.new(updated))
-          subject.should_receive(:update).and_return(updated)
+          allow(updated).to receive(:[]).and_return(Hash.new)
+          allow(updated).to receive(:_attributes_).and_return(Hash.new)
+          expect(resource).to receive(:create).and_raise(Ridley::Errors::HTTPConflict.new(updated))
+          expect(subject).to receive(:update).and_return(updated)
 
           subject.save
         end
@@ -88,12 +88,12 @@ describe Ridley::ChefObject do
     end
 
     context "when the object is invalid" do
-      before(:each) { subject.stub(:valid?).and_return(false) }
+      before(:each) { allow(subject).to receive(:valid?).and_return(false) }
 
       it "raises an InvalidResource error" do
-        lambda {
+        expect {
           subject.save
-        }.should raise_error(Ridley::Errors::InvalidResource)
+        }.to raise_error(Ridley::Errors::InvalidResource)
       end
     end
   end
@@ -102,31 +102,31 @@ describe Ridley::ChefObject do
     context "when the object is valid" do
       let(:updated) do
         updated = double('updated')
-        updated.stub(:[]).and_return(Hash.new)
-        updated.stub(:_attributes_).and_return(Hash.new)
+        allow(updated).to receive(:[]).and_return(Hash.new)
+        allow(updated).to receive(:_attributes_).and_return(Hash.new)
         updated
       end
 
-      before(:each) { subject.stub(:valid?).and_return(true) }
+      before(:each) { allow(subject).to receive(:valid?).and_return(true) }
 
       it "sends an update message to the implementing class" do
-        resource.should_receive(:update).with(subject).and_return(updated)
+        expect(resource).to receive(:update).with(subject).and_return(updated)
         subject.update
       end
 
       it "returns true" do
-        resource.should_receive(:update).with(subject).and_return(updated)
-        subject.update.should eql(true)
+        expect(resource).to receive(:update).with(subject).and_return(updated)
+        expect(subject.update).to eql(true)
       end
     end
 
     context "when the object is invalid" do
-      before(:each) { subject.stub(:valid?).and_return(false) }
+      before(:each) { allow(subject).to receive(:valid?).and_return(false) }
 
       it "raises an InvalidResource error" do
-        lambda {
+        expect {
           subject.update
-        }.should raise_error(Ridley::Errors::InvalidResource)
+        }.to raise_error(Ridley::Errors::InvalidResource)
       end
     end
   end
@@ -134,10 +134,10 @@ describe Ridley::ChefObject do
   describe "#chef_id" do
     it "returns the value of the chef_id attribute" do
       subject.class.attribute(:name)
-      subject.class.stub(:chef_id) { :name }
+      allow(subject.class).to receive(:chef_id) { :name }
       subject.mass_assign(name: "reset")
 
-      subject.chef_id.should eql("reset")
+      expect(subject.chef_id).to eql("reset")
     end
   end
 
@@ -147,17 +147,17 @@ describe Ridley::ChefObject do
     before(:each) do
       subject.class.attribute(:one)
       subject.class.attribute(:two)
-      resource.stub(:find).with(subject).and_return(updated_subject)
+      allow(resource).to receive(:find).with(subject).and_return(updated_subject)
     end
 
     it "returns itself" do
-      subject.reload.should eql(subject)
+      expect(subject.reload).to eql(subject)
     end
 
     it "sets the attributes of self to equal those of the updated object" do
       subject.reload
 
-      subject.get_attribute(:one).should eql("val")
+      expect(subject.get_attribute(:one)).to eql("val")
     end
 
     it "does not include attributes not set by the updated object" do
@@ -188,7 +188,7 @@ describe Ridley::ChefObject do
       end
 
       it "is equal" do
-        one.should be_eql(two)
+        expect(one).to be_eql(two)
       end
     end
 
@@ -199,7 +199,7 @@ describe Ridley::ChefObject do
       end
 
       it "is not equal" do
-        one.should_not be_eql(two)
+        expect(one).not_to be_eql(two)
       end
     end
   end
@@ -227,7 +227,7 @@ describe Ridley::ChefObject do
       end
 
       it "returns only one unique element" do
-        nodes.uniq.should have(1).item
+        expect(nodes.uniq.size).to eq(1)
       end
     end
 
@@ -240,7 +240,7 @@ describe Ridley::ChefObject do
       end
 
       it "returns all of the elements" do
-        nodes.uniq.should have(2).item
+        expect(nodes.uniq.size).to eq(2)
       end
     end
   end

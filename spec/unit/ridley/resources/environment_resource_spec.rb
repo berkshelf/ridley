@@ -28,13 +28,13 @@ describe Ridley::EnvironmentResource do
       end
 
       it "returns a Hash" do
-        should be_a(Hash)
+        is_expected.to be_a(Hash)
       end
 
       it "contains a key for each cookbook" do
-        subject.keys.should have(2).items
-        subject.should have_key("hello")
-        subject.should have_key("there")
+        expect(subject.keys.size).to eq(2)
+        expect(subject).to have_key("hello")
+        expect(subject).to have_key("there")
       end
     end
 

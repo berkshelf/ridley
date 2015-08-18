@@ -18,7 +18,7 @@ describe Ridley::Errors do
         it "adds an item to the error map" do
           subject.register_error(400)
 
-          subject.error_map.should have(1).item
+          expect(subject.error_map.size).to eq(1)
         end
 
         it "adds a key of the given status code with a value of the class inheriting from HTTPError" do
@@ -26,7 +26,7 @@ describe Ridley::Errors do
             register_error(400)
           end
 
-          subject.error_map[400].should eql(RidleyTestHTTPError)
+          expect(subject.error_map[400]).to eql(RidleyTestHTTPError)
         end
       end
     end
@@ -35,7 +35,7 @@ describe Ridley::Errors do
       subject { Ridley::Errors::HTTPError.new(:body => "<html><body><h1>Redirected</h1></body></html>") }
 
       it "has an HTML body" do
-        subject.message.should eq("<html><body><h1>Redirected</h1></body></html>")
+        expect(subject.message).to eq("<html><body><h1>Redirected</h1></body></html>")
       end
     end
   end

@@ -7,9 +7,9 @@ module Ridley
         let(:instance) { Class.new { include Ridley::Mixin::FromFile }.new }
 
         before do
-          File.stub(:exists?).and_return(true)
-          File.stub(:readable?).and_return(true)
-          IO.stub(:read).and_return('invalid Ruby code')
+          allow(File).to receive(:exists?).and_return(true)
+          allow(File).to receive(:readable?).and_return(true)
+          allow(IO).to receive(:read).and_return('invalid Ruby code')
         end
 
         it 'raises a FromFileParserError' do

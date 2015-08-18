@@ -41,7 +41,7 @@ end
 group :test do
   gem 'thor'
   gem 'rake', '>= 0.9.2.2'
-  gem 'rspec', '~> 2.14.0'
+  gem 'rspec', '~> 3.0'
   gem 'fuubar'
   gem 'json_spec'
   gem 'webmock'

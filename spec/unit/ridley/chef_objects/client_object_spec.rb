@@ -2,10 +2,10 @@ require 'spec_helper'
 
 describe Ridley::ClientObject do
   describe "#to_json" do
-    pending
+    skip
   end
 
   describe "#regenerate_key" do
-    pending
+    skip
   end
 end

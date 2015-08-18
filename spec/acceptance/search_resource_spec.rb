@@ -10,18 +10,18 @@ describe "Search API operations", type: "acceptance" do
     it "returns an array of indexes" do
       indexes = connection.search_indexes
 
-      indexes.should include("role")
-      indexes.should include("node")
-      indexes.should include("client")
-      indexes.should include("environment")
+      expect(indexes).to include("role")
+      expect(indexes).to include("node")
+      expect(indexes).to include("client")
+      expect(indexes).to include("environment")
     end
   end
 
   describe "searching an index that doesn't exist" do
     it "it raises a Ridley::Errors::HTTPNotFound error" do
-      lambda {
+      expect {
         connection.search(:notthere)
-      }.should raise_error(Ridley::Errors::HTTPNotFound)
+      }.to raise_error(Ridley::Errors::HTTPNotFound)
     end
   end
 end

@@ -10,7 +10,7 @@ describe "Environment API operations", type: "acceptance" do
     before { chef_environment("ridley-test-env") }
 
     it "returns a valid Ridley::EnvironmentObject object" do
-      connection.environment.find("ridley-test-env").should be_a(Ridley::EnvironmentObject)
+      expect(connection.environment.find("ridley-test-env")).to be_a(Ridley::EnvironmentObject)
     end
   end
 
@@ -18,13 +18,13 @@ describe "Environment API operations", type: "acceptance" do
     it "returns a valid Ridley::EnvironmentObject object" do
       obj = connection.environment.create(name: "ridley-test-env", description: "a testing env for ridley")
 
-      obj.should be_a(Ridley::EnvironmentObject)
+      expect(obj).to be_a(Ridley::EnvironmentObject)
     end
 
     it "adds an environment to the chef server" do
       old = connection.environment.all.length
       connection.environment.create(name: "ridley")
-      connection.environment.all.should have(old + 1).item
+      expect(connection.environment.all.size).to eq(old + 1)
     end
   end
 
@@ -32,19 +32,19 @@ describe "Environment API operations", type: "acceptance" do
     before { chef_environment("ridley-env") }
 
     it "returns a Ridley::EnvironmentObject object" do
-      connection.environment.delete("ridley-env").should be_a(Ridley::EnvironmentObject)
+      expect(connection.environment.delete("ridley-env")).to be_a(Ridley::EnvironmentObject)
     end
 
     it "removes the environment from the server" do
       connection.environment.delete("ridley-env")
 
-      connection.environment.find("ridley-env").should be_nil
+      expect(connection.environment.find("ridley-env")).to be_nil
     end
 
     it "raises Ridley::Errors::HTTPMethodNotAllowed when attempting to delete the '_default' environment" do
-      lambda {
+      expect {
         connection.environment.delete("_default")
-      }.should raise_error(Ridley::Errors::HTTPMethodNotAllowed)
+      }.to raise_error(Ridley::Errors::HTTPMethodNotAllowed)
     end
   end
 
@@ -55,19 +55,19 @@ describe "Environment API operations", type: "acceptance" do
     end
 
     it "returns an array of Ridley::EnvironmentObject objects" do
-      connection.environment.delete_all.should each be_a(Ridley::EnvironmentObject)
+      expect(connection.environment.delete_all).to each be_a(Ridley::EnvironmentObject)
     end
 
     it "deletes all environments but '_default' from the remote" do
       connection.environment.delete_all
 
-      connection.environment.all.should have(1).item
+      expect(connection.environment.all.size).to eq(1)
     end
   end
 
   describe "listing all environments" do
     it "should return an array of Ridley::EnvironmentObject objects" do
-      connection.environment.all.should each be_a(Ridley::EnvironmentObject)
+      expect(connection.environment.all).to each be_a(Ridley::EnvironmentObject)
     end
   end
 
@@ -79,7 +79,7 @@ describe "Environment API operations", type: "acceptance" do
       target.description = description = "ridley testing environment"
 
       connection.environment.update(target)
-      target.reload.description.should eql(description)
+      expect(target.reload.description).to eql(description)
     end
 
     it "saves a new set of 'default_attributes'" do
@@ -92,7 +92,7 @@ describe "Environment API operations", type: "acceptance" do
 
       connection.environment.update(target)
       obj = connection.environment.find(target)
-      obj.default_attributes.should eql(default_attributes)
+      expect(obj.default_attributes).to eql(default_attributes)
     end
 
     it "saves a new set of 'override_attributes'" do
@@ -105,7 +105,7 @@ describe "Environment API operations", type: "acceptance" do
 
       connection.environment.update(target)
       obj = connection.environment.find(target)
-      obj.override_attributes.should eql(override_attributes)
+      expect(obj.override_attributes).to eql(override_attributes)
     end
 
     it "saves a new set of 'cookbook_versions'" do
@@ -116,7 +116,7 @@ describe "Environment API operations", type: "acceptance" do
 
       connection.environment.update(target)
       obj = connection.environment.find(target)
-      obj.cookbook_versions.should eql(cookbook_versions)
+      expect(obj.cookbook_versions).to eql(cookbook_versions)
     end
   end
 end

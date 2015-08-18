@@ -17,36 +17,36 @@ describe Ridley::Chef::Cookbook::Metadata do
         :choice => [ "test1", "test2" ],
         :default => "test1"
       }
-      lambda {
+      expect {
         subject.attribute("test_cookbook/test", options)
-      }.should_not raise_error
+      }.not_to raise_error
   
       options = {
         :type => "boolean",
         :choice => [ true, false ],
         :default => true
       }
-      lambda {
+      expect {
         subject.attribute("test_cookbook/test", options)
-      }.should_not raise_error
+      }.not_to raise_error
 
       options = {
         :type => "numeric",
         :choice => [ 1337, 420 ],
         :default => 1337
       }
-      lambda {
+      expect {
         subject.attribute("test_cookbook/test", options)
-      }.should_not raise_error
+      }.not_to raise_error
 
       options = {
         :type => "numeric",
         :choice => [ true, "false" ],
         :default => false
       }
-      lambda {
+      expect {
         subject.attribute("test_cookbook/test", options)
-      }.should raise_error
+      }.to raise_error
     end
   end
 end

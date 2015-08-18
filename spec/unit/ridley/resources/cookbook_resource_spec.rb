@@ -42,7 +42,7 @@ describe Ridley::CookbookResource do
       end
 
       it "returns the latest version" do
-        subject.latest_version(name).should eql("3.0.0")
+        expect(subject.latest_version(name)).to eql("3.0.0")
       end
     end
   end
@@ -58,16 +58,16 @@ describe Ridley::CookbookResource do
       end
 
       it "returns an array" do
-        subject.versions(name).should be_a(Array)
+        expect(subject.versions(name)).to be_a(Array)
       end
 
       it "contains a version string for each cookbook version available" do
         result = subject.versions(name)
 
-        result.should have(3).versions
-        result.should include("1.0.0")
-        result.should include("1.1.0")
-        result.should include("1.2.0")
+        expect(result.size).to eq(3)
+        expect(result).to include("1.0.0")
+        expect(result).to include("1.1.0")
+        expect(result).to include("1.2.0")
       end
     end
 
@@ -90,11 +90,11 @@ describe Ridley::CookbookResource do
       end
 
       it "returns a CookbookObject" do
-        subject.satisfy(name, ">= 2.0.0").should be_a(Ridley::CookbookObject)
+        expect(subject.satisfy(name, ">= 2.0.0")).to be_a(Ridley::CookbookObject)
       end
 
       it "is the best solution" do
-        subject.satisfy(name, ">= 2.0.0").version.should eql("3.0.0")
+        expect(subject.satisfy(name, ">= 2.0.0").version).to eql("3.0.0")
       end
     end
 
@@ -102,7 +102,7 @@ describe Ridley::CookbookResource do
       before { chef_cookbook(name, "1.0.0") }
 
       it "returns nil" do
-        subject.satisfy(name, ">= 2.0.0").should be_nil
+        expect(subject.satisfy(name, ">= 2.0.0")).to be_nil
       end
     end
 
@@ -148,6 +148,6 @@ describe Ridley::CookbookResource do
   end
 
   describe "#update" do
-    pending
+    skip
   end
 end

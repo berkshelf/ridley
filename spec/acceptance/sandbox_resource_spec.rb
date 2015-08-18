@@ -15,15 +15,15 @@ describe "Sandbox API operations", type: "acceptance" do
 
   describe "creating a new sandbox" do
     it "returns an instance of Ridley::SandboxObject" do
-      connection.sandbox.create(checksums).should be_a(Ridley::SandboxObject)
+      expect(connection.sandbox.create(checksums)).to be_a(Ridley::SandboxObject)
     end
 
     it "contains a value for sandbox_id" do
-      connection.sandbox.create(checksums).sandbox_id.should_not be_nil
+      expect(connection.sandbox.create(checksums).sandbox_id).not_to be_nil
     end
 
     it "returns an instance with the same amount of checksums given to create" do
-      connection.sandbox.create(checksums).checksums.should have(2).items
+      expect(connection.sandbox.create(checksums).checksums.size).to eq(2)
     end
   end
 end

@@ -24,15 +24,15 @@ describe Ridley::SandboxObject do
     )
   end
 
-  before { subject.stub(resource: resource) }
+  before { allow(subject).to receive_messages(resource: resource) }
 
   describe "#checksums" do
-    pending
+    skip
   end
 
   describe "#commit" do
     let(:response) { { is_completed: nil} }
-    before { resource.should_receive(:commit).with(subject).and_return(response) }
+    before { expect(resource).to receive(:commit).with(subject).and_return(response) }
 
     context "when the commit is successful" do
       before { response[:is_completed] = true }
@@ -40,7 +40,7 @@ describe Ridley::SandboxObject do
       it "has an 'is_completed' value of true" do
         subject.commit
 
-        subject.is_completed.should be_true
+        expect(subject.is_completed).to be_truthy
       end
     end
 
@@ -50,7 +50,7 @@ describe Ridley::SandboxObject do
       it "has an 'is_completed' value of false" do
         subject.commit
 
-        subject.is_completed.should be_false
+        expect(subject.is_completed).to be_falsey
       end
     end
   end
@@ -58,7 +58,7 @@ describe Ridley::SandboxObject do
   describe "#upload" do
     it "delegates to resource#upload" do
       checksums = double('checksums')
-      resource.should_receive(:upload).with(subject, checksums)
+      expect(resource).to receive(:upload).with(subject, checksums)
 
       subject.upload(checksums)
     end

@@ -58,10 +58,10 @@ describe Ridley::NodeObject do
     it "sets a normal node attribute at the nested path" do
        subject.set_chef_attribute('deep.nested.item', true)
 
-       subject.normal.should have_key("deep")
-       subject.normal["deep"].should have_key("nested")
-       subject.normal["deep"]["nested"].should have_key("item")
-       subject.normal["deep"]["nested"]["item"].should be_true
+       expect(subject.normal).to have_key("deep")
+       expect(subject.normal["deep"]).to have_key("nested")
+       expect(subject.normal["deep"]["nested"]).to have_key("item")
+       expect(subject.normal["deep"]["nested"]["item"]).to be_truthy
     end
 
     context "when the normal attribute is already set" do
@@ -75,7 +75,7 @@ describe Ridley::NodeObject do
         }
         subject.set_chef_attribute('deep.nested.item', true)
 
-        subject.normal["deep"]["nested"]["item"].should be_true
+        expect(subject.normal["deep"]["nested"]["item"]).to be_truthy
       end
     end
   end
@@ -123,13 +123,13 @@ describe Ridley::NodeObject do
         "cloud" => Hash.new
       }
 
-      subject.cloud?.should be_true
+      expect(subject.cloud?).to be_truthy
     end
 
     it "returns false if the cloud automatic attribute is not set" do
       subject.automatic.delete(:cloud)
 
-      subject.cloud?.should be_false
+      expect(subject.cloud?).to be_falsey
     end
   end
 
@@ -141,13 +141,13 @@ describe Ridley::NodeObject do
         }
       }
 
-      subject.eucalyptus?.should be_true
+      expect(subject.eucalyptus?).to be_truthy
     end
 
     it "returns false if the node is not a cloud node" do
       subject.automatic.delete(:cloud)
 
-      subject.eucalyptus?.should be_false
+      expect(subject.eucalyptus?).to be_falsey
     end
 
     it "returns false if the node is a cloud node but not using the eucalyptus provider" do
@@ -157,7 +157,7 @@ describe Ridley::NodeObject do
         }
       }
 
-      subject.eucalyptus?.should be_false
+      expect(subject.eucalyptus?).to be_falsey
     end
   end
 
@@ -169,13 +169,13 @@ describe Ridley::NodeObject do
         }
       }
 
-      subject.ec2?.should be_true
+      expect(subject.ec2?).to be_truthy
     end
 
     it "returns false if the node is not a cloud node" do
       subject.automatic.delete(:cloud)
 
-      subject.ec2?.should be_false
+      expect(subject.ec2?).to be_falsey
     end
 
     it "returns false if the node is a cloud node but not using the ec2 provider" do
@@ -185,7 +185,7 @@ describe Ridley::NodeObject do
         }
       }
 
-      subject.ec2?.should be_false
+      expect(subject.ec2?).to be_falsey
     end
   end
 
@@ -197,13 +197,13 @@ describe Ridley::NodeObject do
         }
       }
 
-      subject.rackspace?.should be_true
+      expect(subject.rackspace?).to be_truthy
     end
 
     it "returns false if the node is not a cloud node" do
       subject.automatic.delete(:cloud)
 
-      subject.rackspace?.should be_false
+      expect(subject.rackspace?).to be_falsey
     end
 
     it "returns false if the node is a cloud node but not using the rackspace provider" do
@@ -213,7 +213,7 @@ describe Ridley::NodeObject do
         }
       }
 
-      subject.rackspace?.should be_false
+      expect(subject.rackspace?).to be_falsey
     end
   end
 
@@ -225,13 +225,13 @@ describe Ridley::NodeObject do
         }
       }
 
-      subject.cloud_provider.should eql("ec2")
+      expect(subject.cloud_provider).to eql("ec2")
     end
 
     it "returns nil if the node is not a cloud node" do
       subject.automatic.delete(:cloud)
 
-      subject.cloud_provider.should be_nil
+      expect(subject.cloud_provider).to be_nil
     end
   end
 
@@ -244,7 +244,7 @@ describe Ridley::NodeObject do
         }
       }
 
-      subject.public_ipv4.should eql("10.0.0.1")
+      expect(subject.public_ipv4).to eql("10.0.0.1")
     end
 
     it "returns the ipaddress if the node is not a cloud node" do
@@ -253,7 +253,7 @@ describe Ridley::NodeObject do
       }
       subject.automatic.delete(:cloud)
 
-      subject.public_ipv4.should eql("192.168.1.1")
+      expect(subject.public_ipv4).to eql("192.168.1.1")
     end
   end
 
@@ -265,7 +265,7 @@ describe Ridley::NodeObject do
         }
       }
 
-      subject.public_hostname.should eql("reset.cloud.riotgames.com")
+      expect(subject.public_hostname).to eql("reset.cloud.riotgames.com")
     end
 
     it "returns the FQDN if the node is not a cloud node" do
@@ -274,7 +274,7 @@ describe Ridley::NodeObject do
       }
       subject.automatic.delete(:cloud)
 
-      subject.public_hostname.should eql("reset.internal.riotgames.com")
+      expect(subject.public_hostname).to eql("reset.internal.riotgames.com")
     end
   end
 
@@ -284,14 +284,14 @@ describe Ridley::NodeObject do
     it "appends items to the run_list" do
       subject.merge_data(run_list: ["cook::one", "cook::two"])
 
-      subject.run_list.should =~ ["cook::one", "cook::two"]
+      expect(subject.run_list).to match_array(["cook::one", "cook::two"])
     end
 
     it "ensures the run_list is unique if identical items are given" do
       subject.run_list = [ "cook::one" ]
       subject.merge_data(run_list: ["cook::one", "cook::two"])
 
-      subject.run_list.should =~ ["cook::one", "cook::two"]
+      expect(subject.run_list).to match_array(["cook::one", "cook::two"])
     end
 
     it "deep merges attributes into the normal attributes" do
@@ -310,10 +310,10 @@ describe Ridley::NodeObject do
         }
       })
 
-      subject.normal[:one][:two].should have_key(:four)
-      subject.normal[:one][:two][:four].should eql(:deep)
-      subject.normal[:one][:two].should have_key(:three)
-      subject.normal[:one][:two][:three].should eql(:deep)
+      expect(subject.normal[:one][:two]).to have_key(:four)
+      expect(subject.normal[:one][:two][:four]).to eql(:deep)
+      expect(subject.normal[:one][:two]).to have_key(:three)
+      expect(subject.normal[:one][:two][:three]).to eql(:deep)
     end
   end
 end
