@@ -1,8 +1,8 @@
 # Ridley
 [![Gem Version](https://badge.fury.io/rb/ridley.png)](http://badge.fury.io/rb/ridley)
-[![Build Status](https://secure.travis-ci.org/RiotGames/ridley.png?branch=master)](http://travis-ci.org/RiotGames/ridley)
-[![Dependency Status](https://gemnasium.com/RiotGames/ridley.png?travis)](https://gemnasium.com/RiotGames/ridley)
-[![Code Climate](https://codeclimate.com/github/RiotGames/ridley.png)](https://codeclimate.com/github/RiotGames/ridley)
+[![Build Status](https://secure.travis-ci.org/reset/ridley.png?branch=master)](http://travis-ci.org/reset/ridley)
+[![Dependency Status](https://gemnasium.com/reset/ridley.png?travis)](https://gemnasium.com/reset/ridley)
+[![Code Climate](https://codeclimate.com/github/reset/ridley.png)](https://codeclimate.com/github/reset/ridley)
 
 A reliable Chef API client with a clean syntax
 
@@ -430,4 +430,4 @@ Authors and Contributors
 - Jamie Winsor (<jamie@vialstudios.com>)
 - Kyle Allan (<kallan@riotgames.com>)
 
-Thank you to all of our [Contributors](https://github.com/RiotGames/ridley/graphs/contributors), testers, and users.
+Thank you to all of our [Contributors](https://github.com/reset/ridley/graphs/contributors), testers, and users.
