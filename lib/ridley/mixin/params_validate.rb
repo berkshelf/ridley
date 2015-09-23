@@ -1,3 +1,5 @@
+require 'ridley/errors'
+
 module Ridley::Mixin
   # Borrowed and modified from: {https://raw.github.com/opscode/chef/11.4.0/lib/chef/mixin/params_validate.rb}
   #
@@ -15,6 +17,8 @@ module Ridley::Mixin
   # See the License for the specific language governing permissions and
   # limitations under the License.
   module ParamsValidate
+    include Ridley::Errors
+
     # Takes a hash of options, along with a map to validate them.  Returns the original
     # options hash, plus any changes that might have been made (through things like setting
     # default values in the validation map)

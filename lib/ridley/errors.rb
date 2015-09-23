@@ -10,6 +10,7 @@ module Ridley
 
     class ResourceNotFound < RidleyError; end
     class ValidatorNotFound < RidleyError; end
+    class ValidationFailed < RidleyError; end
 
     class InvalidResource < RidleyError
       attr_reader :errors
