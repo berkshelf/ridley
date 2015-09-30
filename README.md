@@ -338,7 +338,7 @@ ridley.data_bag.create(name: "ridley-test")
 You can create, delete, update, or retrieve a data bag exactly how you would expect if you read through the
 Manipulating Chef Resources portion of this document.
 
-Unlike a role, node, client, or environment, a data bag is a container for other resources. These other resources are Data Bag Items. Data Bag Items behave slightly different than other resources. Data Bag Items can have an abritrary attribute hash filled with any key values that you would like. The one exception is that every Data Bag Item __requires__ an 'id' key and value. This identifier is the name of the Data Bag Item.
+Unlike a role, node, client, or environment, a data bag is a container for other resources. These other resources are Data Bag Items. Data Bag Items behave slightly different than other resources. Data Bag Items can have an arbitrary attribute hash filled with any key values that you would like. The one exception is that every Data Bag Item __requires__ an 'id' key and value. This identifier is the name of the Data Bag Item.
 
 ### Creating a Data Bag Item
 
