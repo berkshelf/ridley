@@ -1,3 +1,7 @@
+# 4.2.1
+
+* Loosen constraint on Hashie to allow for both the 2.x and 3.x line
+
 # 4.2.0
 
 * Enhancements
