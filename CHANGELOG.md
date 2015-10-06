@@ -1,6 +1,10 @@
-# 4.2.1
+# 4.3.0
 
-* Loosen constraint on Hashie to allow for both the 2.x and 3.x line
+* Enhancements
+  * Switch internal HTTP client from `net_http_persistent` to `httpclient`
+  * Loosen constraint on Hashie to allow for both the 2.x and 3.x line
+* Bug Fixes
+  * Fix missiong constant ValidationFailed when performing a params validation
 
 # 4.2.0
 
