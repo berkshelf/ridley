@@ -1,3 +1,7 @@
+# 4.3.1
+
+* Tighten constraint on varia_model to `~> 0.4.0`
+
 # 4.3.0
 
 * Enhancements
