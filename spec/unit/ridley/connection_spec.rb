@@ -17,7 +17,7 @@ describe Ridley::Connection do
     it "attempts five (5) retries by default" do
       expect {
         subject.get('organizations/vialstudios')
-      }.to raise_error
+      }.to raise_error(Ridley::Errors::HTTPInternalServerError)
       expect(a_request(:get, "https://api.opscode.com/organizations/vialstudios")).to have_been_made.times(6)
     end
 
@@ -29,7 +29,7 @@ describe Ridley::Connection do
       it "attempts two (2) retries" do
         expect {
           subject.get('organizations/vialstudios')
-        }.to raise_error
+        }.to raise_error(Ridley::Errors::HTTPInternalServerError)
 
         expect(a_request(:get, "https://api.opscode.com/organizations/vialstudios")).to have_been_made.times(3)
       end
