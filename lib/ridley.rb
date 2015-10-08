@@ -7,6 +7,8 @@ require 'hashie'
 require 'json'
 require 'pathname'
 require 'semverse'
+require 'httpclient'
+require 'ridley/httpclient_ext'
 
 JSON.create_id = nil
 
