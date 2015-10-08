@@ -1,3 +1,8 @@
+# 4.3.2
+
+* Bug Fixes
+  * Supress warning output re: cookbook domain from httpclient
+
 # 4.3.1
 
 * Tighten constraint on varia_model to `~> 0.4.0`
