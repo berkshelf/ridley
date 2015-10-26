@@ -255,8 +255,8 @@ module Ridley::Chef
       def load_files
         load_shallow(:recipes, 'recipes', '*.rb')
         load_shallow(:definitions, 'definitions', '*.rb')
-        load_shallow(:libraries, 'libraries', '*.rb')
         load_shallow(:attributes, 'attributes', '*.rb')
+        load_recursively(:libraries, 'libraries', '*.rb')
         load_recursively(:files, "files", "*")
         load_recursively(:templates, "templates", "*")
         load_recursively(:resources, "resources", "*.rb")
