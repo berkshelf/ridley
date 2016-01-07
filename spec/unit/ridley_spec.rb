@@ -25,6 +25,7 @@ describe Ridley do
           chef_server_url          "https://api.opscode.com"
           cache_options(:path => "~/.chef/checksums")
           syntax_check_cache_path  "/foo/bar"
+          ssl_verify_mode          :verify_none
         )
       end
 
@@ -45,6 +46,7 @@ describe Ridley do
           server_url: 'https://api.opscode.com',
           syntax_check_cache_path: "/foo/bar",
           cache_options: { path: "~/.chef/checksums" },
+          ssl: {verify: false},
         )).and_return(nil)
 
         subject.from_chef_config(path)
@@ -59,6 +61,7 @@ describe Ridley do
           server_url: 'https://api.opscode.com',
           syntax_check_cache_path: "/foo/bar",
           cache_options: { path: "~/.chef/checksums" },
+          ssl: {verify: false},
         ))
 
         subject.from_chef_config(path, client_key: 'bacon.pem', client_name: 'bacon')
