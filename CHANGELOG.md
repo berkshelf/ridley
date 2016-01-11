@@ -1,3 +1,8 @@
+# 4.4.0
+
+* Enhancements
+  * Use chef-config gem for Chef configuration, including proxy improvements
+
 # 4.3.2
 
 * Bug Fixes
