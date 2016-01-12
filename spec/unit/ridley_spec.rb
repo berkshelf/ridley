@@ -37,29 +37,43 @@ describe Ridley do
       end
 
       it "creates a Ridley connection from the Chef config" do
-        expect(Ridley::Client).to receive(:new).with(hash_including(
+        expect(Ridley::Client).to receive(:new).with({
           client_key: 'username.pem',
           client_name: 'username',
           validator_client: 'validator',
           validator_path: 'validator.pem',
           server_url: 'https://api.opscode.com',
+
+          cookbook_copyright: 'YOUR_NAME',
+          cookbook_email: 'YOUR_EMAIL',
+          cookbook_license: 'reserved',
+
+          knife: {},
+
           syntax_check_cache_path: "/foo/bar",
           cache_options: { path: "~/.chef/checksums" },
-        )).and_return(nil)
+        }).and_return(nil)
 
         subject.from_chef_config(path)
       end
 
       it "allows the user to override attributes" do
-        expect(Ridley::Client).to receive(:new).with(hash_including(
+        expect(Ridley::Client).to receive(:new).with({
           client_key: 'bacon.pem',
           client_name: 'bacon',
           validator_client: 'validator',
           validator_path: 'validator.pem',
           server_url: 'https://api.opscode.com',
+
+          cookbook_copyright: 'YOUR_NAME',
+          cookbook_email: 'YOUR_EMAIL',
+          cookbook_license: 'reserved',
+
+          knife: {},
+
           syntax_check_cache_path: "/foo/bar",
           cache_options: { path: "~/.chef/checksums" },
-        ))
+        })
 
         subject.from_chef_config(path, client_key: 'bacon.pem', client_name: 'bacon')
       end
@@ -74,15 +88,22 @@ describe Ridley do
         end
 
         it "does a knife.rb search" do
-          expect(Ridley::Client).to receive(:new).with(hash_including(
+          expect(Ridley::Client).to receive(:new).with({
             client_key: 'username.pem',
             client_name: 'username',
             validator_client: 'validator',
             validator_path: 'validator.pem',
             server_url: 'https://api.opscode.com',
+
+            cookbook_copyright: 'YOUR_NAME',
+            cookbook_email: 'YOUR_EMAIL',
+            cookbook_license: 'reserved',
+
+            knife: {},
+
             syntax_check_cache_path: "/foo/bar",
             cache_options: { path: "~/.chef/checksums" },
-          )).and_return(nil)
+          }).and_return(nil)
 
           Dir.chdir(tmp_path) do
             ENV['PWD'] = Dir.pwd
