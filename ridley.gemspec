@@ -25,6 +25,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'buff-shell_out',          '~> 0.1'
   s.add_dependency 'celluloid',               '~> 0.16.0'
   s.add_dependency 'celluloid-io',            '~> 0.16.1'
+  s.add_dependency 'chef-config'
   s.add_dependency 'erubis'
   s.add_dependency 'faraday',                 '~> 0.9.0'
   s.add_dependency 'hashie',                  '>= 2.0.2', '< 4.0.0'

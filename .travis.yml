@@ -27,10 +27,10 @@ rvm:
   - 1.9
   - 2.0
   - 2.1
-  - jruby-19mode
+#  - jruby-19mode
 matrix:
-  allow_failures:
-    - rvm: jruby-19mode
+  # allow_failures:
+  #   - rvm: jruby-19mode
   include:
     # Test against master of berkshelf
     - rvm: 2.2
