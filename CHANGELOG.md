@@ -1,3 +1,7 @@
+# 4.4.2
+
+* Bring back 4.4.0 with backcompat fixes!
+
 # 4.4.1
 
 * Revert 4.4.0 while we figure out a regression
