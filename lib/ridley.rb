@@ -45,6 +45,9 @@ module Ridley
       config[:validator_path]   = config.delete(:validation_key)
       config[:client_name]      = config.delete(:node_name)
       config[:server_url]       = config.delete(:chef_server_url)
+      if config[:ssl_verify_mode] == :verify_none
+        config[:ssl] = {verify: false}
+      end
 
       Client.new(config.merge(options))
     end
