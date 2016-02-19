@@ -431,3 +431,4 @@ Authors and Contributors
 - Kyle Allan (<kallan@riotgames.com>)
 
 Thank you to all of our [Contributors](https://github.com/reset/ridley/graphs/contributors), testers, and users.
+
