@@ -1,3 +1,6 @@
+# 4.4.3
+* updating httpclient version dep to ~> 2.7
+
 # 4.4.2
 
 * Bring back 4.4.0 with backcompat fixes!
