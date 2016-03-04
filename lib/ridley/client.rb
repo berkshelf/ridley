@@ -248,6 +248,12 @@ module Ridley
       @resources_registry[:search_resource].partial(index, query, Array(attributes), @resources_registry, options)
     end
 
+    def universe
+      connection.send(:get, "universe").body
+    rescue Errors::HTTPError, Errors::ClientError => ex
+      abort(ex)
+    end
+
     # The encrypted data bag secret for this connection.
     #
     # @raise [Ridley::Errors::EncryptedDataBagSecretNotFound]

@@ -1,3 +1,7 @@
+# 4.5.0
+* Enhancements
+  * Add support for chef server universe endpoint
+
 # 4.4.3
 * updating httpclient version dep to ~> 2.7
 
