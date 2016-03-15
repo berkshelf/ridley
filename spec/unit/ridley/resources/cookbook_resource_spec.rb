@@ -131,7 +131,7 @@ describe Ridley::CookbookResource do
       # non-ignored files are the ONLY thing uploaded
       sandbox_resource.should_receive(:create).with([
         "211a3a8798d4acd424af15ff8a2e28a5",
-        "64ac6346672c6bea4ade983e3d58cd14",
+        "5f025b0817442ec087c4e0172a6d1e67",
         "75077ba33d2887cc1746d1ef716bf8b7",
         "7b1ebd2ff580ca9dc46fb27ec1653bf2",
         "84e12365e6f4ebe7db6a0e6a92473b16",

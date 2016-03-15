@@ -49,6 +49,10 @@ module Ridley::Chef
       VERSION          = 'version'.freeze
       SOURCE_URL       = 'source_url'.freeze
       ISSUES_URL       = 'issues_url'.freeze
+      PRIVACY          = "privacy".freeze
+      CHEF_VERSIONS    = "chef_versions".freeze
+      OHAI_VERSIONS    = "ohai_versions".freeze
+      GEMS             = "gems".freeze
 
       COMPILED_FILE_NAME = "metadata.json".freeze
       RAW_FILE_NAME      = "metadata.rb".freeze
@@ -58,8 +62,8 @@ module Ridley::Chef
         :maintainer_email, :license, :platforms, :dependencies,
         :recommendations, :suggestions, :conflicting, :providing,
         :replacing, :attributes, :groupings, :recipes, :version,
-        :source_url, :issues_url
-      ]
+        :source_url, :issues_url, :privacy, :chef_versions, :ohai_versions,
+        :gems ]
 
       include Ridley::Mixin::ParamsValidate
       include Ridley::Mixin::FromFile
@@ -76,6 +80,13 @@ module Ridley::Chef
       attr_reader :groupings
       attr_reader :recipes
       attr_reader :version
+
+      # @return [Array<Gem::Dependency>] Array of supported Chef versions
+      attr_reader :chef_versions
+      # @return [Array<Gem::Dependency>] Array of supported Ohai versions
+      attr_reader :ohai_versions
+      # @return [Array<Array>] Array of gems to install with *args as an Array
+      attr_reader :gems
 
       # Builds a new Chef::Cookbook::Metadata object.
       #
@@ -108,6 +119,10 @@ module Ridley::Chef
         @version         = Semverse::Version.new("0.0.0")
         @source_url      = ''
         @issues_url      = ''
+        @privacy = false
+        @chef_versions = []
+        @ohai_versions = []
+        @gems = []
 
         if cookbook
           @recipes = cookbook.fully_qualified_recipe_names.inject({}) do |r, e|
@@ -123,6 +138,12 @@ module Ridley::Chef
         COMPARISON_FIELDS.inject(true) do |equal_so_far, field|
           equal_so_far && other.respond_to?(field) && (other.send(field) == send(field))
         end
+      end
+
+      # Ensure that we don't have to update Ridley every time we add
+      # a new metadata field to Chef
+      def method_missing(method_sym, *args)
+        Ridley::Logging.logger.warn "Ignoring unknown metadata"
       end
 
       # Sets the cookbooks maintainer, or returns it.
@@ -346,6 +367,39 @@ module Ridley::Chef
         @replacing[cookbook]
       end
 
+      # Metadata DSL to set a valid chef_version.  May be declared multiple times
+      # with the result being 'OR'd such that if any statements match, the version
+      # is considered supported.  Uses Gem::Requirement for its implementation.
+      #
+      # @param version_args [Array<String>] Version constraint in String form
+      # @return [Array<Gem::Dependency>] Current chef_versions array
+      def chef_version(*version_args)
+        @chef_versions << Gem::Dependency.new("chef", *version_args) unless version_args.empty?
+        @chef_versions
+      end
+
+      # Metadata DSL to set a valid ohai_version.  May be declared multiple times
+      # with the result being 'OR'd such that if any statements match, the version
+      # is considered supported.  Uses Gem::Requirement for its implementation.
+      #
+      # @param version_args [Array<String>] Version constraint in String form
+      # @return [Array<Gem::Dependency>] Current ohai_versions array
+      def ohai_version(*version_args)
+        @ohai_versions << Gem::Dependency.new("ohai", *version_args) unless version_args.empty?
+        @ohai_versions
+      end
+
+      # Metadata DSL to set a gem to install from the cookbook metadata.  May be declared
+      # multiple times.  All the gems from all the cookbooks are combined into one Gemfile
+      # and depsolved together.  Uses Bundler's DSL for its implementation.
+      #
+      # @param args [Array<String>] Gem name and options to pass to Bundler's DSL
+      # @return [Array<Array>] Array of gem statements as args
+      def gem(*args)
+        @gems << args unless args.empty?
+        @gems
+      end
+
       # Adds a description for a recipe.
       #
       # === Parameters
@@ -390,7 +444,8 @@ module Ridley::Chef
             :recipes => { :kind_of => [ Array ], :default => [] },
             :default => { :kind_of => [ String, Array, Hash, Symbol, Numeric, TrueClass, FalseClass ] },
             :source_url => { :kind_of => String },
-            :issues_url => { :kind_of => String }
+            :issues_url => { :kind_of => String },
+            :privacy => { :kind_of => [ TrueClass, FalseClass ] },
           }
         )
         options[:required] = remap_required_attribute(options[:required]) unless options[:required].nil?
@@ -414,6 +469,40 @@ module Ridley::Chef
         @groupings[name]
       end
 
+      # Convert an Array of Gem::Dependency objects (chef_version/ohai_version) to an Array.
+      #
+      # Gem::Dependencey#to_s is not useful, and there is no #to_json defined on it or its component
+      # objets, so we have to write our own rendering method.
+      #
+      # [ Gem::Dependency.new(">= 12.5"), Gem::Dependency.new(">= 11.18.0", "< 12.0") ]
+      #
+      # results in:
+      #
+      # [ [ ">= 12.5" ], [ ">= 11.18.0", "< 12.0" ] ]
+      #
+      # @param deps [Array<Gem::Dependency>] Multiple Gem-style version constraints
+      # @return [Array<Array<String>]] Simple object representation of version constraints (for json)
+      def gem_requirements_to_array(*deps)
+        deps.map do |dep|
+          dep.requirement.requirements.map do |op, version|
+            "#{op} #{version}"
+          end.sort
+        end
+      end
+
+      # Convert an Array of Gem::Dependency objects (chef_version/ohai_version) to a hash.
+      #
+      # This is the inverse of #gem_requirements_to_array
+      #
+      # @param what [String] What version constraint we are constructing ('chef' or 'ohai' presently)
+      # @param array [Array<Array<String>]] Simple object representation of version constraints (from json)
+      # @return [Array<Gem::Dependency>] Multiple Gem-style version constraints
+      def gem_requirements_from_array(what, array)
+        array.map do |dep|
+          Gem::Dependency.new(what, *dep)
+        end
+      end
+
       def to_hash
         {
           NAME             => self.name,
@@ -434,7 +523,11 @@ module Ridley::Chef
           RECIPES          => self.recipes,
           VERSION          => self.version,
           SOURCE_URL       => self.source_url,
-          ISSUES_URL       => self.issues_url
+          ISSUES_URL       => self.issues_url,
+          PRIVACY          => self.privacy,
+          CHEF_VERSIONS    => gem_requirements_to_array(*self.chef_versions),
+          OHAI_VERSIONS    => gem_requirements_to_array(*self.ohai_versions),
+          GEMS             => self.gems,
         }
       end
 
@@ -466,6 +559,10 @@ module Ridley::Chef
         @version          = o[VERSION] if o.has_key?(VERSION)
         @source_url       = o[SOURCE_URL] if o.has_key?(SOURCE_URL)
         @issues_url       = o[ISSUES_URL] if o.has_key?(ISSUES_URL)
+        @privacy          = o[PRIVACY] if o.has_key?(PRIVACY)
+        @chef_versions    = gem_requirements_from_array("chef", o[CHEF_VERSIONS]) if o.has_key?(CHEF_VERSIONS)
+        @ohai_versions    = gem_requirements_from_array("ohai", o[OHAI_VERSIONS]) if o.has_key?(OHAI_VERSIONS)
+        @gems             = o[GEMS] if o.has_key?(GEMS)
         self
       end
 
@@ -500,6 +597,23 @@ module Ridley::Chef
           :issues_url,
           arg,
           :kind_of => [ String ]
+        )
+      end
+
+      #
+      # Sets the cookbook's privacy flag, or returns it.
+      #
+      # === Parameters
+      # privacy<TrueClass,FalseClass>:: Whether this cookbook is private or not
+      #
+      # === Returns
+      # privacy<TrueClass,FalseClass>:: Whether this cookbook is private or not
+      #
+      def privacy(arg = nil)
+        set_or_return(
+          :privacy,
+          arg,
+          :kind_of => [ TrueClass, FalseClass ],
         )
       end
 
