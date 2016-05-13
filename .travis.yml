@@ -15,7 +15,7 @@ cache:
   - apt
   - bundler
 dist: precise
-
+bundler_args: --without development
 script: "bundle exec thor spec:$TEST_SUITE"
 before_install:
   - gem update --system
