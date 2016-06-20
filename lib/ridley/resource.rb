@@ -64,7 +64,7 @@ module Ridley
     # @return [Array<Object>]
     def all
       request(:get, self.class.resource_path).collect do |identity, location|
-        new(self.class.representation.chef_id => identity)
+        new(self.class.representation.chef_id.to_s => identity)
       end
     end
 
