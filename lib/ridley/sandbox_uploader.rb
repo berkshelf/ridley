@@ -74,7 +74,7 @@ module Ridley
         'Content-Type' => 'application/x-binary',
         'content-md5' => calculated_checksum
       }
-
+      
       url         = URI(checksum[:url])
       upload_path = url.path
       url.path    = ""
@@ -92,7 +92,7 @@ module Ridley
           c.response :chef_response
           c.response :follow_redirects
           c.request :chef_auth, self.client_name, self.client_key
-          c.adapter :net_http
+          c.adapter :httpclient
         end.put(upload_path, io.read, headers)
       rescue Ridley::Errors::HTTPError => ex
         abort(ex)
