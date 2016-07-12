@@ -9,6 +9,27 @@ describe Ridley::Connection do
     described_class.new(server_url, client_name, client_key)
   end
 
+  context " when proxy environment variables are set" do
+    subject do
+      described_class.new('http://0.0.0.0:8889', client_name, client_key)
+    end
+
+    it "fails with http_proxy set without no_proxy" do
+      stub_const('ENV', ENV.to_hash.merge(
+        'http_proxy' => 'http://i.am.an.http.proxy')
+      )
+      expect { subject.get('/nodes') }.to raise_error(SocketError)
+    end
+
+    it "works with http_proxy and no_proxy set" do
+      stub_const('ENV', ENV.to_hash.merge(
+        'http_proxy' => 'http://i.am.an.http.proxy',
+        'no_proxy' => '0.0.0.0:8889')
+      )
+      expect(subject.get('/nodes').status).to eq(200)
+    end
+  end
+
   describe "configurable retries" do
     before(:each) do
       stub_request(:get, "https://api.opscode.com/organizations/vialstudios").to_return(status: 500, body: "")
