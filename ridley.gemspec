@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.email         = ["jamie@vialstudios.com", "kallan@riotgames.com"]
   s.description   = %q{A reliable Chef API client with a clean syntax}
   s.summary       = s.description
-  s.homepage      = "https://github.com/RiotGames/ridley"
+  s.homepage      = "https://github.com/berkshelf/ridley"
   s.license       = "Apache 2.0"
 
   s.files         = `git ls-files`.split($\)
