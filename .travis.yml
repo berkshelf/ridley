@@ -28,6 +28,8 @@ rvm:
   - 2.2.5
   - 2.3.1
 matrix:
+  allow_failures:
+    - 2.3.1
   include:
     # Test against master of berkshelf
     - rvm: 2.2.5
