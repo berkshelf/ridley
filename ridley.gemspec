@@ -15,13 +15,13 @@ Gem::Specification.new do |s|
   s.name          = "ridley"
   s.require_paths = ["lib"]
   s.version       = Ridley::VERSION
-  s.required_ruby_version = ">= 1.9.1"
+  s.required_ruby_version = ">= 2.1"
 
   s.add_dependency 'addressable'
   s.add_dependency 'varia_model',             '~> 0.4.0'
   s.add_dependency 'buff-config',             '~> 1.0'
   s.add_dependency 'buff-extensions',         '~> 1.0'
-  s.add_dependency 'buff-ignore',             '~> 1.1.1'
+  s.add_dependency 'buff-ignore',             '~> 1.2'
   s.add_dependency 'buff-shell_out',          '~> 0.1'
   s.add_dependency 'celluloid',               '~> 0.16.0'
   s.add_dependency 'celluloid-io',            '~> 0.16.1'

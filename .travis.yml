@@ -24,16 +24,16 @@ env:
   - TEST_SUITE=unit
   - TEST_SUITE=acceptance
 rvm:
-  - 1.9
-  - 2.0
-  - 2.1
-#  - jruby-19mode
+  - 2.1.9
+  - 2.2.5
+  - 2.3.1
+
 matrix:
-  # allow_failures:
-  #   - rvm: jruby-19mode
+  allow_failures:
+    - rvm: 2.3.1
   include:
     # Test against master of berkshelf
-    - rvm: 2.2
+    - rvm: 2.2.5
       gemfile: berkshelf/Gemfile
       before_install:
         - gem update --system
