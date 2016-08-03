@@ -1,8 +1,8 @@
 # Ridley
-[![Gem Version](https://badge.fury.io/rb/ridley.png)](http://badge.fury.io/rb/ridley)
-[![Build Status](https://secure.travis-ci.org/reset/ridley.png?branch=master)](http://travis-ci.org/reset/ridley)
-[![Dependency Status](https://gemnasium.com/reset/ridley.png?travis)](https://gemnasium.com/reset/ridley)
-[![Code Climate](https://codeclimate.com/github/reset/ridley.png)](https://codeclimate.com/github/reset/ridley)
+[![Gem Version](https://badge.fury.io/rb/ridley.svg)](http://badge.fury.io/rb/ridley)
+[![Build Status](https://secure.travis-ci.org/berkshelf/ridley.svg?branch=master)](http://travis-ci.org/berkshelf/ridley)
+[![Dependency Status](https://gemnasium.com/berkshelf/ridley.svg?travis)](https://gemnasium.com/berkshelf/ridley)
+[![Code Climate](https://codeclimate.com/github/berkshelf/ridley.svg)](https://codeclimate.com/github/berkshelf/ridley)
 
 A reliable Chef API client with a clean syntax
 
