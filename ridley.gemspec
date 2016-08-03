@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   s.name          = "ridley"
   s.require_paths = ["lib"]
   s.version       = Ridley::VERSION
-  s.required_ruby_version = ">= 1.9.1"
+  s.required_ruby_version = ">= 2.1"
 
   s.add_dependency 'addressable'
   s.add_dependency 'varia_model',             '~> 0.4.0'
