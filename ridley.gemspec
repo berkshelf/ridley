@@ -33,7 +33,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'json',                    '>= 1.7.7'
   s.add_dependency 'mixlib-authentication',   '>= 1.3.0'
   s.add_dependency 'retryable',               '~> 2.0'
-  s.add_dependency 'semverse',                '~> 1.1'
+  s.add_dependency 'semverse',                '>= 1.1', '< 3'
 
   s.add_development_dependency 'buff-ruby_engine', '~> 0.1'
 end
