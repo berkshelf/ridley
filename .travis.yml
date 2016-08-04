@@ -14,33 +14,29 @@ addons:
 cache:
   - apt
   - bundler
-dist: precise
 bundler_args: --without development
-script: "bundle exec thor spec:$TEST_SUITE"
+dist: precise
+branches:
+  only:
+    - master
+script: "bundle exec thor spec:all"
 before_install:
   - gem update --system
   - gem install bundler
-env:
-  - TEST_SUITE=unit
-  - TEST_SUITE=acceptance
-rvm:
-  - 2.1.9
-  - 2.2.5
-  - 2.3.1
-
 matrix:
-  allow_failures:
-    - rvm: 2.3.1
   include:
-    # Test against master of berkshelf
     - rvm: 2.2.5
-      gemfile: berkshelf/Gemfile
-      before_install:
-        - gem update --system
-        - gem install bundler
-        - git clone --depth 1 https://github.com/berkshelf/berkshelf
-        - cd berkshelf
-        - echo "gem 'ridley', :path => '..'" >> Gemfile
-      install: bundle install --jobs=3 --retry=3 --path=${BUNDLE_PATH:-vendor/bundle}
-      env:
-      script: bundle exec thor spec:ci
+    - rvm: 2.3.1
+    - rvm: ruby-head
+    # Test against master of berkshelf
+#    - rvm: 2.2.5
+#      gemfile: berkshelf/Gemfile
+#      before_install:
+#        - gem update --system
+#        - gem install bundler
+#        - git clone --depth 1 https://github.com/berkshelf/berkshelf
+#        - cd berkshelf
+#        - echo "gem 'ridley', :path => '..'" >> Gemfile
+#      install: bundle install --jobs=3 --retry=3 --path=${BUNDLE_PATH:-vendor/bundle}
+#      env:
+#      script: bundle exec thor spec:ci
