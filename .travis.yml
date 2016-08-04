@@ -19,7 +19,7 @@ dist: precise
 branches:
   only:
     - master
-script: "bundle exec thor spec:ci"
+script: "bundle exec thor spec:all"
 before_install:
   - gem update --system
   - gem install bundler
