@@ -14,8 +14,11 @@ addons:
 cache:
   - apt
   - bundler
-dist: precise
 bundler_args: --without development
+dist: precise
+branches:
+  only:
+    - master
 script: "bundle exec thor spec:$TEST_SUITE"
 before_install:
   - gem update --system
@@ -23,15 +26,11 @@ before_install:
 env:
   - TEST_SUITE=unit
   - TEST_SUITE=acceptance
-rvm:
-  - 2.1.9
-  - 2.2.5
-  - 2.3.1
-
 matrix:
-  allow_failures:
-    - rvm: 2.3.1
   include:
+    - rvm: 2.2.5
+    - rvm: 2.3.1
+    - rvm: ruby-head
     # Test against master of berkshelf
     - rvm: 2.2.5
       gemfile: berkshelf/Gemfile
