@@ -15,11 +15,11 @@ Gem::Specification.new do |s|
   s.name          = "ridley"
   s.require_paths = ["lib"]
   s.version       = Ridley::VERSION
-  s.required_ruby_version = ">= 2.1"
+  s.required_ruby_version = ">= 2.2"
 
   s.add_dependency 'addressable'
-  s.add_dependency 'varia_model',             '~> 0.4'
-  s.add_dependency 'buff-config',             '~> 1.0'
+  s.add_dependency 'varia_model',             '~> 0.6'
+  s.add_dependency 'buff-config',             '~> 2.0'
   s.add_dependency 'buff-extensions',         '~> 2.0'
   s.add_dependency 'buff-ignore',             '~> 1.2'
   s.add_dependency 'buff-shell_out',          '~> 0.1'
@@ -33,7 +33,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'json',                    '>= 1.7.7'
   s.add_dependency 'mixlib-authentication',   '>= 1.3.0'
   s.add_dependency 'retryable',               '~> 2.0'
-  s.add_dependency 'semverse',                '~> 1.1'
+  s.add_dependency 'semverse',                '~> 2.0'
 
   s.add_development_dependency 'buff-ruby_engine', '~> 0.1'
 end
