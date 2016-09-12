@@ -22,7 +22,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'buff-config',             '~> 2.0'
   s.add_dependency 'buff-extensions',         '~> 2.0'
   s.add_dependency 'buff-ignore',             '~> 1.2'
-  s.add_dependency 'buff-shell_out',          '~> 0.1'
+  s.add_dependency 'buff-shell_out',          '~> 1.0'
   s.add_dependency 'celluloid',               '~> 0.16.0'
   s.add_dependency 'celluloid-io',            '~> 0.16.1'
   s.add_dependency 'chef-config',             '>= 12.5.0'
