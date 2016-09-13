@@ -14,7 +14,7 @@ module Ridley
       #
       # @return [Logger]
       def set_logger(obj)
-        @logger = (obj.nil? ? Logger.new('/dev/null') : obj)
+        @logger = (obj.nil? ? Logger.new(File::NULL) : obj)
       end
       alias_method :logger=, :set_logger
     end

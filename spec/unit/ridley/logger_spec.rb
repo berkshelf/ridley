@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Ridley::Logging::Logger do
-  subject { described_class.new("/dev/null") }
+  subject { described_class.new(File::NULL) }
   let(:message) { "my message" }
   let(:filtered_param) { "message" }
 
