@@ -11,7 +11,7 @@ describe Ridley::Connection do
 
   context " when proxy environment variables are set" do
     subject do
-      described_class.new('http://0.0.0.0:8889', client_name, client_key)
+      described_class.new('http://127.0.0.1:8889', client_name, client_key)
     end
 
     it "fails with http_proxy set without no_proxy" do
@@ -24,7 +24,7 @@ describe Ridley::Connection do
     it "works with http_proxy and no_proxy set" do
       stub_const('ENV', ENV.to_hash.merge(
         'http_proxy' => 'http://i.am.an.http.proxy',
-        'no_proxy' => '0.0.0.0:8889')
+        'no_proxy' => '127.0.0.1:8889')
       )
       expect(subject.get('/nodes').status).to eq(200)
     end

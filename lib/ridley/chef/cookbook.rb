@@ -119,7 +119,7 @@ module Ridley::Chef
     #   path to the compiled metadata
     def compile_metadata(out = self.path)
       filepath = File.join(out, Metadata::COMPILED_FILE_NAME)
-      File.open(filepath, "w+") do |f|
+      File.open(filepath, "wb+") do |f|
         f.write(metadata.to_json)
       end
 
