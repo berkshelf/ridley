@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.version       = Ridley::VERSION
   s.required_ruby_version = ">= 1.9.1"
 
-  s.add_dependency 'addressable'
+  s.add_dependency 'addressable',             '~> 2.4.0'
   s.add_dependency 'varia_model',             '~> 0.4.0'
   s.add_dependency 'buff-config',             '~> 1.0'
   s.add_dependency 'buff-extensions',         '~> 1.0'

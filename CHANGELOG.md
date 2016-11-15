@@ -1,5 +1,9 @@
 # Ridley Changelog
 
+## 4.6.2
+
+- Force addressable version to 2.4.0 to keep compatibility with ruby 1.9.1
+
 ## 4.6.1
 
 - Pin to buff-ignore to ensure support for legacy Ruby releases. This will be the last release of Ridley that supports Ruby < 2.1.X. Pin accordingly if you require support for deprecated Ruby releases.
