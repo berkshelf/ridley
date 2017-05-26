@@ -12,4 +12,4 @@ Notice
 This is the HTTP Client API for Berkshelf.  It is supported for that purpose, but for all external purposes its use
 is deprecated.  Chef user's should use the `Chef::ServerAPI` class in the `chef` gem.
 
-
+The old documentation is still available at [README.old.md](README.old.md)
