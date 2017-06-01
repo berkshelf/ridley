@@ -49,6 +49,34 @@ describe Ridley::SandboxUploader do
 
     before { connection.stub(foss?: false) }
 
+    context " when proxy environment variables are set" do
+      let(:checksums) do
+        {
+          chk_id => {
+            url: "http://jsonplaceholder.typicode.com/posts/1",
+            needs_upload: true
+          }
+        }
+      end
+
+      it "fails with http_proxy set without no_proxy" do
+        stub_const('ENV', ENV.to_hash.merge(
+          'http_proxy' => 'http://i.am.an.http.proxy')
+        )
+        WebMock.disable_net_connect!(allow: "jsonplaceholder.typicode.com")
+        expect { subject.upload(sandbox, chk_id, path) }.to raise_error(SocketError)
+      end
+
+      it "works with http_proxy and no_proxy set" do
+        stub_const('ENV', ENV.to_hash.merge(
+          'http_proxy' => 'http://i.am.an.http.proxy',
+          'no_proxy' => 'jsonplaceholder.typicode.com')
+        )
+        WebMock.disable_net_connect!(allow: "jsonplaceholder.typicode.com")
+        expect(subject.upload(sandbox, chk_id, path).status).to eq(200)
+      end
+    end
+
     context "when the checksum needs uploading" do
       let(:checksums) do
         {
