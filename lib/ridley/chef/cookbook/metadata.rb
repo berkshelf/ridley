@@ -245,6 +245,7 @@ module Ridley::Chef
       # === Returns
       # name<String>:: Returns the current cookbook name.
       def name(arg = nil)
+        arg = arg.nil? nil : arg.downcase
         set_or_return(
           :name,
           arg,
