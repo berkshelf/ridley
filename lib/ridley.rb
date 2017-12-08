@@ -13,7 +13,7 @@ require 'ridley/httpclient_ext'
 JSON.create_id = nil
 
 module Ridley
-  CHEF_VERSION = '11.4.0'.freeze
+  CHEF_VERSION = '13.6.4'.freeze
 
   class << self
     extend Forwardable
