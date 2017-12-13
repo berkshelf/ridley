@@ -18,7 +18,7 @@ describe Ridley::Connection do
       stub_const('ENV', ENV.to_hash.merge(
         'http_proxy' => 'http://i.am.an.http.proxy')
       )
-      expect { subject.get('/nodes') }.to raise_error(SocketError)
+      expect { subject.get('/nodes') }.to raise_error(Ridley::Errors::ConnectionFailed)
     end
 
     it "works with http_proxy and no_proxy set" do
