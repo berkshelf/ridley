@@ -1,6 +1,7 @@
 require 'addressable/uri'
 require 'celluloid'
 require 'celluloid/io'
+require 'celluloid/autostart'
 require 'faraday'
 require 'forwardable'
 require 'hashie'
