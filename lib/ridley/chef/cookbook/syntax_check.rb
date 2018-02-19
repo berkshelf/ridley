@@ -1,4 +1,9 @@
 require 'erubis'
+require 'rbconfig'
+
+if (RbConfig::CONFIG['host_os'] =~ /mswin|mingw|cygwin/)
+	require 'win32api'
+end
 
 module Ridley::Chef
   class Cookbook
@@ -205,4 +210,26 @@ module Ridley::Chef
         end
     end
   end
+end
+
+module Shellwords
+	def get_short_win32_filename(long_name)
+		win_func = Win32API.new("kernel32","GetShortPathName","PPL"," L")
+		buf = 0.chr * 256
+		buf[0..long_name.length-1] = long_name
+		win_func.call(long_name, buf, buf.length)
+		return buf.split(0.chr).first
+	end
+	
+	module_function :get_short_win32_filename
+end
+
+class String
+	def shellescape
+		if (RbConfig::CONFIG['host_os'] =~ /mswin|mingw|cygwin/)
+			Shellwords.get_short_win32_filename(self)
+		else
+			Shellwords.escape(self)  
+		end
+	end
 end
